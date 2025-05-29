@@ -1,0 +1,17 @@
+# Instalar las dependencias de Node.js
+npm install // NODE MODULES
+
+# Instalar Tailwind CSS y su integración con Vite
+npm install tailwindcss @tailwindcss/vite // TAILWIND
+
+# Instalar los componentes de Material-UI
+npm install @mui/material @emotion/react @emotion/styled // COMPONENTES MATERIAL
+
+# Instalar Headless UI (aún no utilizado)
+npm install @headlessui/react // AÚN NO UTILIZADO
+
+# Instalar los íconos de Material-UI junto con sus dependencias
+npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // ICONS
+
+# Instalar React Router DOM
+npm install react-router-dom // ROUTER
