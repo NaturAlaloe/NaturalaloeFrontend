@@ -1,4 +1,3 @@
-# .github/workflows/toggle-protection.yml
 name: Toggle branch protection
 
 on:
@@ -11,12 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
     - name: Comprobar si hoy es fecha de bloqueo
       id: datecheck
       run: |
         TODAY=$(date +'%Y-%m-%d')
-        TARGET="2025-06-12"
+        TARGET="2025-06-12"  # Cambiá esta fecha según el bloqueo que necesités
         if [ "$TODAY" = "$TARGET" ]; then
           echo "block=true" >> $GITHUB_OUTPUT
         else
