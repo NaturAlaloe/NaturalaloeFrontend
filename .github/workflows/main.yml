@@ -27,7 +27,7 @@ jobs:
       if: steps.datecheck.outputs.block == 'true'
       uses: actions/github-script@v6
       with:
-        github-token: ${{ secrets.PAT }}
+        github-token: ${{ secrets.MY_PAT }}
         script: |
           const branches = ['main', 'develop'];
           for (const branch of branches) {
@@ -49,7 +49,7 @@ jobs:
       if: steps.datecheck.outputs.block == 'false'
       uses: actions/github-script@v6
       with:
-        github-token: ${{ secrets.PAT }}
+        github-token: ${{ secrets.MY_PAT }}
         script: |
           const branches = ['main', 'develop'];
           for (const branch of branches) {
