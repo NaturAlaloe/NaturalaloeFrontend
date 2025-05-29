@@ -64,7 +64,7 @@ jobs:
               },
               required_pull_request_reviews: null,
               restrictions: {
-                users: ['AdonayXX','EkarCortes'],
+                users: [],
                 teams: []
               }
             });
