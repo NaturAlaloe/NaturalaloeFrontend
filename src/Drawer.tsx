@@ -20,7 +20,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Routes, Route, Link } from 'react-router-dom';
-import HomeScreen from './components/HomeScreen';
+import HomeScreen from './views/home/HomeScreen';
 import Procedimientos from './views/procedures/procedures';
 import ListaProcedimientos from './views/procedures/listProcedures';
 import Capacitaciones from './views/capacitation/capacitacion';
