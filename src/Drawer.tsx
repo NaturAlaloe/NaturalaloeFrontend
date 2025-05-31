@@ -11,26 +11,27 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Collapse from '@mui/material/Collapse';
+import GroupIcon from '@mui/icons-material/Group'; // Para Colaboradores
 import { Routes, Route, Link } from 'react-router-dom';
 import HomeScreen from './views/home/HomeScreen';
 import Procedimientos from './views/procedures/procedures';
 import ListaProcedimientos from './views/procedures/listProcedures';
 import Capacitaciones from './views/capacitation/capacitacion';
 import ListaCapacitaciones from './views/capacitation/listCapacitation';
+import Colaboradores from './views/collaborators/collaborators';
+import { ListItem, ListItemButton, ListItemText } from '@mui/material';
 
-const drawerWidth = 240;
+const drawerWidth = 270;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
-}>(({ theme }) => ({
+}>(({ theme, open }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
   transition: theme.transitions.create('margin', {
@@ -38,18 +39,13 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     duration: theme.transitions.duration.leavingScreen,
   }),
   marginLeft: `-${drawerWidth}px`,
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        transition: theme.transitions.create('margin', {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: 0,
-      },
-    },
-  ],
+  ...(open && {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: 0,
+  }),
 }));
 
 interface AppBarProps extends MuiAppBarProps {
@@ -58,38 +54,40 @@ interface AppBarProps extends MuiAppBarProps {
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({ theme }) => ({
+})<AppBarProps>(({ theme, open }) => ({
   transition: theme.transitions.create(['margin', 'width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create(['margin', 'width'], {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      },
-    },
-  ],
+  ...(open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+  backgroundColor: '#2AAC67',
 }));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
+  justifyContent: 'center',
   ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
 }));
 
+
+const drawerBg = `linear-gradient(to bottom,rgb(23, 134, 75) 0%,rgb(42, 172, 103) 100%)`;
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+
+  // Estados para submenús
+  const [openDashboard, setOpenDashboard] = React.useState(false);
+  const [openProcedimientos, setOpenProcedimientos] = React.useState(false);
+  const [openCapacitaciones, setOpenCapacitaciones] = React.useState(false);
+  const [openColaboradores, setOpenColaboradores] = React.useState(false);
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -97,7 +95,7 @@ export default function PersistentDrawerLeft() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open} sx={{ backgroundColor: '#2AAC67' }} >
+      <AppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -117,76 +115,260 @@ export default function PersistentDrawerLeft() {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
+            background: drawerBg,
+            color: '#f4fcec',
+            border: 'none',
             display: 'flex',
             flexDirection: 'column',
+            boxShadow: '0 2px 24px 0 #304328',
+            // Scrollbar personalizado:
+            '& *::-webkit-scrollbar': {
+              width: '8px',
+              background: 'transparent',
+            },
+            '& *::-webkit-scrollbar-thumb': {
+              background: '#fff',
+              borderRadius: '8px',
+            },
+            '& *::-webkit-scrollbar-thumb:hover': {
+              background: '#ccc',
+            },
+            '& *::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            // Firefox
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#ccc transparent',
           },
         }}
         variant="persistent"
         anchor="left"
         open={open}
       >
-        {/* Flecha y perfil juntos */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2, pb: 1 }}>
-          <IconButton onClick={handleDrawerClose} sx={{ alignSelf: 'flex-end', mb: 1 }}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        {/* Perfil, nombre y botón cerrar arriba */}
+        <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 3, pb: 1 }}>
+          <IconButton
+            onClick={handleDrawerClose}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              color: '#fff',
+              '&:hover': { background: '#21824f', color: '#13bd62' },
+              width: 46,
+              height: 46,
+              zIndex: 1,
+            }}
+            size="small"
+            aria-label="Cerrar menú"
+          >
+            <ChevronLeftIcon />
           </IconButton>
-          <AccountCircleIcon sx={{ fontSize: 60, color: '#2AAC67' }} />
-          <Box sx={{ mt: 1, fontWeight: 'bold' }}>Nombre Usuario</Box>
+          <AccountCircleIcon sx={{ fontSize: 48, color: '#ddebd7', mb: 1, mt: 1 }} />
+          <Box sx={{ fontWeight: 'bold', color: '#fff', fontSize: 18, mt: 1 }}>Emerson Duarte</Box>
         </Box>
-        <Divider />
-        {/* Lista scrollable */}
-        <Box sx={{ flex: 1, overflow: 'auto' }}>
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton component={Link} to="/">
-                <ListItemIcon>
-                  <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="Home" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton component={Link} to="/procedures">
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Procedimientos" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton component={Link} to="/procedures/listProcedures">
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="ListaProcedimientos" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton component={Link} to="/capacitation">
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Capacitaciones" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton component={Link} to="/capacitation/listCapacitation">
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="ListaCapacitaciones" />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </Box>
-        {/* Botón cerrar sesión al fondo */}
-        <Box sx={{ p: 2 }}>
-          <Divider sx={{ mb: 2 }} />
+        <Divider sx={{ borderColor: '#fff', opacity: 0.7, my: 2, mx: 0 }} />
+        <List sx={{ flex: 1, px: 0 }}>
+          {/* Dashboard */}
           <ListItem disablePadding>
-            <ListItemButton onClick={() => alert('Sesión cerrada')}>
-              <ListItemText primary="Cerrar sesión" sx={{ textAlign: 'center', color: 'green' }} />
+            <ListItemButton
+              component={Link}
+              to="/"
+              sx={{
+                color: '#fff',
+                pl: 3,
+                '&:hover': {
+                  background: '#21824f',
+                  color: '#fff',
+                  '& .MuiSvgIcon-root': { color: '#09984c' },
+                },
+              }}
+            >
+              <HomeIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ListItemText primary="Inicio" />
             </ListItemButton>
           </ListItem>
+
+          {/* Procedimientos */}
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setOpenProcedimientos(!openProcedimientos)}
+              sx={{
+                color: '#fff',
+                pl: 3,
+                '&:hover': {
+                  background: '#21824f',
+                  color: '#fff',
+                  '& .MuiSvgIcon-root': { color: '#13bd62' },
+                },
+              }}
+            >
+              <InboxIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ListItemText primary="Procedimientos" />
+              {openProcedimientos ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={openProcedimientos} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/procedures"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Agregar Procedimientos" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/procedures/listProcedures"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Listado" />
+              </ListItemButton>
+            </List>
+          </Collapse>
+
+          {/* Capacitaciones */}
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setOpenCapacitaciones(!openCapacitaciones)}
+              sx={{
+                color: '#fff',
+                pl: 3,
+                '&:hover': {
+                  background: '#21824f',
+                  color: '#fff',
+                  '& .MuiSvgIcon-root': { color: '#13bd62' },
+                },
+              }}
+            >
+              <InboxIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ListItemText primary="Capacitaciones" />
+              {openCapacitaciones ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={openCapacitaciones} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/capacitation"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Agregar Capacitaciones" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/capacitation/listCapacitation"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Listado" />
+              </ListItemButton>
+            </List>
+          </Collapse>
+
+          {/* Colaboradores */}
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setOpenColaboradores(!openColaboradores)}
+              sx={{
+                color: '#fff',
+                pl: 3,
+                '&:hover': {
+                  background: '#21824f',
+                  color: '#fff',
+                  '& .MuiSvgIcon-root': { color: '#13bd62' },
+                },
+              }}
+            >
+              <GroupIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ListItemText primary="Colaboradores" />
+              {openColaboradores ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={openColaboradores} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/collaborators/collaborators"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Buscar Colaboradores" />
+              </ListItemButton>
+              
+            </List>
+          </Collapse>
+        </List>
+        {/* Divider bien posicionado antes del botón */}
+        <Divider sx={{ borderColor: '#fff', opacity: 0.7, my: 2, mx: 0 }} />
+        {/* Botón cerrar sesión abajo, diseño destacado */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+          <Box
+            component="button"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.2,
+              border: 'none',
+              borderRadius: 2,
+              px: 3,
+              py: 1.2,
+              fontWeight: 700,
+              fontSize: 15,
+              letterSpacing: 1,
+              cursor: 'pointer',
+              background: '#2AAC67',
+              color: '#fff',
+              boxShadow: 'none',
+              transition: 'background 0.2s, color 0.2s',
+              '&:hover': {
+                background: '#1d854e',
+                color: '#fff',
+              },
+            }}
+            onClick={() => {
+              // Aquí puedes poner tu lógica de logout
+              alert('Cerrar sesión');
+            }}
+          >
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3h-8c-1.1 0-2 .9-2 2v4h2V5h8v14h-8v-4h-2v4c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+            </svg>
+            Cerrar sesión
+          </Box>
         </Box>
       </Drawer>
       <Main open={open}>
@@ -197,6 +379,8 @@ export default function PersistentDrawerLeft() {
           <Route path="/procedures/listProcedures" element={<ListaProcedimientos />} />
           <Route path="/capacitation/" element={<Capacitaciones />} />
           <Route path="/capacitation/listCapacitation" element={<ListaCapacitaciones />} />
+          <Route path="/collaborators/collaborators" element={<Colaboradores />} />
+          {/* Agrega tus rutas de colaboradores aquí */}
         </Routes>
       </Main>
     </Box>
