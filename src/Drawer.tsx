@@ -25,6 +25,7 @@ import ListaProcedimientos from './views/procedures/listProcedures';
 import Capacitaciones from './views/capacitation/capacitacion';
 import ListaCapacitaciones from './views/capacitation/listCapacitation';
 import Colaboradores from './views/collaborators/collaborators';
+import AddCollaborator from './views/collaborators/addCollaborator';
 import { ListItem, ListItemButton, ListItemText } from '@mui/material';
 import Profile from './views/profile/profile';
 
@@ -189,7 +190,7 @@ export default function PersistentDrawerLeft() {
               <ListItemText primary="Inicio" />
             </ListItemButton>
           </ListItem>
-           {/*  perfil */}
+          {/*  perfil */}
           <ListItem disablePadding>
             <ListItemButton
               component={Link}
@@ -334,6 +335,28 @@ export default function PersistentDrawerLeft() {
           </ListItem>
           <Collapse in={openColaboradores} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
+
+                <ListItemButton
+                  component={Link}
+                  to="/collaborators/addCollaborator"
+                  sx={{
+                    pl: 6,
+                    color: '#f4fcec',
+                    '&:hover': {
+                      background: '#2AAC67',
+                      color: '#fff',
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" fill="#b4ebce"/>
+                      <path d="M12 8v8M8 12h8" stroke="#21824f" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </Box>
+                  <ListItemText primary="Añadir Colaborador" />
+                </ListItemButton>
+
               <ListItemButton
                 component={Link}
                 to="/collaborators/collaborators"
@@ -348,7 +371,7 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
-              
+
             </List>
           </Collapse>
         </List>
@@ -401,6 +424,7 @@ export default function PersistentDrawerLeft() {
           <Route path="/capacitation/listCapacitation" element={<ListaCapacitaciones />} />
           <Route path="/collaborators/collaborators" element={<Colaboradores />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
           {/* Agrega tus rutas de colaboradores aquí */}
         </Routes>
       </Main>
