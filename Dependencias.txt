@@ -11,25 +11,8 @@ npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // 
 npm install @mui/material @emotion/react @emotion/styled // COMPONENTES MATERIA
 
 # Instalar Tailwind CSS y su integración con Vite
-npm install -D tailwindcss postcss autoprefixer // TAILWIND
+npm install tailwindcss @tailwindcss/vite
 
-# Crea un archivo llamado tailwind.config.js
-npx tailwindcss init -p
-
-
-#Se pega lo siguinete en tailwind.config.js
-
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
 
 # Instalar React Router DOM
 npm install react-router-dom // ROUTER
