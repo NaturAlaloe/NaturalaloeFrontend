@@ -25,6 +25,7 @@ import ListaProcedimientos from './views/procedures/listProcedures';
 import Capacitaciones from './views/capacitation/capacitacion';
 import ListaCapacitaciones from './views/capacitation/listCapacitation';
 import Colaboradores from './views/collaborators/collaborators';
+import RegistroColaboradores from './views/capacitation/facilitatorTraining';
 import { ListItem, ListItemButton, ListItemText } from '@mui/material';
 
 const drawerWidth = 270;
@@ -145,7 +146,6 @@ export default function PersistentDrawerLeft() {
         anchor="left"
         open={open}
       >
-        {/* Perfil, nombre y botón cerrar arriba */}
         <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 3, pb: 1 }}>
           <IconButton
             onClick={handleDrawerClose}
@@ -290,6 +290,20 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Listado" />
               </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/capacitation/facilitatorTraining"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Registro de capacitaciones" />
+              </ListItemButton>
             </List>
           </Collapse>
 
@@ -380,6 +394,7 @@ export default function PersistentDrawerLeft() {
           <Route path="/capacitation/" element={<Capacitaciones />} />
           <Route path="/capacitation/listCapacitation" element={<ListaCapacitaciones />} />
           <Route path="/collaborators/collaborators" element={<Colaboradores />} />
+          <Route path="/capacitation/facilitatorTraining" element={<RegistroColaboradores />} />
           {/* Agrega tus rutas de colaboradores aquí */}
         </Routes>
       </Main>
