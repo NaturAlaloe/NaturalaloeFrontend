@@ -22,3 +22,6 @@ npm install @headlessui/react // AÚN NO UTILIZADO
 
 # instalar para que funciionen los graficos 
 npm install chart.js react-chartjs-2
+
+#para instalar la fuente popins 
+npm install @fontsource/poppins
