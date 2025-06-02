@@ -1,32 +1,26 @@
-import { useState } from 'react';
+import { useAddFacilitator } from '../../hooks/capacitations/useAddFacilitator';
 
 const AgregarFacilitadores = () => {
-  const [step, setStep] = useState(1);
-
-  const [nombre, setNombre] = useState('');
-  const [tipo, setTipo] = useState('');
-
-  const [profesorNombre, setProfesorNombre] = useState('');
-  const [profesorApellido, setProfesorApellido] = useState('');
-  const [profesorId, setProfesorId] = useState('');
-
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStep(2);
-  };
-
-  const handleBack = () => setStep(1);
-
-  const handleGuardar = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('¡Capacitación guardada!');
-  };
+  const {
+    step,
+    nombre,
+    tipo,
+    profesorNombre,
+    profesorApellido,
+    profesorId,
+    setNombre,
+    setTipo,
+    setProfesorNombre,
+    setProfesorApellido,
+    setProfesorId,
+    handleNext,
+    handleBack,
+    handleGuardar,
+  } = useAddFacilitator();
 
   return (
-    <div className=" mt-10 bg-white flex items-center justify-center">
-      <div
-        className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-md border border-green-700"
-      >
+    <div className="mt-10 bg-white flex items-center justify-center">
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-md border border-green-700">
         <div className="flex flex-col items-center mb-8">
           <div className="flex gap-4 mb-4">
             <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${step === 1 ? 'bg-green-600 text-white' : 'bg-green-200 text-green-700'}`}>1</div>
@@ -83,10 +77,10 @@ const AgregarFacilitadores = () => {
               <div>
                 <label className="block text-sm font-semibold text-green-700 mb-1">Opciones</label>
                 <select
-                  className="w-full px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 bg-green-50 transition overflow-visible"
-                  style={{ position: "relative" }}
+                  className="w-full px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 bg-green-50 transition"
                   required
                 >
+                  <option value="">(Opciones internas aquí)</option>
                 </select>
               </div>
             ) : (
