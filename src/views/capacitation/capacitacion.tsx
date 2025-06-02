@@ -4,6 +4,7 @@ import { useState } from 'react';
 const Capacitacion = () => {
     const [showColaboradorModal, setShowColaboradorModal] = useState(false);
     const [showFacilitadorModal, setShowFacilitadorModal] = useState(false);
+    const [isEvaluado, setIsEvaluado] = useState(false);
 
     return (
         <div className=" mt-13 flex items-center justify-center bg-[#f6fff6]">
@@ -57,18 +58,22 @@ const Capacitacion = () => {
                                 type="checkbox"
                                 id="evaluado"
                                 className="accent-[#2ecc71] mr-2 w-5 h-5"
+                                checked={isEvaluado}
+                                onChange={() => setIsEvaluado(!isEvaluado)}
                             />
                             <label htmlFor="evaluado" className="font-semibold text-[#2ecc71]">Es Evaluado</label>
                         </div>
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Método de evaluación</label>
-                            <select className="w-full mt-1 px-4 py-2 border-2 border-[#2ecc71] rounded-lg outline-none text-base text-[#222]">
-                                <option>Seleccione...</option>
-                                <option>Teórico</option>
-                                <option>Práctico</option>
-                                <option>Campo</option>
-                            </select>
-                        </div>
+                        {isEvaluado && (
+                            <div>
+                                <label className="font-semibold text-[#2ecc71]">Método de evaluación</label>
+                                <select className="w-full mt-1 px-4 py-2 border-2 border-[#2ecc71] rounded-lg outline-none text-base text-[#222]">
+                                    <option>Seleccione...</option>
+                                    <option>Teórico</option>
+                                    <option>Práctico</option>
+                                    <option>Campo</option>
+                                </select>
+                            </div>
+                        )}
                         <div>
                             <label className="font-semibold text-[#2ecc71]">Seguimiento</label>
                             <select className="w-full mt-1 px-4 py-2 border-2 border-[#2ecc71] rounded-lg outline-none text-base text-[#222]">
@@ -133,12 +138,18 @@ const Capacitacion = () => {
                             placeholder="Buscar facilitador..."
                             className="w-full px-4 py-2 border-2 border-[#2ecc71] rounded-lg outline-none text-base text-[#222]"
                         />
-                        <div className="mt-6 text-right">
+                        <div className="mt-6 mr-7 flex justify-end gap-3">
                             <button
                                 onClick={() => setShowFacilitadorModal(false)}
                                 className="bg-[#2ecc71] text-white rounded-lg px-6 py-2 font-semibold hover:bg-[#27ae60] transition"
                             >
                                 Cerrar
+                            </button>
+                            <button
+
+                                className="bg-[#2ecc71] text-white rounded-lg px-6 py-2 font-semibold hover:bg-[#27ae60] transition"
+                            >
+                                Asignar
                             </button>
                         </div>
                     </div>
