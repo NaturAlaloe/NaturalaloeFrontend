@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const ListaCapacitaciones = () => {
+const AgregarFacilitadores = () => {
   const [step, setStep] = useState(1);
 
   const [nombre, setNombre] = useState('');
@@ -23,7 +23,7 @@ const ListaCapacitaciones = () => {
   };
 
   return (
-    <div className="bg-white flex items-center justify-center">
+    <div className=" mt-10 bg-white flex items-center justify-center">
       <div
         className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-md border border-green-700"
       >
@@ -33,11 +33,11 @@ const ListaCapacitaciones = () => {
             <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${step === 2 ? 'bg-green-600 text-white' : 'bg-green-200 text-green-700'}`}>2</div>
           </div>
           <h2 className="text-2xl font-extrabold text-green-700 mb-1">
-            {step === 1 ? 'Nueva Capacitación' : 'Profesor responsable'}
+            {step === 1 ? 'Nuevo Facilitador' : 'Profesor responsable'}
           </h2>
           <p className="text-gray-500 text-sm">
             {step === 1
-              ? 'Registra una nueva capacitación para tu equipo'
+              ? 'Registra un Nuevo Facilitador para la capacitación'
               : 'Ingresa los datos del profesor que realizará la capacitación'}
           </p>
         </div>
@@ -50,7 +50,7 @@ const ListaCapacitaciones = () => {
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Seguridad Industrial"
+                placeholder="Ej: Nombre del Instructor"
                 className="w-full px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 bg-green-50 transition"
                 required
               />
@@ -146,4 +146,4 @@ const ListaCapacitaciones = () => {
   );
 };
 
-export default ListaCapacitaciones;
+export default AgregarFacilitadores;
