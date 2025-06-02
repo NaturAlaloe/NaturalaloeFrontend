@@ -54,46 +54,83 @@ export default function CollaboratorRolesList() {
       sx={{
         width: '100%',
         bgcolor: 'background.paper',
-        borderRadius: 3,
-        boxShadow: 2,
+        borderRadius: 4, 
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.12)', 
         border: '1px solid #2AAC67',
-        px: 0
+        px: 0,
+        transition: 'box-shadow 0.3s ease', 
+        '&:hover': { 
+          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.18)' 
+        }
       }}
       component="nav"
     >
       {roles.map((role) => (
         <React.Fragment key={role}>
-          <ListItemButton onClick={() => handleClick(role)}>
+          {/* Boton de cada rol con diseño*/}
+          <ListItemButton onClick={() => handleClick(role)}
+          sx={{
+              py: 1.2, 
+              transition: 'background-color 0.3s ease, transform 0.3s ease', 
+              '&:hover': { 
+                backgroundColor: '#E6F3EA', 
+                transform: 'translateX(5px)' 
+              }
+            }}
+            >
             <ListItemIcon>
-              <WorkIcon sx={{ color: '#2AAC67' }} />
+              <WorkIcon sx={{ color: '#2AAC67', fontSize: '1.7rem' }} />
             </ListItemIcon>
-            <ListItemText primary={role} />
+            <ListItemText primary={role} 
+            primaryTypographyProps={{
+                fontWeight: 'bold', 
+                color: 'black', 
+              }}
+            />
             {open[role] ? <ExpandLess sx={{ color: '#2AAC67' }} /> : <ExpandMore sx={{ color: '#2AAC67' }} />}
           </ListItemButton>
+          {/*seccion colapsable*/}
           <Collapse in={!!open[role]} timeout="auto" unmountOnExit>
-            <TableContainer component={Paper} sx={{ my: 1, mx: 2, borderRadius: 2, boxShadow: 1 }}>
+            <TableContainer component={Paper} 
+            sx={{ my: 1, mx: 2,               
+               borderRadius: 3, 
+                boxShadow: '0 3px 10px rgba(0, 0, 0, 0.1)', 
+                border: '1px solid #2AAC67', 
+                animation: 'fadeIn 0.5s ease-out', 
+                '@keyframes fadeIn': { 
+                  '0%': { opacity: 0, transform: 'translateY(10px)' },
+                  '100%': { opacity: 1, transform: 'translateY(0)' },
+                }
+            }}>
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold' }}>POE</TableCell>
-                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold' }}>Descripción</TableCell>
-                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold' }}>Versión</TableCell>
-                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold' }}>Fecha de inducción</TableCell>
-                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold' }}>Estado</TableCell>
+                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold', letterSpacing: '0.5px'  }}>POE</TableCell>
+                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold', letterSpacing: '0.5px'  }}>Descripción</TableCell>
+                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold', letterSpacing: '0.5px'  }}>Versión</TableCell>
+                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold', letterSpacing: '0.5px'  }}>Fecha de inducción</TableCell>
+                    <TableCell sx={{ color: '#2AAC67', fontWeight: 'bold', letterSpacing: '0.5px'  }}>Estado</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {(poePorRol[role] || []).map((row, idx) => (
-                    <TableRow key={idx}>
+                    <TableRow key={idx}
+                    sx={{
+                        transition: 'background-color 0.3s ease', 
+                        '&:hover': { 
+                          backgroundColor: '#F0F8F2' 
+                        }
+                      }}
+                    >
                       <TableCell>{row.poe}</TableCell>
                       <TableCell>{row.descripcion}</TableCell>
                       <TableCell>{row.version}</TableCell>
                       <TableCell>{row.fecha}</TableCell>
                       <TableCell>
                         {row.estado ? (
-                          <CheckCircleIcon sx={{ color: '#2AAC67' }} />
+                          <CheckCircleIcon sx={{ color: '#2AAC67', fontSize: '1.6rem' }} />
                         ) : (
-                          <CancelIcon sx={{ color: '#e53935' }} />
+                          <CancelIcon sx={{ color: '#e53935', fontSize: '1.6rem' }} />
                         )}
                       </TableCell>
                     </TableRow>

@@ -20,24 +20,33 @@ export default function CollaboratorDetail() {
     <Box
       sx={{
         minHeight: '90vh',
+        background: 'linear-gradient(135deg, #E6F3EA 0%, #F6FBF7 100%)', // Gradiente sutil
         bgcolor: '#F6FBF7',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         py: 4
+        
       }}
     >
+      {/* Cuadro blanco que contiene toda la informacion*/}
       <Paper
         elevation={4}
         sx={{
           display: 'flex',
           flexDirection: 'row',
-          borderRadius: 4,
-          p: 4,
+          borderRadius: 6,
+          p: 5,
           width: '90%',
           maxWidth: 1200,
           bgcolor: '#fff',
-          border: '2px solid #2AAC67'
+          border: '2px solid #2AAC67',
+          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.1)', //una sombra mas profunda
+          transition: 'transform 0.3s ease, box-shadow 0.3s ease', // nueva transicion
+          '&:hover': {
+            transform: 'scale(1.02)', // una escala al cuadro
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)' // sombra mas intensa al hover
+          }
         }}
       >
         {/* Lateral izquierdo: Información del colaborador */}
@@ -45,17 +54,22 @@ export default function CollaboratorDetail() {
           sx={{
             minWidth: 300,
             maxWidth: 340,
-            mr: 4,
+            mr: 5,
             bgcolor: '#F6FBF7',
-            borderRadius: 3,
+            borderRadius: 4,
             p: 3,
             border: '1px solid #2AAC67',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
+            transition: 'transform 0.3s ease, box-shadow 0.3s ease', // Nueva transición para efectos suaves
+            '&:hover': { // Nuevo efecto al pasar el cursor
+            transform: 'scale(1.02)', // Escala ligeramente el cuadro
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)' // Sombra más intensa al hover
+          }
           }}
         >
-          <Typography variant="h6" sx={{ color: '#2AAC67', fontWeight: 'bold', mb: 2 }}>
+          <Typography variant="h6" sx={{ color: '#2AAC67', fontWeight: 'bold', mb: 6}}>
             Información del Colaborador
           </Typography>
           <TextField
@@ -64,7 +78,18 @@ export default function CollaboratorDetail() {
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
-            sx={{ mb: 2, width: '100%' }}
+            sx={{ mb: 2.5, 
+              width: '100%', 
+              backgroundColor: '#fff', // fondo blanco
+              '& .MuiOutlinedInput-root': { // personalizacion del borde
+                '& fieldset': { borderColor: '#2AAC67' }, // borde verde base
+                '&:hover fieldset': { borderColor: 'black' }, // borde oscuro al hover
+                transition: 'background-color 0.3s ease', // nueva transicion suave
+                '&:hover': { backgroundColor: '#E6F3EA' } // nuevo fondo verde claro al hover
+              }
+
+
+            }}
           />
           <TextField
             label="Apellidos"
@@ -72,7 +97,16 @@ export default function CollaboratorDetail() {
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
-            sx={{ mb: 2, width: '100%' }}
+            sx={{ mb: 2.5, 
+              width: '100%', 
+              backgroundColor: '#fff', 
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#2AAC67' },
+                '&:hover fieldset': { borderColor: 'black' }, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
+              }
+            }}
           />
           <TextField
             label="Cédula"
@@ -80,7 +114,16 @@ export default function CollaboratorDetail() {
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
-            sx={{ mb: 2, width: '100%' }}
+            sx={{ mb: 2.5, 
+              width: '100%', 
+              backgroundColor: '#fff', 
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#2AAC67' },
+                '&:hover fieldset': { borderColor: 'black' }, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
+              }
+            }}
           />
           <TextField
             label="Compañía"
@@ -88,7 +131,16 @@ export default function CollaboratorDetail() {
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
-            sx={{ mb: 2, width: '100%' }}
+           sx={{ mb: 2.5, 
+              width: '100%', 
+              backgroundColor: '#fff', 
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#2AAC67' },
+                '&:hover fieldset': { borderColor: 'black' }, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
+              }
+            }}
           />
           <TextField
             label="Departamento"
@@ -96,7 +148,16 @@ export default function CollaboratorDetail() {
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
-            sx={{ mb: 2, width: '100%' }}
+           sx={{ mb: 2.5, 
+              width: '100%', 
+              backgroundColor: '#fff', 
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#2AAC67' },
+                '&:hover fieldset': { borderColor: 'black' }, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
+              }
+            }}
           />
           <TextField
             label="Puesto de trabajo"
@@ -104,12 +165,21 @@ export default function CollaboratorDetail() {
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
-            sx={{ width: '100%' }}
+            sx={{ mb: 2.5, 
+              width: '100%', 
+              backgroundColor: '#fff', 
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#2AAC67' },
+                '&:hover fieldset': { borderColor: 'black' }, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
+              }
+            }}
           />
         </Box>
         {/* Derecha: Lista de roles y tablas */}
         <Box sx={{ flex: 1 }}>
-          <Typography variant="h5" sx={{ color: '#2AAC67', fontWeight: 'bold', mb: 2 }}>
+          <Typography variant="h5" sx={{ color: '#2AAC67', fontWeight: 'bold', mb: 2.5, letterSpacing: '0.5px'}}>
             Roles de Trabajo y Capacitaciones
           </Typography>
           <CollaboratorRolesList />
