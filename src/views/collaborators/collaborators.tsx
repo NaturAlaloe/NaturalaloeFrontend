@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
 
 const collaborators = [
@@ -11,6 +12,12 @@ const collaborators = [
 ];
 
 const Collaborators: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+  navigate("/collaborators/detail"); // Navegación directa sin ID
+  };
+
   return (
     <div className="p-6 font-sans">
       <h1 className="text-2xl font-bold text-center mb-6">Colaboradores</h1>
@@ -27,7 +34,8 @@ const Collaborators: React.FC = () => {
         {collaborators.map((colab) => (
           <div
             key={colab.id}
-            className="bg-white border border-gray-200 rounded-xl shadow p-4 flex flex-col items-center"
+            onClick={handleCardClick} // Todas las cards usan la misma función
+            className="cursor-pointer bg-white border border-gray-200 rounded-xl shadow p-4 flex flex-col items-center hover:shadow-lg transition"
           >
             <div className="bg-gray-200 rounded-full p-4 mb-3">
               <User className="w-10 h-10 text-gray-600" />
