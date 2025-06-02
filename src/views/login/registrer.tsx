@@ -45,8 +45,7 @@ export default function Login() {
           onChange={handleChange}
           placeholder="Apellido"
           type="text"
-          required
-        />
+          required pattern={undefined}        />
         <InputField
           label="Contraseña"
           name="contrasena"
@@ -54,8 +53,7 @@ export default function Login() {
           onChange={handleChange}
           placeholder="********"
           type="password"
-          required
-        />
+          required pattern={undefined}        />
       </div>
     </FormContainer>
   );

@@ -28,7 +28,9 @@ import Colaboradores from './views/collaborators/collaborators';
 import AddCollaborator from './views/collaborators/addCollaborator';
 import { ListItem, ListItemButton, ListItemText } from '@mui/material';
 import Profile from './views/profile/profile';
-
+import Login from './views/login/login';
+import Register from './views/login/registrer';
+import UserAssignment from './views/login/userAssignment';
 const drawerWidth = 270;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -87,6 +89,7 @@ export default function PersistentDrawerLeft() {
 
   // Estados para submenús
   const [openDashboard, setOpenDashboard] = React.useState(false);
+  const [openLogin, setOpenLogin] = React.useState(false);
   const [openProcedimientos, setOpenProcedimientos] = React.useState(false);
   const [openCapacitaciones, setOpenCapacitaciones] = React.useState(false);
   const [openColaboradores, setOpenColaboradores] = React.useState(false);
@@ -210,6 +213,72 @@ export default function PersistentDrawerLeft() {
             </ListItemButton>
           </ListItem>
 
+            {/* Login */}
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setOpenLogin(!openLogin)}
+              sx={{
+                color: '#fff',
+                pl: 3,
+                '&:hover': {
+                  background: '#21824f',
+                  color: '#fff',
+                  '& .MuiSvgIcon-root': { color: '#13bd62' },
+                },
+              }}
+            >
+              <InboxIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ListItemText primary="Autenticación" />
+              {openLogin ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={openLogin} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/login/login"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Login" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/login/register"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Registro" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/login/userAssignment"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Asignación de Usuario" />
+              </ListItemButton>
+            </List>
+          </Collapse>
+
           {/* Procedimientos */}
           <ListItem disablePadding>
             <ListItemButton
@@ -313,7 +382,8 @@ export default function PersistentDrawerLeft() {
               </ListItemButton>
             </List>
           </Collapse>
-
+      
+      
           {/* Colaboradores */}
           <ListItem disablePadding>
             <ListItemButton
@@ -371,7 +441,7 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
-
+ 
             </List>
           </Collapse>
         </List>
@@ -417,6 +487,9 @@ export default function PersistentDrawerLeft() {
       <Main open={open}>
         <DrawerHeader />
         <Routes>
+          <Route path="/login/login" element={<Login />} />
+          <Route path="/login/register" element={<Register />} />
+          <Route path="/login/userAssignment" element={<UserAssignment />} />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
           <Route path="/procedures/listProcedures" element={<ListaProcedimientos />} />
