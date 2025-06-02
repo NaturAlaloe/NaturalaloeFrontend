@@ -25,6 +25,7 @@ import ListaProcedimientos from './views/procedures/listProcedures';
 import Capacitaciones from './views/capacitation/capacitacion';
 import ListaCapacitaciones from './views/capacitation/listCapacitation';
 import Colaboradores from './views/collaborators/collaborators';
+import AddCollaborator from './views/collaborators/addCollaborator';
 import { ListItem, ListItemButton, ListItemText } from '@mui/material';
 import Profile from './views/profile/profile';
 
@@ -348,6 +349,21 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
+
+               <ListItemButton
+                component={Link}
+                to="/collaborators/addCollaborator"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Añadir Colaborador" />
+              </ListItemButton>
               
             </List>
           </Collapse>
@@ -401,6 +417,7 @@ export default function PersistentDrawerLeft() {
           <Route path="/capacitation/listCapacitation" element={<ListaCapacitaciones />} />
           <Route path="/collaborators/collaborators" element={<Colaboradores />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
           {/* Agrega tus rutas de colaboradores aquí */}
         </Routes>
       </Main>
