@@ -26,6 +26,7 @@ import Capacitaciones from './views/capacitation/capacitacion';
 import ListaCapacitaciones from './views/capacitation/listCapacitation';
 import Colaboradores from './views/collaborators/collaborators';
 import { ListItem, ListItemButton, ListItemText } from '@mui/material';
+import Profile from './views/profile/profile';
 
 const drawerWidth = 270;
 
@@ -186,6 +187,25 @@ export default function PersistentDrawerLeft() {
             >
               <HomeIcon sx={{ color: '#b4ebce', mr: 2 }} />
               <ListItemText primary="Inicio" />
+            </ListItemButton>
+          </ListItem>
+           {/*  perfil */}
+          <ListItem disablePadding>
+            <ListItemButton
+              component={Link}
+              to="/profile"
+              sx={{
+                color: '#fff',
+                pl: 3,
+                '&:hover': {
+                  background: '#21824f',
+                  color: '#fff',
+                  '& .MuiSvgIcon-root': { color: '#13bd62' },
+                },
+              }}
+            >
+              <AccountCircleIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ListItemText primary="Perfil" />
             </ListItemButton>
           </ListItem>
 
@@ -380,6 +400,7 @@ export default function PersistentDrawerLeft() {
           <Route path="/capacitation/" element={<Capacitaciones />} />
           <Route path="/capacitation/listCapacitation" element={<ListaCapacitaciones />} />
           <Route path="/collaborators/collaborators" element={<Colaboradores />} />
+          <Route path="/profile" element={<Profile />} />
           {/* Agrega tus rutas de colaboradores aquí */}
         </Routes>
       </Main>
