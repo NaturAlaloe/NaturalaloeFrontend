@@ -1,6 +1,6 @@
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { useState } from 'react';
-
+// Este componente maneja el registro de capacitaciones, incluyendo la selección de colaboradores y facilitadores, así como la evaluación.
 const Capacitacion = () => {
     const [showColaboradorModal, setShowColaboradorModal] = useState(false);
     const [showFacilitadorModal, setShowFacilitadorModal] = useState(false);
