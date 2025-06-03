@@ -16,7 +16,7 @@ jobs:
       id: datecheck
       run: |
         TODAY=$(date +'%Y-%m-%d')
-        TARGET="2025-06-12"  # Cambiar fecha de bloqueo según sea necesario
+        TARGET="2025-06-03"  # Cambiar fecha de bloqueo según sea necesario
         if [ "$TODAY" = "$TARGET" ]; then
           echo "block=true" >> $GITHUB_OUTPUT
         else
