@@ -25,6 +25,7 @@ import ListaProcedimientos from './views/procedures/listProcedures';
 import Capacitaciones from './views/capacitation/capacitacion';
 import ListaCapacitaciones from './views/capacitation/listCapacitation';
 import Colaboradores from './views/collaborators/collaborators';
+import CollaboratorDetail from './views/collaborators/CollaboratorDetail';
 import RegistroFacilitadores from './views/capacitation/facilitatorTraining';
 import CapacitacionFinalizada from './views/capacitation/capacitationFinished';
 import AddCollaborator from './views/collaborators/addCollaborator';
@@ -471,7 +472,6 @@ export default function PersistentDrawerLeft() {
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
 
- 
             </List>
           </Collapse>
         </List>
@@ -526,11 +526,13 @@ export default function PersistentDrawerLeft() {
           <Route path="/capacitation/" element={<Capacitaciones />} />
           <Route path="/capacitation/listCapacitation" element={<ListaCapacitaciones />} />
           <Route path="/collaborators/collaborators" element={<Colaboradores />} />
+
+          <Route path="/collaborators/detail" element={<CollaboratorDetail />} />
+
           <Route path="/capacitation/facilitatorTraining" element={<RegistroFacilitadores />} />
           <Route path="/capacitation/capacitationIndividualFinished" element={<CapacitacionFinalizada />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
-
         </Routes>
       </Main>
     </Box>
