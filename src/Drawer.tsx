@@ -329,20 +329,6 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to="/collaborators/detail"
-                sx={{
-                  pl: 6,
-                  color: '#f4fcec',
-                  '&:hover': {
-                    background: '#2AAC67',
-                    color: '#fff',
-                  },
-                }}
-              >
-                <ListItemText primary="Detalle Colaborador" />
-              </ListItemButton>
             </List>
           </Collapse>
         </List>

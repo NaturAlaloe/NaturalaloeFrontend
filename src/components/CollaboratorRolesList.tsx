@@ -1,9 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import WorkIcon from '@mui/icons-material/Work';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
@@ -78,9 +76,6 @@ export default function CollaboratorRolesList() {
               }
             }}
             >
-            <ListItemIcon>
-              <WorkIcon sx={{ color: '#2AAC67', fontSize: '1.7rem' }} />
-            </ListItemIcon>
             <ListItemText primary={role} 
             primaryTypographyProps={{
                 fontWeight: 'bold', 
