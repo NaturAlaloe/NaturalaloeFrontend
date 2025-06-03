@@ -1,17 +1,133 @@
+//procedures.tsx
+import "@fontsource/poppins";
+import "@fontsource/poppins/700.css";
+import FormContainer from "../../components/formComponents/FormContainer";
+import InputField from "../../components/formComponents/InputField";
+import SelectField from "../../components/formComponents/SelectField";
+import PoeSearchInput from "../../components/formComponents/PoeSearchInput";
+import { useProceduresForm } from "../../hooks/procedureFormHooks/useProceduresForm";
+import { usePoeSearch } from "../../hooks/procedureFormHooks/usePoeSearch";
 
+export default function Procedures() {
+  const {
+    formData,
+    handleSubmit,
+    pdfFile,
+    poees,
+    departamentos,
+    responsables,
+    categorias,
+    handleChange,
+    handlePdfChange,
+    setPdfFile,
+  } = useProceduresForm();
 
-function procedures() {
+  const {
+    busqueda,
+    setBusqueda,
+    showSugerencias,
+    setShowSugerencias,
+    resultados,
+  } = usePoeSearch(poees);
+
   return (
-    <div>
-
-      <h1 className='text-3xl font-bold underline'>Procedimientos</h1>
-      <p>Contenido relacionado con los procedimientos.</p>
-      <p>Esta es una sección dedicada a los procedimientos de la aplicación.</p>
-      <p>Aquí puedes encontrar guías y pasos a seguir para realizar tareas específicas.</p>
-      <p>¡Explora y aprende más sobre nuestros procedimientos!</p>
-      
-    </div>
-  )
+    <FormContainer title="Registro de Procedimiento" onSubmit={handleSubmit}>
+      {/* Buscador de POE existente */}
+      <PoeSearchInput
+        busqueda={busqueda}
+        setBusqueda={setBusqueda}
+        showSugerencias={showSugerencias}
+        setShowSugerencias={setShowSugerencias}
+        resultados={resultados}
+        onSelect={(poe) => setBusqueda(poe.codigo)}
+      />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <InputField
+          label="Título"
+          name="titulo"
+          value={formData.titulo}
+          onChange={handleChange}
+          placeholder="Ingrese título"
+          required
+        />
+        <SelectField
+          label="Departamento"
+          name="departamento"
+          value={formData.departamento}
+          onChange={handleChange}
+          options={departamentos}
+          required
+          optionLabel="nombre"
+          optionValue="nombre"
+        />
+        <SelectField
+          label="Categoría"
+          name="categoria"
+          value={formData.categoria}
+          onChange={handleChange}
+          options={categorias}
+          required
+          optionLabel="nombre"
+          optionValue="nombre"
+        />
+        <InputField
+          label="Número de POE"
+          name="poeNumber"
+          value={formData.poeNumber}
+          readOnly
+          required
+        />
+        <SelectField
+          label="Responsable"
+          name="responsable"
+          value={formData.responsable}
+          onChange={handleChange}
+          options={responsables.map((r) => ({ nombre: r }))}
+          required
+          optionLabel="nombre"
+          optionValue="nombre"
+        />
+        <InputField
+          label="Revisión"
+          name="revision"
+          value={formData.revision}
+          onChange={handleChange}
+          placeholder="1.0"
+          pattern="^\d+(\.\d+)?$"
+          required
+        />
+        <InputField
+          label="Fecha"
+          name="fecha"
+          value={formData.fecha}
+          onChange={handleChange}
+          type="date"
+          required
+        />
+        <div className="md:col-span-2">
+          <InputField
+            label="Seleccionar PDF"
+            type="file"
+            accept="application/pdf"
+            onChange={handlePdfChange}
+            required={!pdfFile}
+          />
+          {pdfFile && (
+            <div className="flex items-center gap-2 mt-2">
+              <p className="text-sm text-[#2AAC67] font-medium">
+                Archivo seleccionado: {pdfFile.name}
+              </p>
+              <button
+                type="button"
+                className="text-red-600 underline text-xs"
+                onClick={() => setPdfFile(null)}
+              >
+                Quitar
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </FormContainer>
+  );
 }
-
-export default procedures
