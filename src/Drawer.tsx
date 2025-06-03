@@ -449,7 +449,7 @@ export default function PersistentDrawerLeft() {
                   }}
                 >
                   
-                  <ListItemText primary="Añadir Colaborador" />
+                    <ListItemText primary="Añadir Colaborador" />
                 </ListItemButton>
 
               <ListItemButton
