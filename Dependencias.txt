@@ -20,4 +20,5 @@ npm install react-router-dom // ROUTER
 # Instalar Headless UI (aún no utilizado)
 npm install @headlessui/react // AÚN NO UTILIZADO
 
-
+#Instalar iconos SVG 
+npm install lucide-react
