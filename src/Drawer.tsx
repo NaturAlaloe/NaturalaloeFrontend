@@ -25,11 +25,14 @@ import ListaProcedimientos from './views/procedures/listProcedures';
 import Capacitaciones from './views/capacitation/capacitacion';
 import ListaCapacitaciones from './views/capacitation/listCapacitation';
 import Colaboradores from './views/collaborators/collaborators';
+import CollaboratorDetail from './views/collaborators/CollaboratorDetail';
+import RegistroFacilitadores from './views/capacitation/facilitatorTraining';
+import CapacitacionFinalizada from './views/capacitation/capacitationFinished';
 import AddCollaborator from './views/collaborators/addCollaborator';
 import { ListItem, ListItemButton, ListItemText } from '@mui/material';
 import Profile from './views/profile/profile';
 import Login from './views/login/login';
-import Register from './views/login/registrer';
+import Register from './views/login/register';
 import UserAssignment from './views/login/userAssignment';
 const drawerWidth = 270;
 
@@ -150,7 +153,6 @@ export default function PersistentDrawerLeft() {
         anchor="left"
         open={open}
       >
-        {/* Perfil, nombre y botón cerrar arriba */}
         <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 3, pb: 1 }}>
           <IconButton
             onClick={handleDrawerClose}
@@ -368,6 +370,34 @@ export default function PersistentDrawerLeft() {
               </ListItemButton>
               <ListItemButton
                 component={Link}
+                to="/capacitation/facilitatorTraining"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Agregar Facilitadores" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/capacitation/capacitationIndividualFinished"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Finalizadas" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
                 to="/capacitation/listCapacitation"
                 sx={{
                   pl: 6,
@@ -378,7 +408,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-                <ListItemText primary="Listado" />
+                <ListItemText primary="Lista" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -418,12 +448,7 @@ export default function PersistentDrawerLeft() {
                     },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" fill="#b4ebce"/>
-                      <path d="M12 8v8M8 12h8" stroke="#21824f" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                  </Box>
+                  
                   <ListItemText primary="Añadir Colaborador" />
                 </ListItemButton>
 
@@ -441,7 +466,7 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
- 
+
             </List>
           </Collapse>
         </List>
@@ -496,9 +521,13 @@ export default function PersistentDrawerLeft() {
           <Route path="/capacitation/" element={<Capacitaciones />} />
           <Route path="/capacitation/listCapacitation" element={<ListaCapacitaciones />} />
           <Route path="/collaborators/collaborators" element={<Colaboradores />} />
+
+          <Route path="/collaborators/detail" element={<CollaboratorDetail />} />
+
+          <Route path="/capacitation/facilitatorTraining" element={<RegistroFacilitadores />} />
+          <Route path="/capacitation/capacitationIndividualFinished" element={<CapacitacionFinalizada />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
-          {/* Agrega tus rutas de colaboradores aquí */}
         </Routes>
       </Main>
     </Box>

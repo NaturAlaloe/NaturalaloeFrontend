@@ -15,7 +15,9 @@ export default function Register() {
     confirmarContrasena: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -41,11 +43,16 @@ export default function Register() {
       >
         <div className="flex flex-row items-center justify-between mb-8">
           <div className="flex flex-col items-start">
-            <h2 className="text-4xl font-bold text-[#2AAC67] mb-1">Registrar administrador</h2>
+            <h2 className="text-4xl font-bold text-[#2AAC67] mb-1">
+              Registrar administrador
+            </h2>
           </div>
-          <img src={LogoNaturaloe} alt="Natural Aloe Logo" className="w-46 h-46 ml-6 drop-shadow-md" />
+          <img
+            src={LogoNaturaloe}
+            alt="Natural Aloe Logo"
+            className="w-46 h-46 ml-6 drop-shadow-md"
+          />
         </div>
-
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -56,7 +63,8 @@ export default function Register() {
               onChange={handleChange}
               placeholder="Tu nombre completo"
               type="text"
-              required pattern={undefined}
+              required
+              pattern={undefined}
             />
             <InputField
               label="Cédula"
@@ -65,7 +73,8 @@ export default function Register() {
               onChange={handleChange}
               placeholder="Tu cédula"
               type="text"
-              required pattern={undefined}
+              required
+              pattern={undefined}
             />
           </div>
 
@@ -77,14 +86,15 @@ export default function Register() {
               onChange={handleChange}
               placeholder="ejemplo@correo.com"
               type="email"
-              required pattern={undefined}
+              required
+              pattern={undefined}
             />
             <SelectField
               label="Departamento"
               name="departamento"
               value={formData.departamento}
               onChange={handleChange}
-              options={[]} 
+              options={[]}
               required
               optionLabel="departamento"
               optionValue="departamento"
@@ -109,7 +119,8 @@ export default function Register() {
               onChange={handleChange}
               placeholder="********"
               type="password"
-              required pattern={undefined}
+              required
+              pattern={undefined}
             />
           </div>
 
@@ -121,7 +132,8 @@ export default function Register() {
               onChange={handleChange}
               placeholder="********"
               type="password"
-              required pattern={undefined}
+              required
+              pattern={undefined}
             />
           </div>
 
@@ -132,7 +144,6 @@ export default function Register() {
             Registrar
           </button>
         </form>
-
       </motion.div>
     </div>
   );
