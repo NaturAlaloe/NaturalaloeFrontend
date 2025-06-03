@@ -25,10 +25,15 @@ import ListaProcedimientos from './views/procedures/listProcedures';
 import Capacitaciones from './views/capacitation/capacitacion';
 import ListaCapacitaciones from './views/capacitation/listCapacitation';
 import Colaboradores from './views/collaborators/collaborators';
+import CollaboratorDetail from './views/collaborators/CollaboratorDetail';
 import RegistroFacilitadores from './views/capacitation/facilitatorTraining';
 import CapacitacionFinalizada from './views/capacitation/capacitationFinished';
+import AddCollaborator from './views/collaborators/addCollaborator';
 import { ListItem, ListItemButton, ListItemText } from '@mui/material';
-
+import Profile from './views/profile/profile';
+import Login from './views/login/login';
+import Register from './views/login/registrer';
+import UserAssignment from './views/login/userAssignment';
 const drawerWidth = 270;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -87,6 +92,7 @@ export default function PersistentDrawerLeft() {
 
   // Estados para submenús
   const [openDashboard, setOpenDashboard] = React.useState(false);
+  const [openLogin, setOpenLogin] = React.useState(false);
   const [openProcedimientos, setOpenProcedimientos] = React.useState(false);
   const [openCapacitaciones, setOpenCapacitaciones] = React.useState(false);
   const [openColaboradores, setOpenColaboradores] = React.useState(false);
@@ -189,6 +195,91 @@ export default function PersistentDrawerLeft() {
               <ListItemText primary="Inicio" />
             </ListItemButton>
           </ListItem>
+          {/*  perfil */}
+          <ListItem disablePadding>
+            <ListItemButton
+              component={Link}
+              to="/profile"
+              sx={{
+                color: '#fff',
+                pl: 3,
+                '&:hover': {
+                  background: '#21824f',
+                  color: '#fff',
+                  '& .MuiSvgIcon-root': { color: '#13bd62' },
+                },
+              }}
+            >
+              <AccountCircleIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ListItemText primary="Perfil" />
+            </ListItemButton>
+          </ListItem>
+
+            {/* Login */}
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setOpenLogin(!openLogin)}
+              sx={{
+                color: '#fff',
+                pl: 3,
+                '&:hover': {
+                  background: '#21824f',
+                  color: '#fff',
+                  '& .MuiSvgIcon-root': { color: '#13bd62' },
+                },
+              }}
+            >
+              <InboxIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ListItemText primary="Autenticación" />
+              {openLogin ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={openLogin} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/login/login"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Login" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/login/register"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Registro" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/login/userAssignment"
+                sx={{
+                  pl: 6,
+                  color: '#f4fcec',
+                  '&:hover': {
+                    background: '#2AAC67',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemText primary="Asignación de Usuario" />
+              </ListItemButton>
+            </List>
+          </Collapse>
 
           {/* Procedimientos */}
           <ListItem disablePadding>
@@ -321,7 +412,8 @@ export default function PersistentDrawerLeft() {
               </ListItemButton>
             </List>
           </Collapse>
-
+      
+      
           {/* Colaboradores */}
           <ListItem disablePadding>
             <ListItemButton
@@ -343,6 +435,28 @@ export default function PersistentDrawerLeft() {
           </ListItem>
           <Collapse in={openColaboradores} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
+
+                <ListItemButton
+                  component={Link}
+                  to="/collaborators/addCollaborator"
+                  sx={{
+                    pl: 6,
+                    color: '#f4fcec',
+                    '&:hover': {
+                      background: '#2AAC67',
+                      color: '#fff',
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" fill="#b4ebce"/>
+                      <path d="M12 8v8M8 12h8" stroke="#21824f" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </Box>
+                  <ListItemText primary="Añadir Colaborador" />
+                </ListItemButton>
+
               <ListItemButton
                 component={Link}
                 to="/collaborators/collaborators"
@@ -403,15 +517,22 @@ export default function PersistentDrawerLeft() {
       <Main open={open}>
         <DrawerHeader />
         <Routes>
+          <Route path="/login/login" element={<Login />} />
+          <Route path="/login/register" element={<Register />} />
+          <Route path="/login/userAssignment" element={<UserAssignment />} />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
           <Route path="/procedures/listProcedures" element={<ListaProcedimientos />} />
           <Route path="/capacitation/" element={<Capacitaciones />} />
           <Route path="/capacitation/listCapacitation" element={<ListaCapacitaciones />} />
           <Route path="/collaborators/collaborators" element={<Colaboradores />} />
+
+          <Route path="/collaborators/detail" element={<CollaboratorDetail />} />
+
           <Route path="/capacitation/facilitatorTraining" element={<RegistroFacilitadores />} />
           <Route path="/capacitation/capacitationIndividualFinished" element={<CapacitacionFinalizada />} />
-          {/* Agrega tus rutas de colaboradores aquí */}
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
         </Routes>
       </Main>
     </Box>
