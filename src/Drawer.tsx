@@ -448,12 +448,7 @@ export default function PersistentDrawerLeft() {
                     },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" fill="#b4ebce"/>
-                      <path d="M12 8v8M8 12h8" stroke="#21824f" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                  </Box>
+                  
                   <ListItemText primary="Añadir Colaborador" />
                 </ListItemButton>
 
