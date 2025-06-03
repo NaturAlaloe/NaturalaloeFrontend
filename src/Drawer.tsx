@@ -32,7 +32,7 @@ import AddCollaborator from './views/collaborators/addCollaborator';
 import { ListItem, ListItemButton, ListItemText } from '@mui/material';
 import Profile from './views/profile/profile';
 import Login from './views/login/login';
-import Register from './views/login/registrer';
+import Register from './views/login/register';
 import UserAssignment from './views/login/userAssignment';
 const drawerWidth = 270;
 

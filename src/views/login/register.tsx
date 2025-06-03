@@ -27,7 +27,7 @@ export default function Login() {
   };
 
   return (
-    <FormContainer title="Inicio de Sesión" onSubmit={handleSubmit}>
+    <FormContainer title="Registro" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-6">
         <InputField
           label="Nombre"
@@ -46,9 +46,26 @@ export default function Login() {
           placeholder="Apellido"
           type="text"
           required pattern={undefined}        />
+            
+          <InputField
+          label="Email"
+          name="email"
+          value={formData.apellido}
+          onChange={handleChange}
+          placeholder="Email"
+          type="text"
+          required pattern={undefined}        />
         <InputField
           label="Contraseña"
           name="contrasena"
+          value={formData.contrasena}
+          onChange={handleChange}
+          placeholder="********"
+          type="password"
+          required pattern={undefined}        />
+        <InputField
+          label="Confirmar Contraseña"
+          name="confirmarContrasena"
           value={formData.contrasena}
           onChange={handleChange}
           placeholder="********"

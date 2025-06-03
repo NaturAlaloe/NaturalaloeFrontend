@@ -194,7 +194,6 @@ const ChartSelector = () => {
             <MenuItem value="pie">Circular (Pie)</MenuItem>
             <MenuItem value="doughnut">Dona (Doughnut)</MenuItem>
             <MenuItem value="line">Líneas</MenuItem>
-            <MenuItem value="polar">Área Polar</MenuItem>
           </Select>
         </FormControl>
       </div>

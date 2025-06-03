@@ -1,5 +1,4 @@
 // userAssignment.tsx
-import "@fontsource/poppins";
 import "@fontsource/poppins/700.css";
 import FormContainer from "../../components/formComponents/FormContainer";
 import SelectField from "../../components/formComponents/SelectField";
@@ -26,27 +25,27 @@ export default function UserAssignment() {
   };
 
   const areas = [
-    { nombre: "Administración" },
-    { nombre: "Finanzas" },
-    { nombre: "Operaciones" },
+    { codigo: "1", nombre: "Administración" },
+    { codigo: "2", nombre: "Finanzas" },
+    { codigo: "3", nombre: "Operaciones" },
   ];
 
   const departamentos = [
-    { nombre: "Contabilidad" },
-    { nombre: "Recursos Humanos" },
-    { nombre: "Tecnología" },
+    { codigo: "5", nombre: "Contabilidad" },
+    { codigo: "6", nombre: "Recursos Humanos" },
+    { codigo: "7", nombre: "Tecnología" },
   ];
 
   const puestos = [
-    { nombre: "Gerente" },
-    { nombre: "Analista" },
-    { nombre: "Asistente" },
+    { codigo: "10", nombre: "Gerente" },
+    { codigo: "11", nombre: "Analista" },
+    { codigo: "12", nombre: "Asistente" },
   ];
 
   const colaboradores = [
-    { nombre: "Juan Pérez" },
-    { nombre: "María Gómez" },
-    { nombre: "Carlos Rodríguez" },
+    { codigo: "20", nombre: "Juan Pérez" },
+    { codigo: "21", nombre: "María Gómez" },
+    { codigo: "22", nombre: "Carlos Rodríguez" },
   ];
 
   return (
@@ -57,7 +56,6 @@ export default function UserAssignment() {
           name="area"
           value={formData.area}
           onChange={handleChange}
-          options={areas}
           required
           optionLabel="1"
           optionValue="2"
@@ -67,7 +65,6 @@ export default function UserAssignment() {
           name="departamento"
           value={formData.departamento}
           onChange={handleChange}
-          options={departamentos}
           required
           optionLabel="5"
           optionValue="6"
@@ -77,7 +74,7 @@ export default function UserAssignment() {
           name="puesto"
           value={formData.puesto}
           onChange={handleChange}
-          options={puestos}
+
           required
           optionLabel="1"
           optionValue="2"
@@ -87,7 +84,6 @@ export default function UserAssignment() {
           name="colaborador"
           value={formData.colaborador}
           onChange={handleChange}
-          options={colaboradores}
           required
           optionLabel="Juan"
           optionValue="Pedro"

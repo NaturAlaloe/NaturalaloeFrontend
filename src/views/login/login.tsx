@@ -31,19 +31,11 @@ export default function Login() {
 <div className="grid grid-cols-1 gap-6">
   
         <InputField
-          label="Nombre"
-          name="nombre"
+          label="Email"
+          name="email"
           value={formData.nombre}
           onChange={handleChange}
-          placeholder="Nombre"
-          type="text"
-          required pattern={undefined}        />
-        <InputField
-          label="Apellido"
-          name="apellido"
-          value={formData.apellido}
-          onChange={handleChange}
-          placeholder="Apellido"
+          placeholder="Email"
           type="text"
           required pattern={undefined}        />
         <InputField
