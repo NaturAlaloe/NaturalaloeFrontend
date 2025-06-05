@@ -12,10 +12,11 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import HomeIcon from '@mui/icons-material/Home';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
+import ArticleIcon from '@mui/icons-material/Article';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import HandymanIcon from '@mui/icons-material/Handyman';
 import Collapse from '@mui/material/Collapse';
 import GroupIcon from '@mui/icons-material/Group'; // Para Colaboradores
 import { Routes, Route, Link } from 'react-router-dom';
@@ -31,7 +32,6 @@ import CapacitacionFinalizada from './views/capacitation/capacitationFinished';
 import AddCollaborator from './views/collaborators/addCollaborator';
 import { ListItem, ListItemButton, ListItemText } from '@mui/material';
 import Profile from './views/profile/profile';
-import Login from './views/login/login';
 import Register from './views/login/register';
 import UserAssignment from './views/login/userAssignment';
 const drawerWidth = 270;
@@ -215,41 +215,27 @@ export default function PersistentDrawerLeft() {
             </ListItemButton>
           </ListItem>
 
-            {/* Login */}
+            {/* Administracion */}
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => setOpenLogin(!openLogin)}
               sx={{
+              color: '#fff',
+              pl: 3,
+              '&:hover': {
+                background: '#21824f',
                 color: '#fff',
-                pl: 3,
-                '&:hover': {
-                  background: '#21824f',
-                  color: '#fff',
-                  '& .MuiSvgIcon-root': { color: '#13bd62' },
-                },
+                '& .MuiSvgIcon-root': { color: '#13bd62' },
+              },
               }}
             >
-              <InboxIcon sx={{ color: '#b4ebce', mr: 2 }} />
-              <ListItemText primary="Autenticación" />
+              <HandymanIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ListItemText primary="Administración" />
               {openLogin ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
           <Collapse in={openLogin} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              <ListItemButton
-                component={Link}
-                to="/login/login"
-                sx={{
-                  pl: 6,
-                  color: '#f4fcec',
-                  '&:hover': {
-                    background: '#2AAC67',
-                    color: '#fff',
-                  },
-                }}
-              >
-                <ListItemText primary="Login" />
-              </ListItemButton>
               <ListItemButton
                 component={Link}
                 to="/login/register"
@@ -262,7 +248,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-                <ListItemText primary="Registro" />
+                <ListItemText primary="Registrar Usuarios" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
@@ -295,7 +281,7 @@ export default function PersistentDrawerLeft() {
                 },
               }}
             >
-              <InboxIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ArticleIcon sx={{ color: '#b4ebce', mr: 2 }} />
               <ListItemText primary="Procedimientos" />
               {openProcedimientos ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
@@ -347,7 +333,7 @@ export default function PersistentDrawerLeft() {
                 },
               }}
             >
-              <InboxIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ArticleIcon sx={{ color: '#b4ebce', mr: 2 }} />
               <ListItemText primary="Capacitaciones" />
               {openCapacitaciones ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
@@ -499,7 +485,7 @@ export default function PersistentDrawerLeft() {
             }}
             onClick={() => {
               // Aquí puedes poner tu lógica de logout
-              alert('Cerrar sesión');
+              window.location.replace('/login'); // Redirigir al login
             }}
           >
             <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
@@ -512,7 +498,6 @@ export default function PersistentDrawerLeft() {
       <Main open={open}>
         <DrawerHeader />
         <Routes>
-          <Route path="/login/login" element={<Login />} />
           <Route path="/login/register" element={<Register />} />
           <Route path="/login/userAssignment" element={<UserAssignment />} />
           <Route path="/" element={<HomeScreen />} />
