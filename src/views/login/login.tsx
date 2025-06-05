@@ -3,9 +3,11 @@ import InputField from "../../components/formComponents/InputField";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import LogoNaturaloe from "../../assets/img/Logo_Naturaloe.png";
+import { Link } from "react-router-dom";
+import ChangePassword from "./changePassword";
 
 
-export default function Login() {
+export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void }) {
   const [formData, setFormData] = useState({
     correo: "",
     contrasena: "",
@@ -21,15 +23,18 @@ export default function Login() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Datos ingresados:", formData);
+    // Aquí iría tu lógica real de autenticación
+    // Si es exitosa:
+    if (onLoginSuccess) onLoginSuccess();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#eafbf2] to-[#d6f5e3] flex items-center justify-center px-4 py-12 font-[Poppins]">
+    <div className="min-h-screen bg-gradient-to-br from-[#eafbf2] to-[#d6f5e3] flex items-center justify-center px-4 py-6 font-[Poppins]">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="w-full max-w-2xl bg-white rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.1)] px-15 py-10"
+        className="w-full max-w-2xl bg-white rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.1)] px-15 py-8"
       >
         <div className="flex flex-row items-center justify-between mb-8">
           <div className="flex flex-col items-start">
@@ -69,9 +74,11 @@ export default function Login() {
           </button>
 
           <div className="text-center mt-2">
-            <a href="#" className="text-sm text-[#2AAC67] hover:underline">
-              ¿Olvidaste tu contraseña?
-            </a>
+            <div className="text-center mt-2">
+              <Link to="/login/recoverPassword" className="text-sm text-[#2AAC67] hover:underline">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
           </div>
         </form>
       </motion.div>
