@@ -1,4 +1,4 @@
-import React from "react";
+
 import { useCapacitationFinished } from '../../hooks/capacitations/useCapacitationFinished';
 
 

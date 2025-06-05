@@ -1,4 +1,4 @@
-import React from "react";
+
 
 export default function PoeSearchInput({
   label = "Buscar POE existente",
