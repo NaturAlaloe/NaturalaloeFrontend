@@ -5,8 +5,10 @@ import FormContainer from "../../components/formComponents/FormContainer";
 import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
 import PoeSearchInput from "../../components/formComponents/PoeSearchInput";
+import VigenciaToggle from "../../components/formComponents/ValidityToggle";
 import { useProceduresForm } from "../../hooks/procedureFormHooks/useProceduresForm";
 import { usePoeSearch } from "../../hooks/procedureFormHooks/usePoeSearch";
+import { useState } from "react";
 
 export default function Procedures() {
   const {
@@ -29,6 +31,9 @@ export default function Procedures() {
     setShowSugerencias,
     resultados,
   } = usePoeSearch(poees);
+
+  // Nuevo estado para el check de vigencia
+  const [enVigencia, setEnVigencia] = useState(true);
 
   return (
     <FormContainer title="Registro de Procedimiento" onSubmit={handleSubmit}>
@@ -97,14 +102,25 @@ export default function Procedures() {
           required
         />
         <InputField
-          label="Fecha"
-          name="fecha"
-          value={formData.fecha}
+          label="Fecha de Creación"
+          name="fechaCreacion"
+          value={formData.fechaCreacion}
           onChange={handleChange}
           type="date"
           required
         />
-        <div className="md:col-span-2">
+        <InputField
+          label="Fecha de Vigencia"
+          name="fechaVigencia"
+          value={formData.fechaVigencia}
+          onChange={handleChange}
+          type="date"
+          required
+        />
+        <div className="md:col-start-3 md:row-start-3 flex flex-row items-center justify-center gap-2">
+          <VigenciaToggle enVigencia={enVigencia} setEnVigencia={setEnVigencia} />
+        </div>
+        <div className="md:col-span-3">
           <InputField
             label="Seleccionar PDF"
             type="file"
