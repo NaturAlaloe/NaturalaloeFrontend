@@ -1,4 +1,4 @@
-import { useProceduresList, type Procedure } from "../../hooks/listProcedure/useProceduresList";
+import { useProceduresList} from "../../hooks/listProcedure/useProceduresList";
 import { Search } from "@mui/icons-material";
 
 export default function ListProcedures() {
