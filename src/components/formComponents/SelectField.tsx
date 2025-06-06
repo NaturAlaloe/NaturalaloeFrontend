@@ -1,4 +1,19 @@
+import type { ChangeEventHandler, SelectHTMLAttributes } from "react";
 
+interface OptionType {
+  [key: string]: any;
+}
+
+interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string;
+  name: string;
+  value: string | number;
+  onChange: ChangeEventHandler<HTMLSelectElement>;
+  options?: OptionType[];
+  className?: string;
+  optionLabel?: string;
+  optionValue?: string;
+}
 
 export default function SelectField({
   label,
@@ -12,7 +27,7 @@ export default function SelectField({
   optionLabel = "nombre",
   optionValue = "nombre",
   ...props
-}) {
+}: SelectFieldProps) {
   return (
     <div>
       {label && (

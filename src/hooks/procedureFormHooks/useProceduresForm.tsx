@@ -1,42 +1,68 @@
-//useProceduresForm.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent} from "react";
+
+interface Departamento {
+  nombre: string;
+  codigo: string;
+}
+
+interface Categoria {
+  nombre: string;
+  codigo: string;
+}
+
+interface Poe {
+  codigo: string;
+  titulo: string;
+}
+
+interface FormData {
+  titulo: string;
+  departamento: string;
+  categoria: string;
+  poeNumber: string;
+  responsable: string;
+  revision: string;
+  fechaCreacion: string; // <-- Agregado
+  fechaVigencia: string; // <-- Agregado
+}
 
 export function useProceduresForm() {
   // Datos estáticos igual que en tu vista
-  const departamentos = [
+  const departamentos: Departamento[] = [
     { nombre: "Ventas", codigo: "700" },
     { nombre: "Producción", codigo: "800" },
     { nombre: "Calidad", codigo: "900" },
     { nombre: "Logística", codigo: "600" },
   ];
-  const categorias = [
+  const categorias: Categoria[] = [
     { nombre: "Manual", codigo: "10" },
     { nombre: "Política", codigo: "20" },
     { nombre: "Procedimiento", codigo: "30" },
   ];
-  const responsables = [
+  const responsables: string[] = [
     "Juan Pérez",
     "Ana Gómez",
     "Luis Martínez",
     "Marta Díaz",
   ];
-  const poees = [
+  const poees: Poe[] = [
     { codigo: "700-30-0001", titulo: "Ventas de Procedimiento" },
     { codigo: "900-30-0001", titulo: "Calidad de Procedimiento" },
   ];
 
   // Estado del formulario
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     titulo: "",
     departamento: "",
     categoria: "",
     poeNumber: "",
     responsable: "",
     revision: "",
-    fecha: "",
+    fechaCreacion: "", // <-- Agregado
+    fechaVigencia: "", // <-- Agregado
   });
 
-  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   // Generar poeNumber automáticamente
   useEffect(() => {
@@ -57,10 +83,10 @@ export function useProceduresForm() {
         poeNumber: "",
       }));
     }
-  }, [formData.departamento, formData.categoria]);
+  }, [formData.departamento, formData.categoria]); // <-- Solo dependencias necesarias
 
   // Handlers
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -69,12 +95,14 @@ export function useProceduresForm() {
   };
 
   // Para el PDF
-  const handlePdfChange = (e) => {
-    setPdfFile(e.target.files[0]);
+  const handlePdfChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setPdfFile(e.target.files[0]);
+    }
   };
 
   // Submit básico
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     alert(JSON.stringify(formData, null, 2));
   };

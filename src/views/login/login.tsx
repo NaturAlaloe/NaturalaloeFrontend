@@ -4,8 +4,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import LogoNaturaloe from "../../assets/img/Logo_Naturaloe.png";
 import { Link } from "react-router-dom";
-import ChangePassword from "./changePassword";
-
 
 export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void }) {
   const [formData, setFormData] = useState({

@@ -1,4 +1,20 @@
+import type { Dispatch, SetStateAction } from "react";
 
+interface Poe {
+  codigo: string;
+  titulo: string;
+  [key: string]: any; 
+}
+
+interface PoeSearchInputProps {
+  label?: string;
+  busqueda: string;
+  setBusqueda: Dispatch<SetStateAction<string>>;
+  showSugerencias: boolean;
+  setShowSugerencias: Dispatch<SetStateAction<boolean>>;
+  resultados: Poe[];
+  onSelect: (poe: Poe) => void;
+}
 
 export default function PoeSearchInput({
   label = "Buscar POE existente",
@@ -8,7 +24,7 @@ export default function PoeSearchInput({
   setShowSugerencias,
   resultados,
   onSelect,
-}) {
+}: PoeSearchInputProps) {
   return (
     <div className="relative mb-6">
       <label className="block text-sm font-semibold text-[#2AAC67] mb-2">

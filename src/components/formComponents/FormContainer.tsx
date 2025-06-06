@@ -1,11 +1,20 @@
+
 import { motion } from "framer-motion";
+import type { FormEventHandler, ReactNode } from "react";
+
+interface FormContainerProps {
+  title?: string;
+  onSubmit: FormEventHandler<HTMLFormElement>;
+  children: ReactNode;
+  buttonText?: string;
+}
 
 export default function FormContainer({
   title = "Formulario",
   onSubmit,
   children,
   buttonText = "Guardar",
-}) {
+}: FormContainerProps) {
   return (
     <div className="min-h-screen bg-[#DEF7E9] flex items-center justify-center px-4 py-12 font-[Poppins]">
       <motion.form

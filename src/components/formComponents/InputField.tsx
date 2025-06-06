@@ -1,3 +1,12 @@
+import type { ChangeEventHandler, InputHTMLAttributes } from "react";
+
+interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  name: string;
+  value?: string | number; // value ahora es opcional
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  className?: string;
+}
 
 export default function InputField({
   label,
@@ -11,7 +20,7 @@ export default function InputField({
   pattern,
   className = "",
   ...props
-}) {
+}: InputFieldProps) {
   return (
     <div>
       {label && (
@@ -22,7 +31,7 @@ export default function InputField({
       <input
         type={type}
         name={name}
-        value={value}
+        {...(type !== "file" ? { value } : {})} 
         onChange={onChange}
         placeholder={placeholder}
         required={required}

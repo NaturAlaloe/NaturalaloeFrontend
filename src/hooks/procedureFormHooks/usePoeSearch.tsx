@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { useState,  } from "react";
 
-export function usePoeSearch(poees) {
-  const [busqueda, setBusqueda] = useState("");
-  const [showSugerencias, setShowSugerencias] = useState(false);
+interface Poe {
+  codigo: string;
+  titulo: string;
+  [key: string]: any;
+}
+
+export function usePoeSearch(poees: Poe[]) {
+  const [busqueda, setBusqueda] = useState<string>("");
+  const [showSugerencias, setShowSugerencias] = useState<boolean>(false);
 
   const resultados = poees.filter(
     (poe) =>

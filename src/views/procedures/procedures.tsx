@@ -1,5 +1,5 @@
 //procedures.tsx
-import "@fontsource/poppins";
+
 import "@fontsource/poppins/700.css";
 import FormContainer from "../../components/formComponents/FormContainer";
 import InputField from "../../components/formComponents/InputField";
@@ -80,6 +80,7 @@ export default function Procedures() {
           name="poeNumber"
           value={formData.poeNumber}
           readOnly
+          onChange={() => {}}
           required
         />
         <SelectField
@@ -123,6 +124,7 @@ export default function Procedures() {
         <div className="md:col-span-3">
           <InputField
             label="Seleccionar PDF"
+            name="pdfFile"
             type="file"
             accept="application/pdf"
             onChange={handlePdfChange}
