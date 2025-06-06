@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -18,7 +18,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import HandymanIcon from '@mui/icons-material/Handyman';
 import Collapse from '@mui/material/Collapse';
-import GroupIcon from '@mui/icons-material/Group'; // Para Colaboradores
+import GroupIcon from '@mui/icons-material/Group'; 
 import { Routes, Route, Link } from 'react-router-dom';
 import HomeScreen from './views/home/HomeScreen';
 import Procedimientos from './views/procedures/procedures';
@@ -87,11 +87,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const drawerBg = `linear-gradient(to bottom,rgb(23, 134, 75) 0%,rgb(42, 172, 103) 100%)`;
 export default function PersistentDrawerLeft() {
-  const theme = useTheme();
+
   const [open, setOpen] = React.useState(false);
 
   // Estados para submenús
-  const [openDashboard, setOpenDashboard] = React.useState(false);
+
   const [openLogin, setOpenLogin] = React.useState(false);
   const [openProcedimientos, setOpenProcedimientos] = React.useState(false);
   const [openCapacitaciones, setOpenCapacitaciones] = React.useState(false);
