@@ -3,6 +3,7 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import CollaboratorRolesList from "../../components/CollaboratorRolesList";
+//import { transform } from "framer-motion";
 
 export default function CollaboratorDetail() {
   const collaborator = {
@@ -17,7 +18,7 @@ export default function CollaboratorDetail() {
   return (
     <Box
       sx={{
-        minHeight: "90vh",
+        minHeight: "100vh",
         background: "linear-gradient(135deg, #E6F3EA 0%, #F6FBF7 100%)",
         bgcolor: "#F6FBF7",
         display: "flex",
@@ -26,8 +27,9 @@ export default function CollaboratorDetail() {
         py: 4,
       }}
     >
+      {/*cuando blanco que contien toda la información del colaborador*/}
       <Paper
-        elevation={4}
+        elevation={8} //se aumenta para una sombra más pronunciada
         sx={{
           display: "flex",
           flexDirection: "row",
@@ -37,10 +39,15 @@ export default function CollaboratorDetail() {
           maxWidth: 1200,
           bgcolor: "#fff",
           border: "2px solid #2AAC67",
-          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.1)",
-          transition: "transform 0.3s ease, box-shadow 0.3s ease",
+          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.1)", // nueva sombra para mas profundidad 
+          transition: "transform 0.3s ease, box-shadow 0.3s ease", // transicion para efecto hover
+          '&:hover': {
+            transform: "scale(1.02)", // esto escala ligeramente el cuadro 
+            boxShadow: "0 12px 30px rgba(0, 0, 0, 0.2)",  // sombra intensa al hover 
+          },
         }}
       >
+        {/*cuadro que contiene la información del colaborador*/}
         <Box
           sx={{
             minWidth: 300,
@@ -53,12 +60,20 @@ export default function CollaboratorDetail() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            transition: "transform 0.3s ease, box-shadow 0.3s ease", 
+            '&:hover': { 
+              transform: "scale(1.02)", 
+              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)"  
+            },
           }}
         >
           <Typography
             variant="h6"
-            sx={{ color: "#2AAC67", fontWeight: "bold", mb: 6 }}
+            sx={{ color: "#2AAC67", 
+              fontWeight: "bold", 
+              mb: 2.5,
+              letterSpacing: "0.5px"
+             }}
           >
             Información del Colaborador
           </Typography>
@@ -70,12 +85,17 @@ export default function CollaboratorDetail() {
             size="small"
             disabled
             sx={{
-              mb: 2.5,
-              width: "100%",
-              "& .Mui-disabled": {
-                WebkitTextFillColor: "#222",
-                opacity: 1,
-                backgroundColor: "#fff",
+              mb: 2.5, 
+              width: '100%',
+              borderRadius: 3, 
+              backgroundColor: '#fff', 
+              WebkitTextFillColor: "#18703f", 
+              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},// Nueva personalización del texto
+              '& .MuiOutlinedInput-root': { // Nueva personalización del borde
+                '& fieldset': { borderColor: '#2AAC67 !important'}, 
+                '&:hover fieldset': { borderColor: 'black !important'}, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
               },
             }}
           />
@@ -87,12 +107,17 @@ export default function CollaboratorDetail() {
             size="small"
             disabled
             sx={{
-              mb: 2.5,
-              width: "100%",
-              "& .Mui-disabled": {
-                WebkitTextFillColor: "#222",
-                opacity: 1,
-                backgroundColor: "#fff",
+              mb: 2.5, 
+              width: '100%',
+              borderRadius: 3, 
+              backgroundColor: '#fff', 
+              WebkitTextFillColor: "#18703f", 
+              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},// Nueva personalización del texto
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#2AAC67 !important'}, 
+                '&:hover fieldset': { borderColor: 'black !important'}, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
               },
             }}
           />
@@ -104,12 +129,17 @@ export default function CollaboratorDetail() {
             size="small"
             disabled
             sx={{
-              mb: 2.5,
-              width: "100%",
-              "& .Mui-disabled": {
-                WebkitTextFillColor: "#222",
-                opacity: 1,
-                backgroundColor: "#fff",
+              mb: 2.5, 
+              width: '100%',
+              borderRadius: 3, 
+              backgroundColor: '#fff', 
+              WebkitTextFillColor: "#18703f", 
+              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#2AAC67 !important'}, 
+                '&:hover fieldset': { borderColor: 'black !important'}, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
               },
             }}
           />
@@ -121,12 +151,17 @@ export default function CollaboratorDetail() {
             size="small"
             disabled
             sx={{
-              mb: 2.5,
-              width: "100%",
-              "& .Mui-disabled": {
-                WebkitTextFillColor: "#222",
-                opacity: 1,
-                backgroundColor: "#fff",
+              mb: 2.5, 
+              width: '100%',
+              borderRadius: 3, 
+              backgroundColor: '#fff', 
+              WebkitTextFillColor: "#18703f", 
+              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: '#2AAC67 !important'}, 
+                '&:hover fieldset': { borderColor: 'black !important'}, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
               },
             }}
           />
@@ -138,12 +173,17 @@ export default function CollaboratorDetail() {
             size="small"
             disabled
             sx={{
-              mb: 2.5,
-              width: "100%",
-              "& .Mui-disabled": {
-                WebkitTextFillColor: "#222",
-                opacity: 1,
-                backgroundColor: "#fff",
+              mb: 2.5, 
+              width: '100%',
+              borderRadius: 3, 
+              backgroundColor: '#fff', 
+              WebkitTextFillColor: "#18703f", 
+              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: '#2AAC67 !important'}, 
+                '&:hover fieldset': { borderColor: 'black !important'}, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
               },
             }}
           />
@@ -155,12 +195,17 @@ export default function CollaboratorDetail() {
             size="small"
             disabled
             sx={{
-              mb: 2.5,
-              width: "100%",
-              "& .Mui-disabled": {
-                WebkitTextFillColor: "#222",
-                opacity: 1,
-                backgroundColor: "#fff",
+              mb: 2.5, 
+              width: '100%',
+              borderRadius: 3, 
+              backgroundColor: '#fff', 
+              WebkitTextFillColor: "#18703f", 
+              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
+              '& .MuiOutlinedInput-root': { 
+                '& fieldset': { borderColor: '#2AAC67 !important'}, 
+                '&:hover fieldset': { borderColor: 'black !important'}, 
+                transition: 'background-color 0.3s ease', 
+                '&:hover': { backgroundColor: '#E6F3EA' } 
               },
             }}
           />

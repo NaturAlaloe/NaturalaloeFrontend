@@ -14,6 +14,12 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import WorkIcon from '@mui/icons-material/Work';
+import { Button } from '@mui/material';
+import EditDocumentIcon from '@mui/icons-material/EditDocument';
+import Box from '@mui/material/Box';
+import { Link } from 'react-router-dom';
 
 const roles = [
   "Operador de Lavandería",
@@ -76,10 +82,15 @@ export default function CollaboratorRolesList() {
               }
             }}
             >
-            <ListItemText primary={role} 
+            <ListItemIcon>
+              <WorkIcon sx={{ color: '#2AAC67', fontSize: '1.6rem' }} /> 
+            </ListItemIcon>
+            <ListItemText 
+            primary={role} 
             primaryTypographyProps={{
                 fontWeight: 'bold', 
                 color: 'black', 
+                letterSpacing: '0.5px'
               }}
             />
             {open[role] ? <ExpandLess sx={{ color: '#2AAC67' }} /> : <ExpandMore sx={{ color: '#2AAC67' }} />}
@@ -122,11 +133,33 @@ export default function CollaboratorRolesList() {
                       <TableCell>{row.version}</TableCell>
                       <TableCell>{row.fecha}</TableCell>
                       <TableCell>
-                        {row.estado ? (
-                          <CheckCircleIcon sx={{ color: '#2AAC67', fontSize: '1.6rem' }} />
-                        ) : (
-                          <CancelIcon sx={{ color: '#e53935', fontSize: '1.6rem' }} />
-                        )}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {row.estado ? (
+                            <CheckCircleIcon sx={{ color: '#2AAC67', fontSize: '1.6rem' }} />
+                          ) : (
+                            <>
+                              <CancelIcon sx={{ color: '#e53935', fontSize: '1.6rem' }} />
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                component={Link}
+                                to={"/capacitation/"} // Redirección con parámetros
+                                sx={{
+                                  backgroundColor: '#2AAC67',
+                                  '&:hover': { backgroundColor: '#1F8A50' },
+                                  textTransform: 'none',
+                                  fontWeight: 'bold',
+                                  borderRadius: 2,
+                                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                                  transition: 'all 0.3s ease',
+                                }}
+                              >
+                                <EditDocumentIcon/>
+                              </Button>
+                            </>
+                          )}
+                        </Box>
                       </TableCell>
                     </TableRow>
                   ))}
