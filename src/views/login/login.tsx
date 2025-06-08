@@ -5,11 +5,16 @@ import { motion } from "framer-motion";
 import LogoNaturaloe from "../../assets/img/Logo_Naturaloe.png";
 import { Link } from "react-router-dom";
 
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
 export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void }) {
   const [formData, setFormData] = useState({
     correo: "",
     contrasena: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -21,7 +26,7 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Datos ingresados:", formData);
-   //LÓGICA REAL DE AUTENTICACIÓN AQUÍ
+    //LÓGICA REAL DE AUTENTICACIÓN AQUÍ
     if (onLoginSuccess) onLoginSuccess();
   };
 
@@ -52,16 +57,29 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
             required
             pattern={undefined}
           />
-          <InputField
-            label="Contraseña"
-            name="contrasena"
-            value={formData.contrasena}
-            onChange={handleChange}
-            placeholder="********"
-            type="password"
-            required
-            pattern={undefined}
-          />
+
+          <div className="relative">
+            <InputField
+              label="Contraseña"
+              name="contrasena"
+              value={formData.contrasena}
+              onChange={handleChange}
+              placeholder="********"
+              type={showPassword ? "text" : "password"}
+              required
+              pattern={undefined}
+            />
+           <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-[70%] -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            tabIndex={-1}
+            >
+              {showPassword ? <VisibilityOff /> : <Visibility />}
+            </button>
+
+          </div>
 
           <button
             type="submit"
@@ -71,11 +89,9 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
           </button>
 
           <div className="text-center mt-2">
-            <div className="text-center mt-2">
-              <Link to="/login/recoverPassword" className="text-sm text-[#2AAC67] hover:underline">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
+            <Link to="/login/recoverPassword" className="text-sm text-[#2AAC67] hover:underline">
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
         </form>
       </motion.div>
