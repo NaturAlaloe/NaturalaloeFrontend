@@ -21,8 +21,7 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Datos ingresados:", formData);
-    // Aquí iría tu lógica real de autenticación
-    // Si es exitosa:
+   //LÓGICA REAL DE AUTENTICACIÓN AQUÍ
     if (onLoginSuccess) onLoginSuccess();
   };
 
