@@ -11,7 +11,7 @@ export default function Profile() {
     toggleEditing,
     handleInputChange,
     handleAvatarChange,
-    setUserData
+
   } = useProfile();
 
   const handleCancel = () => {
@@ -59,11 +59,12 @@ export default function Profile() {
               editing={isEditing}
               onChange={handleInputChange}
             />
+  
             
             <ProfileField
-              label="Biografía"
-              name="bio"
-              value={userData.bio}
+              label="Roles"
+              name="roles"
+              value={userData.roles}
               editing={isEditing}
               onChange={handleInputChange}
               multiline
