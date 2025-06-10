@@ -31,3 +31,6 @@ npm install chart.js react-chartjs-2
 
 #para instalar la fuente popins 
 npm install @fontsource/poppins
+
+#para instalar el datatable 
+npm install react-data-table-component
