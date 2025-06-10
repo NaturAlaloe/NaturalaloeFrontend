@@ -329,7 +329,7 @@ export default function ListProcedures() {
           onSort={(column, sortDirection) => {
             if (typeof column.selector === "function" && typeof column.name === "string") {
            
-              handleSort(column.name as keyof Procedure, sortDirection, column);
+              handleSort(column.name as keyof Procedure);
             }
           }}
           sortIcon={
