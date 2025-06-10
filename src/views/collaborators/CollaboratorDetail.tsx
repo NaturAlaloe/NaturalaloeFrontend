@@ -18,9 +18,6 @@ export default function CollaboratorDetail() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #E6F3EA 0%, #F6FBF7 100%)",
-        bgcolor: "#F6FBF7",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -29,7 +26,7 @@ export default function CollaboratorDetail() {
     >
       {/*cuando blanco que contien toda la información del colaborador*/}
       <Paper
-        elevation={8} //se aumenta para una sombra más pronunciada
+        elevation={8}
         sx={{
           display: "flex",
           flexDirection: "row",
@@ -39,12 +36,7 @@ export default function CollaboratorDetail() {
           maxWidth: 1200,
           bgcolor: "#fff",
           border: "2px solid #2AAC67",
-          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.1)", // nueva sombra para mas profundidad 
-          transition: "transform 0.3s ease, box-shadow 0.3s ease", // transicion para efecto hover
-          '&:hover': {
-            transform: "scale(1.02)", // esto escala ligeramente el cuadro 
-            boxShadow: "0 12px 30px rgba(0, 0, 0, 0.2)",  // sombra intensa al hover 
-          },
+          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.1)",
         }}
       >
         {/*cuadro que contiene la información del colaborador*/}
@@ -60,11 +52,6 @@ export default function CollaboratorDetail() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            transition: "transform 0.3s ease, box-shadow 0.3s ease", 
-            '&:hover': { 
-              transform: "scale(1.02)", 
-              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)"  
-            },
           }}
         >
           <Typography
@@ -90,8 +77,8 @@ export default function CollaboratorDetail() {
               borderRadius: 3, 
               backgroundColor: '#fff', 
               WebkitTextFillColor: "#18703f", 
-              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},// Nueva personalización del texto
-              '& .MuiOutlinedInput-root': { // Nueva personalización del borde
+              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
+              '& .MuiOutlinedInput-root': {
                 '& fieldset': { borderColor: '#2AAC67 !important'}, 
                 '&:hover fieldset': { borderColor: 'black !important'}, 
                 transition: 'background-color 0.3s ease', 
@@ -112,7 +99,7 @@ export default function CollaboratorDetail() {
               borderRadius: 3, 
               backgroundColor: '#fff', 
               WebkitTextFillColor: "#18703f", 
-              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},// Nueva personalización del texto
+              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
               '& .MuiOutlinedInput-root': { 
                 '& fieldset': { borderColor: '#2AAC67 !important'}, 
                 '&:hover fieldset': { borderColor: 'black !important'}, 

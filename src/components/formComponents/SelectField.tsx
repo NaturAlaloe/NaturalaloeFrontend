@@ -9,7 +9,7 @@ interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   name: string;
   value: string | number;
   onChange: ChangeEventHandler<HTMLSelectElement>;
-  options?: OptionType[];
+  options?: (OptionType | string)[];
   className?: string;
   optionLabel?: string;
   optionValue?: string;
@@ -28,6 +28,13 @@ export default function SelectField({
   optionValue = "nombre",
   ...props
 }: SelectFieldProps) {
+  // Normaliza para aceptar string[] y OptionType[]
+  const normalizedOptions = options.map((opt) =>
+    typeof opt === "object"
+      ? opt
+      : { [optionLabel]: opt, [optionValue]: opt }
+  );
+
   return (
     <div>
       {label && (
@@ -47,12 +54,12 @@ export default function SelectField({
         <option value="" disabled>
           Seleccione {label?.toLowerCase()}
         </option>
-        {options.map((opt, i) => (
+        {normalizedOptions.map((opt, i) => (
           <option
             key={opt.codigo ?? opt[optionValue] ?? i}
-            value={opt[optionValue] ?? opt}
+            value={opt[optionValue]}
           >
-            {opt[optionLabel] ?? opt}
+            {opt[optionLabel]}
           </option>
         ))}
       </select>
