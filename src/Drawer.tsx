@@ -34,6 +34,13 @@ import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Profile from "./views/profile/profile";
 import Register from "./views/login/register";
 import UserAssignment from "./views/login/userAssignment";
+import SchoolIcon from '@mui/icons-material/School';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+
+
 const drawerWidth = 270;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
@@ -348,7 +355,7 @@ export default function PersistentDrawerLeft() {
                 },
               }}
             >
-              <ArticleIcon sx={{ color: "#b4ebce", mr: 2 }} />
+              <SchoolIcon sx={{ color: "#b4ebce", mr: 2 }} />
               <ListItemText primary="Capacitaciones" />
               {openCapacitaciones ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
@@ -367,6 +374,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
+                <LibraryAddIcon sx={{ color: "#b4ebce", mr: 2 }} />
                 <ListItemText primary="Agregar Capacitaciones" />
               </ListItemButton>
               <ListItemButton
@@ -381,21 +389,8 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
+                <PersonAddIcon sx={{ color: "#b4ebce", mr: 2 }} />
                 <ListItemText primary="Agregar Facilitadores" />
-              </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to="/capacitation/capacitationIndividualFinished"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
-              >
-                <ListItemText primary="Finalizadas" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
@@ -409,8 +404,25 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
+                <FormatListBulletedIcon sx={{ color: "#b4ebce", mr: 2 }} />
                 <ListItemText primary="Lista" />
               </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/capacitation/capacitationIndividualFinished"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <AssignmentTurnedInIcon sx={{ color: "#b4ebce", mr: 2 }} />
+                <ListItemText primary="Finalizadas" />
+              </ListItemButton>
+
             </List>
           </Collapse>
 
