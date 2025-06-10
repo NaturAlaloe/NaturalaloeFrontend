@@ -2,7 +2,6 @@ import InputField from "../../components/formComponents/InputField";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import LogoNaturaloe from "../../assets/img/Logo_Naturaloe.png";
-import SelectField from "../../components/formComponents/SelectField";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -66,19 +65,7 @@ export default function Register() {
               required
               pattern={undefined}
             />
-            <InputField
-              label="Cédula"
-              name="cedula"
-              value={formData.cedula}
-              onChange={handleChange}
-              placeholder="Tu cédula"
-              type="text"
-              required
-              pattern={undefined}
-            />
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
               label="Correo Electrónico"
               name="correo"
@@ -89,29 +76,11 @@ export default function Register() {
               required
               pattern={undefined}
             />
-            <SelectField
-              label="Departamento"
-              name="departamento"
-              value={formData.departamento}
-              onChange={handleChange}
-              options={[]}
-              required
-              optionLabel="departamento"
-              optionValue="departamento"
-            />
+
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <SelectField
-              label="Puesto"
-              name="puesto"
-              value={formData.puesto}
-              onChange={handleChange}
-              options={[]}
-              required
-              optionLabel="puesto"
-              optionValue="puesto"
-            />
+
             <InputField
               label="Contraseña"
               name="contrasena"
@@ -122,9 +91,6 @@ export default function Register() {
               required
               pattern={undefined}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
               label="Confirmar Contraseña"
               name="confirmarContrasena"
@@ -135,7 +101,10 @@ export default function Register() {
               required
               pattern={undefined}
             />
+
           </div>
+
+
 
           <button
             type="submit"
