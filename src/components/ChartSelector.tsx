@@ -1,5 +1,5 @@
 // src/components/ChartSelector.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Bar, Pie, Doughnut, Line, PolarArea } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -13,7 +13,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Select, MenuItem, FormControl, InputLabel, Box, Grid } from '@mui/material';
+import { Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
+
 
 ChartJS.register(
   CategoryScale,
@@ -97,87 +98,53 @@ const ChartSelector = () => {
     },
   };
 
-  const renderSingleChart = () => {
+  const renderChart = () => {
     const options = {
       ...commonOptions,
       plugins: {
         ...commonOptions.plugins,
         title: {
           display: true,
-          text: chartType === 'bar' 
-            ? 'Personal Capacitado vs No Capacitado por Área' 
-            : chartType === 'line' 
-              ? 'Tendencia de Capacitación por Área' 
+          text:
+            chartType === 'bar'
+              ? 'Personal Capacitado vs No Capacitado por Área'
+              : chartType === 'line'
+              ? 'Tendencia de Capacitación por Área'
+              : chartType === 'pie'
+              ? 'Personal Capacitado por Área'
+              : chartType === 'doughnut'
+              ? 'Personal No Capacitado por Área'
               : 'Distribución de Personal por Área',
-          font: { size: 18 }
-        }
-      }
+          font: { size: 18 },
+        },
+      },
     };
 
     switch (chartType) {
-      case 'bar': return <Bar data={comparativeData} options={options} />;
-      case 'line': return <Line data={comparativeData} options={options} />;
-      case 'polar': return <PolarArea data={comparativeData} options={options} />;
-      default: return <Bar data={comparativeData} options={options} />;
+      case 'bar':
+        return <Bar data={comparativeData} options={options} />;
+      case 'line':
+        return <Line data={comparativeData} options={options} />;
+      case 'polar':
+        return <PolarArea data={comparativeData} options={options} />;
+      case 'pie':
+        return (
+          <Pie
+            data={trainedData}
+            options={options}
+          />
+        );
+      case 'doughnut':
+        return (
+          <Doughnut
+            data={untrainedData}
+            options={options}
+          />
+        );
+      default:
+        return <Bar data={comparativeData} options={options} />;
     }
   };
-
-  const renderDoubleCharts = () => (
-    <Grid container spacing={4} sx={{ height: '100%' }}>
-      <Grid item xs={12} md={6} sx={{ height: '100%' }}>
-        <Box sx={{ 
-          p: 3, 
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
-        }}>
-          <h3 className="text-xl font-bold text-green-800 mb-4">
-            Personal Capacitado por Área
-          </h3>
-          <div style={{ width: '100%', height: '400px' }}>
-            {chartType === 'pie' ? (
-              <Pie 
-                data={trainedData} 
-                options={commonOptions} 
-              />
-            ) : (
-              <Doughnut 
-                data={trainedData} 
-                options={commonOptions} 
-              />
-            )}
-          </div>
-        </Box>
-      </Grid>
-      <Grid item xs={12} md={6} sx={{ height: '100%' }}>
-        <Box sx={{ 
-          p: 3, 
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
-        }}>
-          <h3 className="text-xl font-bold text-red-800 mb-4">
-            Personal No Capacitado por Área
-          </h3>
-          <div style={{ width: '100%', height: '400px' }}>
-            {chartType === 'pie' ? (
-              <Pie 
-                data={untrainedData} 
-                options={commonOptions} 
-              />
-            ) : (
-              <Doughnut 
-                data={untrainedData} 
-                options={commonOptions} 
-              />
-            )}
-          </div>
-        </Box>
-      </Grid>
-    </Grid>
-  );
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md w-full">
@@ -197,9 +164,11 @@ const ChartSelector = () => {
           </Select>
         </FormControl>
       </div>
-      
-      <div style={{ height: '600px' }}>
-        {['pie', 'doughnut'].includes(chartType) ? renderDoubleCharts() : renderSingleChart()}
+
+      <div style={{ height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Box sx={{ width: '100%', height: '100%' }}>
+          {renderChart()}
+        </Box>
       </div>
     </div>
   );

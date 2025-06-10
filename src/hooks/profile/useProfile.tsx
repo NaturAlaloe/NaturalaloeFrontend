@@ -7,7 +7,7 @@ export default function useProfile() {
     email: "juan.perez@ejemplo.com",
     position: "Desarrollador Frontend",
     department: "Tecnología",
-    bio: "Apasionado por crear interfaces de usuario intuitivas y eficientes.",
+    roles: "Usuario, Administrador", // Cambiado de bio a roles
     avatar: ""
   });
 
@@ -23,8 +23,9 @@ export default function useProfile() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        if (event.target?.result) {
-          setUserData(prev => ({ ...prev, avatar: event.target.result as string }));
+        const result = (event.target as FileReader | null)?.result;
+        if (result) {
+          setUserData(prev => ({ ...prev, avatar: result as string }));
         }
       };
       reader.readAsDataURL(file);
