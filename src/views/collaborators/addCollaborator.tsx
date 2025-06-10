@@ -1,61 +1,80 @@
+import { useState } from 'react';
 import FormContainer from '../../components/formComponents/FormContainer'
 import InputField from '../../components/formComponents/InputField'
 import SelectField from '../../components/formComponents/SelectField'
 
-
 function addCollaborator() {
+
+    const [formData, setFormData] = useState({
+        nombreCompleto: "",
+        cedula: "",
+        correo: "",
+        numero: "",
+        fechaNacimiento: "",
+        area: "",
+        departamento: "",
+        puesto: "",
+        rol: "",
+    });
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
     return (
         <div>
-
             <FormContainer title="Registro de Colaboradores" onSubmit={() => { }}>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                     <InputField
                         label="Nombre Completo"
-                        name="nombre"
-                        value={''}
-                        onChange={() => { }}
+                        name="nombreCompleto"
+                        value={formData.nombreCompleto}
+                        onChange={handleChange}
                         placeholder="Ingrese el nombre"
                         required pattern={undefined} />
 
                     <InputField
                         label="Cédula"
                         name="cedula"
-                        value={''}
-                        onChange={() => { }}
+                        value={formData.cedula}
+                        onChange={handleChange}
                         placeholder="Ingrese la cedula"
                         required pattern={undefined} />
 
                     <InputField
                         label="Correo"
                         name="correo"
-                        value={''}
-                        onChange={() => { }}
+                        value={formData.correo}
+                        onChange={handleChange}
                         placeholder="Ingrese el correo"
                         required pattern={undefined} />
 
                     <InputField
                         label="Número telefónico"
                         name="numero"
-                        value={''}
-                        onChange={() => { }}
+                        value={formData.numero}
+                        onChange={handleChange}
                         placeholder="Ingrese el número telefónico"
                         required pattern={undefined} />
 
                     <InputField
                         label="Fecha de nacimiento"
-                        name="fecha"
-                        value={''}
-                        onChange={() => { }}
+                        name="fechaNacimiento"
+                        value={formData.fechaNacimiento}
+                        onChange={handleChange}
                         type="date"
                         required pattern={undefined} />
 
                     <SelectField
                         label="Área"
                         name="area"
-                        value={''}
-                        onChange={() => { }}
+                        value={formData.area}
+                        onChange={handleChange}
                         options={[]}
                         required
                         optionLabel="area"
@@ -65,8 +84,8 @@ function addCollaborator() {
                     <SelectField
                         label="Departamento"
                         name="departamento"
-                        value={''}
-                        onChange={() => { }}
+                        value={formData.departamento}
+                        onChange={handleChange}
                         options={[]}
                         required
                         optionLabel="departamento"
@@ -76,8 +95,8 @@ function addCollaborator() {
                     <SelectField
                         label="Puesto"
                         name="puesto"
-                        value={''}
-                        onChange={() => { }}
+                        value={formData.puesto}
+                        onChange={handleChange}
                         options={[]}
                         required
                         optionLabel="puesto"
@@ -85,19 +104,17 @@ function addCollaborator() {
                     />
 
                     <SelectField
-                        label="Colaborador"
-                        name="colaborador"
-                        value={''}
-                        onChange={() => { }}
+                        label="Rol"
+                        name="rol"
+                        value={formData.rol}
+                        onChange={handleChange}
                         options={[]}
                         required
-                        optionLabel="colaborador"
-                        optionValue="colaborador"
+                        optionLabel="rol"
+                        optionValue="rol"
                     />
                 </div>
-
             </FormContainer>
-
         </div>
     )
 }

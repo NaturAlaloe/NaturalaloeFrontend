@@ -41,8 +41,6 @@ export default function Profile() {
               label="Correo electrónico"
               name="email"
               value={userData.email}
-              editing={isEditing}
-              onChange={handleInputChange}
               type="email"
             />
             
