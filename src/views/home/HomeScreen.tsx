@@ -1,5 +1,4 @@
 // src/views/home/HomeScreen.tsx
-import { Home as HomeIcon } from '@mui/icons-material';
 import StatsCards from '../../components/StatsCards';
 import ChartSelector from '../../components/ChartSelector';
 

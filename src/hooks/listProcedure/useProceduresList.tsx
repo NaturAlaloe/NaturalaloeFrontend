@@ -177,7 +177,7 @@ export function useProceduresList() {
     },
   ];
 
-  const [procedures, setProcedures] = useState<Procedure[]>(initialProcedures);
+  const [procedures, ] = useState<Procedure[]>(initialProcedures);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Procedure>("poe");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -211,7 +211,7 @@ export function useProceduresList() {
   const responsibles = Array.from(new Set(procedures.map(p => p.responsable)));
 
   // Función para cambiar el ordenamiento
-  const handleSort = (field: keyof Procedure) => {
+  const handleSort = (p0: string, sortDirection: unknown, column: unknown, field: keyof Procedure) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {

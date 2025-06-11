@@ -24,29 +24,7 @@ export default function UserAssignment() {
     console.log("Datos enviados:", formData);
   };
 
-  const areas = [
-    { codigo: "1", nombre: "Administración" },
-    { codigo: "2", nombre: "Finanzas" },
-    { codigo: "3", nombre: "Operaciones" },
-  ];
-
-  const departamentos = [
-    { codigo: "5", nombre: "Contabilidad" },
-    { codigo: "6", nombre: "Recursos Humanos" },
-    { codigo: "7", nombre: "Tecnología" },
-  ];
-
-  const puestos = [
-    { codigo: "10", nombre: "Gerente" },
-    { codigo: "11", nombre: "Analista" },
-    { codigo: "12", nombre: "Asistente" },
-  ];
-
-  const colaboradores = [
-    { codigo: "20", nombre: "Juan Pérez" },
-    { codigo: "21", nombre: "María Gómez" },
-    { codigo: "22", nombre: "Carlos Rodríguez" },
-  ];
+ 
 
   return (
     <FormContainer title="Asignación de Usuario" onSubmit={handleSubmit}>

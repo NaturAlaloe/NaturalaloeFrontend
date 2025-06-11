@@ -1,5 +1,4 @@
-// src/components/StatsCards.tsx
-import React from 'react';
+
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 
 const StatsCards = () => {

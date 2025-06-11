@@ -24,7 +24,7 @@ export default function ListProcedures() {
 
   // Estado para paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, ] = useState(10);
 
   // Calcular los datos a mostrar según la página
   const paginatedProcedures = procedures.slice(
@@ -328,7 +328,6 @@ export default function ListProcedures() {
           sortServer
           onSort={(column, sortDirection) => {
             if (typeof column.selector === "function" && typeof column.name === "string") {
-           
               handleSort(column.name as keyof Procedure, sortDirection, column);
             }
           }}

@@ -31,7 +31,10 @@ export default function PoliticsForm() {
         setBusqueda={setBusqueda}
         showSugerencias={showSugerencias}
         setShowSugerencias={setShowSugerencias}
-        resultados={resultados}
+        resultados={resultados.map(pol => ({
+          ...pol,
+          titulo: pol.descripcion // agrega la propiedad 'titulo' usando 'descripcion'
+        }))}
         onSelect={(pol: { codigo: string }) => setBusqueda(pol.codigo)}
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
