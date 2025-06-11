@@ -1,9 +1,11 @@
 import { useProceduresList, type Procedure } from "../../hooks/listProcedure/useProceduresList";
+import type { TableColumn, SortOrder } from 'react-data-table-component';
 import { Search, Check, Close, Info, Person, Badge, Apartment, Work, Edit, Delete } from "@mui/icons-material";
 import { Box } from "@mui/material";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import DataTable from 'react-data-table-component';
+
 
 export default function ListProcedures() {
   const {
@@ -232,7 +234,6 @@ export default function ListProcedures() {
               disabled={currentPage === 1}
             >
               <span className="sr-only">Anterior</span>
-              <span className="sr-only">Anterior</span>
               <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
@@ -311,7 +312,7 @@ export default function ListProcedures() {
           columns={columns}
           data={paginatedProcedures}
           customStyles={customStyles}
-          onRowClicked={(row, e) => {
+          onRowClicked={(row: Procedure, e: React.MouseEvent) => {
             const target = e.target as HTMLElement;
             if (!target.closest('.action-button')) {
               setSelectedProcedure(row);
@@ -326,9 +327,17 @@ export default function ListProcedures() {
             </div>
           }
           sortServer
-          onSort={(column, sortDirection) => {
+          onSort={(
+            column: TableColumn<Procedure>,
+            sortDirection: SortOrder
+          ) => {
             if (typeof column.selector === "function" && typeof column.name === "string") {
-              handleSort(column.name as keyof Procedure, sortDirection, column, searchTerm);
+              handleSort(
+                column.name as string, 
+                sortDirection,        
+                column,                
+                column.selector.name as keyof Procedure 
+              );
             }
           }}
           sortIcon={
