@@ -3,7 +3,7 @@ import { useState } from "react";
 export function useCapacitationList() {
   const [showModal, setShowModal] = useState(false);
 
-  // Ejemplo de varias capacitaciones
+  // Ejemplo de varias capacitaciones con campo estado
   const capacitaciones = [
     {
       id: "001",
@@ -13,6 +13,7 @@ export function useCapacitationList() {
       evaluado: "Sí",
       metodo: "Teórico",
       seguimiento: "Reprogramar",
+      estado: "Finalizado",
       colaborador: {
         nombreCompleto: "Juan Pérez",
         cedula: "123456789",
@@ -36,6 +37,7 @@ export function useCapacitationList() {
       evaluado: "No",
       metodo: "Práctico",
       seguimiento: "Satisfactorio",
+      estado: "Pendiente",
       colaborador: {
         nombreCompleto: "María López",
         cedula: "987654321",
@@ -59,6 +61,7 @@ export function useCapacitationList() {
       evaluado: "Sí",
       metodo: "Mixto",
       seguimiento: "Reevaluación",
+      estado: "Finalizado",
       colaborador: {
         nombreCompleto: "Pedro Sánchez",
         cedula: "456789123",
@@ -76,7 +79,6 @@ export function useCapacitationList() {
     },
   ];
 
-  // Para el ejemplo, mostramos siempre la primera capacitación en el modal
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleRowClick = (index: number) => {
@@ -89,6 +91,7 @@ export function useCapacitationList() {
     setShowModal,
     colaborador: capacitaciones[selectedIndex].colaborador,
     profesor: capacitaciones[selectedIndex].profesor,
+    selectedCapacitation: capacitaciones[selectedIndex],
     handleRowClick,
     capacitaciones,
   };

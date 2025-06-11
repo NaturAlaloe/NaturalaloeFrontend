@@ -1,40 +1,47 @@
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import MuiAppBar from '@mui/material/AppBar';
-import type { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import HomeIcon from '@mui/icons-material/Home';
-import ArticleIcon from '@mui/icons-material/Article';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import HandymanIcon from '@mui/icons-material/Handyman';
-import Collapse from '@mui/material/Collapse';
-import GroupIcon from '@mui/icons-material/Group'; 
-import { Routes, Route, Link } from 'react-router-dom';
-import HomeScreen from './views/home/HomeScreen';
-import Procedimientos from './views/procedures/procedures';
-import ListaProcedimientos from './views/procedures/listProcedures';
-import Capacitaciones from './views/capacitation/capacitacion';
-import ListaCapacitaciones from './views/capacitation/listCapacitation';
-import Colaboradores from './views/collaborators/collaborators';
-import CollaboratorDetail from './views/collaborators/CollaboratorDetail';
-import RegistroFacilitadores from './views/capacitation/facilitatorTraining';
-import CapacitacionFinalizada from './views/capacitation/capacitationFinished';
-import AddCollaborator from './views/collaborators/addCollaborator';
-import { ListItem, ListItemButton, ListItemText } from '@mui/material';
-import Profile from './views/profile/profile';
-import Register from './views/login/register';
-import UserAssignment from './views/login/userAssignment';
+
+import * as React from "react";
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import CssBaseline from "@mui/material/CssBaseline";
+import MuiAppBar from "@mui/material/AppBar";
+import type { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import HomeIcon from "@mui/icons-material/Home";
+import ArticleIcon from "@mui/icons-material/Article";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import HandymanIcon from "@mui/icons-material/Handyman";
+import Collapse from "@mui/material/Collapse";
+import GroupIcon from "@mui/icons-material/Group";
+import { Routes, Route, Link } from "react-router-dom";
+import HomeScreen from "./views/home/HomeScreen";
+import Procedimientos from "./views/procedures/procedures";
+import ListaProcedimientos from "./views/procedures/listProcedures";
+import Capacitaciones from "./views/capacitation/capacitacion";
+import ListaCapacitaciones from "./views/capacitation/listCapacitation";
+import Colaboradores from "./views/collaborators/collaborators";
+import CollaboratorDetail from "./views/collaborators/CollaboratorDetail";
+import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
+import CapacitacionFinalizada from "./views/capacitation/capacitationFinished";
+import AddCollaborator from "./views/collaborators/addCollaborator";
+import { ListItem, ListItemButton, ListItemText } from "@mui/material";
+import Profile from "./views/profile/profile";
+import Register from "./views/login/register";
+import UserAssignment from "./views/login/userAssignment";
+import SchoolIcon from '@mui/icons-material/School';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import Politicies from './views/politics/politicsForm';
+
 
 const drawerWidth = 270;
 
@@ -390,7 +397,7 @@ export default function PersistentDrawerLeft() {
                 },
               }}
             >
-              <ArticleIcon sx={{ color: "#b4ebce", mr: 2 }} />
+              <SchoolIcon sx={{ color: "#b4ebce", mr: 2 }} />
               <ListItemText primary="Capacitaciones" />
               {openCapacitaciones ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
@@ -409,6 +416,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
+                <LibraryAddIcon sx={{ color: "#b4ebce", mr: 2 }} />
                 <ListItemText primary="Agregar Capacitaciones" />
               </ListItemButton>
               <ListItemButton
@@ -423,21 +431,8 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
+                <PersonAddIcon sx={{ color: "#b4ebce", mr: 2 }} />
                 <ListItemText primary="Agregar Facilitadores" />
-              </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to="/capacitation/capacitationIndividualFinished"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
-              >
-                <ListItemText primary="Finalizadas" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
@@ -451,8 +446,25 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
+                <FormatListBulletedIcon sx={{ color: "#b4ebce", mr: 2 }} />
                 <ListItemText primary="Lista" />
               </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/capacitation/capacitationIndividualFinished"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <AssignmentTurnedInIcon sx={{ color: "#b4ebce", mr: 2 }} />
+                <ListItemText primary="Finalizadas" />
+              </ListItemButton>
+
             </List>
           </Collapse>
 
