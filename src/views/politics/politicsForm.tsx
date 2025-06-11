@@ -4,6 +4,7 @@ import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
 import PoeSearchInput from "../../components/formComponents/PoeSearchInput";
 import PuestosAutocomplete from "../../components/formComponents/JobsAutocomplete";
+import SubmitButton from "../../components/formComponents/SubmitButton";
 
 export default function PoliticsForm() {
   const {
@@ -77,6 +78,9 @@ export default function PoliticsForm() {
           required
           pattern=""
         />
+      </div>
+      <div className="text-center mt-8">
+        <SubmitButton width="">{"Guardar"}</SubmitButton>
       </div>
     </FormContainer>
   );

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import FormContainer from '../../components/formComponents/FormContainer'
 import InputField from '../../components/formComponents/InputField'
 import SelectField from '../../components/formComponents/SelectField'
+import SubmitButton from '../../components/formComponents/SubmitButton';
 
 function addCollaborator() {
 
@@ -114,6 +115,9 @@ function addCollaborator() {
                         optionValue="rol"
                     />
                 </div>
+                <div className="text-center mt-8">
+        <SubmitButton width="">{"Guardar"}</SubmitButton>
+      </div>
             </FormContainer>
         </div>
     )

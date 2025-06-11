@@ -38,14 +38,7 @@ export default function FormContainer({
         <div>{children}</div>
 
         {/* Botón */}
-        <div className="text-center">
-          <button
-            type="submit"
-            className="bg-[#2AAC67] text-white font-bold py-3 px-10 rounded-full hover:bg-opacity-90 transition"
-          >
-            {buttonText}
-          </button>
-        </div>
+    
       </motion.form>
     </div>
   );

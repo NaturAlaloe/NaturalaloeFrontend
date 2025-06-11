@@ -9,6 +9,7 @@ import VigenciaToggle from "../../components/formComponents/ValidityToggle";
 import { useProceduresForm } from "../../hooks/procedureFormHooks/useProceduresForm";
 import { usePoeSearch } from "../../hooks/procedureFormHooks/usePoeSearch";
 import { useState } from "react";
+import SubmitButton from "../../components/formComponents/SubmitButton";
 
 export default function Procedures() {
   const {
@@ -80,7 +81,7 @@ export default function Procedures() {
           name="poeNumber"
           value={formData.poeNumber}
           readOnly
-          onChange={() => {}}
+          onChange={() => { }}
           required
         />
         <SelectField
@@ -145,7 +146,12 @@ export default function Procedures() {
             </div>
           )}
         </div>
+
+      </div>
+      <div className="text-center mt-8">
+        <SubmitButton width="">{"Guardar"}</SubmitButton>
       </div>
     </FormContainer>
+
   );
 }

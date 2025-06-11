@@ -2,6 +2,7 @@ import InputField from "../../components/formComponents/InputField";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import LogoNaturaloe from "../../assets/img/Logo_Naturaloe.png";
+import SubmitButton from "../../components/formComponents/SubmitButton";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -33,7 +34,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#eafbf2] to-[#d6f5e3] flex items-center justify-center px-4 py-12 font-[Poppins]">
+    <div className="min-h-screen bg-[#DEF7E9] flex items-center justify-center px-4 py-12 font-[Poppins]">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -104,14 +105,8 @@ export default function Register() {
 
           </div>
 
+          <SubmitButton width="w-full">{"Registrar"}</SubmitButton>
 
-
-          <button
-            type="submit"
-            className="w-full bg-[#2AAC67] text-white font-semibold text-lg py-3 rounded-full shadow-md hover:bg-[#24965c] transition duration-200"
-          >
-            Registrar
-          </button>
         </form>
       </motion.div>
     </div>

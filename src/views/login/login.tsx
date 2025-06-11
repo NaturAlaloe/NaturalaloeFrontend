@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import SubmitButton from "../../components/formComponents/SubmitButton";
 
 export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void }) {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#eafbf2] to-[#d6f5e3] flex items-center justify-center px-4 py-6 font-[Poppins]">
+    <div className="min-h-screen bg-[#DEF7E9] flex items-center justify-center px-4 py-6 font-[Poppins]">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -69,24 +70,21 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
               required
               pattern={undefined}
             />
-           <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-[70%] -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-            tabIndex={-1}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-[70%] -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              tabIndex={-1}
             >
               {showPassword ? <VisibilityOff /> : <Visibility />}
             </button>
 
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-[#2AAC67] text-white font-semibold text-lg py-3 rounded-full shadow-md hover:bg-[#24965c] transition duration-200"
-          >
-            Iniciar Sesión
-          </button>
+
+          <SubmitButton width="w-full">{"Iniciar Sesión"}</SubmitButton>
+
 
           <div className="text-center mt-2">
             <Link to="/login/recoverPassword" className="text-sm text-[#2AAC67] hover:underline">
