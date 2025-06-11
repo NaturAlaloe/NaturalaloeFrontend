@@ -332,12 +332,8 @@ export default function ListProcedures() {
             sortDirection: SortOrder
           ) => {
             if (typeof column.selector === "function" && typeof column.name === "string") {
-              handleSort(
-                column.name as string, 
-                sortDirection,        
-                column,                
-                column.selector.name as keyof Procedure 
-              );
+              const field = column.selector.name as keyof Procedure;
+              handleSort(field, sortDirection as "asc" | "desc");
             }
           }}
           sortIcon={
