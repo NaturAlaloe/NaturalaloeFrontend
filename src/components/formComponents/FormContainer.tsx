@@ -15,7 +15,7 @@ export default function FormContainer({
   children,
 }: FormContainerProps) {
   return (
-    <div className="min-h-screen bg-[#DEF7E9] flex items-center justify-center px-4 py-12 font-[Poppins]">
+    <div className="min-h-screen bg-[#DEF7E9] flex items-start justify-center px-4 py-12 font-[Poppins]">
       <motion.form
         onSubmit={onSubmit}
         initial={{ opacity: 0, y: 50 }}
