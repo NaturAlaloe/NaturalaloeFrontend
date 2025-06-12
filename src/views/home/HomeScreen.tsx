@@ -1,6 +1,6 @@
 // src/views/home/HomeScreen.tsx
-import StatsCards from '../../components/StatsCards';
-import ChartSelector from '../../components/ChartSelector';
+import StatsCards from '../../components/home/StatsCards';
+import ChartSelector from '../../components/home/ChartSelector';
 
 export default function HomeScreen() {
   return (

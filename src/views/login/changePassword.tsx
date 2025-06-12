@@ -1,6 +1,6 @@
 import { useState } from "react";
 import InputField from "../../components/formComponents/InputField";
-import { showCustomToast } from "../../components/CustomToaster";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export default function ChangePassword() {
   const [currentPassword, setCurrentPassword] = useState("");
