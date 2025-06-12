@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -36,9 +35,9 @@ import AddCollaborator from "./views/collaborators/addCollaborator";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
 import UserAssignment from "./views/login/userAssignment";
-import SchoolIcon from '@mui/icons-material/School';
-import Politicies from './views/politics/politicsForm';
-
+import SchoolIcon from "@mui/icons-material/School";
+import Politicies from "./views/politics/politicsForm";
+import VersionControlProcedures from "./views/procedures/versionControllProcedures";
 
 const drawerWidth = 270;
 
@@ -269,11 +268,8 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Registrar Usuarios" />
               </ListItemButton>
-
-        
             </List>
           </Collapse>
-          
 
           {/* Procedimientos */}
           <ListItem disablePadding>
@@ -338,6 +334,20 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Asignar Procedimientos" />
               </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/procedures/versionControlProcedures"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Control de Versiones" />
+              </ListItemButton>
             </List>
           </Collapse>
 
@@ -346,16 +356,16 @@ export default function PersistentDrawerLeft() {
             <ListItemButton
               onClick={() => setOpenPoliticas(!openPoliticas)}
               sx={{
-              color: '#fff',
-              pl: 3,
-              '&:hover': {
-                background: '#21824f',
-                color: '#fff',
-                '& .MuiSvgIcon-root': { color: '#13bd62' },
-              },
+                color: "#fff",
+                pl: 3,
+                "&:hover": {
+                  background: "#21824f",
+                  color: "#fff",
+                  "& .MuiSvgIcon-root": { color: "#13bd62" },
+                },
               }}
             >
-              <ArticleIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ArticleIcon sx={{ color: "#b4ebce", mr: 2 }} />
               <ListItemText primary="Políticas" />
               {openPoliticas ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
@@ -367,10 +377,10 @@ export default function PersistentDrawerLeft() {
                 to="/politics/politicsForm"
                 sx={{
                   pl: 6,
-                  color: '#f4fcec',
-                  '&:hover': {
-                    background: '#2AAC67',
-                    color: '#fff',
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
                   },
                 }}
               >
@@ -412,7 +422,6 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-              
                 <ListItemText primary="Agregar Capacitaciones" />
               </ListItemButton>
               <ListItemButton
@@ -427,7 +436,6 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-               
                 <ListItemText primary="Agregar Facilitadores" />
               </ListItemButton>
               <ListItemButton
@@ -442,7 +450,6 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-            
                 <ListItemText primary="Lista" />
               </ListItemButton>
               <ListItemButton
@@ -457,7 +464,6 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-            
                 <ListItemText primary="Lista de Facilitadores" />
               </ListItemButton>
               <ListItemButton
@@ -472,10 +478,8 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-              
                 <ListItemText primary="Finalizadas" />
               </ListItemButton>
-
             </List>
           </Collapse>
 
@@ -585,7 +589,7 @@ export default function PersistentDrawerLeft() {
             path="/procedures/listProcedures"
             element={<ListaProcedimientos />}
           />
-            <Route
+          <Route
             path="/procedures/assignmentProcedures"
             element={<AsignacionProcedimientos />}
           />
@@ -608,7 +612,7 @@ export default function PersistentDrawerLeft() {
             path="/capacitation/facilitatorTraining"
             element={<RegistroFacilitadores />}
           />
-          
+
           <Route
             path="/capacitation/listFacilitators"
             element={<ListaFacilitadores />}
@@ -617,10 +621,15 @@ export default function PersistentDrawerLeft() {
             path="/capacitation/capacitationIndividualFinished"
             element={<CapacitacionFinalizada />}
           />
-          <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
+          <Route
+            path="/collaborators/addCollaborator"
+            element={<AddCollaborator />}
+          />
           <Route path="/politics/politicsForm" element={<Politicies />} />
-
-
+          <Route
+            path="/procedures/versionControlProcedures"
+            element={<VersionControlProcedures />}
+          />
         </Routes>
       </Main>
     </Box>

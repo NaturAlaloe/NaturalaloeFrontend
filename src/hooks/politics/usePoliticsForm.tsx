@@ -45,6 +45,8 @@ export function usePoliticsForm() {
     descripcion: "",
     responsable: "",
     categoria: "",
+    area: "",
+    departamento: "",
     puestos: [] as string[],
   });
 
