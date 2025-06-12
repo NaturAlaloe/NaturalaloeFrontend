@@ -26,8 +26,8 @@ import Procedimientos from "./views/procedures/procedures";
 import AsignacionProcedimientos from "./views/procedures/assignmentProcedures";
 import ListaProcedimientos from "./views/procedures/listProcedures";
 import Capacitaciones from "./views/capacitation/capacitacion";
-import ListaFacilitadores from "./views/capacitation/capacitacion";
-import ListaCapacitaciones from "./views/capacitation/listFacilitators";
+import ListaFacilitadores from "./views/capacitation/listFacilitators";
+import ListaCapacitaciones from "./views/capacitation/listCapacitation";
 import Colaboradores from "./views/collaborators/collaborators";
 import CollaboratorDetail from "./views/collaborators/CollaboratorDetail";
 import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
@@ -447,7 +447,7 @@ export default function PersistentDrawerLeft() {
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/listaFacilitators"
+                to="/capacitation/listFacilitators"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
