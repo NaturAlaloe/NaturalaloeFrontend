@@ -23,6 +23,8 @@ import GroupIcon from "@mui/icons-material/Group";
 import { Routes, Route, Link } from "react-router-dom";
 import HomeScreen from "./views/home/HomeScreen";
 import Procedimientos from "./views/procedures/procedures";
+import AsignacionProcedimientos from "./views/procedures/assignmentProcedures";
+
 import ListaProcedimientos from "./views/procedures/listProcedures";
 import Capacitaciones from "./views/capacitation/capacitacion";
 import ListaCapacitaciones from "./views/capacitation/listCapacitation";
@@ -32,8 +34,7 @@ import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
 import CapacitacionFinalizada from "./views/capacitation/capacitationFinished";
 import AddCollaborator from "./views/collaborators/addCollaborator";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
-import Profile from "./views/profile/profile";
-import Register from "./views/login/register";
+import Register from "./views/administration/register";
 import UserAssignment from "./views/login/userAssignment";
 import SchoolIcon from '@mui/icons-material/School';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
@@ -273,22 +274,7 @@ export default function PersistentDrawerLeft() {
                 <ListItemText primary="Registrar Usuarios" />
               </ListItemButton>
 
-              {/*
-    <ListItemButton
-      component={Link}
-      to="/login/userAssignment"
-      sx={{
-        pl: 6,
-        color: '#f4fcec',
-        '&:hover': {
-          background: '#2AAC67',
-          color: '#fff',
-        },
-      }}
-    >
-      <ListItemText primary="Asignación de Usuario" />
-    </ListItemButton>
-    */}
+        
             </List>
           </Collapse>
           
@@ -341,6 +327,20 @@ export default function PersistentDrawerLeft() {
                 }}
               >
                 <ListItemText primary="Listado" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/procedures/assignmentProcedures"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Asignar Procedimientos" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -416,7 +416,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-                <LibraryAddIcon sx={{ color: "#b4ebce", mr: 2 }} />
+              
                 <ListItemText primary="Agregar Capacitaciones" />
               </ListItemButton>
               <ListItemButton
@@ -431,7 +431,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-                <PersonAddIcon sx={{ color: "#b4ebce", mr: 2 }} />
+               
                 <ListItemText primary="Agregar Facilitadores" />
               </ListItemButton>
               <ListItemButton
@@ -446,7 +446,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-                <FormatListBulletedIcon sx={{ color: "#b4ebce", mr: 2 }} />
+            
                 <ListItemText primary="Lista" />
               </ListItemButton>
               <ListItemButton
@@ -461,7 +461,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-                <AssignmentTurnedInIcon sx={{ color: "#b4ebce", mr: 2 }} />
+              
                 <ListItemText primary="Finalizadas" />
               </ListItemButton>
 
@@ -574,6 +574,10 @@ export default function PersistentDrawerLeft() {
             path="/procedures/listProcedures"
             element={<ListaProcedimientos />}
           />
+            <Route
+            path="/procedures/assignmentProcedures"
+            element={<AsignacionProcedimientos />}
+          />
           <Route path="/capacitation/" element={<Capacitaciones />} />
           <Route
             path="/capacitation/listCapacitation"
@@ -597,7 +601,6 @@ export default function PersistentDrawerLeft() {
             path="/capacitation/capacitationIndividualFinished"
             element={<CapacitacionFinalizada />}
           />
-          <Route path="/profile" element={<Profile />} />
           <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
           <Route path="/politics/politicsForm" element={<Politicies />} />
 
