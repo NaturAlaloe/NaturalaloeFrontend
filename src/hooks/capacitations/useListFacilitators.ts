@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from "react";
 
 export interface Facilitador {
   id: number;
@@ -7,41 +7,52 @@ export interface Facilitador {
   tipo: string;
 }
 
-const datosFacilitadores: Facilitador[] = [
-  { id: 1, nombre: 'Ana', apellido: 'Gómez', tipo: 'Interno' },
-  { id: 2, nombre: 'Luis', apellido: 'Pérez', tipo: 'Externo' },
-  { id: 3, nombre: 'Marta', apellido: 'Rodríguez', tipo: 'Interno' },
-  { id: 4, nombre: 'Carlos', apellido: 'Ramírez', tipo: 'Externo' },
+const initialData: Facilitador[] = [
+  { id: 1, nombre: "Juan", apellido: "Pérez", tipo: "Interno" },
+  { id: 2, nombre: "Ana", apellido: "García", tipo: "Externo" },
+  { id: 3, nombre: "Luis", apellido: "Martínez", tipo: "Interno" },
 ];
 
-export const useFacilitadoresList = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+export function useFacilitadoresList() {
+  const [facilitadores, setFacilitadores] = useState<Facilitador[]>(initialData);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
-  const normalizeText = (text: string) =>
-    text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const filtered = useMemo(() => {
+    return facilitadores.filter((fac) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        fac.nombre.toLowerCase().includes(term) ||
+        fac.apellido.toLowerCase().includes(term) ||
+        fac.tipo.toLowerCase().includes(term)
+      );
+    });
+  }, [searchTerm, facilitadores]);
 
-  const filtered = datosFacilitadores.filter((f) => {
-    const fullText = `${f.nombre} ${f.apellido} ${f.tipo}`;
-    return normalizeText(fullText).includes(normalizeText(searchTerm));
-  });
-
-  const paginated = filtered.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
+  const paginated = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    return filtered.slice(start, start + rowsPerPage);
+  }, [currentPage, filtered]);
 
   const totalPages = Math.ceil(filtered.length / rowsPerPage);
 
+  const updateFacilitador = (updated: Facilitador) => {
+    setFacilitadores((prev) =>
+      prev.map((f) => (f.id === updated.id ? updated : f))
+    );
+  };
+
   return {
+    facilitadores,
+    filtered,
+    paginated,
     searchTerm,
     setSearchTerm,
     currentPage,
     setCurrentPage,
     rowsPerPage,
-    filtered,
-    paginated,
     totalPages,
+    updateFacilitador,
   };
-};
+}
