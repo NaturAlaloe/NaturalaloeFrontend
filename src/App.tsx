@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Drawer from './Drawer';
-import CustomToaster from './components/CustomToaster';
+import CustomToaster from './components/globalComponents/CustomToaster';
 import Login from './views/login/login';
 import ChangePassword from './views/login/changePassword';
 import RecoverPassword from './views/login/recoverPassword';
