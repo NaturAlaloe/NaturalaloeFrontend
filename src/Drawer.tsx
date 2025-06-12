@@ -24,10 +24,10 @@ import { Routes, Route, Link } from "react-router-dom";
 import HomeScreen from "./views/home/HomeScreen";
 import Procedimientos from "./views/procedures/procedures";
 import AsignacionProcedimientos from "./views/procedures/assignmentProcedures";
-
 import ListaProcedimientos from "./views/procedures/listProcedures";
 import Capacitaciones from "./views/capacitation/capacitacion";
-import ListaCapacitaciones from "./views/capacitation/listCapacitation";
+import ListaFacilitadores from "./views/capacitation/capacitacion";
+import ListaCapacitaciones from "./views/capacitation/listFacilitators";
 import Colaboradores from "./views/collaborators/collaborators";
 import CollaboratorDetail from "./views/collaborators/CollaboratorDetail";
 import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
@@ -37,10 +37,6 @@ import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
 import UserAssignment from "./views/login/userAssignment";
 import SchoolIcon from '@mui/icons-material/School';
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import Politicies from './views/politics/politicsForm';
 
 
@@ -451,6 +447,21 @@ export default function PersistentDrawerLeft() {
               </ListItemButton>
               <ListItemButton
                 component={Link}
+                to="/capacitation/listaFacilitators"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+            
+                <ListItemText primary="Lista de Facilitadores" />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
                 to="/capacitation/capacitationIndividualFinished"
                 sx={{
                   pl: 6,
@@ -596,6 +607,11 @@ export default function PersistentDrawerLeft() {
           <Route
             path="/capacitation/facilitatorTraining"
             element={<RegistroFacilitadores />}
+          />
+          
+          <Route
+            path="/capacitation/listFacilitators"
+            element={<ListaFacilitadores />}
           />
           <Route
             path="/capacitation/capacitationIndividualFinished"
