@@ -1,4 +1,56 @@
-import { useState, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+
+// Datos quemados de ejemplo
+const facilitadores = [
+  { nombre: "Juan Pérez" },
+  { nombre: "Ana Gómez" },
+  { nombre: "Luis Martínez" },
+  { nombre: "Marta Díaz" },
+];
+
+const tiposCapacitacion = [
+  { value: "", label: "Seleccione...", disabled: true },
+  { value: "Interna", label: "Interna" },
+  { value: "Externa", label: "Externa" },
+];
+
+const metodosEvaluacion = [
+  { value: "", label: "Seleccione...", disabled: true },
+  { value: "Teórico", label: "Teórico" },
+  { value: "Práctico", label: "Práctico" },
+  { value: "Campo", label: "Campo" },
+];
+
+const colaboradoresDisponibles = [
+  { id: 1, nombre: "Juan Pérez", puesto: "Operador" },
+  { id: 2, nombre: "Ana Gómez", puesto: "Supervisor" },
+  { id: 3, nombre: "Luis Martínez", puesto: "Analista" },
+];
+
+const poesDisponibles = [
+  { id: 1, codigo: "700-30-0001", titulo: "POE Ventas" },
+  { id: 2, codigo: "900-30-0001", titulo: "POE Calidad" },
+];
+
+const columnsColaboradores = [
+  { name: "Nombre", selector: (row: any) => row.nombre, sortable: true },
+  { name: "Puesto", selector: (row: any) => row.puesto, sortable: true },
+];
+
+const columnsPoes = [
+  { name: "Código", selector: (row: any) => row.codigo, sortable: true },
+  { name: "Título", selector: (row: any) => row.titulo, sortable: true },
+];
+
+interface FormData {
+  titulo: string;
+  tipoCapacitacion: string;
+  facilitador: string;
+  fecha: string;
+  fechaFin: string;
+  duracion: string;
+  metodoEvaluacion: string;
+}
 
 export function useCapacitation() {
   const [showColaboradorModal, setShowColaboradorModal] = useState(false);
@@ -6,30 +58,59 @@ export function useCapacitation() {
   const [isEvaluado, setIsEvaluado] = useState(false);
   const [showAsignacionesModal, setShowAsignacionesModal] = useState(false);
 
-  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<
-    string[]
-  >(["Juan Pérez", "María López"]);
-  const [poesAsignados, setPoesAsignados] = useState<string[]>([
-    "700-50-001 - Nombre Procedimiento",
-  ]);
-  const [nuevoPoe, setNuevoPoe] = useState("");
+  const [formData, setFormData] = useState<FormData>({
+    titulo: "",
+    tipoCapacitacion: "",
+    facilitador: "",
+    fecha: "",
+    fechaFin: "",
+    duracion: "",
+    metodoEvaluacion: "",
+  });
 
-  const poesDisponibles = [
-    "700-50-001 - Nombre Procedimiento",
-    "500-53-002 - Nombre Procedimiento",
-    "600-40-003 - Nombre Procedimiento",
-  ];
+  // Estado para tablas de selección en el modal
+  const [showColaboradoresTable, setShowColaboradoresTable] = useState(false);
+  const [showPoesTable, setShowPoesTable] = useState(false);
+  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>([]);
+  const [poesAsignados, setPoesAsignados] = useState<any[]>([]);
+  const [selectedColaboradores, setSelectedColaboradores] = useState<any[]>([]);
+  const [selectedPoes, setSelectedPoes] = useState<any[]>([]);
 
-  const handleAgregarPoe = () => {
-    if (nuevoPoe && !poesAsignados.includes(nuevoPoe)) {
-      setPoesAsignados([...poesAsignados, nuevoPoe]);
-      setNuevoPoe("");
-    }
+  const agregarColaboradores = () => {
+    setColaboradoresAsignados(prev => [
+      ...prev,
+      ...selectedColaboradores.filter(
+        c => !prev.some((asig: any) => asig.id === c.id)
+      ),
+    ]);
+    setShowColaboradoresTable(false);
+    setSelectedColaboradores([]);
+  };
+
+  const agregarPoes = () => {
+    setPoesAsignados(prev => [
+      ...prev,
+      ...selectedPoes.filter(
+        p => !prev.some((asig: any) => asig.id === p.id)
+      ),
+    ]);
+    setShowPoesTable(false);
+    setSelectedPoes([]);
+  };
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+    // Aquí puedes manejar el submit real
   };
 
   return {
@@ -41,14 +122,31 @@ export function useCapacitation() {
     setIsEvaluado,
     showAsignacionesModal,
     setShowAsignacionesModal,
+    formData,
+    setFormData,
+    handleChange,
+    handleSubmit,
+    facilitadores,
+    tiposCapacitacion,
+    metodosEvaluacion,
+    // Lógica para asignaciones:
+    colaboradoresDisponibles,
+    poesDisponibles,
+    columnsColaboradores,
+    columnsPoes,
+    showColaboradoresTable,
+    setShowColaboradoresTable,
+    showPoesTable,
+    setShowPoesTable,
     colaboradoresAsignados,
     setColaboradoresAsignados,
     poesAsignados,
     setPoesAsignados,
-    nuevoPoe,
-    setNuevoPoe,
-    poesDisponibles,
-    handleAgregarPoe,
-    handleSubmit,
+    selectedColaboradores,
+    setSelectedColaboradores,
+    selectedPoes,
+    setSelectedPoes,
+    agregarColaboradores,
+    agregarPoes,
   };
 }
