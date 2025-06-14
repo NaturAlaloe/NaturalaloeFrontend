@@ -34,3 +34,6 @@ npm install @fontsource/poppins
 
 #para instalar el datatable 
 npm install react-data-table-component
+
+# Instalar axios
+npm i axios
