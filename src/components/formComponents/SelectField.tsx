@@ -7,8 +7,8 @@ interface OptionType {
 interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   name: string;
-  value: string | number;
-  onChange: ChangeEventHandler<HTMLSelectElement>;
+  value?: string | number;
+  onChange?: ChangeEventHandler<HTMLSelectElement>;
   options?: (OptionType | string)[];
   className?: string;
   optionLabel?: string;

@@ -318,7 +318,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-                <ListItemText primary="Listado" />
+                <ListItemText primary="Lista de Procedimientos" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
@@ -450,7 +450,7 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-                <ListItemText primary="Lista" />
+                <ListItemText primary="Lista de Capacitaciones" />
               </ListItemButton>
               <ListItemButton
                 component={Link}

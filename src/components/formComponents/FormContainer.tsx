@@ -4,7 +4,7 @@ import type { FormEventHandler, ReactNode } from "react";
 
 interface FormContainerProps {
   title?: string;
-  onSubmit: FormEventHandler<HTMLFormElement>;
+  onSubmit?: FormEventHandler<HTMLFormElement>;
   children: ReactNode;
   buttonText?: string;
 }

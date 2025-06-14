@@ -4,7 +4,7 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   name: string;
   value?: string | number; // value ahora es opcional
-  onChange: ChangeEventHandler<HTMLInputElement>;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
   className?: string;
 }
 
@@ -31,7 +31,7 @@ export default function InputField({
       <input
         type={type}
         name={name}
-        {...(type !== "file" ? { value } : {})} 
+        {...(type !== "file" ? { value } : {})}
         onChange={onChange}
         placeholder={placeholder}
         required={required}

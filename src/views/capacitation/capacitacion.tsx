@@ -1,5 +1,10 @@
-import AssignmentIcon from "@mui/icons-material/Assignment";
 import { useCapacitation } from "../../hooks/capacitations/useCapacitation";
+import FormContainer from '../../components/formComponents/FormContainer';
+import InputField from '../../components/formComponents/InputField';
+import SelectField from '../../components/formComponents/SelectField';
+import SubmitButton from '../../components/formComponents/SubmitButton';
+import SimpleModal from "../../components/globalComponents/SimpleModal";
+
 
 const Capacitacion = () => {
     const {
@@ -15,249 +20,180 @@ const Capacitacion = () => {
         poesAsignados,
         nuevoPoe,
         setNuevoPoe,
-        poesDisponibles,
         handleAgregarPoe,
+        handleSubmit
     } = useCapacitation();
 
     return (
-        <div className="mt-13 flex items-center justify-center">
-            <div className="bg-white border-2 border-[white] rounded-2xl shadow-lg max-w-3xl w-full px-8 py-8">
-                <div className="flex items-center justify-center mb-8 gap-3">
-                    <AssignmentIcon sx={{ color: "#15803D", fontSize: 36 }} />
-                    <h2 className="text-[#15803D] font-bold text-2xl m-0">
-                        Registro de Capacitación
-                    </h2>
+        <FormContainer title="Registro de Capacitación" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <InputField
+                    name="titulo"
+                    label="Título capacitación:"
+                    placeholder="Ingrese el título"
+                    className="w-full"
+                />
+                <SelectField
+                    name="procedimiento"
+                    label="Procedimiento:"
+                    className="w-full"
+                    defaultValue=""
+                />
+                <SelectField
+                    name="tipoCapacitacion"
+                    label="Tipo capacitación:"
+                    className="w-full"
+                    defaultValue=""
+
+                />
+                <InputField
+                    name="colaborador"
+                    label="Colaborador:"
+                    placeholder="Buscar colaborador"
+                    className="w-full cursor-pointer bg-white"
+                    readOnly
+                    onClick={() => setShowColaboradorModal(true)}
+                />
+                <InputField
+                    name="facilitador"
+                    label="Facilitador:"
+                    placeholder="Buscar facilitador"
+                    className="w-full cursor-pointer bg-white"
+                    readOnly
+                    onClick={() => setShowFacilitadorModal(true)}
+                />
+                <InputField
+                    name="fecha"
+                    label="Fecha Inicio:"
+                    type="date"
+                    className="w-full"
+                />
+                <InputField
+                    name="fechaFin"
+                    label="Fecha Fin:"
+                    type="date"
+                    className="w-full"
+                />
+                <InputField
+                    name="duracion"
+                    label="Duración (horas):"
+                    type="number"
+                    min={1}
+                    placeholder="Ingrese la duración"
+                    className="w-full"
+                />
+                <div className="flex items-center mt-7">
+                    <input
+                        type="checkbox"
+                        id="evaluado"
+                        className="accent-[#2ecc71] mr-2 w-5 h-5"
+                        checked={isEvaluado}
+                        onChange={() => setIsEvaluado(!isEvaluado)}
+                    />
+                    <label htmlFor="evaluado" className="font-semibold text-[#2AAC67]">Es Evaluado:</label>
                 </div>
-                <form>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Título capacitación:</label>
-                            <input
-                                type="text"
-                                placeholder="Ingrese el título"
-                                className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]"
-                            />
-                        </div>
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Procedimineto(POE):</label>
-                            <select className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]">
-                                <option value="" disabled selected>Seleccione...</option>
-                                <option>700-50-001 - Nombre Procedimiento</option>
-                                <option>500-53-002 - Nombre Procedimiento</option>
-                                <option>600-40-003 - Nombre Procedimiento</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Tipo capacitación:</label>
-                            <select className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]">
-                                <option value="" disabled selected>Seleccione...</option>
-                                <option>Interna</option>
-                                <option>Externa</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Colaborador:</label>
-                            <input
-                                type="text"
-                                placeholder="Buscar colaborador"
-                                className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222] cursor-pointer bg-white"
-                                readOnly
-                                onClick={() => setShowColaboradorModal(true)}
-                            />
-                        </div>
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Facilitador:</label>
-                            <input
-                                type="text"
-                                placeholder="Buscar facilitador"
-                                className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222] cursor-pointer bg-white"
-                                readOnly
-                                onClick={() => setShowFacilitadorModal(true)}
-                            />
-                        </div>
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Fecha Inicio:</label>
-                            <input type="date" className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]" />
-                        </div>
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Fecha Fin:</label>
-                            <input type="date" className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]" />
-                        </div>
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Duración (horas):</label>
-                            <input
-                                type="number"
-                                min="1"
-                                placeholder="Ingrese la duración"
-                                className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]"
-                            />
-                        </div>
-                        <div>
-                            <label className="font-semibold text-[#2ecc71]">Seguimiento:</label>
-                            <select className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]">
-                                <option value="" disabled selected>Seleccione...</option>
-                                <option>Satisfactorio</option>
-                                <option>Reprogramar</option>
-                                <option>Reevaluación</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center mt-7">
-                            <input
-                                type="checkbox"
-                                id="evaluado"
-                                className="accent-[#2ecc71] mr-2 w-5 h-5"
-                                checked={isEvaluado}
-                                onChange={() => setIsEvaluado(!isEvaluado)}
-                            />
-                            <label htmlFor="evaluado" className="font-semibold text-[#2ecc71]">Es Evaluado:</label>
-                        </div>
-                        {isEvaluado && (
-                            <div>
-                                <label className="font-semibold text-[#2ecc71]">Método de evaluación:</label>
-                                <select className="w-full mt-1 px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]">
-                                    <option>Seleccione...</option>
-                                    <option>Teórico</option>
-                                    <option>Práctico</option>
-                                    <option>Campo</option>
-                                </select>
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex justify-center mt-6 gap-4">
-                        <button
-                            type="button"
-                            className="bg-[#15803D] text-white font-bold rounded-full px-12 py-3 text-lg shadow-md hover:bg-[#27ae60] transition"
-                        >
-                            Guardar
-                        </button>
-                        <button
-                            type="button"
-                            className="bg-[#15803D] text-white font-bold rounded-full px-12 py-3 text-lg shadow-md hover:bg-[#14532d] transition"
-                            onClick={() => setShowAsignacionesModal(true)}
-                        >
-                            Progreso
-                        </button>
-                    </div>
-                </form>
+                {isEvaluado && (
+                    <SelectField
+                        name="metodoEvaluacion"
+                        label="Método de evaluación:"
+                        className="w-full"
+                        defaultValue=""
+                        options={[
+                            { value: "", label: "Seleccione...", disabled: true },
+                            { value: "Teórico", label: "Teórico" },
+                            { value: "Práctico", label: "Práctico" },
+                            { value: "Campo", label: "Campo" },
+                        ]}
+                    />
+                )}
             </div>
-
-            {/* Modal Colaborador */}
+            <div className="flex justify-center mt-6 gap-4">
+                <SubmitButton width="w-40">
+                    Guardar
+                </SubmitButton>
+                <SubmitButton
+                    onClick={() => setShowAsignacionesModal(true)}
+                    width="w-40">
+                    Progreso
+                </SubmitButton>
+            </div>
+            {/* Modales */}
             {showColaboradorModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backdropFilter: "blur(4px)", backgroundColor: "rgba(0,0,0,0.2)" }}>
-                    <div className="bg-white rounded-xl p-8 min-w-[340px] shadow-lg">
-                        <h3 className="text-[#2ecc71] font-bold text-lg mb-4">Seleccionar Colaborador:</h3>
-                        <input
-                            type="text"
-                            placeholder="Buscar por id, nombre"
-                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]"
-                        />
-                        <div className="mt-6 mr-7 flex justify-end gap-3">
-                            <button
-                                onClick={() => setShowColaboradorModal(false)}
-                                className="bg-[#2ecc71] text-white rounded-lg px-6 py-2 font-semibold hover:bg-[#27ae60] transition"
-                            >
-                                Cerrar
-                            </button>
-                            <button
-
-                                className="bg-[#2ecc71] text-white rounded-lg px-6 py-2 font-semibold hover:bg-[#27ae60] transition"
-                            >
-                                Asignar
-                            </button>
-                        </div>
+                <SimpleModal
+                    open={showColaboradorModal}
+                    title="Seleccionar Colaborador"
+                    onClose={() => setShowColaboradorModal(false)}
+                    widthClass="min-w-[340px] max-w-md w-full"
+                >
+                    <InputField
+                        name="buscarColaborador"
+                        placeholder="Buscar por id, nombre"
+                        className="w-full"
+                    />
+                    <div className="mt-6 mr-7 flex justify-center gap-3">
+                        <SubmitButton>
+                            Asignar
+                        </SubmitButton>
                     </div>
-                </div>
+                </SimpleModal>
             )}
-
-            {/* Modal Facilitador */}
             {showFacilitadorModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backdropFilter: "blur(4px)", backgroundColor: "rgba(0,0,0,0.2)" }}>
-                    <div
-                        className="bg-white p-8 min-w-[340px] shadow-lg"
-                        style={{
-                            borderRadius: "0.75rem",
-                        }}
-                    >
-                        <h3 className="text-[#2ecc71] font-bold text-lg mb-4">Seleccionar Facilitador</h3>
-                        <input
-                            type="text"
-                            placeholder="Buscar facilitador..."
-                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg outline-none text-base text-[#222]"
-                        />
-                        <div className="mt-6 mr-7 flex justify-end gap-3">
-                            <button
-                                onClick={() => setShowFacilitadorModal(false)}
-                                className="bg-[#2ecc71] text-white rounded-lg px-6 py-2 font-semibold hover:bg-[#27ae60] transition"
-                            >
-                                Cerrar
-                            </button>
-                            <button
-
-                                className="bg-[#2ecc71] text-white rounded-lg px-6 py-2 font-semibold hover:bg-[#27ae60] transition"
-                            >
-                                Asignar
-                            </button>
-                        </div>
+                <SimpleModal
+                    open={showFacilitadorModal}
+                    title="Seleccionar Facilitador"
+                    onClose={() => setShowFacilitadorModal(false)}
+                    widthClass="min-w-[340px] max-w-md w-full"
+                >
+                    <InputField
+                        name="buscarFacilitador"
+                        placeholder="Buscar facilitador..."
+                        className="w-full"
+                    />
+                    <div className="mt-6 mr-7 flex justify-center gap-3">
+                        <SubmitButton>
+                            Asignar
+                        </SubmitButton>
                     </div>
-                </div>
+                </SimpleModal>
             )}
-
-            {/* Modal Asignaciones */}
             {showAsignacionesModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backdropFilter: "blur(4px)", backgroundColor: "rgba(0,0,0,0.2)" }}>
-                    <div className="bg-white rounded-xl p-8 min-w-[400px] shadow-lg max-w-lg w-full">
-                        <h3 className="text-[#2ecc71] font-bold text-lg mb-4">Asignaciones</h3>
-                        {/* Colaboradores asignados */}
-                        <div className="mb-6">
-                            <h4 className="font-semibold text-[#15803D] mb-2">Colaboradores asignados:</h4>
-                            <ul className="list-disc ml-6">
-                                {colaboradoresAsignados.map((col, idx) => (
-                                    <li key={idx} className="text-[#222]">{col}</li>
-                                ))}
-                            </ul>
-                        </div>
-                        {/* POEs asignados */}
-                        <div className="mb-4">
-                            <h4 className="font-semibold text-[#15803D] mb-2">POE(s) asignados:</h4>
-                            <ul className="list-disc ml-6 mb-2">
-                                {poesAsignados.map((poe, idx) => (
-                                    <li key={idx} className="text-[#222]">{poe}</li>
-                                ))}
-                            </ul>
-                            <div className="flex items-center gap-2 mb-2">
-                                <select
-                                    className="border-2 border-gray-300 rounded-lg px-3 py-2 text-base text-[#222]"
-                                    value={nuevoPoe}
-                                    onChange={e => setNuevoPoe(e.target.value)}
-                                >
-                                    <option value="">Seleccione POE...</option>
-                                    {poesDisponibles
-                                        .filter(poe => !poesAsignados.includes(poe))
-                                        .map((poe, idx) => (
-                                            <option key={idx} value={poe}>{poe}</option>
-                                        ))}
-                                </select>
-                                <button
-                                    type="button"
-                                    className="bg-[#2ecc71] text-white rounded-lg px-4 py-2 font-semibold hover:bg-[#27ae60] transition"
-                                    onClick={handleAgregarPoe}
-                                >
-                                    Agregar
-                                </button>
-                            </div>
-                        </div>
-                        <div className="flex justify-end mt-6">
-                            <button
-                                onClick={() => setShowAsignacionesModal(false)}
-                                className="bg-[#2ecc71] text-white rounded-lg px-6 py-2 font-semibold hover:bg-[#27ae60] transition"
-                            >
-                                Cerrar
-                            </button>
+                <SimpleModal
+                    open={showAsignacionesModal}
+                    title="Progreso"
+                    onClose={() => setShowAsignacionesModal(false)}
+                >
+                    {/* Colaboradores asignados */}
+                    <div className="mt-10 mb-6">
+                        <h4 className="font-semibold text-[#15803D] mb-2">Colaboradores asignados:</h4>
+                        <ul className="list-disc ml-6">
+                            {colaboradoresAsignados.map((col, idx) => (
+                                <li key={idx} className="text-[#222]">{col}</li>
+                            ))}
+                        </ul>
+                    </div>
+                    {/* POEs asignados */}
+                    <div className="mb-4">
+                        <h4 className="font-semibold text-[#15803D] mb-2">POE(s) asignados:</h4>
+                        <ul className="list-disc ml-6 mb-2">
+                            {poesAsignados.map((poe, idx) => (
+                                <li key={idx} className="text-[#222]">{poe}</li>
+                            ))}
+                        </ul>
+                        <div className="flex items-center gap-2 mb-2">
+                            <SelectField
+                                name="nuevoPoe"
+                                className="w-full"
+                                value={nuevoPoe}
+                                onChange={e => setNuevoPoe(e.target.value)}
+                            />
+                            <SubmitButton onClick={handleAgregarPoe} type="button">
+                                <span className="text-white">Agregar</span>
+                            </SubmitButton>
                         </div>
                     </div>
-                </div>
+                </SimpleModal>
             )}
-        </div>
+        </FormContainer>
     );
 };
 

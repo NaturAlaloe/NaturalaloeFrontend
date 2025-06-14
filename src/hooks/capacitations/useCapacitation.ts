@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 export function useCapacitation() {
   const [showColaboradorModal, setShowColaboradorModal] = useState(false);
@@ -6,10 +6,9 @@ export function useCapacitation() {
   const [isEvaluado, setIsEvaluado] = useState(false);
   const [showAsignacionesModal, setShowAsignacionesModal] = useState(false);
 
-  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<string[]>([
-    "Juan Pérez",
-    "María López",
-  ]);
+  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<
+    string[]
+  >(["Juan Pérez", "María López"]);
   const [poesAsignados, setPoesAsignados] = useState<string[]>([
     "700-50-001 - Nombre Procedimiento",
   ]);
@@ -26,6 +25,11 @@ export function useCapacitation() {
       setPoesAsignados([...poesAsignados, nuevoPoe]);
       setNuevoPoe("");
     }
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  
   };
 
   return {
@@ -45,5 +49,6 @@ export function useCapacitation() {
     setNuevoPoe,
     poesDisponibles,
     handleAgregarPoe,
+    handleSubmit,
   };
 }
