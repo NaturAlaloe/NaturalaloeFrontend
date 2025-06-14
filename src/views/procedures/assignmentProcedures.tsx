@@ -24,10 +24,20 @@ const rolesDisponibles = [
   "Supervisor",
   "Operador",
   "Invitado",
-  "6sasasasa",
-  "411212ed",
-  "3sasasas",
-  "2fffff",
+  "Gerente de Planta",
+  "Gerente de Calidad",
+  "Gerente de Producción",
+  "Gerente de Logística",
+  "Gerente de Mantenimiento",
+  "Gerente de Recursos Humanos",
+  "Gerente de Finanzas",
+  "Gerente de Ventas",
+  "Gerente de Marketing",
+  "Gerente de IT",
+  "Gerente de Seguridad",
+  "Gerente de Proyectos",
+  "Gerente de Innovación",
+
 ];
 
 export default function RolesProcedures() {
@@ -159,7 +169,7 @@ export default function RolesProcedures() {
 
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm max-w-4xl mx-auto">
+    <div className="p-6 bg-white rounded-lg shadow-sm">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
         Asignar Procedimientos a Roles
       </h1>
@@ -176,6 +186,7 @@ export default function RolesProcedures() {
       <GlobalDataTable
         columns={columns}
         data={rolesFiltrados}
+        pagination= {true}
       />
 
       <GlobalModal
