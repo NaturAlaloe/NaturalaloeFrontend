@@ -1,58 +1,54 @@
-import { useState, useMemo } from "react";
-
-export interface Facilitador {
-  id: number;
-  nombre: string;
-  apellido: string;
-  tipo: string;
-}
-
-const initialData: Facilitador[] = [
-  { id: 1, nombre: "Juan", apellido: "Pérez", tipo: "Interno" },
-  { id: 2, nombre: "Ana", apellido: "García", tipo: "Externo" },
-  { id: 3, nombre: "Luis", apellido: "Martínez", tipo: "Interno" },
-];
+import { useEffect, useState, useMemo } from "react";
+import { getFacilitadores, type Facilitador } from "../../services/listFacilitatorService";
 
 export function useFacilitadoresList() {
-  const [facilitadores, setFacilitadores] = useState<Facilitador[]>(initialData);
+  const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
+  useEffect(() => {
+    getFacilitadores().then(setFacilitadores);
+  }, []);
+
   const filtered = useMemo(() => {
-    return facilitadores.filter((fac) => {
-      const term = searchTerm.toLowerCase();
-      return (
-        fac.nombre.toLowerCase().includes(term) ||
-        fac.apellido.toLowerCase().includes(term) ||
-        fac.tipo.toLowerCase().includes(term)
-      );
-    });
-  }, [searchTerm, facilitadores]);
+    const term = searchTerm.toLowerCase();
+    return facilitadores.filter(f =>
+      f.nombre.toLowerCase().includes(term) ||
+      f.apellido.toLowerCase().includes(term) ||
+      f.tipo_facilitador.toLowerCase().includes(term)
+    );
+  }, [facilitadores, searchTerm]);
 
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
     return filtered.slice(start, start + rowsPerPage);
-  }, [currentPage, filtered]);
+  }, [filtered, currentPage]);
 
   const totalPages = Math.ceil(filtered.length / rowsPerPage);
 
   const updateFacilitador = (updated: Facilitador) => {
-    setFacilitadores((prev) =>
-      prev.map((f) => (f.id === updated.id ? updated : f))
+    setFacilitadores(prev =>
+      prev.map(f =>
+        f.nombre === updated.nombre && f.apellido === updated.apellido
+          ? updated
+          : f
+      )
     );
+    // Aquí podrías agregar PUT al backend si lo necesitas
   };
 
   return {
-    facilitadores,
-    filtered,
-    paginated,
     searchTerm,
     setSearchTerm,
     currentPage,
     setCurrentPage,
     rowsPerPage,
+    filtered,
+    paginated,
     totalPages,
     updateFacilitador,
   };
 }
+export type { Facilitador };
+

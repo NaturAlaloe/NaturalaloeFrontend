@@ -49,17 +49,15 @@ export default function ListFacilitadores() {
     setFacilitadorEditando(null);
   };
 
-  const handleDelete = (id: number, e: React.MouseEvent) => {
+  const handleDelete = (id: number | undefined, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm("¿Desea eliminar este facilitador?")) {
-      alert("Eliminar no implementado (solo visual)");
-    }
+    alert("Eliminar no implementado");
   };
 
   const columns = [
     { name: "NOMBRE", selector: (row: Facilitador) => row.nombre, sortable: true },
     { name: "APELLIDO", selector: (row: Facilitador) => row.apellido, sortable: true },
-    { name: "TIPO DE FACILITADOR", selector: (row: Facilitador) => row.tipo, sortable: true },
+    { name: "TIPO DE FACILITADOR", selector: (row: Facilitador) => row.tipo_facilitador, sortable: true },
     {
       name: "ACCIONES",
       cell: (row: Facilitador) => (
@@ -90,21 +88,16 @@ export default function ListFacilitadores() {
         <div>
           <nav className="inline-flex rounded-md shadow-sm -space-x-px">
             <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}
-              className="px-2 py-2 border text-sm text-gray-500 bg-white hover:bg-gray-100 rounded-l-md">
-              ◀
-            </button>
+              className="px-2 py-2 border text-sm text-gray-500 bg-white hover:bg-gray-100 rounded-l-md">◀</button>
             {[...Array(totalPages)].map((_, idx) => (
               <button key={idx + 1}
                 onClick={() => setCurrentPage(idx + 1)}
-                className={`px-4 py-2 border text-sm ${currentPage === idx + 1 ? 'bg-gray-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-gray-100'
-                  }`}>
+                className={`px-4 py-2 border text-sm ${currentPage === idx + 1 ? 'bg-gray-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-gray-100'}`}>
                 {idx + 1}
               </button>
             ))}
             <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}
-              className="px-2 py-2 border text-sm text-gray-500 bg-white hover:bg-gray-100 rounded-r-md">
-              ▶
-            </button>
+              className="px-2 py-2 border text-sm text-gray-500 bg-white hover:bg-gray-100 rounded-r-md">▶</button>
           </nav>
         </div>
       </div>
@@ -161,7 +154,6 @@ export default function ListFacilitadores() {
                 name="nombre"
                 value={facilitadorEditando.nombre}
                 onChange={handleEditChange}
-                placeholder="Nombre del facilitador"
                 required
               />
               <InputField
@@ -169,40 +161,23 @@ export default function ListFacilitadores() {
                 name="apellido"
                 value={facilitadorEditando.apellido}
                 onChange={handleEditChange}
-                placeholder="Apellido del facilitador"
                 required
               />
               <SelectField
                 label="Tipo de Facilitador"
-                name="tipo"
-                value={facilitadorEditando.tipo}
+                name="tipo_facilitador"
+                value={facilitadorEditando.tipo_facilitador}
                 onChange={handleEditChange}
                 options={[
-                  { value: "Interno", label: "Interno" },
-                  { value: "Externo", label: "Externo" }
+                  { value: "interno", label: "Interno" },
+                  { value: "externo", label: "Externo" }
                 ]}
                 required
               />
-            </div>
-            <div className="flex justify-end gap-2 mt-6">
-              <button
-                type="button"
-                onClick={handleCancelEdit}
-                className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded-md bg-[#2AAC67] text-white hover:bg-[#259e5d]"
-              >
-                Guardar
-              </button>
             </div>
           </form>
         </GlobalModal>
       )}
     </FormContainer>
-
   );
 }
