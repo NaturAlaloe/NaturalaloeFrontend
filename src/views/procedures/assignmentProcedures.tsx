@@ -16,6 +16,23 @@ const procedimientosEjemplo = [
   { poe: "POE-001", titulo: "Limpieza de equipos" },
   { poe: "POE-002", titulo: "Control de calidad" },
   { poe: "POE-003", titulo: "Muestreo de producto" },
+  { poe: "POE-004", titulo: "Mantenimiento preventivo" },
+  { poe: "POE-005", titulo: "Capacitación de personal" },
+  { poe: "POE-006", titulo: "Gestión de inventarios" },
+  { poe: "POE-007", titulo: "Auditoría interna" },
+  { poe: "POE-008", titulo: "Control de documentos" },
+  { poe: "POE-009", titulo: "Gestión de residuos" },
+  { poe: "POE-010", titulo: "Seguridad industrial" },
+  { poe: "POE-011", titulo: "Plan de emergencia" },
+  { poe: "POE-012", titulo: "Manejo de sustancias químicas" },
+  { poe: "POE-013", titulo: "Control de procesos" },
+  { poe: "POE-014", titulo: "Inspección de calidad" },
+  { poe: "POE-015", titulo: "Registro de datos" },
+  { poe: "POE-016", titulo: "Análisis estadístico" },
+  { poe: "POE-017", titulo: "Mejora continua" },
+  { poe: "POE-018", titulo: "Auditoría externa" },
+  { poe: "POE-019", titulo: "Evaluación de proveedores" },
+  { poe: "POE-020", titulo: "Gestión de proyectos" },
   // ...agrega más para probar paginación
 ];
 
@@ -195,15 +212,11 @@ export default function RolesProcedures() {
         title={`Asignar procedimientos a ${rolActual}`}
         maxWidth="md"
         actions={
-          <>
-            <div className="flex justify-center items-center gap-2">
-              <SubmitButton
-                onClick={handleSaveProcedimientos}
-              >
-                Guardar
-              </SubmitButton>
-            </div>
-          </>
+          <div className="flex justify-center items-center gap-2">
+            <SubmitButton onClick={handleSaveProcedimientos}>
+              Guardar
+            </SubmitButton>
+          </div>
         }
       >
         <div className="relative mb-4">
@@ -213,11 +226,14 @@ export default function RolesProcedures() {
             placeholder="Buscar procedimientos por código o título..."
           />
         </div>
-        <ProceduresTableModal
-          procedimientos={procedimientosFiltradosModal}
-          procedimientosSeleccionados={procedimientosSeleccionados}
-          onSeleccionChange={setProcedimientosSeleccionados}
-        />
+        {/* Solo la tabla tiene scroll */}
+        <div style={{ maxHeight: 350, overflowY: "auto" }}>
+          <ProceduresTableModal
+            procedimientos={procedimientosFiltradosModal}
+            procedimientosSeleccionados={procedimientosSeleccionados}
+            onSeleccionChange={setProcedimientosSeleccionados}
+          />
+        </div>
       </GlobalModal>
     </div>
   );
