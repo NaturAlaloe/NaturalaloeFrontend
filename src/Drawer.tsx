@@ -34,7 +34,10 @@ import CapacitacionFinalizada from "./views/capacitation/capacitationFinished";
 import AddCollaborator from "./views/collaborators/addCollaborator";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
-import UserAssignment from "./views/login/userAssignment";
+import Manage from "./views/administration/manage";
+import ListaAreas from "./views/administration/listAreas";
+import ListaDepartamentos from "./views/administration/listDepartments";
+import ListaPuestos from "./views/administration/listWorkstations";
 import SchoolIcon from "@mui/icons-material/School";
 import Politicies from "./views/politics/politicsForm";
 import VersionControlProcedures from "./views/procedures/versionControllProcedures";
@@ -256,7 +259,7 @@ export default function PersistentDrawerLeft() {
             <List component="div" disablePadding>
               <ListItemButton
                 component={Link}
-                to="/login/register"
+                to="/administration/register"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -267,6 +270,22 @@ export default function PersistentDrawerLeft() {
                 }}
               >
                 <ListItemText primary="Registrar Usuarios" />
+              </ListItemButton>
+            </List>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/administration/manage"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Gestionar" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -581,8 +600,11 @@ export default function PersistentDrawerLeft() {
       <Main open={open}>
         <DrawerHeader />
         <Routes>
-          <Route path="/login/register" element={<Register />} />
-          <Route path="/login/userAssignment" element={<UserAssignment />} />
+          <Route path="/administration/register" element={<Register />} />
+          <Route path="/administration/manage" element={<Manage />} />
+          <Route path="/administration/listAreas" element={<ListaAreas />} />
+          <Route path="/administration/listDepartments" element={<ListaDepartamentos />} />
+          <Route path="/administration/listWorkstations" element={<ListaPuestos />} />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
           <Route
