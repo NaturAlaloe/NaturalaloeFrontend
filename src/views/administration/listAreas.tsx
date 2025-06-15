@@ -19,18 +19,18 @@ export default function AreasList() {
     },
     {
       name: "Acciones",
-      cell: (_: { titulo: string }, idx: number) => (
+      cell: (row: any, idx: number) => (
         <div className="flex gap-2">
           <button
             className="text-[#2AAC67] hover:text-green-700"
-            onClick={() => ui.handleOpenEdit(idx)}
+            onClick={() => ui.handleOpenEdit(row)} // Pasa el área, no el índice
             title="Editar"
           >
             <Edit fontSize="small" />
           </button>
           <button
             className="text-red-500 hover:text-red-700"
-            onClick={() => ui.setDeleteIndex(idx)}
+            onClick={() => ui.handleOpenDelete(row)}
             title="Eliminar"
           >
             <Delete fontSize="small" />
@@ -72,8 +72,11 @@ export default function AreasList() {
 
       <GlobalModal
         open={ui.modalOpen}
-        onClose={() => ui.setModalOpen(false)}
-        title={ui.editIndex !== null ? "Editar Área" : "Agregar Área"}
+        onClose={() => {
+          ui.setModalOpen(false);
+          ui.setEditAreaObj(null);
+        }}
+        title={ui.editAreaObj ? "Editar Área" : "Agregar Área"}
         maxWidth="sm"
       >
         <form
@@ -89,14 +92,14 @@ export default function AreasList() {
           />
 
           <SubmitButton>
-            {ui.editIndex !== null ? "Guardar Cambios" : "Agregar"}
+            {ui.editAreaObj ? "Guardar Cambios" : "Agregar"}
           </SubmitButton>
         </form>
       </GlobalModal>
 
       <GlobalModal
-        open={ui.deleteIndex !== null}
-        onClose={() => ui.setDeleteIndex(null)}
+        open={ui.deleteAreaObj !== null}
+        onClose={() => ui.setDeleteAreaObj(null)}
         title="Eliminar Área"
         maxWidth="sm"
         actions={
@@ -104,7 +107,7 @@ export default function AreasList() {
             <SubmitButton
               className="bg-gray-400 hover:bg-gray-500"
               type="button"
-              onClick={() => ui.setDeleteIndex(null)}
+              onClick={() => ui.setDeleteAreaObj(null)}
             >
               Cancelar
             </SubmitButton>
