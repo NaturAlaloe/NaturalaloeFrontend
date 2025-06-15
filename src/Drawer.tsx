@@ -36,7 +36,7 @@ import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
 import Manage from "./views/administration/manage";
 import ListaAreas from "./views/administration/listAreas";
-
+import ListaDepartamentos from "./views/administration/listDepartments";
 import SchoolIcon from "@mui/icons-material/School";
 import Politicies from "./views/politics/politicsForm";
 import VersionControlProcedures from "./views/procedures/versionControllProcedures";
@@ -602,6 +602,7 @@ export default function PersistentDrawerLeft() {
           <Route path="/administration/register" element={<Register />} />
           <Route path="/administration/manage" element={<Manage />} />
           <Route path="/administration/listAreas" element={<ListaAreas />} />
+          <Route path="/administration/listDepartments" element={<ListaDepartamentos />} />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
           <Route
