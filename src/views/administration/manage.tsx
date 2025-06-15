@@ -10,7 +10,7 @@ const cards = [
   {
     title: "Puestos",
     description: "Gestiona los puestos de trabajo.",
-    to: "/administration/puestos",
+    to: "/administration/listWorkstations",
   },
   {
     title: "Categorías",
