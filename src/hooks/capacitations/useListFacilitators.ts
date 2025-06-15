@@ -8,7 +8,9 @@ export function useFacilitadoresList() {
   const rowsPerPage = 5;
 
   useEffect(() => {
-    getFacilitadores().then(setFacilitadores);
+    getFacilitadores().then(data => {
+      setFacilitadores(data);
+    });
   }, []);
 
   const filtered = useMemo(() => {
@@ -35,7 +37,10 @@ export function useFacilitadoresList() {
           : f
       )
     );
-    // Aquí podrías agregar PUT al backend si lo necesitas
+  };
+
+  const removeFacilitador = (id: number) => {
+    setFacilitadores(prev => prev.filter(f => f.id !== id));
   };
 
   return {
@@ -48,6 +53,7 @@ export function useFacilitadoresList() {
     paginated,
     totalPages,
     updateFacilitador,
+    removeFacilitador, 
   };
 }
 export type { Facilitador };

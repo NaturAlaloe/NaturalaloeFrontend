@@ -45,7 +45,7 @@ export default function FacilitatorTraining() {
             onChange={handleInternoChange}
             options={facilitadoresInternos.map((f) => ({
               nombre: `${f.nombre} ${f.apellido}`,
-              value: f.id,
+              value: f.id_facilitador.toString(),
             }))}
             required
             optionLabel="nombre"
@@ -87,7 +87,7 @@ export default function FacilitatorTraining() {
       </div>
 
       <div className="text-center mt-8">
-        <SubmitButton>{"Guardar"}</SubmitButton>
+        <SubmitButton>Guardar</SubmitButton>
       </div>
     </FormContainer>
   );
