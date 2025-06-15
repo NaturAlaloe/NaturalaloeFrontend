@@ -3,8 +3,8 @@ import InputField from '../../components/formComponents/InputField';
 import SelectField from '../../components/formComponents/SelectField';
 import SubmitButton from '../../components/formComponents/SubmitButton';
 import SimpleModal from "../../components/globalComponents/SimpleModal";
-import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import { useCapacitation } from '../../hooks/capacitations/useCapacitation';
+import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
 
 const Capacitacion = () => {
     const {
@@ -18,7 +18,6 @@ const Capacitacion = () => {
         facilitadores,
         tiposCapacitacion,
         metodosEvaluacion,
-        // Lógica para asignaciones:
         colaboradoresDisponibles,
         poesDisponibles,
         columnsColaboradores,
@@ -29,8 +28,6 @@ const Capacitacion = () => {
         setShowPoesTable,
         colaboradoresAsignados,
         poesAsignados,
-        setSelectedColaboradores,
-        setSelectedPoes,
         agregarColaboradores,
         agregarPoes,
     } = useCapacitation();
@@ -129,106 +126,103 @@ const Capacitacion = () => {
                     Asignar
                 </SubmitButton>
             </div>
-            {/* Modal de asignaciones */}
             {showAsignacionesModal && (
                 <SimpleModal
                     open={showAsignacionesModal}
                     title="Progreso"
                     onClose={() => setShowAsignacionesModal(false)}
                 >
-                    {/* Colaboradores asignados */}
-                    <div className="mb-6">
-                        <div className="flex justify-between items-center mb-2">
-                            <h4 className="font-semibold text-[#15803D]">Colaboradores asignados:</h4>
+                    <div className="mb-8">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                            <h4 className="font-semibold text-[#15803D] text-lg">Colaboradores asignados</h4>
                             <button
-                                className="bg-[#2AAC67] text-white px-4 py-1 rounded hover:bg-[#24965c] text-sm"
+                                className="bg-[#2AAC67] text-white px-4 py-1 rounded hover:bg-[#24965c] text-sm shadow w-full md:w-auto"
                                 onClick={() => setShowColaboradoresTable(true)}
                                 type="button"
                             >
-                                Agregar colaboradores
+                                + Agregar
                             </button>
                         </div>
-                        <ul className="list-disc ml-6">
-                            {colaboradoresAsignados.map((col) => (
-                                <li key={col.id} className="text-[#222]">{col.nombre} - {col.puesto}</li>
-                            ))}
-                        </ul>
-                    </div>
-                    {/* Tabla para seleccionar colaboradores */}
-                    {showColaboradoresTable && (
-                        <div className="mb-4">
-                            <GlobalDataTable
-                                columns={columnsColaboradores}
-                                data={colaboradoresDisponibles}
-                                selectableRows
-                                onSelectedRowsChange={({ selectedRows }: { selectedRows: any[] }) => setSelectedColaboradores(selectedRows)}
-                                pagination={false}
-                            />
-                            <div className="flex justify-end gap-2 mt-2">
-                                <button
-                                    className="bg-[#2AAC67] text-white px-4 py-1 rounded hover:bg-[#24965c]"
-                                    onClick={agregarColaboradores}
-                                    type="button"
-                                >
-                                    Añadir seleccionados
-                                </button>
-                                <button
-                                    className="bg-gray-300 px-4 py-1 rounded"
-                                    onClick={() => setShowColaboradoresTable(false)}
-                                    type="button"
-                                >
-                                    Cancelar
-                                </button>
-                            </div>
+                        <div className="overflow-x-auto rounded-lg border border-[#2AAC67] shadow">
+                            <table className="min-w-full divide-y divide-[#2AAC67]">
+                                <thead className="bg-[#F0FFF4]">
+                                    <tr>
+                                        <th className="px-2 py-2 text-left text-xs font-bold text-[#2AAC67] uppercase">Nombre</th>
+                                        <th className="px-2 py-2 text-left text-xs font-bold text-[#2AAC67] uppercase">Puesto</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-[#e5e7eb]">
+                                    {colaboradoresAsignados.length > 0 ? (
+                                        colaboradoresAsignados.map((col) => (
+                                            <tr key={col.id}>
+                                                <td className="px-2 py-2">{col.nombre}</td>
+                                                <td className="px-2 py-2">{col.puesto}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={2} className="px-2 py-4 text-center text-gray-500">No hay colaboradores asignados</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
-                    )}
-
-                    {/* POEs asignados */}
-                    <div className="mb-6">
-                        <div className="flex justify-between items-center mb-2">
-                            <h4 className="font-semibold text-[#15803D]">POE(s) asignados:</h4>
+                    </div>
+                    <div className="mb-8">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                            <h4 className="font-semibold text-[#15803D] text-lg">POE(s) asignados</h4>
                             <button
-                                className="bg-[#2AAC67] text-white px-4 py-1 rounded hover:bg-[#24965c] text-sm"
+                                className="bg-[#2AAC67] text-white px-4 py-1 rounded hover:bg-[#24965c] text-sm shadow w-full md:w-auto"
                                 onClick={() => setShowPoesTable(true)}
                                 type="button"
                             >
-                                Agregar POEs
+                                + Agregar
                             </button>
                         </div>
-                        <ul className="list-disc ml-6">
-                            {poesAsignados.map((poe) => (
-                                <li key={poe.id} className="text-[#222]">{poe.codigo} - {poe.titulo}</li>
-                            ))}
-                        </ul>
-                    </div>
-                    {/* Tabla para seleccionar POEs */}
-                    {showPoesTable && (
-                        <div className="mb-4">
-                            <GlobalDataTable
-                                columns={columnsPoes}
-                                data={poesDisponibles}
-                                selectableRows
-                                onSelectedRowsChange={({ selectedRows }: { selectedRows: any[] }) => setSelectedPoes(selectedRows)}
-                                pagination={false}
-                            />
-                            <div className="flex justify-end gap-2 mt-2">
-                                <button
-                                    className="bg-[#2AAC67] text-white px-4 py-1 rounded hover:bg-[#24965c]"
-                                    onClick={agregarPoes}
-                                    type="button"
-                                >
-                                    Añadir seleccionados
-                                </button>
-                                <button
-                                    className="bg-gray-300 px-4 py-1 rounded"
-                                    onClick={() => setShowPoesTable(false)}
-                                    type="button"
-                                >
-                                    Cancelar
-                                </button>
-                            </div>
+                        <div className="overflow-x-auto rounded-lg border border-[#2AAC67] shadow">
+                            <table className="min-w-full divide-y divide-[#2AAC67]">
+                                <thead className="bg-[#F0FFF4]">
+                                    <tr>
+                                        <th className="px-2 py-2 text-left text-xs font-bold text-[#2AAC67] uppercase">Código</th>
+                                        <th className="px-2 py-2 text-left text-xs font-bold text-[#2AAC67] uppercase">Título</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-[#e5e7eb]">
+                                    {poesAsignados.length > 0 ? (
+                                        poesAsignados.map((poe) => (
+                                            <tr key={poe.id}>
+                                                <td className="px-2 py-2">{poe.codigo}</td>
+                                                <td className="px-2 py-2">{poe.titulo}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={2} className="px-2 py-4 text-center text-gray-500">No hay POEs asignados</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
-                    )}
+                    </div>
+
+                    <PaginatedTableModal
+                        open={showColaboradoresTable}
+                        onClose={() => setShowColaboradoresTable(false)}
+                        title="Selecciona colaboradores para agregar"
+                        columns={columnsColaboradores}
+                        data={colaboradoresDisponibles}
+                        onAdd={agregarColaboradores}
+                    />
+                    <PaginatedTableModal
+                        open={showPoesTable}
+                        onClose={() => setShowPoesTable(false)}
+                        title="Selecciona POEs para agregar"
+                        columns={columnsPoes}
+                        data={poesDisponibles}
+                        onAdd={agregarPoes}
+                    />
+
+
                 </SimpleModal>
             )}
         </FormContainer>

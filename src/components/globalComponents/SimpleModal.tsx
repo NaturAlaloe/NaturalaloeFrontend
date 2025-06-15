@@ -25,7 +25,6 @@ const ModalWithHeader: React.FC<ModalWithHeaderProps> = ({
             }}
         >
             <div className={`bg-white rounded-xl p-8 shadow-lg relative ${widthClass}`}>
-                {/* Encabezado con título y botón X */}
                 <div className="flex items-center justify-center gap-4 mb-2">
                     <p className="text-2xl font-bold text-[#2AAC67] text-center flex-1">{title}</p>
                     <button
