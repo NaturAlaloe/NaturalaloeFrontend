@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -35,10 +34,13 @@ import CapacitacionFinalizada from "./views/capacitation/capacitationFinished";
 import AddCollaborator from "./views/collaborators/addCollaborator";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
-import UserAssignment from "./views/login/userAssignment";
-import SchoolIcon from '@mui/icons-material/School';
-import Politicies from './views/politics/politicsForm';
-
+import Manage from "./views/administration/manage";
+import ListaAreas from "./views/administration/listAreas";
+import ListaDepartamentos from "./views/administration/listDepartments";
+import ListaPuestos from "./views/administration/listWorkstations";
+import SchoolIcon from "@mui/icons-material/School";
+import Politicies from "./views/politics/politicsForm";
+import VersionControlProcedures from "./views/procedures/versionControllProcedures";
 
 const drawerWidth = 270;
 
@@ -257,7 +259,7 @@ export default function PersistentDrawerLeft() {
             <List component="div" disablePadding>
               <ListItemButton
                 component={Link}
-                to="/login/register"
+                to="/administration/register"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -269,11 +271,24 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Registrar Usuarios" />
               </ListItemButton>
-
-        
+            </List>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/administration/manage"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Gestionar" />
+              </ListItemButton>
             </List>
           </Collapse>
-          
 
           {/* Procedimientos */}
           <ListItem disablePadding>
@@ -338,6 +353,20 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Asignar Procedimientos" />
               </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to="/procedures/versionControlProcedures"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Control de Versiones" />
+              </ListItemButton>
             </List>
           </Collapse>
 
@@ -346,16 +375,16 @@ export default function PersistentDrawerLeft() {
             <ListItemButton
               onClick={() => setOpenPoliticas(!openPoliticas)}
               sx={{
-              color: '#fff',
-              pl: 3,
-              '&:hover': {
-                background: '#21824f',
-                color: '#fff',
-                '& .MuiSvgIcon-root': { color: '#13bd62' },
-              },
+                color: "#fff",
+                pl: 3,
+                "&:hover": {
+                  background: "#21824f",
+                  color: "#fff",
+                  "& .MuiSvgIcon-root": { color: "#13bd62" },
+                },
               }}
             >
-              <ArticleIcon sx={{ color: '#b4ebce', mr: 2 }} />
+              <ArticleIcon sx={{ color: "#b4ebce", mr: 2 }} />
               <ListItemText primary="Políticas" />
               {openPoliticas ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
@@ -367,10 +396,10 @@ export default function PersistentDrawerLeft() {
                 to="/politics/politicsForm"
                 sx={{
                   pl: 6,
-                  color: '#f4fcec',
-                  '&:hover': {
-                    background: '#2AAC67',
-                    color: '#fff',
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
                   },
                 }}
               >
@@ -412,7 +441,6 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-              
                 <ListItemText primary="Agregar Capacitaciones" />
               </ListItemButton>
               <ListItemButton
@@ -427,7 +455,6 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-               
                 <ListItemText primary="Agregar Facilitadores" />
               </ListItemButton>
               <ListItemButton
@@ -442,7 +469,6 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-            
                 <ListItemText primary="Lista" />
               </ListItemButton>
               <ListItemButton
@@ -457,7 +483,6 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-            
                 <ListItemText primary="Lista de Facilitadores" />
               </ListItemButton>
               <ListItemButton
@@ -472,10 +497,8 @@ export default function PersistentDrawerLeft() {
                   },
                 }}
               >
-              
                 <ListItemText primary="Finalizadas" />
               </ListItemButton>
-
             </List>
           </Collapse>
 
@@ -577,15 +600,18 @@ export default function PersistentDrawerLeft() {
       <Main open={open}>
         <DrawerHeader />
         <Routes>
-          <Route path="/login/register" element={<Register />} />
-          <Route path="/login/userAssignment" element={<UserAssignment />} />
+          <Route path="/administration/register" element={<Register />} />
+          <Route path="/administration/manage" element={<Manage />} />
+          <Route path="/administration/listAreas" element={<ListaAreas />} />
+          <Route path="/administration/listDepartments" element={<ListaDepartamentos />} />
+          <Route path="/administration/listWorkstations" element={<ListaPuestos />} />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
           <Route
             path="/procedures/listProcedures"
             element={<ListaProcedimientos />}
           />
-            <Route
+          <Route
             path="/procedures/assignmentProcedures"
             element={<AsignacionProcedimientos />}
           />
@@ -608,7 +634,7 @@ export default function PersistentDrawerLeft() {
             path="/capacitation/facilitatorTraining"
             element={<RegistroFacilitadores />}
           />
-          
+
           <Route
             path="/capacitation/listFacilitators"
             element={<ListaFacilitadores />}
@@ -617,10 +643,15 @@ export default function PersistentDrawerLeft() {
             path="/capacitation/capacitationIndividualFinished"
             element={<CapacitacionFinalizada />}
           />
-          <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
+          <Route
+            path="/collaborators/addCollaborator"
+            element={<AddCollaborator />}
+          />
           <Route path="/politics/politicsForm" element={<Politicies />} />
-
-
+          <Route
+            path="/procedures/versionControlProcedures"
+            element={<VersionControlProcedures />}
+          />
         </Routes>
       </Main>
     </Box>

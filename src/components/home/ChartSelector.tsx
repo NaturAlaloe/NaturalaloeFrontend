@@ -1,5 +1,5 @@
 // src/components/ChartSelector.tsx
-import { useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { Bar, Pie, Doughnut, Line, PolarArea } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -14,7 +14,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
-
+import api from '../../apiConfig/api';
 
 ChartJS.register(
   CategoryScale,
@@ -30,21 +30,46 @@ ChartJS.register(
 
 const ChartSelector = () => {
   const [chartType, setChartType] = useState('bar');
+  const [labels, setLabels] = useState<string[]>([]);
+  const [capData, setCapData] = useState<number[]>([]);
+  const [noCapData, setNoCapData] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await api.get('/dataForGraphic');
+        if (res.data.success) {
+          const data = res.data.data;
+          setLabels(data.map((item: any) => item.area));
+          setCapData(data.map((item: any) => Number(item.capacitados)));
+          setNoCapData(data.map((item: any) => Number(item.no_capacitados)));
+        }
+      } catch (error) {
+        setLabels([]);
+        setCapData([]);
+        setNoCapData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Datos para gráficos comparativos (barras, líneas, polar)
   const comparativeData = {
-    labels: ['Limpieza', 'Inspección', 'Recolección'],
+    labels,
     datasets: [
       {
         label: 'Capacitados',
-        data: [42, 35, 28],
+        data: capData,
         backgroundColor: '#4ade80',
         borderColor: '#16a34a',
         borderWidth: 1,
       },
       {
         label: 'No capacitados',
-        data: [8, 15, 12],
+        data: noCapData,
         backgroundColor: '#f87171',
         borderColor: '#dc2626',
         borderWidth: 1,
@@ -54,20 +79,20 @@ const ChartSelector = () => {
 
   // Datos para gráficos individuales (pie/doughnut)
   const trainedData = {
-    labels: ['Limpieza', 'Inspección', 'Recolección'],
+    labels,
     datasets: [{
       label: 'Capacitados',
-      data: [42, 35, 28],
+      data: capData,
       backgroundColor: ['#4ade80', '#86efac', '#16a34a'],
       borderWidth: 1,
     }]
   };
 
   const untrainedData = {
-    labels: ['Limpieza', 'Inspección', 'Recolección'],
+    labels,
     datasets: [{
       label: 'No capacitados',
-      data: [8, 15, 12],
+      data: noCapData,
       backgroundColor: ['#f87171', '#fca5a5', '#dc2626'],
       borderWidth: 1,
     }]
@@ -128,19 +153,9 @@ const ChartSelector = () => {
       case 'polar':
         return <PolarArea data={comparativeData} options={options} />;
       case 'pie':
-        return (
-          <Pie
-            data={trainedData}
-            options={options}
-          />
-        );
+        return <Pie data={trainedData} options={options} />;
       case 'doughnut':
-        return (
-          <Doughnut
-            data={untrainedData}
-            options={options}
-          />
-        );
+        return <Doughnut data={untrainedData} options={options} />;
       default:
         return <Bar data={comparativeData} options={options} />;
     }
@@ -167,7 +182,7 @@ const ChartSelector = () => {
 
       <div style={{ height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Box sx={{ width: '100%', height: '100%' }}>
-          {renderChart()}
+          {loading ? 'Cargando...' : renderChart()}
         </Box>
       </div>
     </div>
