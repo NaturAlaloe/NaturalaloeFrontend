@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import TableContainer from "../../components/TableContainer";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
@@ -6,69 +5,11 @@ import SubmitButton from "../../components/formComponents/SubmitButton";
 import InputField from "../../components/formComponents/InputField";
 import SearchBar from "../../components/globalComponents/SearchBarTable";
 import { Edit, Delete } from "@mui/icons-material";
-import { useAreas } from "../../hooks/useAreas";
-import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+import { useAreasList } from '../../hooks/manage/useAreasList';
+import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 
 export default function AreasList() {
-  const {
-    areas,
-    loading,
-    error,
-    addArea,
-  } = useAreas();
-
-  const [search, setSearch] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [areaInput, setAreaInput] = useState("");
-  const [areaPadreInput, setAreaPadreInput] = useState<number | undefined>(undefined);
-  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
-
-  // Filtrar áreas según búsqueda
-  const filteredAreas = Array.isArray(areas)
-    ? areas.filter((a) => a.titulo.toLowerCase().includes(search.toLowerCase()))
-    : [];
-
-  // Abrir modal para agregar
-  const handleOpenAdd = () => {
-    setEditIndex(null);
-    setAreaInput("");
-    setAreaPadreInput(undefined);
-    setModalOpen(true);
-  };
-
-  // Abrir modal para editar
-  const handleOpenEdit = (idx: number) => {
-    setEditIndex(idx);
-    setAreaInput(filteredAreas[idx].titulo);
-    setModalOpen(true);
-  };
-
-  // Guardar área (agregar o editar)
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (areaInput.trim() === "") return;
-    if (editIndex !== null) {
-      setModalOpen(false);
-    } else {
-      try {
-        await addArea({
-          titulo: areaInput,
-          id_area_padre: areaPadreInput ?? undefined,
-        });
-        showCustomToast("Éxito", "Área agregada correctamente", "success");
-        setModalOpen(false);
-        setAreaInput("");
-        setAreaPadreInput(undefined);
-      } catch (err) {
-        showCustomToast("Error", "Error al agregar área", "error");
-      }
-    }
-  };
-
-  const handleDelete = () => {
-    setDeleteIndex(null);
-  };
+  const ui = useAreasList();
 
   const columns = [
     {
@@ -82,14 +23,14 @@ export default function AreasList() {
         <div className="flex gap-2">
           <button
             className="text-[#2AAC67] hover:text-green-700"
-            onClick={() => handleOpenEdit(idx)}
+            onClick={() => ui.handleOpenEdit(idx)}
             title="Editar"
           >
             <Edit fontSize="small" />
           </button>
           <button
             className="text-red-500 hover:text-red-700"
-            onClick={() => setDeleteIndex(idx)}
+            onClick={() => ui.setDeleteIndex(idx)}
             title="Eliminar"
           >
             <Delete fontSize="small" />
@@ -104,20 +45,19 @@ export default function AreasList() {
 
   return (
     <TableContainer title="Áreas">
-      <div className="flex items-center justify-between mb-4 gap-2">
-        <div className="flex-1 flex items-center">
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Buscar área..."
-            className="mb-0"
-          />
-        </div>
+      {ui.loading && <FullScreenSpinner />}
+      <div className="flex items-center justify-between mb-4">
+        <SearchBar
+          value={ui.search}
+          onChange={ui.setSearch}
+          placeholder="Buscar área..."
+          className="w-full mr-4"
+        />
         <SubmitButton
-          className="ml-2 px-3 py-2 text-base rounded-lg flex items-center justify-center"
+          className="px-3 py-2 text-base rounded-lg flex items-center justify-center"
           width="w-10"
           type="button"
-          onClick={handleOpenAdd}
+          onClick={ui.handleOpenAdd}
           style={{ minWidth: "40px", minHeight: "40px", padding: 0 }}
         >
           <span className="text-xl leading-none">+</span>
@@ -125,40 +65,38 @@ export default function AreasList() {
       </div>
       <GlobalDataTable
         columns={columns}
-        data={filteredAreas}
+        data={ui.filteredAreas}
         rowsPerPage={5}
-        progressPending={loading}
+        progressPending={ui.loading}
       />
 
-      {/* Modal para agregar/editar */}
       <GlobalModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={editIndex !== null ? "Editar Área" : "Agregar Área"}
+        open={ui.modalOpen}
+        onClose={() => ui.setModalOpen(false)}
+        title={ui.editIndex !== null ? "Editar Área" : "Agregar Área"}
         maxWidth="sm"
       >
         <form
-          onSubmit={handleSave}
+          onSubmit={ui.handleSave}
           className="flex flex-col gap-4 min-w-[250px]"
         >
           <InputField
             label="Nombre del Área"
             name="area"
-            value={areaInput}
-            onChange={(e) => setAreaInput(e.target.value)}
+            value={ui.areaInput}
+            onChange={(e) => ui.setAreaInput(e.target.value)}
             required
           />
-       
+
           <SubmitButton>
-            {editIndex !== null ? "Guardar Cambios" : "Agregar"}
+            {ui.editIndex !== null ? "Guardar Cambios" : "Agregar"}
           </SubmitButton>
         </form>
       </GlobalModal>
 
-      {/* Modal de confirmación para eliminar */}
       <GlobalModal
-        open={deleteIndex !== null}
-        onClose={() => setDeleteIndex(null)}
+        open={ui.deleteIndex !== null}
+        onClose={() => ui.setDeleteIndex(null)}
         title="Eliminar Área"
         maxWidth="sm"
         actions={
@@ -166,14 +104,14 @@ export default function AreasList() {
             <SubmitButton
               className="bg-gray-400 hover:bg-gray-500"
               type="button"
-              onClick={() => setDeleteIndex(null)}
+              onClick={() => ui.setDeleteIndex(null)}
             >
               Cancelar
             </SubmitButton>
             <SubmitButton
               className="bg-red-500 hover:bg-red-600"
               type="button"
-              onClick={handleDelete}
+              onClick={ui.handleDelete}
             >
               Eliminar
             </SubmitButton>
@@ -182,8 +120,8 @@ export default function AreasList() {
       >
         <div>¿Estás seguro de que deseas eliminar esta área?</div>
       </GlobalModal>
-      {error && (
-        <div className="text-red-500 mt-2 text-center">{error}</div>
+      {ui.error && (
+        <div className="text-red-500 mt-2 text-center">{ui.error}</div>
       )}
     </TableContainer>
   );

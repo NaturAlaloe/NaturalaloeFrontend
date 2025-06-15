@@ -20,7 +20,7 @@ const cards = [
   {
     title: "Departamentos",
     description: "Gestiona los departamentos.",
-    to: "/administration/departamentos",
+    to: "/administration/listDepartments",
   },
 ];
 

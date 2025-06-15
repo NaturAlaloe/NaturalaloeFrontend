@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { getAreas, createArea, type Area } from "../services/areaService";
+import { getAreas, createArea, type Area } from "../../services/manage/areaService";
+
+// Este hook maneja la lógica ddel crud de áreas, incluyendo la obtención, adición y manejo de errores.
 
 export function useAreas() {
   const [areas, setAreas] = useState<Area[]>([]);
