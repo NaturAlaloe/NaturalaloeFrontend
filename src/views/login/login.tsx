@@ -9,23 +9,26 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 import useLogin from "../../hooks/login/useLogin"; // ajusta la ruta según tu estructura
 
-export default function Login() {
+interface LoginProps {
+  onLoginSuccess: () => void;
+}
+
+export default function Login({ onLoginSuccess }: LoginProps) {
   const [formData, setFormData] = useState({
     correo: "",
     contrasena: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
 
   const { login, error, success, loading } = useLogin();
 
-  // Redirige cuando el login sea exitoso
+  // Llama a onLoginSuccess cuando el login sea exitoso
   useEffect(() => {
     if (success) {
-      navigate("/HomeScreen/dashboard", { replace: true });
+      onLoginSuccess();
     }
-  }, [success, navigate]);
+  }, [success, onLoginSuccess]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

@@ -93,7 +93,12 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const drawerBg = `linear-gradient(to bottom,rgb(23, 134, 75) 0%,rgb(42, 172, 103) 100%)`;
-export default function PersistentDrawerLeft() {
+
+interface DrawerProps {
+  onLogout: () => void;
+}
+
+export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
   const [open, setOpen] = React.useState(false);
 
   // Estados para submenús
@@ -583,8 +588,7 @@ export default function PersistentDrawerLeft() {
               },
             }}
             onClick={() => {
-              // Aquí puedes poner tu lógica de logout
-              window.location.replace("/login"); // Redirigir al login
+              onLogout();
             }}
           >
             <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
