@@ -3,6 +3,10 @@ import FormContainer from '../../components/formComponents/FormContainer'
 import InputField from '../../components/formComponents/InputField'
 import SelectField from '../../components/formComponents/SelectField'
 import SubmitButton from '../../components/formComponents/SubmitButton';
+import { useDepartments } from '../../hooks/manage/useDepartments';
+import { useWorkstations } from '../../hooks/manage/useWorkstations';
+import { useAreas } from '../../hooks/manage/useAreas';
+
 
 function addCollaborator() {
 
@@ -26,6 +30,12 @@ function addCollaborator() {
             [e.target.name]: e.target.value,
         });
     };
+
+    // Hooks para obtener las opciones de área, departamento y puesto
+    const { areas } = useAreas();
+    const { departments } = useDepartments();
+    const { workstations } = useWorkstations();
+
     return (
         <div>
             <FormContainer title="Registro de Colaboradores" onSubmit={() => { }}>
@@ -84,10 +94,10 @@ function addCollaborator() {
                         name="area"
                         value={formData.area}
                         onChange={handleChange}
-                        options={[]}
+                        options={areas}
                         required
-                        optionLabel="area"
-                        optionValue="area"
+                        optionLabel="titulo" 
+                        optionValue="id_area"
                     />
 
                     <SelectField
@@ -95,10 +105,10 @@ function addCollaborator() {
                         name="departamento"
                         value={formData.departamento}
                         onChange={handleChange}
-                        options={[]}
+                        options={departments}
                         required
-                        optionLabel="departamento"
-                        optionValue="departamento"
+                        optionLabel="titulo_departamento" 
+                        optionValue=" id_departamento" 
                     />
 
                     <SelectField
@@ -106,17 +116,12 @@ function addCollaborator() {
                         name="puesto"
                         value={formData.puesto}
                         onChange={handleChange}
-                        options={[]}
+                        options={workstations}
                         required
-                        optionLabel="puesto"
-                        optionValue="puesto"
-                    />
-
-                    {/* el rol se manda por defecto dependiendo del puesto */}
-                    
+                        optionLabel="titulo_puesto" 
+                        optionValue="id_puesto" 
+                    />     
                 </div>
-
-
                 <div className="text-center mt-8">
                     <SubmitButton width="">{"Guardar"}</SubmitButton>
                 </div>
