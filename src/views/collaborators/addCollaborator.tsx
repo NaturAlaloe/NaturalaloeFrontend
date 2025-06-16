@@ -1,133 +1,199 @@
-import { useState } from 'react';
-import FormContainer from '../../components/formComponents/FormContainer'
-import InputField from '../../components/formComponents/InputField'
-import SelectField from '../../components/formComponents/SelectField'
-import SubmitButton from '../../components/formComponents/SubmitButton';
-import { useDepartments } from '../../hooks/manage/useDepartments';
-import { useWorkstations } from '../../hooks/manage/useWorkstations';
-import { useAreas } from '../../hooks/manage/useAreas';
-
+import { useState } from "react";
+import FormContainer from "../../components/formComponents/FormContainer";
+import InputField from "../../components/formComponents/InputField";
+import SelectField from "../../components/formComponents/SelectField";
+import SubmitButton from "../../components/formComponents/SubmitButton";
+import { useDepartments } from "../../hooks/manage/useDepartments";
+import { useWorkstations } from "../../hooks/manage/useWorkstations";
+import { useAreas } from "../../hooks/manage/useAreas";
+import { useAddCollaborator } from "../../hooks/collaborators/useAddCollaborator";
 
 function addCollaborator() {
+  const [formData, setFormData] = useState({
+    nombreCompleto: "",
+    apellidos: "",
+    cedula: "",
+    correo: "",
+    numero: "",
+    fechaNacimiento: "",
+    area: "",
+    departamento: "",
+    puesto: "",
+    rol: "",
+  });
 
-    const [formData, setFormData] = useState({
-        nombreCompleto: "",
-        cedula: "",
-        correo: "",
-        numero: "",
-        fechaNacimiento: "",
-        area: "",
+  // Hooks para obtener todas las opciones
+  const { areas } = useAreas();
+  const { departments } = useDepartments();
+  const { workstations } = useWorkstations();
+  const { handleAddCollaborator, loading, error, success } =
+    useAddCollaborator();
+
+  // Filtrar departamentos según área seleccionada
+  const filteredDepartments = formData.area
+    ? departments.filter(
+        (d: any) => String(d.id_area) === String(formData.area)
+      )
+    : [];
+  // Filtrar puestos según departamento seleccionado
+  const filteredWorkstations = formData.departamento
+    ? workstations.filter(
+        (w: any) => String(w.id_departamento) === String(formData.departamento)
+      )
+    : [];
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    // Limpiar selects dependientes
+    if (name === "area") {
+      setFormData({
+        ...formData,
+        area: value,
         departamento: "",
         puesto: "",
-        rol: "",
-    });
+      });
+    } else if (name === "departamento") {
+      setFormData({
+        ...formData,
+        departamento: value,
+        puesto: "",
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-    ) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const collaboratorData = {
+      id_colaborador: Number(formData.cedula), 
+      id_puesto: Number(formData.puesto),
+      nombre: formData.nombreCompleto,
+      apellido: formData.apellidos,
+      fecha_nacimiento: formData.fechaNacimiento,
+      numero: formData.numero,
+      correo: formData.correo,
     };
+    console.log("Datos enviados al backend:", collaboratorData);
+    await handleAddCollaborator(collaboratorData);
+  };
 
-    // Hooks para obtener las opciones de área, departamento y puesto
-    const { areas } = useAreas();
-    const { departments } = useDepartments();
-    const { workstations } = useWorkstations();
+  return (
+    <div>
+      <FormContainer title="Registro de Colaboradores" onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <InputField
+            label="Nombre"
+            name="nombreCompleto"
+            value={formData.nombreCompleto}
+            onChange={handleChange}
+            placeholder="Ingrese el nombre"
+            required
+            pattern={undefined}
+          />
 
-    return (
-        <div>
-            <FormContainer title="Registro de Colaboradores" onSubmit={() => { }}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <InputField
+            label="Apellidos"
+            name="apellidos"
+            value={formData.apellidos}
+            onChange={handleChange}
+            placeholder="Ingrese los apellidos"
+            required
+            pattern={undefined}
+          />
 
-                    <InputField
-                        label="Nombre"
-                        name="nombreCompleto"
-                        value={formData.nombreCompleto}
-                        onChange={handleChange}
-                        placeholder="Ingrese el nombre"
-                        required pattern={undefined} />
+          <InputField
+            label="Cédula"
+            name="cedula"
+            value={formData.cedula}
+            onChange={handleChange}
+            placeholder="Ingrese la cedula"
+            required
+            pattern={undefined}
+          />
 
-                    <InputField
-                        label="Apellidos"
-                        name="apellidos"
-                        value={formData.nombreCompleto}
-                        onChange={handleChange}
-                        placeholder="Ingrese los apellidos"
-                        required pattern={undefined} />
+          <InputField
+            label="Correo"
+            name="correo"
+            value={formData.correo}
+            onChange={handleChange}
+            placeholder="Ingrese el correo"
+            required
+            pattern={undefined}
+          />
 
-                    <InputField
-                        label="Cédula"
-                        name="cedula"
-                        value={formData.cedula}
-                        onChange={handleChange}
-                        placeholder="Ingrese la cedula"
-                        required pattern={undefined} />
+          <InputField
+            label="Número telefónico"
+            name="numero"
+            value={formData.numero}
+            onChange={handleChange}
+            placeholder="Ingrese el número telefónico"
+            required
+            pattern={undefined}
+          />
 
-                    <InputField
-                        label="Correo"
-                        name="correo"
-                        value={formData.correo}
-                        onChange={handleChange}
-                        placeholder="Ingrese el correo"
-                        required pattern={undefined} />
+          <InputField
+            label="Fecha de nacimiento"
+            name="fechaNacimiento"
+            value={formData.fechaNacimiento}
+            onChange={handleChange}
+            type="date"
+            required
+            pattern={undefined}
+          />
 
-                    <InputField
-                        label="Número telefónico"
-                        name="numero"
-                        value={formData.numero}
-                        onChange={handleChange}
-                        placeholder="Ingrese el número telefónico"
-                        required pattern={undefined} />
+          <SelectField
+            label="Área"
+            name="area"
+            value={formData.area}
+            onChange={handleChange}
+            options={areas}
+            required
+            optionLabel="titulo"
+            optionValue="id_area"
+          />
 
-                    <InputField
-                        label="Fecha de nacimiento"
-                        name="fechaNacimiento"
-                        value={formData.fechaNacimiento}
-                        onChange={handleChange}
-                        type="date"
-                        required pattern={undefined} />
+          <SelectField
+            label="Departamento"
+            name="departamento"
+            value={formData.departamento}
+            onChange={handleChange}
+            options={filteredDepartments}
+            required
+            optionLabel="titulo_departamento"
+            optionValue="id_departamento"
+          />
 
-                    <SelectField
-                        label="Área"
-                        name="area"
-                        value={formData.area}
-                        onChange={handleChange}
-                        options={areas}
-                        required
-                        optionLabel="titulo" 
-                        optionValue="id_area"
-                    />
-
-                    <SelectField
-                        label="Departamento"
-                        name="departamento"
-                        value={formData.departamento}
-                        onChange={handleChange}
-                        options={departments}
-                        required
-                        optionLabel="titulo_departamento" 
-                        optionValue=" id_departamento" 
-                    />
-
-                    <SelectField
-                        label="Puesto"
-                        name="puesto"
-                        value={formData.puesto}
-                        onChange={handleChange}
-                        options={workstations}
-                        required
-                        optionLabel="titulo_puesto" 
-                        optionValue="id_puesto" 
-                    />     
-                </div>
-                <div className="text-center mt-8">
-                    <SubmitButton width="">{"Guardar"}</SubmitButton>
-                </div>
-            </FormContainer>
+          <SelectField
+            label="Puesto"
+            name="puesto"
+            value={formData.puesto}
+            onChange={handleChange}
+            options={filteredWorkstations}
+            required
+            optionLabel="titulo_puesto"
+            optionValue="id_puesto"
+          />
         </div>
-    )
+        <div className="text-center mt-8">
+          <SubmitButton width="" disabled={loading}>
+            {loading ? "Guardando..." : "Guardar"}
+          </SubmitButton>
+          {error && <div className="text-red-500 mt-2">{error}</div>}
+          {success && (
+            <div className="text-green-600 mt-2">
+              Colaborador agregado correctamente
+            </div>
+          )}
+        </div>
+      </FormContainer>
+    </div>
+  );
 }
 
-export default addCollaborator
+export default addCollaborator;
