@@ -32,11 +32,19 @@ function addCollaborator() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                     <InputField
-                        label="Nombre Completo"
+                        label="Nombre"
                         name="nombreCompleto"
                         value={formData.nombreCompleto}
                         onChange={handleChange}
                         placeholder="Ingrese el nombre"
+                        required pattern={undefined} />
+
+                    <InputField
+                        label="Apellidos"
+                        name="apellidos"
+                        value={formData.nombreCompleto}
+                        onChange={handleChange}
+                        placeholder="Ingrese los apellidos"
                         required pattern={undefined} />
 
                     <InputField
@@ -104,20 +112,14 @@ function addCollaborator() {
                         optionValue="puesto"
                     />
 
-                    <SelectField
-                        label="Rol"
-                        name="rol"
-                        value={formData.rol}
-                        onChange={handleChange}
-                        options={[]}
-                        required
-                        optionLabel="rol"
-                        optionValue="rol"
-                    />
+                    {/* el rol se manda por defecto dependiendo del puesto */}
+                    
                 </div>
+
+
                 <div className="text-center mt-8">
-        <SubmitButton width="">{"Guardar"}</SubmitButton>
-      </div>
+                    <SubmitButton width="">{"Guardar"}</SubmitButton>
+                </div>
             </FormContainer>
         </div>
     )
