@@ -1,20 +1,24 @@
 import React from 'react';
-import { Card, CardContent, Typography, Avatar, Box } from '@mui/material';
+import { Card, CardContent, Avatar, Box, Typography } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
 
 interface CollaboratorCardProps {
   id: string;
   nombre: string;
+  puesto?: string;
   onClick: (id: string) => void;
 }
 
-const CollaboratorCard: React.FC<CollaboratorCardProps> = ({ id, nombre, onClick }) => (
+const CollaboratorCard: React.FC<CollaboratorCardProps> = ({ id, nombre, puesto, onClick }) => (
   <Card
     key={id}
     onClick={() => onClick(id)}
     sx={{
-      height: '100%',
+      minWidth: 320,
+      minHeight: 220,
       display: 'flex',
       flexDirection: 'column',
+      alignItems: 'center',
       cursor: 'pointer',
       transition: 'transform 0.3s, box-shadow 0.3s',
       fontFamily: 'Poppins, sans-serif',
@@ -24,44 +28,63 @@ const CollaboratorCard: React.FC<CollaboratorCardProps> = ({ id, nombre, onClick
       }
     }}
   >
-    <CardContent sx={{ flexGrow: 1 }}>
-      <Box sx={{
+    <CardContent
+      sx={{
+        flexGrow: 1,
+        width: '100%',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        mb: 2
-      }}>
-        <Avatar sx={{
-          width: 56,
-          height: 56,
-          mr: 2,
-          bgcolor: '#A6E8C7', // tono más bajo de #13bd62
+        justifyContent: 'center',
+        gap: 2,
+        p: 3
+      }}
+    >
+      <Avatar
+        sx={{
+          width: 80,
+          height: 80,
+          bgcolor: '#A6E8C7',
           color: '#2AAC67',
-          fontFamily: 'Poppins, sans-serif'
-        }}>
-          {nombre.charAt(0)}
-        </Avatar>
-        <Box>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{
-              color: '#2AAC67',
-              fontFamily: 'Poppins, sans-serif'
-            }}
-          >
-            {nombre}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              color: '#2AAC67',
-              fontFamily: 'Poppins, sans-serif'
-            }}
-          >
-            Código: {id}
-          </Typography>
-        </Box>
-      </Box>
+          fontFamily: 'Poppins, sans-serif',
+          mb: 2
+        }}
+      >
+        <PersonIcon sx={{ fontSize: 48 }} />
+      </Avatar>
+      <Typography
+        variant="body1"
+        sx={{
+          color: '#2AAC67',
+          fontFamily: 'Poppins, sans-serif',
+          textAlign: 'center'
+        }}
+      >
+        ID: {id}
+      </Typography>
+      <Typography
+        variant="h6"
+        sx={{
+          color: '#2AAC67',
+          fontFamily: 'Poppins, sans-serif',
+          fontWeight: 600,
+          textAlign: 'center'
+        }}
+      >
+        {nombre}
+      </Typography>
+      {puesto && (
+        <Typography
+          variant="body2"
+          sx={{
+            color: '#2AAC67',
+            fontFamily: 'Poppins, sans-serif',
+            textAlign: 'center'
+          }}
+        >
+          Puesto: {puesto}
+        </Typography>
+      )}
     </CardContent>
   </Card>
 );

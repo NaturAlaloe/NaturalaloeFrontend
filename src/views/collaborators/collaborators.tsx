@@ -38,7 +38,23 @@ const Collaborators: React.FC = () => {
           placeholder="Buscar por nombre o código"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ maxWidth: 600 }}
+          sx={{ 
+            maxWidth: 600,
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#2AAC67',
+              },
+              '&:hover fieldset': {
+                borderColor: '#13bd62',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#13bd62',
+              },
+            },
+            '& .MuiInputAdornment-root .MuiSvgIcon-root': {
+              color: '#2AAC67',
+            }
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -79,7 +95,8 @@ const Collaborators: React.FC = () => {
             <CollaboratorCard
               key={colab.id_colaborador}
               id={colab.id_colaborador}
-              nombre={colab.nombre}
+              nombre={colab.nombre_completo}
+              puesto={colab.puesto}
               onClick={handleCardClick}
             />
           ))}

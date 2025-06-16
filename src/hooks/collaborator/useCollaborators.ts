@@ -35,7 +35,7 @@ const useCollaborators = () => {
   // Filtrado en frontend si searchTerm existe
   const filteredCollaborators = searchTerm
     ? collaborators.filter(colab =>
-        colab.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        colab.nombre_completo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         colab.id_colaborador.includes(searchTerm)
       )
     : collaborators;
