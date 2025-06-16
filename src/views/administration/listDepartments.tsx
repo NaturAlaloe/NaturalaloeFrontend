@@ -37,7 +37,7 @@ export default function DepartmentsList() {
   } = useDepartmentsList();
 
   const columns = [
-    { name: "Código", selector: (row: any) => row.codigo, sortable: true },
+    { name: "Código", selector: (row: any) => row.codigo_departamento, sortable: true },
     { name: "Departamento", selector: (row: any) => row.titulo_departamento, sortable: true },
     { name: "Área", selector: (row: any) => row.titulo_area, sortable: true },
     {
