@@ -71,31 +71,31 @@ export function useCapacitation() {
   // Estado para tablas de selección en el modal
   const [showColaboradoresTable, setShowColaboradoresTable] = useState(false);
   const [showPoesTable, setShowPoesTable] = useState(false);
-  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>([]);
+  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>(
+    []
+  );
   const [poesAsignados, setPoesAsignados] = useState<any[]>([]);
   const [selectedColaboradores, setSelectedColaboradores] = useState<any[]>([]);
   const [selectedPoes, setSelectedPoes] = useState<any[]>([]);
 
-  const agregarColaboradores = () => {
-    setColaboradoresAsignados(prev => [
+  const agregarColaboradores = (seleccionados: any[]) => {
+    setColaboradoresAsignados((prev) => [
       ...prev,
-      ...selectedColaboradores.filter(
-        c => !prev.some((asig: any) => asig.id === c.id)
+      ...seleccionados.filter(
+        (c) => !prev.some((asig: any) => asig.id === c.id)
       ),
     ]);
     setShowColaboradoresTable(false);
-    setSelectedColaboradores([]);
   };
 
-  const agregarPoes = () => {
-    setPoesAsignados(prev => [
+  const agregarPoes = (seleccionados: any[]) => {
+    setPoesAsignados((prev) => [
       ...prev,
-      ...selectedPoes.filter(
-        p => !prev.some((asig: any) => asig.id === p.id)
+      ...seleccionados.filter(
+        (p) => !prev.some((asig: any) => asig.id === p.id)
       ),
     ]);
     setShowPoesTable(false);
-    setSelectedPoes([]);
   };
 
   const handleChange = (
@@ -129,7 +129,6 @@ export function useCapacitation() {
     facilitadores,
     tiposCapacitacion,
     metodosEvaluacion,
-    // Lógica para asignaciones:
     colaboradoresDisponibles,
     poesDisponibles,
     columnsColaboradores,
