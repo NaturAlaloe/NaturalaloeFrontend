@@ -14,7 +14,7 @@ export default function SearchBar({
   className = "",
 }: SearchBarProps) {
   return (
-    <div className={`relative mb-6 ${className}`}>
+    <div className={`relative flex items-center mb-0 ${className}`}>
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <Search className="text-gray-400" />
       </div>

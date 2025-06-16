@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { Edit, Delete, Search } from "@mui/icons-material";
-import { useFacilitadoresList, type Facilitador } from "../../hooks/capacitations/useListFacilitators";
+import {
+  useFacilitadoresList,
+  type Facilitador,
+} from "../../hooks/capacitations/useListFacilitators";
+import { deletefacilitator } from "../../services/listFacilitatorService";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
+import FormContainer from "../../components/formComponents/FormContainer";
 
 export default function ListFacilitadores() {
   const {
@@ -17,10 +22,14 @@ export default function ListFacilitadores() {
     paginated,
     totalPages,
     updateFacilitador,
+    removeFacilitador,
   } = useFacilitadoresList();
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [facilitadorEditando, setFacilitadorEditando] = useState<Facilitador | null>(null);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [facilitadorAEliminar, setFacilitadorAEliminar] = useState<Facilitador | null>(null);
 
   const handleEditClick = (facilitador: Facilitador, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -36,7 +45,8 @@ export default function ListFacilitadores() {
     });
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!facilitadorEditando) return;
     updateFacilitador(facilitadorEditando);
     setShowEditModal(false);
@@ -47,32 +57,46 @@ export default function ListFacilitadores() {
     setFacilitadorEditando(null);
   };
 
-  const handleDelete = (id: number, e: React.MouseEvent) => {
+  const handleDeleteClick = (facilitador: Facilitador, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm("¿Desea eliminar este facilitador?")) {
-      alert("Eliminar no implementado (solo visual)");
+    setFacilitadorAEliminar(facilitador);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!facilitadorAEliminar?.id_facilitador) return;
+    const success = await deletefacilitator(facilitadorAEliminar.id_facilitador);
+    if (success) {
+      alert("Facilitador eliminado correctamente");
+      removeFacilitador(facilitadorAEliminar.id_facilitador);
+      setShowDeleteModal(false);
+      setFacilitadorAEliminar(null);
+    } else {
+      alert("Error al eliminar el facilitador");
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setFacilitadorAEliminar(null);
   };
 
   const columns = [
     { name: "NOMBRE", selector: (row: Facilitador) => row.nombre, sortable: true },
     { name: "APELLIDO", selector: (row: Facilitador) => row.apellido, sortable: true },
-    { name: "TIPO DE FACILITADOR", selector: (row: Facilitador) => row.tipo, sortable: true },
+    { name: "TIPO DE FACILITADOR", selector: (row: Facilitador) => row.tipo_facilitador, sortable: true },
     {
       name: "ACCIONES",
       cell: (row: Facilitador) => (
         <div className="flex items-center space-x-2">
-          <button className="text-[#2AAC67]" onClick={(e) => handleEditClick(row, e)}>
+          <button type="button" className="text-[#2AAC67]" onClick={(e) => handleEditClick(row, e)}>
             <Edit fontSize="small" />
           </button>
-          <button className="text-[#F44336]" onClick={(e) => handleDelete(row.id, e)}>
+          <button type="button" className="text-[#F44336]" onClick={(e) => handleDeleteClick(row, e)}>
             <Delete fontSize="small" />
           </button>
         </div>
-      ),
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
+      )
     },
   ];
 
@@ -80,30 +104,15 @@ export default function ListFacilitadores() {
     <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
       <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between w-full">
         <p className="text-sm text-gray-700">
-          Mostrando {" "}
-          <span className="font-medium">{(currentPage - 1) * rowsPerPage + 1}</span> a {" "}
-          <span className="font-medium">{Math.min(currentPage * rowsPerPage, filtered.length)}</span> de {" "}
-          <span className="font-medium">{filtered.length}</span> resultados
+          Mostrando <span className="font-medium">{(currentPage - 1) * rowsPerPage + 1}</span> a <span className="font-medium">{Math.min(currentPage * rowsPerPage, filtered.length)}</span> de <span className="font-medium">{filtered.length}</span> resultados
         </p>
         <div>
           <nav className="inline-flex rounded-md shadow-sm -space-x-px">
-            <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}
-              className="px-2 py-2 border text-sm text-gray-500 bg-white hover:bg-gray-100 rounded-l-md">
-              ◀
-            </button>
+            <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} className="px-2 py-2 border text-sm text-gray-500 bg-white hover:bg-gray-100 rounded-l-md">◀</button>
             {[...Array(totalPages)].map((_, idx) => (
-              <button key={idx + 1}
-                onClick={() => setCurrentPage(idx + 1)}
-                className={`px-4 py-2 border text-sm ${
-                  currentPage === idx + 1 ? 'bg-gray-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-gray-100'
-                }`}>
-                {idx + 1}
-              </button>
+              <button key={idx + 1} onClick={() => setCurrentPage(idx + 1)} className={`px-4 py-2 border text-sm ${currentPage === idx + 1 ? 'bg-gray-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-gray-100'}`}>{idx + 1}</button>
             ))}
-            <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}
-              className="px-2 py-2 border text-sm text-gray-500 bg-white hover:bg-gray-100 rounded-r-md">
-              ▶
-            </button>
+            <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages} className="px-2 py-2 border text-sm text-gray-500 bg-white hover:bg-gray-100 rounded-r-md">▶</button>
           </nav>
         </div>
       </div>
@@ -111,11 +120,7 @@ export default function ListFacilitadores() {
   );
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
-        Facilitadores
-      </h1>
-
+    <FormContainer title="Facilitadores" onSubmit={e => e.preventDefault()}>
       <div className="relative mb-6">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <Search className="text-gray-400" />
@@ -142,46 +147,55 @@ export default function ListFacilitadores() {
       <CustomPagination />
 
       {showEditModal && facilitadorEditando && (
-        <GlobalModal
-          open={showEditModal}
-          onClose={handleCancelEdit}
-          title="Editar Facilitador"
-          actions={
-            <>
-              <button onClick={handleCancelEdit} className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">
-                Cancelar
-              </button>
-              <button onClick={handleSaveEdit} className="px-4 py-2 rounded-md bg-[#2AAC67] text-white hover:bg-[#259e5d]">
-                Guardar
-              </button>
-            </>
-          }
-        >
-          <div className="space-y-4">
-            <InputField
-              label="Nombre"
-              name="nombre"
-              value={facilitadorEditando.nombre}
-              onChange={handleEditChange}
-              placeholder="Nombre del facilitador"
-            />
-            <InputField
-              label="Apellido"
-              name="apellido"
-              value={facilitadorEditando.apellido}
-              onChange={handleEditChange}
-              placeholder="Apellido del facilitador"
-            />
-            <SelectField
-              label="Tipo de Facilitador"
-              name="tipo"
-              value={facilitadorEditando.tipo}
-              onChange={handleEditChange}
-              options={["Interno", "Externo"]}
-            />
-          </div>
+        <GlobalModal open={showEditModal} onClose={handleCancelEdit} title="Editar Facilitador">
+          <form onSubmit={handleSaveEdit}>
+            <div className="space-y-4">
+              <InputField
+                label="Nombre"
+                name="nombre"
+                value={facilitadorEditando.nombre}
+                onChange={handleEditChange}
+                required
+              />
+              <InputField
+                label="Apellido"
+                name="apellido"
+                value={facilitadorEditando.apellido}
+                onChange={handleEditChange}
+                required
+              />
+              <SelectField
+                label="Tipo de Facilitador"
+                name="tipo_facilitador"
+                value={facilitadorEditando.tipo_facilitador}
+                onChange={handleEditChange}
+                options={[
+                  { value: "interno", label: "Interno" },
+                  { value: "externo", label: "Externo" },
+                ]}
+                required
+              />
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <button type="button" onClick={handleCancelEdit} className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">Cancelar</button>
+              <button type="submit" className="px-4 py-2 rounded-md bg-[#2AAC67] text-white hover:bg-[#259e5d]">Guardar</button>
+            </div>
+          </form>
         </GlobalModal>
       )}
-    </div>
+
+      {showDeleteModal && facilitadorAEliminar && (
+        <GlobalModal open={showDeleteModal} onClose={handleCancelDelete} title="Confirmar eliminación" actions={(
+          <>
+            <button onClick={handleCancelDelete} className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">Cancelar</button>
+            <button onClick={handleConfirmDelete} className="px-4 py-2 rounded-md bg-[#F44336] text-white hover:bg-red-600">Eliminar</button>
+          </>
+        )}>
+          <p className="text-sm text-gray-700">
+            ¿Estás seguro de eliminar al facilitador <strong>{facilitadorAEliminar.nombre} {facilitadorAEliminar.apellido}</strong>?
+          </p>
+        </GlobalModal>
+      )}
+    </FormContainer>
   );
 }
