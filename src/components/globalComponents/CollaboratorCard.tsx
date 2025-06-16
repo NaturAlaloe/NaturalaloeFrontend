@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Avatar, Box, Typography } from '@mui/material';
+import { Card, CardContent, Avatar, Typography } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 
 interface CollaboratorCardProps {
