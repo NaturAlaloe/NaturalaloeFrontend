@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  getFacilitadoresInternos,
+  getColaboradoresDisponibles,
   createFacilitador,
   type Facilitador,
 } from "../../services/addFacilitatorService";
@@ -15,10 +15,10 @@ export const useFacilitatorForm = () => {
 
   useEffect(() => {
     if (tipo === "Interno") {
-      getFacilitadoresInternos()
+      getColaboradoresDisponibles()
         .then(setFacilitadoresInternos)
         .catch((err) => {
-          console.error("Error al cargar internos:", err);
+          console.error("Error al cargar colaboradores:", err);
           setFacilitadoresInternos([]);
         });
     }
@@ -42,7 +42,7 @@ export const useFacilitatorForm = () => {
     if (found) {
       setNombre(found.nombre);
       setApellido(found.apellido);
-      setIdentificacion(found.identificacion);
+      setIdentificacion(found.identificacion); // ← esto ya es la cédula (id_colaborador)
     }
   };
 
