@@ -1,11 +1,11 @@
 import api from "../apiConfig/api";
 
 export interface Facilitador {
-  id?: number;
+  id_facilitador: number;
   nombre: string;
   apellido: string;
   tipo_facilitador: string;
-  estado?: boolean; // opcional para manejar estado lógico
+  estado?: boolean;
 }
 
 export async function getFacilitadores(): Promise<Facilitador[]> {
@@ -21,7 +21,7 @@ export async function getFacilitadores(): Promise<Facilitador[]> {
 
 export async function deletefacilitator(id: number): Promise<boolean> {
   try {
-    await api.patch(`/facilitador/${id}`, { estado: false });
+    await api.delete(`/facilitador/${id}`);
     return true;
   } catch (error) {
     console.error("Error al eliminar lógicamente facilitador:", error);

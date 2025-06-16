@@ -64,11 +64,11 @@ export default function ListFacilitadores() {
   };
 
   const handleConfirmDelete = async () => {
-    if (!facilitadorAEliminar?.id) return;
-    const success = await deletefacilitator(facilitadorAEliminar.id);
+    if (!facilitadorAEliminar?.id_facilitador) return;
+    const success = await deletefacilitator(facilitadorAEliminar.id_facilitador);
     if (success) {
       alert("Facilitador eliminado correctamente");
-      removeFacilitador(facilitadorAEliminar.id);
+      removeFacilitador(facilitadorAEliminar.id_facilitador);
       setShowDeleteModal(false);
       setFacilitadorAEliminar(null);
     } else {

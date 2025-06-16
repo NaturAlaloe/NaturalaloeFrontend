@@ -32,15 +32,13 @@ export function useFacilitadoresList() {
   const updateFacilitador = (updated: Facilitador) => {
     setFacilitadores(prev =>
       prev.map(f =>
-        f.nombre === updated.nombre && f.apellido === updated.apellido
-          ? updated
-          : f
+        f.id_facilitador === updated.id_facilitador ? updated : f
       )
     );
   };
 
   const removeFacilitador = (id: number) => {
-    setFacilitadores(prev => prev.filter(f => f.id !== id));
+    setFacilitadores(prev => prev.filter(f => f.id_facilitador !== id));
   };
 
   return {
@@ -53,8 +51,8 @@ export function useFacilitadoresList() {
     paginated,
     totalPages,
     updateFacilitador,
-    removeFacilitador, 
+    removeFacilitador,
   };
 }
-export type { Facilitador };
 
+export type { Facilitador };
