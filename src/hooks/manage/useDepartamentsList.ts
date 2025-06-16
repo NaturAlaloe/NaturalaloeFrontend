@@ -18,10 +18,11 @@ export function useDepartmentsList() {
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+  const [deleteIndex, setDeleteIndex] = useState<{ id_departamento: number } | null>(null);
   const [departmentInput, setDepartmentInput] = useState("");
   const [areaInput, setAreaInput] = useState<number | "">("");
   const [codigoInput, setCodigoInput] = useState<number | "">("");
+  const [editDepartment, setEditDepartment] = useState<any | null>(null);
 
   const filteredDepartments = useMemo(
     () =>
@@ -38,6 +39,7 @@ export function useDepartmentsList() {
   // Abrir modal para agregar
   const handleOpenAdd = () => {
     setEditIndex(null);
+    setEditDepartment(null);
     setDepartmentInput("");
     setAreaInput("");
     setCodigoInput("");
@@ -45,26 +47,28 @@ export function useDepartmentsList() {
   };
 
   // Abrir modal para editar
-  const handleOpenEdit = (idx: number) => {
-    const dep = filteredDepartments[idx];
-    setEditIndex(idx);
+  const handleOpenEdit = (dep: any) => {
+    setEditDepartment(dep);
+    setEditIndex(null); // ya no lo necesitas para editar
     setDepartmentInput(dep.titulo_departamento);
     setAreaInput(dep.id_area);
-    setCodigoInput(dep.codigo);
+    setCodigoInput(dep.codigo_departamento ?? dep.codigo ?? "");
     setModalOpen(true);
   };
 
   // Guardar (agregar o editar)
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!departmentInput.trim() || !areaInput || !codigoInput) return;
-    if (editIndex !== null) {
-      const dep = filteredDepartments[editIndex];
-      await updateDepartment(dep.id_departamento, {
+    if (!departmentInput.trim()) return;
+    if (editDepartment) {
+      const payload = {
         titulo: departmentInput,
-        id_area: Number(areaInput),
         codigo: Number(codigoInput),
-      });
+        id_departamento: editDepartment.id_departamento,
+        id_area: Number(areaInput), // <-- AGREGA ESTA LÍNEA
+      };
+      console.log("Payload enviado a updateDepartment:", payload);
+      await updateDepartment(editDepartment.id_departamento, payload);
     } else {
       await addDepartment({
         titulo: departmentInput,
@@ -76,14 +80,13 @@ export function useDepartmentsList() {
     setDepartmentInput("");
     setAreaInput("");
     setCodigoInput("");
-    setEditIndex(null);
+    setEditDepartment(null);
   };
 
   // Eliminar
   const handleDelete = async () => {
-    if (deleteIndex === null) return;
-    const dep = filteredDepartments[deleteIndex];
-    await deleteDepartment(dep.id_departamento);
+    if (!deleteIndex) return;
+    await deleteDepartment(deleteIndex.id_departamento);
     setDeleteIndex(null);
   };
 
@@ -106,6 +109,8 @@ export function useDepartmentsList() {
     setAreaInput,
     codigoInput,
     setCodigoInput,
+    editDepartment,
+    setEditDepartment,
     filteredDepartments,
     handleOpenAdd,
     handleOpenEdit,
