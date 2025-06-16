@@ -4,8 +4,6 @@ import { getFacilitadores, type Facilitador } from "../../services/listFacilitat
 export function useFacilitadoresList() {
   const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5;
 
   useEffect(() => {
     getFacilitadores().then(data => {
@@ -22,13 +20,6 @@ export function useFacilitadoresList() {
     );
   }, [facilitadores, searchTerm]);
 
-  const paginated = useMemo(() => {
-    const start = (currentPage - 1) * rowsPerPage;
-    return filtered.slice(start, start + rowsPerPage);
-  }, [filtered, currentPage]);
-
-  const totalPages = Math.ceil(filtered.length / rowsPerPage);
-
   const updateFacilitador = (updated: Facilitador) => {
     setFacilitadores(prev =>
       prev.map(f =>
@@ -44,12 +35,7 @@ export function useFacilitadoresList() {
   return {
     searchTerm,
     setSearchTerm,
-    currentPage,
-    setCurrentPage,
-    rowsPerPage,
     filtered,
-    paginated,
-    totalPages,
     updateFacilitador,
     removeFacilitador,
   };
