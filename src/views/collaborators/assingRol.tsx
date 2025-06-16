@@ -139,7 +139,7 @@ export default function AssignRol() {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Buscar procedimientos por código o título..."
+          placeholder="Buscar Colaboradores por nombre o id..."
           value={busqueda}
           onChange={manejarCambioBusqueda}
           sx={{
