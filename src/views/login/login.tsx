@@ -1,21 +1,31 @@
 import "@fontsource/poppins/700.css";
 import InputField from "../../components/formComponents/InputField";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import LogoNaturaloe from "../../assets/img/Logo_Naturaloe.png";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import SubmitButton from "../../components/formComponents/SubmitButton";
+import useLogin from "../../hooks/login/useLogin"; // ajusta la ruta según tu estructura
 
-export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void }) {
+export default function Login() {
   const [formData, setFormData] = useState({
     correo: "",
     contrasena: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const { login, error, success, loading } = useLogin();
+
+  // Redirige cuando el login sea exitoso
+  useEffect(() => {
+    if (success) {
+      navigate("/HomeScreen/dashboard", { replace: true });
+    }
+  }, [success, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -24,11 +34,12 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Datos ingresados:", formData);
-    //LÓGICA REAL DE AUTENTICACIÓN AQUÍ
-    if (onLoginSuccess) onLoginSuccess();
+    await login({
+      email: formData.correo,
+      contrasena: formData.contrasena,
+    });
   };
 
   return (
@@ -44,7 +55,11 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
             <h2 className="text-4xl font-bold text-[#2AAC67] mb-1">¡Bienvenido!</h2>
             <p className="text-gray-500 text-base">Por favor, inicia sesión para continuar</p>
           </div>
-          <img src={LogoNaturaloe} alt="Natural Aloe Logo" className="w-46 h-46 ml-6 drop-shadow-md" />
+          <img
+            src={LogoNaturaloe}
+            alt="Natural Aloe Logo"
+            className="w-46 h-46 ml-6 drop-shadow-md"
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -56,7 +71,6 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
             placeholder="ejemplo@correo.com"
             type="email"
             required
-            pattern={undefined}
           />
 
           <div className="relative">
@@ -68,7 +82,6 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
               placeholder="********"
               type={showPassword ? "text" : "password"}
               required
-              pattern={undefined}
             />
             <button
               type="button"
@@ -79,15 +92,21 @@ export default function Login({ onLoginSuccess }: { onLoginSuccess?: () => void 
             >
               {showPassword ? <VisibilityOff /> : <Visibility />}
             </button>
-
           </div>
 
+          {error && (
+            <p className="text-red-500 text-sm text-center">{error}</p>
+          )}
 
-          <SubmitButton width="w-full">{"Iniciar Sesión"}</SubmitButton>
-
+          <SubmitButton width="w-full" disabled={loading}>
+            {loading ? "Cargando..." : "Iniciar Sesión"}
+          </SubmitButton>
 
           <div className="text-center mt-2">
-            <Link to="/login/recoverPassword" className="text-sm text-[#2AAC67] hover:underline">
+            <Link
+              to="/login/recoverPassword"
+              className="text-sm text-[#2AAC67] hover:underline"
+            >
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
