@@ -1,15 +1,14 @@
 //procedures.tsx
-
 import "@fontsource/poppins/700.css";
 import FormContainer from "../../components/formComponents/FormContainer";
 import InputField from "../../components/formComponents/InputField";
-import SelectField from "../../components/formComponents/SelectField";
 import PoeSearchInput from "../../components/formComponents/PoeSearchInput";
 import VigenciaToggle from "../../components/formComponents/ValidityToggle";
 import { useProceduresForm } from "../../hooks/procedureFormHooks/useProceduresForm";
 import { usePoeSearch } from "../../hooks/procedureFormHooks/usePoeSearch";
 import { useState } from "react";
 import SubmitButton from "../../components/formComponents/SubmitButton";
+import SelectAutocomplete from "../../components/formComponents/SelectAutocomplete";
 
 export default function Procedures() {
   const {
@@ -36,6 +35,26 @@ export default function Procedures() {
   // Nuevo estado para el check de vigencia
   const [enVigencia, setEnVigencia] = useState(true);
 
+  // Limpio: obtener la categoría seleccionada fuera del JSX
+  const categoriaSeleccionada = categorias.find(c => c.nombre === formData.categoria) || null;
+  const departamentoSeleccionado = departamentos.find(d => d.nombre === formData.departamento) || null;
+  const responsableSeleccionado = responsables
+    .map((r) => ({ nombre: r }))
+    .find((r) => r.nombre === formData.responsable) || null;
+
+  // Handler limpio para autocomplete
+  const handleAutocompleteChange = (name: string, value: any) => {
+    handleChange({
+      target: { name, value },
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
+  // Utilidad para extraer el valor del objeto seleccionado
+  function getValueOrEmpty(newValue: any, key = "nombre") {
+    if (newValue && !Array.isArray(newValue)) return newValue[key];
+    return "";
+  }
+
   return (
     <FormContainer title="Registro de Procedimiento" onSubmit={handleSubmit}>
       {/* Buscador de POE existente */}
@@ -56,25 +75,24 @@ export default function Procedures() {
           placeholder="Ingrese título"
           required
         />
-        <SelectField
+        <SelectAutocomplete
           label="Departamento"
-          name="departamento"
-          value={formData.departamento}
-          onChange={handleChange}
           options={departamentos}
-          required
           optionLabel="nombre"
           optionValue="nombre"
+          value={departamentoSeleccionado}
+          onChange={newValue => handleAutocompleteChange("departamento", getValueOrEmpty(newValue, "nombre"))}
+          placeholder="Buscar o seleccionar departamento..."
         />
-        <SelectField
+        {/* Autocomplete para Categoría */}
+        <SelectAutocomplete
           label="Categoría"
-          name="categoria"
-          value={formData.categoria}
-          onChange={handleChange}
           options={categorias}
-          required
           optionLabel="nombre"
-          optionValue="nombre"
+          optionValue="codigo"
+          value={categoriaSeleccionada}
+          onChange={newValue => handleAutocompleteChange("categoria", getValueOrEmpty(newValue, "nombre"))}
+          placeholder="Buscar o seleccionar categoría..."
         />
         <InputField
           label="Número de POE"
@@ -84,15 +102,14 @@ export default function Procedures() {
           onChange={() => { }}
           required
         />
-        <SelectField
+        <SelectAutocomplete
           label="Responsable"
-          name="responsable"
-          value={formData.responsable}
-          onChange={handleChange}
           options={responsables.map((r) => ({ nombre: r }))}
-          required
           optionLabel="nombre"
           optionValue="nombre"
+          value={responsableSeleccionado}
+          onChange={newValue => handleAutocompleteChange("responsable", getValueOrEmpty(newValue, "nombre"))}
+          placeholder="Buscar o seleccionar responsable..."
         />
         <InputField
           label="Revisión"
