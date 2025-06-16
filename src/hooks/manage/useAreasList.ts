@@ -5,14 +5,15 @@ import { showCustomToast } from "../../components/globalComponents/CustomToaster
 // Este hook maneja la lógica de la lista de áreas, incluyendo búsqueda, edición, adición y eliminación de áreas.
 
 export function useAreasList() {
-  const { areas, loading, error, addArea } = useAreas();
+  const { areas, loading, error, addArea, updateArea, removeArea } = useAreas();
 
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [areaInput, setAreaInput] = useState("");
   const [areaPadreInput, setAreaPadreInput] = useState<number | undefined>(undefined);
-  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+  const [deleteAreaObj, setDeleteAreaObj] = useState<any | null>(null);
+  const [editAreaObj, setEditAreaObj] = useState<any | null>(null);
 
   const filteredAreas = Array.isArray(areas)
     ? areas.filter((a) => a.titulo.toLowerCase().includes(search.toLowerCase()))
@@ -25,17 +26,36 @@ export function useAreasList() {
     setModalOpen(true);
   };
 
-  const handleOpenEdit = (idx: number) => {
-    setEditIndex(idx);
-    setAreaInput(filteredAreas[idx].titulo);
+  const handleOpenEdit = (area: any) => {
+    setEditAreaObj(area);
+    setAreaInput(area.titulo);
     setModalOpen(true);
+  };
+
+  const handleOpenDelete = (area: any) => {
+    setDeleteAreaObj(area);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (areaInput.trim() === "") return;
-    if (editIndex !== null) {
-      setModalOpen(false);
+    if (editAreaObj) {
+      try {
+        const updatePayload = {
+          id_area: editAreaObj.id_area,
+          titulo: areaInput,
+          activa: true,
+        };
+        console.log("Actualizando área con:", updatePayload);
+        await updateArea(updatePayload);
+        showCustomToast("Éxito", "Área actualizada correctamente", "success");
+        setModalOpen(false);
+        setEditAreaObj(null);
+        setAreaInput("");
+        setAreaPadreInput(undefined);
+      } catch (err) {
+        showCustomToast("Error", "Error al actualizar área", "error");
+      }
     } else {
       try {
         await addArea({
@@ -52,8 +72,16 @@ export function useAreasList() {
     }
   };
 
-  const handleDelete = () => {
-    setDeleteIndex(null);
+  const handleDelete = async () => {
+    if (deleteAreaObj) {
+      try {
+        await removeArea(deleteAreaObj.id_area);
+        showCustomToast("Éxito", "Área eliminada correctamente", "success");
+      } catch (err) {
+        showCustomToast("Error", "Error al eliminar área", "error");
+      }
+      setDeleteAreaObj(null);
+    }
   };
 
   return {
@@ -70,11 +98,14 @@ export function useAreasList() {
     setAreaInput,
     areaPadreInput,
     setAreaPadreInput,
-    deleteIndex,
-    setDeleteIndex,
+    deleteAreaObj,
+    setDeleteAreaObj,
+    editAreaObj,
+    setEditAreaObj,
     filteredAreas,
     handleOpenAdd,
     handleOpenEdit,
+    handleOpenDelete,
     handleSave,
     handleDelete,
   };

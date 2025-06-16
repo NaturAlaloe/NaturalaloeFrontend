@@ -1,19 +1,20 @@
-import InputField from "../../components/formComponents/InputField";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import LogoNaturaloe from "../../assets/img/Logo_Naturaloe.png";
+import InputField from "../../components/formComponents/InputField";
 import SubmitButton from "../../components/formComponents/SubmitButton";
+import useAddUser from "../../hooks/users/useAddUser";
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    nombreCompleto: "",
-    cedula: "",
+    nombre: "",
+    apellidos: "",
     correo: "",
-    puesto: "",
-    departamento: "",
     contrasena: "",
     confirmarContrasena: "",
   });
+
+  const { insertUser, loading, error, success } = useAddUser();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -24,14 +25,36 @@ export default function Register() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.contrasena !== formData.confirmarContrasena) {
       alert("Las contraseñas no coinciden");
       return;
     }
-    console.log("Datos ingresados:", formData);
+
+    const userInfo = {
+      nombre: formData.nombre,
+      apellido: formData.apellidos,
+      email: formData.correo,
+      contrasena: formData.contrasena,
+    };
+
+    await insertUser(userInfo);
+
+
   };
+
+  useEffect(() => {
+    if (success) {
+      setFormData({
+        nombre: "",
+        apellidos: "",
+        correo: "",
+        contrasena: "",
+        confirmarContrasena: "",
+      });
+    }
+  }, [success]);
 
   return (
     <div className="min-h-screen bg-[#DEF7E9] flex items-center justify-center px-4 py-12 font-[Poppins]">
@@ -57,16 +80,28 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
-              label="Nombre Completo"
-              name="nombreCompleto"
-              value={formData.nombreCompleto}
+              label="Nombre"
+              name="nombre"
+              value={formData.nombre}
               onChange={handleChange}
-              placeholder="Tu nombre completo"
+              placeholder="Nombre"
               type="text"
               required
               pattern={undefined}
             />
+            <InputField
+              label="Apellidos"
+              name="apellidos"
+              value={formData.apellidos}
+              onChange={handleChange}
+              placeholder="Apellidos"
+              type="text"
+              required
+              pattern={undefined}
+            />
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
               label="Correo Electrónico"
               name="correo"
@@ -77,11 +112,6 @@ export default function Register() {
               required
               pattern={undefined}
             />
-
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
             <InputField
               label="Contraseña"
               name="contrasena"
@@ -92,6 +122,9 @@ export default function Register() {
               required
               pattern={undefined}
             />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
               label="Confirmar Contraseña"
               name="confirmarContrasena"
@@ -102,11 +135,24 @@ export default function Register() {
               required
               pattern={undefined}
             />
-
           </div>
 
-          <SubmitButton width="w-full">{"Registrar"}</SubmitButton>
+          <div className="pt-4">
+            <SubmitButton width="w-full">
+              {loading ? "Registrando..." : "Registrar"}
+            </SubmitButton>
+          </div>
 
+          {error && (
+            <p className="text-red-600 text-sm text-center">{error}</p>
+          )}
+          {success && (
+            <p className="text-green-600 text-sm text-center">
+              ¡Usuario registrado con éxito!
+            </p>
+
+
+          )}
         </form>
       </motion.div>
     </div>
