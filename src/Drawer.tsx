@@ -41,6 +41,7 @@ import ListaPuestos from "./views/administration/listWorkstations";
 import SchoolIcon from "@mui/icons-material/School";
 import Politicies from "./views/politics/politicsForm";
 import VersionControlProcedures from "./views/procedures/versionControllProcedures";
+import AssignRol from "./views/collaborators/assingRol"
 
 const drawerWidth = 270;
 
@@ -552,6 +553,20 @@ export default function PersistentDrawerLeft() {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
+                <ListItemButton
+                component={Link}
+                to="/collaborators/assingRol"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Asignar Rol" />
+              </ListItemButton>
             </List>
           </Collapse>
         </List>
@@ -652,6 +667,10 @@ export default function PersistentDrawerLeft() {
             path="/procedures/versionControlProcedures"
             element={<VersionControlProcedures />}
           />
+          <Route
+          path="/collaborators/assingRol"
+          element={<AssignRol/>}
+        />
         </Routes>
       </Main>
     </Box>
