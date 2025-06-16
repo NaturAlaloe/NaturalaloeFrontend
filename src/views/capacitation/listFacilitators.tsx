@@ -1,16 +1,14 @@
-import { useState } from "react";
 import { Edit, Delete, Search } from "@mui/icons-material";
 import {
   useFacilitadoresList,
   type Facilitador,
 } from "../../hooks/capacitations/useListFacilitators";
-import { deletefacilitator } from "../../services/listFacilitatorService";
+import { useFacilitadorActions } from "../../hooks/capacitations/useFacilitadorActions";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
 import TableContainer from "../../components/TableContainer";
-import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export default function ListFacilitadores() {
   const {
@@ -21,61 +19,19 @@ export default function ListFacilitadores() {
     removeFacilitador,
   } = useFacilitadoresList();
 
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [facilitadorEditando, setFacilitadorEditando] = useState<Facilitador | null>(null);
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [facilitadorAEliminar, setFacilitadorAEliminar] = useState<Facilitador | null>(null);
-
-  const handleEditClick = (facilitador: Facilitador, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setFacilitadorEditando({ ...facilitador });
-    setShowEditModal(true);
-  };
-
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    if (!facilitadorEditando) return;
-    setFacilitadorEditando({
-      ...facilitadorEditando,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSaveEdit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!facilitadorEditando) return;
-    updateFacilitador(facilitadorEditando);
-    setShowEditModal(false);
-  };
-
-  const handleCancelEdit = () => {
-    setShowEditModal(false);
-    setFacilitadorEditando(null);
-  };
-
-  const handleDeleteClick = (facilitador: Facilitador, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setFacilitadorAEliminar(facilitador);
-    setShowDeleteModal(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!facilitadorAEliminar?.id_facilitador) return;
-    const success = await deletefacilitator(facilitadorAEliminar.id_facilitador);
-    if (success) {
-      showCustomToast("Éxito", "Facilitador eliminado exitosamente", "success");
-      removeFacilitador(facilitadorAEliminar.id_facilitador);
-      setShowDeleteModal(false);
-      setFacilitadorAEliminar(null);
-    } else {
-      showCustomToast("Error", "Error al eliminar el facilitador", "error");
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setShowDeleteModal(false);
-    setFacilitadorAEliminar(null);
-  };
+  const {
+    showEditModal,
+    facilitadorEditando,
+    handleEditClick,
+    handleEditChange,
+    handleSaveEdit,
+    handleCancelEdit,
+    showDeleteModal,
+    facilitadorAEliminar,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+  } = useFacilitadorActions(updateFacilitador, removeFacilitador);
 
   const columns = [
     { name: "NOMBRE", selector: (row: Facilitador) => row.nombre, sortable: true },
@@ -122,7 +78,7 @@ export default function ListFacilitadores() {
       />
 
       {showEditModal && facilitadorEditando && (
-        <GlobalModal open={showEditModal} onClose={handleCancelEdit} title="Editar Facilitador">
+        <GlobalModal open={showEditModal} onClose={handleCancelEdit} title="Editar Facilitador" maxWidth="sm">
           <form onSubmit={handleSaveEdit}>
             <div className="space-y-4">
               <InputField
@@ -142,7 +98,7 @@ export default function ListFacilitadores() {
               <SelectField
                 label="Tipo de Facilitador"
                 name="tipo_facilitador"
-                value={facilitadorEditando.tipo_facilitador}
+                value={facilitadorEditando.tipo_facilitador || "interno"}
                 onChange={handleEditChange}
                 options={[
                   { value: "interno", label: "Interno" },
@@ -151,7 +107,7 @@ export default function ListFacilitadores() {
                 required
               />
             </div>
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="flex justify-center gap-2 mt-6">
               <button type="button" onClick={handleCancelEdit} className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">Cancelar</button>
               <button type="submit" className="px-4 py-2 rounded-md bg-[#2AAC67] text-white hover:bg-[#259e5d]">Guardar</button>
             </div>
@@ -160,7 +116,7 @@ export default function ListFacilitadores() {
       )}
 
       {showDeleteModal && facilitadorAEliminar && (
-        <GlobalModal open={showDeleteModal} onClose={handleCancelDelete} title="Confirmar eliminación" actions={(
+        <GlobalModal open={showDeleteModal} onClose={handleCancelDelete} title="Confirmar eliminación" maxWidth="sm" actions={(
           <>
             <button onClick={handleCancelDelete} className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">Cancelar</button>
             <button onClick={handleConfirmDelete} className="px-4 py-2 rounded-md bg-[#F44336] text-white hover:bg-red-600">Eliminar</button>

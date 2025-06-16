@@ -1,6 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { getFacilitadores, type Facilitador } from "../../services/listFacilitatorService";
 
+// Este hook maneja la lista de facilitadores, incluyendo búsqueda, actualización y eliminación
+
 export function useFacilitadoresList() {
   const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);
   const [searchTerm, setSearchTerm] = useState("");

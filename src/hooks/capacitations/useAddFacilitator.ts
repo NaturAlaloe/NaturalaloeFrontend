@@ -4,6 +4,9 @@ import {
   createFacilitador,
   type Facilitador,
 } from "../../services/addFacilitatorService";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+
+// Este hook maneja el formulario para agregar un facilitador, ya sea interno o externo
 
 export const useFacilitatorForm = () => {
   const [tipo, setTipo] = useState("");
@@ -73,7 +76,10 @@ export const useFacilitatorForm = () => {
 
     try {
       await createFacilitador(payload);
-      alert("Facilitador guardado correctamente.");
+      showCustomToast(
+        "Éxito", "Facilitador guardado exitosamente.",
+        "success"
+      );
 
       // Limpiar formulario
       setTipo("");
@@ -82,8 +88,10 @@ export const useFacilitatorForm = () => {
       setApellido("");
       setIdentificacion("");
     } catch (error: any) {
-      console.error("Error al guardar facilitador:", error.response?.data || error.message);
-      alert("Error al guardar facilitador.");
+      showCustomToast(
+        "Error", "Error al guardar el facilitador.",
+        "error"
+      );
     }
   };
 
