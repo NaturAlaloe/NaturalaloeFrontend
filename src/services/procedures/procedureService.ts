@@ -13,7 +13,9 @@ export interface Procedure {
 export const getActiveProcedures = async (): Promise<Procedure[]> => {
   const response = await api.get("/procedureActive");
   if (response.data.success) {
+    console.log("Procedimientos activos obtenidos:", response.data.data); 
     return response.data.data;
+
   }
   throw new Error("Error al obtener los procedimientos");
 };
