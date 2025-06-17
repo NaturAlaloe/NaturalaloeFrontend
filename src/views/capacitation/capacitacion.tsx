@@ -16,7 +16,6 @@ const Capacitacion = () => {
         formData,
         handleChange,
         facilitadores,
-        tiposCapacitacion,
         metodosEvaluacion,
         colaboradoresDisponibles,
         poesDisponibles,
@@ -42,16 +41,6 @@ const Capacitacion = () => {
                     className="w-full"
                     value={formData.titulo}
                     onChange={handleChange}
-                />
-                <SelectField
-                    name="tipoCapacitacion"
-                    label="Tipo capacitación:"
-                    className="w-full"
-                    value={formData.tipoCapacitacion}
-                    onChange={handleChange}
-                    options={tiposCapacitacion}
-                    optionLabel="label"
-                    optionValue="value"
                 />
                 <SelectField
                     name="facilitador"
@@ -113,6 +102,17 @@ const Capacitacion = () => {
                         onChange={() => setIsEvaluado(!isEvaluado)}
                     />
                     <label htmlFor="evaluado" className="font-semibold text-[#2AAC67]">Es Evaluado:</label>
+                </div>
+                <div className="md:col-span-3">
+                    <label htmlFor="comentario" className="block font-semibold text-[#2AAC67] mb-1">
+                        Comentario:
+                    </label>
+                    <textarea
+                        id="comentario"
+                        name="comentario"
+                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] resize-y min-h-[80px]"
+                        placeholder="Agrega un comentario..."
+                    />
                 </div>
             </div>
             <div className="flex justify-center mt-6 gap-4">
