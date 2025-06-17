@@ -6,6 +6,7 @@ import SubmitButton from "../../components/formComponents/SubmitButton";
 import SelectAutocomplete from "../../components/formComponents/SelectAutocomplete";
 import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
 import SearchAutocompleteInput from "../../components/formComponents/SearchAutocompleteInput";
+import PdfInput from "../../components/formComponents/PdfInput";
 
 export default function Procedures() {
   const {
@@ -138,30 +139,12 @@ export default function Procedures() {
           type="date"
           required
         />
-        <div>
-          <InputField
-            label="Seleccionar PDF"
-            name="pdfFile"
-            type="file"
-            accept="application/pdf"
-            onChange={handlePdfChange}
-            required={!pdfFile}
-          />
-          {pdfFile && (
-            <div className="flex items-center gap-2 mt-2">
-              <p className="text-sm text-[#2AAC67] font-medium">
-                Archivo seleccionado: {pdfFile.name}
-              </p>
-              <button
-                type="button"
-                className="text-red-600 underline text-xs"
-                onClick={() => setPdfFile(null)}
-              >
-                Quitar
-              </button>
-            </div>
-          )}
-        </div>
+        <PdfInput
+          pdfFile={pdfFile}
+          onChange={handlePdfChange}
+          onRemove={() => setPdfFile(null)}
+          required={!pdfFile}
+        />
         {/* Mostrar el checkbox solo si hay un POE seleccionado */}
         {poeSeleccionado && (
           <StyledCheckbox
