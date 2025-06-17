@@ -4,7 +4,8 @@ import Box from "@mui/material/Box";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import InputField from "./formComponents/InputField";
 import SelectField from "./formComponents/SelectField";
-import SelectModal from "./SelectModal";
+import AutocompleteField from "./formComponents/AutocompleteField";
+import useCollaboratorFacilitator from "../hooks/collaborator/useCollaboratorFacilitator";
 
 interface TrainingModalProps {
   open: boolean;
@@ -13,24 +14,14 @@ interface TrainingModalProps {
 }
 
 const tipoCapacitacionOptions = ["Interna", "Externa"];
-const metodoEvaluacionOptions = [
-  "Teórico",
-  "Práctico",
-  "Campo",
-];
-const seguimientoOptions = [
-  "Satisfactorio",
-  "Reprogramar",
-  "Reevaluación",
-];
+const metodoEvaluacionOptions = ["Teórico", "Práctico", "Campo"];
+const seguimientoOptions = ["Satisfactorio", "Reprogramar", "Reevaluación"];
 
 export default function TrainingModal({
   open,
   onClose,
   initialData,
 }: TrainingModalProps) {
-  const [showColaboradorModal, setShowColaboradorModal] = useState(false);
-  const [showFacilitadorModal, setShowFacilitadorModal] = useState(false);
   const [isEvaluado, setIsEvaluado] = useState(
     initialData?.esEvaluado || false
   );
@@ -38,10 +29,11 @@ export default function TrainingModal({
     fechaInicio: initialData?.fechaInicio || "",
     fechaFin: initialData?.fechaFin || "",
     tipo: initialData?.tipo || "",
-    colaborador: initialData?.colaborador || "",
     facilitador: initialData?.facilitador || "",
     metodoEvaluacion: initialData?.metodoEvaluacion || "",
     seguimiento: initialData?.seguimiento || "",
+    duracionHoras: initialData?.duracionHoras || "",
+    nota: initialData?.nota || "",
   });
 
   const handleChange = (
@@ -49,9 +41,7 @@ export default function TrainingModal({
   ) => {
     const { name, value, type } = e.target;
     const checked =
-      type === "checkbox"
-        ? (e.target as HTMLInputElement).checked
-        : undefined;
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : undefined;
     if (name === "esEvaluado") {
       setIsEvaluado(!!checked);
     }
@@ -61,20 +51,12 @@ export default function TrainingModal({
     }));
   };
 
-  const handleColaboradorSelect = (nombre: string) => {
-    setForm((prev) => ({ ...prev, colaborador: nombre }));
-    setShowColaboradorModal(false);
-  };
-
-  const handleFacilitadorSelect = (nombre: string) => {
-    setForm((prev) => ({ ...prev, facilitador: nombre }));
-    setShowFacilitadorModal(false);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onClose();
   };
+
+  const { nombres: facilitadoresList } = useCollaboratorFacilitator();
 
   return (
     <Modal
@@ -144,31 +126,46 @@ export default function TrainingModal({
                   onChange={handleChange}
                   options={tipoCapacitacionOptions}
                   required
+                  className="bg-white min-h-[50px]"
+                />
+                <InputField
+                  label="Duración (Horas)"
+                  type="number"
+                  name="duracionHoras"
+                  value={form.duracionHoras}
+                  onChange={handleChange}
+                  required
                   className="bg-white"
+                  min={0}
                 />
-                <InputField
-                  label="Colaborador"
-                  type="text"
-                  name="colaborador"
-                  value={form.colaborador}
-                  placeholder="Seleccionar"
-                  readOnly
-                  className="cursor-pointer bg-white"
-                  onClick={() => setShowColaboradorModal(true)}
-                  onChange={() => {}}
-                />
-                <InputField
+                {/* Campo facilitador con AutocompleteField */}
+                <AutocompleteField
                   label="Facilitador"
-                  type="text"
                   name="facilitador"
                   value={form.facilitador}
-                  placeholder="Seleccionar"
-                  readOnly
-                  className="cursor-pointer bg-white"
-                  onClick={() => setShowFacilitadorModal(true)}
-                  onChange={() => {}}
+                  onChange={(value) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      facilitador: value,
+                    }))
+                  }
+                  options={facilitadoresList}
+                  required
+                  className="bg-white"
+                  placeholder="Selecciona un facilitador"
+                  // Puedes deshabilitar mientras carga si lo deseas:
+                  // disabled={loadingFacilitadores}
                 />
-                <div className="flex items-center mt-7">
+                <SelectField
+                  label="Seguimiento"
+                  name="seguimiento"
+                  value={form.seguimiento}
+                  onChange={handleChange}
+                  options={seguimientoOptions}
+                  className="bg-white min-h-[50px]"
+                  required
+                />
+                <div className="flex items-center">
                   <input
                     type="checkbox"
                     id="esEvaluado"
@@ -185,22 +182,29 @@ export default function TrainingModal({
                   </label>
                 </div>
                 {isEvaluado && (
-                  <SelectField
-                    label="Método de evaluación"
-                    name="metodoEvaluacion"
-                    value={form.metodoEvaluacion}
-                    onChange={handleChange}
-                    options={metodoEvaluacionOptions}
-                  />
+                  <>
+                    <SelectField
+                      label="Método de evaluación"
+                      name="metodoEvaluacion"
+                      value={form.metodoEvaluacion}
+                      onChange={handleChange}
+                      options={metodoEvaluacionOptions}
+                      className="bg-white min-h-[50px]"
+                      required
+                    />
+                    <InputField
+                      label="Nota de la capacitación"
+                      type="number"
+                      name="nota"
+                      value={form.nota}
+                      onChange={handleChange}
+                      min={0}
+                      max={100}
+                      className="bg-white"
+                      required
+                    />
+                  </>
                 )}
-                <SelectField
-                  label="Seguimiento"
-                  name="seguimiento"
-                  value={form.seguimiento}
-                  onChange={handleChange}
-                  options={seguimientoOptions}
-                  className="bg-white"
-                />
               </div>
               <div className="flex justify-center mt-6">
                 <button
@@ -213,24 +217,6 @@ export default function TrainingModal({
             </form>
           </div>
         </div>
-
-        {/* Modal Colaborador */}
-        <SelectModal
-          open={showColaboradorModal}
-          onClose={() => setShowColaboradorModal(false)}
-          title="Seleccionar Colaborador"
-          placeholder="Buscar colaborador..."
-          onAssign={handleColaboradorSelect}
-        />
-
-        {/* Modal Facilitador */}
-        <SelectModal
-          open={showFacilitadorModal}
-          onClose={() => setShowFacilitadorModal(false)}
-          title="Seleccionar Facilitador"
-          placeholder="Buscar facilitador..."
-          onAssign={handleFacilitadorSelect}
-        />
       </Box>
     </Modal>
   );
