@@ -78,4 +78,4 @@ export function useProceduresList() {
   };
 }
 
-export { Procedure };
+export type { Procedure };

@@ -12,7 +12,13 @@ export function useWorkstations() {
     setError(null);
     try {
       const data = await getWorkstations();
-      setWorkstations(data);
+      // Normaliza los nombres de las propiedades
+      const normalized = data.map((w: any) => ({
+        ...w,
+        titulo_puesto: w.titulo_puesto || w.nombre_puesto || "",
+        titulo_departamento: w.titulo_departamento || w.nombre_departamento || "",
+      }));
+      setWorkstations(normalized);
     } catch {
       setError("Error al cargar puestos");
     } finally {
