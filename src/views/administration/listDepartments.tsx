@@ -165,9 +165,8 @@ export default function DepartmentsList() {
       >
         <div>¿Estás seguro de que deseas eliminar este departamento?</div>
       </GlobalModal>
-      {error && (
-        <div className="text-red-500 mt-2 text-center">{error}</div>
-      )}
+     
+      
     </TableContainer>
   );
 }

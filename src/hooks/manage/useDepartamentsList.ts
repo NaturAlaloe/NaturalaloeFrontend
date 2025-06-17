@@ -67,7 +67,6 @@ export function useDepartmentsList() {
         id_departamento: editDepartment.id_departamento,
         id_area: Number(areaInput), // <-- AGREGA ESTA LÍNEA
       };
-      console.log("Payload enviado a updateDepartment:", payload);
       await updateDepartment(editDepartment.id_departamento, payload);
     } else {
       await addDepartment({
