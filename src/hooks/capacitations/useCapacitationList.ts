@@ -1,15 +1,44 @@
 import { useState } from "react";
-//Este Hook maneja el estado y la lógica para la lista de capacitaciones
-export function useCapacitationList() {
-  const [showModal, setShowModal] = useState(false);
+import { useNavigate } from "react-router-dom";
 
-  // Ejemplo de varias capacitaciones con campo estado
-  const capacitaciones = [
+export interface Capacitation {
+  id: string;
+  poe: string;
+  titulo: string;
+  duracion: number;
+  fechaInicio: string;
+  fechaFinal: string;
+  comentario: string;
+  evaluado: string;
+  metodo: string;
+  seguimiento: string;
+  estado: string;
+  colaborador: {
+    nombreCompleto: string;
+    cedula: string;
+    correo: string;
+    telefono: string;
+    area: string;
+    departamento: string;
+    puesto: string;
+  };
+  profesor: {
+    nombre: string;
+    apellido: string;
+    identificacion: string;
+  };
+}
+
+export function useCapacitationList() {
+  const initialCapacitations: Capacitation[] = [
     {
       id: "001",
+      poe: "POE-001",
+      titulo: "Inducción a la empresa",
+      duracion: 8,
       fechaInicio: "2024-06-01",
       fechaFinal: "2024-06-05",
-      comentario: "Inducción general",
+      comentario: "Inducción general para nuevos colaboradores.",
       evaluado: "Sí",
       metodo: "Teórico",
       seguimiento: "Reprogramar",
@@ -31,9 +60,12 @@ export function useCapacitationList() {
     },
     {
       id: "002",
+      poe: "POE-002",
+      titulo: "Capacitación en seguridad",
+      duracion: 6,
       fechaInicio: "2024-06-10",
       fechaFinal: "2024-06-12",
-      comentario: "Capacitación en seguridad",
+      comentario: "Capacitación en seguridad industrial y protocolos de emergencia.",
       evaluado: "No",
       metodo: "Práctico",
       seguimiento: "Satisfactorio",
@@ -55,9 +87,12 @@ export function useCapacitationList() {
     },
     {
       id: "003",
+      poe: "POE-003",
+      titulo: "Actualización de procesos",
+      duracion: 4,
       fechaInicio: "2024-07-01",
       fechaFinal: "2024-07-03",
-      comentario: "Actualización de procesos",
+      comentario: "Actualización de procesos internos y mejores prácticas.",
       evaluado: "Sí",
       metodo: "Mixto",
       seguimiento: "Reevaluación",
@@ -79,20 +114,74 @@ export function useCapacitationList() {
     },
   ];
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [capacitations] = useState<Capacitation[]>(initialCapacitations);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [poeFilter, setPoeFilter] = useState("");
+  const [estadoFilter, setEstadoFilter] = useState("");
+  const [seguimientoFilter, setSeguimientoFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage] = useState(10);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCapacitation, setSelectedCapacitation] = useState<Capacitation | null>(null);
+  const navigate = useNavigate();
 
-  const handleRowClick = (index: number) => {
-    setSelectedIndex(index);
+  // Filtros únicos
+  const poes = Array.from(new Set(capacitations.map((c) => c.poe)));
+  const estados = Array.from(new Set(capacitations.map((c) => c.estado)));
+  const seguimientos = Array.from(new Set(capacitations.map((c) => c.seguimiento)));
+
+  // Filtrar por búsqueda y filtros
+  const filteredCapacitations = capacitations.filter((cap) => {
+    const matchesSearch =
+      cap.poe.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cap.estado.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cap.seguimiento.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesPoe = !poeFilter || cap.poe === poeFilter;
+    const matchesEstado = !estadoFilter || cap.estado === estadoFilter;
+    const matchesSeguimiento = !seguimientoFilter || cap.seguimiento === seguimientoFilter;
+    return matchesSearch && matchesPoe && matchesEstado && matchesSeguimiento;
+  });
+
+  const navegarCapacitacionFinalizada = () => {
+    navigate("/capacitation/capacitationFinished");
+  };
+
+  // Paginación
+  const paginatedCapacitations = filteredCapacitations.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+  const totalPages = Math.ceil(filteredCapacitations.length / rowsPerPage);
+
+  // Acciones
+  const handleRowClick = (cap: Capacitation) => {
+    setSelectedCapacitation(cap);
     setShowModal(true);
   };
 
   return {
+    capacitations: paginatedCapacitations,
+    searchTerm,
+    setSearchTerm,
+    poeFilter,
+    setPoeFilter,
+    estadoFilter,
+    setEstadoFilter,
+    seguimientoFilter,
+    setSeguimientoFilter,
+    poes,
+    estados,
+    seguimientos,
+    currentPage,
+    setCurrentPage,
+    rowsPerPage,
+    totalPages,
     showModal,
     setShowModal,
-    colaborador: capacitaciones[selectedIndex].colaborador,
-    profesor: capacitaciones[selectedIndex].profesor,
-    selectedCapacitation: capacitaciones[selectedIndex],
+    navegarCapacitacionFinalizada,
+    selectedCapacitation,
+    setSelectedCapacitation,
     handleRowClick,
-    capacitaciones,
+    totalCount: filteredCapacitations.length,
   };
 }
