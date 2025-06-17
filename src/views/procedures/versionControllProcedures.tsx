@@ -1,7 +1,8 @@
-import DataTable from "react-data-table-component";
-import { Download, Search } from "@mui/icons-material";
+import { Download } from "@mui/icons-material";
 import { useVersionControlProcedures } from "../../hooks/procedures/useVersionControlProcedures";
 import type { PoeRow } from "../../hooks/procedures/useVersionControlProcedures";
+import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
+import SearchBar from "../../components/globalComponents/SearchBarTable";
 
 export default function VersionControlProcedures() {
   const {
@@ -14,16 +15,16 @@ export default function VersionControlProcedures() {
 
   const columns = [
     {
-      name: 'POE',
+      name: "POE",
       selector: (row: PoeRow) => row.codigo,
       sortable: true,
       cell: (row: PoeRow) => (
         <div className="text-sm font-medium text-gray-900">{row.codigo}</div>
       ),
-      width: '120px',
+      width: "120px",
     },
     {
-      name: 'TÍTULO',
+      name: "TÍTULO",
       selector: (row: PoeRow) => row.titulo,
       sortable: true,
       cell: (row: PoeRow) => (
@@ -32,7 +33,7 @@ export default function VersionControlProcedures() {
       grow: 2,
     },
     {
-      name: 'DEPARTAMENTO',
+      name: "DEPARTAMENTO",
       selector: (row: PoeRow) => row.departamento,
       sortable: true,
       cell: (row: PoeRow) => (
@@ -40,7 +41,7 @@ export default function VersionControlProcedures() {
       ),
     },
     {
-      name: 'RESPONSABLE',
+      name: "RESPONSABLE",
       selector: (row: PoeRow) => row.responsable,
       sortable: true,
       cell: (row: PoeRow) => (
@@ -48,7 +49,7 @@ export default function VersionControlProcedures() {
       ),
     },
     {
-      name: 'REVISIÓN',
+      name: "REVISIÓN",
       cell: (row: PoeRow) => {
         const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
         return (
@@ -64,24 +65,24 @@ export default function VersionControlProcedures() {
           </select>
         );
       },
-      width: '140px',
+      width: "140px",
       wrap: true,
     },
     {
-      name: 'FECHA VIGENCIA',
+      name: "FECHA VIGENCIA",
       cell: (row: PoeRow) => {
         const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
         return (
-          <div className="text-sm text-gray-700" style={{ whiteSpace: 'normal', wordBreak: 'break-word', minWidth: 0 }}>
+          <div className="text-sm text-gray-700" style={{ whiteSpace: "normal", wordBreak: "break-word", minWidth: 0 }}>
             {row.versiones[idx].fechaVigencia}
           </div>
         );
       },
-      width: '160px',
+      width: "160px",
       wrap: true,
     },
     {
-      name: 'DOCUMENTO',
+      name: "DOCUMENTO",
       cell: (row: PoeRow) => {
         const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
         return (
@@ -102,54 +103,9 @@ export default function VersionControlProcedures() {
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
-      width: '120px',
+      width: "120px",
     },
   ];
-
-  const customStyles = {
-    headRow: {
-      style: {
-        backgroundColor: '#F0FFF4',
-        borderBottomWidth: '1px',
-        borderBottomColor: '#E5E7EB',
-      },
-    },
-    headCells: {
-      style: {
-        color: '#2AAC67',
-        fontWeight: 'bold',
-        textTransform: 'uppercase' as 'uppercase',
-        fontSize: '0.75rem',
-        letterSpacing: '0.05em',
-        paddingLeft: '1.5rem',
-        paddingRight: '1.5rem',
-      },
-    },
-    cells: {
-      style: {
-        paddingLeft: '1.5rem',
-        paddingRight: '1.5rem',
-      },
-    },
-    rows: {
-      style: {
-        '&:not(:last-of-type)': {
-          borderBottomWidth: '1px',
-          borderBottomColor: '#E5E7EB',
-        },
-        '&:hover': {
-          backgroundColor: '#F0FFF4',
-          cursor: 'pointer',
-        },
-      },
-    },
-    pagination: {
-      style: {
-        borderTopWidth: '1px',
-        borderTopColor: '#E5E7EB',
-      },
-    },
-  };
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
@@ -158,30 +114,23 @@ export default function VersionControlProcedures() {
       </h1>
       {/* Barra de búsqueda */}
       <div className="relative mb-6">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="text-gray-400" />
-        </div>
-        <input
-          type="text"
-          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
-          placeholder="Buscar por código, título, departamento o responsable..."
+        <SearchBar
           value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
+          onChange={setFilterText}
+          placeholder="Buscar por código, título, departamento o responsable..."
         />
       </div>
       {/* DataTable */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden">
-        <DataTable
-          columns={columns}
-          data={poes}
-          customStyles={customStyles}
-          noDataComponent={
-            <div className="px-6 py-4 text-center text-sm text-gray-500">
-              No se encontraron versiones de POEs
-            </div>
-          }
-        />
-      </div>
+      <GlobalDataTable
+        columns={columns}
+        data={poes}
+        pagination={true}
+        noDataComponent={
+          <div className="px-6 py-4 text-center text-sm text-gray-500">
+            No se encontraron versiones de POEs
+          </div>
+        }
+      />
     </div>
   );
 }
