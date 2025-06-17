@@ -46,11 +46,12 @@ export function useDepartments() {
 
   const handleEditDepartment = async (
     id: number,
-    department: { titulo: string; id_area: number; codigo: number }
+    department: { titulo: string; codigo: number; id_departamento: number; id_area: number }
   ) => {
     setLoading(true);
     setError(null);
     try {
+      console.log("Payload enviado a updateDepartment:", department);
       await updateDepartment(id, department);
       await fetchDepartments();
       showCustomToast("Éxito", "Departamento actualizado correctamente", "success");
@@ -68,11 +69,14 @@ export function useDepartments() {
     setLoading(true);
     setError(null);
     try {
-      await deleteDepartment(id);
+      console.log("Intentando eliminar departamento:", id);
+      const response = await deleteDepartment(id);
+      console.log("Respuesta del backend al eliminar:", response);
       await fetchDepartments();
       showCustomToast("Éxito", "Departamento eliminado correctamente", "success");
       return true;
-    } catch (err) {
+    } catch (err: any) {
+      console.log("Error al eliminar departamento:", err?.response?.data || err);
       setError("Error al eliminar departamento");
       showCustomToast("Error", "Error al eliminar departamento", "error");
       return false;
