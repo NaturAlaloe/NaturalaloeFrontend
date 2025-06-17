@@ -8,13 +8,14 @@ interface Participante {
   nombre: string;
   nota: string;
   seguimiento: string;
+  comentario: string;
 }
 
 const CalificarCapacitacionPage = () => {
   const [participantes, setParticipantes] = useState<Participante[]>([
-    { id: 1, nombre: "Juan Pérez", nota: "", seguimiento: "" },
-    { id: 2, nombre: "Ana Gómez", nota: "", seguimiento: "" },
-    { id: 3, nombre: "Carlos Ramírez", nota: "", seguimiento: "" },
+    { id: 1, nombre: "Juan Pérez", nota: "", seguimiento: "", comentario: "" },
+    { id: 2, nombre: "Ana Gómez", nota: "", seguimiento: "", comentario: "" },
+    { id: 3, nombre: "Carlos Ramírez", nota: "", seguimiento: "", comentario: "" },
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,6 +42,12 @@ const CalificarCapacitacionPage = () => {
   const handleSeguimientoChange = (id: number, valor: string) => {
     setParticipantes((prev) =>
       prev.map((p) => (p.id === id ? { ...p, seguimiento: valor } : p))
+    );
+  };
+
+  const handleComentarioChange = (id: number, valor: string) => {
+    setParticipantes((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, comentario: valor } : p))
     );
   };
 
@@ -83,6 +90,17 @@ const CalificarCapacitacionPage = () => {
         </select>
       ),
     },
+    {
+      name: "Comentario",
+      cell: (row: Participante) => (
+        <textarea
+          value={row.comentario}
+          onChange={(e) => handleComentarioChange(row.id, e.target.value)}
+          rows={3}
+          className="w-full border border-gray-300 rounded px-2 py-1 text-sm font-normal text-[#2AAC67] resize-none"
+        />
+      ),
+    }
   ];
 
   const customStyles = {
@@ -169,11 +187,10 @@ const CalificarCapacitacionPage = () => {
           <button
             key={idx + 1}
             onClick={() => setCurrentPage(idx + 1)}
-            className={`px-4 py-2 border text-sm ${
-              currentPage === idx + 1
+            className={`px-4 py-2 border text-sm ${currentPage === idx + 1
                 ? 'bg-gray-300 text-gray-900 font-bold'
                 : 'text-gray-600 hover:bg-gray-100'
-            }`}
+              }`}
           >
             {idx + 1}
           </button>
