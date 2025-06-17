@@ -492,7 +492,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/capacitationIndividualFinished"
+                to="/capacitation/capacitationFinished"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -644,7 +644,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             element={<ListaFacilitadores />}
           />
           <Route
-            path="/capacitation/capacitationIndividualFinished"
+            path="/capacitation/capacitationFinished"
             element={<CapacitacionFinalizada />}
           />
           <Route
