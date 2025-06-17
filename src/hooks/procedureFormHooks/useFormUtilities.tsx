@@ -12,14 +12,6 @@ interface FormData {
 }
 
 export function useProceduresForm() {
-  // Solo datos estáticos que no vienen de API
-  const responsables: string[] = [
-    "Juan Pérez",
-    "Ana Gómez",
-    "Luis Martínez",
-    "Marta Díaz",
-  ];
-
   // Estado del formulario
   const [formData, setFormData] = useState<FormData>({
     titulo: "",
@@ -55,7 +47,6 @@ export function useProceduresForm() {
   return {
     formData,
     pdfFile,
-    responsables,
     handleChange,
     handlePdfChange,
     setFormData,

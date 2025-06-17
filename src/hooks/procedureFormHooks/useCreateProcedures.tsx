@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createProcedure } from "../../services/procedures/createProceduresService";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export function useCreateProcedureSubmit() {
   const [loading, setLoading] = useState(false);
@@ -27,28 +28,22 @@ export function useCreateProcedureSubmit() {
     formData.append("fecha_vigencia", fields.fecha_vigencia);
     formData.append("documento", fields.documento);
 
-    const debugObj: Record<string, any> = {};
-    formData.forEach((value, key) => {
-      debugObj[key] = value;
-    });
-    console.log("[Procedimiento] Enviando a la API (objeto):", debugObj);
-    for (const [key, value] of formData.entries()) {
-      if (key === "documento" && value instanceof File) {
-        console.log(
-          `[Procedimiento] campo: ${key} (File) -> nombre: ${value.name}, size: ${value.size}`
-        );
-      } else {
-        console.log(`[Procedimiento] campo: ${key} ->`, value);
-      }
-    }
-
     try {
       const response = await createProcedure(formData);
+      const codigoGenerado = response?.data?.[0]?.[0]?.codigo_generado;
+      if (codigoGenerado) {
+        showCustomToast(
+          "Procedimiento creado",
+          `Código generado: ${codigoGenerado}`,
+          "success"
+        );
+      }
       return response;
     } catch (error: any) {
-      console.log(
-        "Error al crear procedimiento:",
-        error?.response?.data?.message || "Intenta nuevamente"
+      showCustomToast(
+        "Error al crear procedimiento",
+        error?.response?.data?.message || "Intenta nuevamente",
+        "error"
       );
       throw error;
     } finally {
