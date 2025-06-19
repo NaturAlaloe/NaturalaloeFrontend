@@ -1,10 +1,8 @@
-import type { TableColumn } from 'react-data-table-component';
-
 import { Search, Person, Badge, Apartment, Work, Close, Info, EditNote } from "@mui/icons-material";
-import DataTable from 'react-data-table-component';
 import { useState } from 'react';
-import { useCapacitationList, type Capacitation } from '../../hooks/capacitations/useCapacitationList';
-
+import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
+import { useCapacitationList } from '../../hooks/capacitations/useCapacitationList';
+import SimpleModal from "../../components/globalComponents/SimpleModal";
 
 export default function ListCapacitations() {
   const {
@@ -20,57 +18,49 @@ export default function ListCapacitations() {
     poes,
     estados,
     seguimientos,
-    currentPage,
-    setCurrentPage,
-    rowsPerPage,
-    totalPages,
     showModal,
     setShowModal,
     selectedCapacitation,
     handleRowClick,
     navegarCapacitacionFinalizada,
-    totalCount
   } = useCapacitationList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentToShow, setCommentToShow] = useState<string | null>(null);
 
-
-  
-  const columns: TableColumn<Capacitation>[] = [
+  const columns = [
     {
       name: 'ID',
-      selector: row => row.id,
+      selector: (row: any) => row.id,
       sortable: true,
-      cell: row => <div className="text-sm text-gray-700">{row.id}</div>,
-
+      cell: (row: any) => <div className="text-sm text-gray-700">{row.id}</div>,
     },
     {
       name: 'POE',
-      selector: row => row.poe,
+      selector: (row: any) => row.poe,
       sortable: true,
-      cell: row => <div className="text-sm font-medium text-gray-900">{row.poe}</div>,
+      cell: (row: any) => <div className="text-sm font-medium text-gray-900">{row.poe}</div>,
       wrap: true,
     },
     {
       name: 'TÍTULO',
-      selector: row => row.titulo,
+      selector: (row: any) => row.titulo,
       sortable: true,
-      cell: row => <div className="text-sm text-gray-700">{row.titulo}</div>,
+      cell: (row: any) => <div className="text-sm text-gray-700">{row.titulo}</div>,
       wrap: true,
     },
     {
       name: 'DURACIÓN (h)',
-      selector: row => row.duracion,
+      selector: (row: any) => row.duracion,
       sortable: true,
-      cell: row => <div className="text-sm text-gray-700">{row.duracion}</div>,
+      cell: (row: any) => <div className="text-sm text-gray-700">{row.duracion}</div>,
       wrap: true,
     },
     {
       name: 'COMENTARIO',
-      selector: row => row.comentario,
+      selector: (row: any) => row.comentario,
       sortable: false,
-      cell: row => (
+      cell: (row: any) => (
         <button
           className="text-[#2AAC67] underline hover:text-[#1e8449] text-xs"
           onClick={e => {
@@ -86,30 +76,30 @@ export default function ListCapacitations() {
     },
     {
       name: 'FECHA INICIO',
-      selector: row => row.fechaInicio,
+      selector: (row: any) => row.fechaInicio,
       sortable: true,
-      cell: row => <div className="text-sm text-gray-700">{row.fechaInicio}</div>,
+      cell: (row: any) => <div className="text-sm text-gray-700">{row.fechaInicio}</div>,
 
     },
     {
       name: 'FECHA FINAL',
-      selector: row => row.fechaFinal,
+      selector: (row: any) => row.fechaFinal,
       sortable: true,
-      cell: row => <div className="text-sm text-gray-700">{row.fechaFinal}</div>,
+      cell: (row: any) => <div className="text-sm text-gray-700">{row.fechaFinal}</div>,
 
     },
     {
       name: 'ESTADO',
-      selector: row => row.estado,
+      selector: (row: any) => row.estado,
       sortable: true,
-      cell: row => <div className="text-sm text-gray-700">{row.estado}</div>,
+      cell: (row: any) => <div className="text-sm text-gray-700">{row.estado}</div>,
       wrap: true,
     },
     {
       name: 'SEGUIMIENTO',
-      selector: row => row.seguimiento,
+      selector: (row: any) => row.seguimiento,
       sortable: true,
-      cell: row => <div className="text-sm text-gray-700">{row.seguimiento}</div>,
+      cell: (row: any) => <div className="text-sm text-gray-700">{row.seguimiento}</div>,
       wrap: true,
     },
     {
@@ -131,120 +121,11 @@ export default function ListCapacitations() {
     },
   ];
 
-  // Estilos personalizados para DataTable
-  const customStyles = {
-    table: {
-      style: {
-        minWidth: '100%',
-        width: '100%',
-      },
-    },
-    headRow: {
-      style: {
-        backgroundColor: '#F0FFF4',
-        borderBottomWidth: '1px',
-        borderBottomColor: '#E5E7EB',
-      },
-    },
-    headCells: {
-      style: {
-        color: '#2AAC67',
-        fontWeight: 'bold',
-        textTransform: 'uppercase' as const,
-        fontSize: '0.75rem',
-        letterSpacing: '0.05em',
-        paddingLeft: '1.5rem',
-        paddingRight: '1.5rem',
-        whiteSpace: 'normal',
-      },
-    },
-    cells: {
-      style: {
-        paddingLeft: '1.5rem',
-        paddingRight: '1.5rem',
-        whiteSpace: 'normal',
-      },
-    },
-    rows: {
-      style: {
-        '&:not(:last-of-type)': {
-          borderBottomWidth: '1px',
-          borderBottomColor: '#E5E7EB',
-        },
-        '&:hover': {
-          backgroundColor: '#F0FFF4',
-          cursor: 'pointer',
-        },
-      },
-    },
-    pagination: {
-      style: {
-        borderTopWidth: '1px',
-        borderTopColor: '#E5E7EB',
-      },
-    },
-  };
-
-  // Componente de paginación personalizado
-  const CustomPagination = () => (
-    <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
-      <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between w-full">
-        <div>
-          <p className="text-sm text-gray-700">
-            Mostrando <span className="font-medium">{(currentPage - 1) * rowsPerPage + 1}</span> a <span className="font-medium">{Math.min(currentPage * rowsPerPage, totalCount)}</span> de{' '}
-            <span className="font-medium">{totalCount}</span> resultados
-          </p>
-        </div>
-        <div>
-          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-            <button
-              className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              <span className="sr-only">Anterior</span>
-              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </button>
-            {[...Array(totalPages)].map((_, idx) => (
-              <button
-                key={idx + 1}
-                aria-current={currentPage === idx + 1 ? "page" : undefined}
-                className={
-                  currentPage === idx + 1
-                    ? "bg-gray-300 border-gray-500 text-gray-900 font-bold shadow-md relative inline-flex items-center px-4 py-2 border text-sm rounded-md z-10"
-                    : "bg-white border-gray-300 text-gray-500 hover:bg-gray-100 relative inline-flex items-center px-4 py-2 border text-sm rounded-md"
-                }
-                onClick={() => setCurrentPage(idx + 1)}
-                style={currentPage === idx + 1 ? { pointerEvents: 'none' } : {}}
-              >
-                {idx + 1}
-              </button>
-            ))}
-            <button
-              className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              <span className="sr-only">Siguiente</span>
-              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </nav>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
-    <div className="p-2 sm:p-6 bg-white rounded-lg shadow-sm">
+    <div className="p-4 bg-white">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
         Capacitaciones de la Empresa
       </h1>
-
-      {/* Filtros */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -289,31 +170,28 @@ export default function ListCapacitations() {
           ))}
         </select>
       </div>
-
-      {/* DataTable */}
       <div className="border border-gray-200 rounded-lg overflow-x-auto">
-        <DataTable
+        <GlobalDataTable
           columns={columns}
           data={capacitations}
-          customStyles={customStyles}
-          onRowClicked={(row: Capacitation, e: React.MouseEvent) => {
-            const target = e.target as HTMLElement;
-            if (!target.closest('.action-button')) {
-              handleRowClick(row);
-            }
+          rowsPerPage={10}
+          dense
+          highlightOnHover
+          noDataComponent={<div className="px-6 py-4 text-center text-sm text-gray-500">No se encontraron capacitaciones</div>}
+          customStyles={{
+            headCells: {
+              style: {
+                background: "#F0FFF4",
+                color: "#2AAC67",
+                fontWeight: "bold",
+                fontSize: "13px",
+                textTransform: "uppercase",
+              },
+            },
           }}
-          pagination
-          paginationComponent={CustomPagination}
-          noDataComponent={
-            <div className="px-6 py-4 text-center text-sm text-gray-500">
-              No se encontraron capacitaciones
-            </div>
-          }
-          responsive
+          onRowClicked={handleRowClick}
         />
       </div>
-
-      {/* Modal de detalles */}
       {showModal && selectedCapacitation && (
         <div
           className="fixed mt-15 inset-0 flex items-center justify-center z-50"
@@ -323,7 +201,6 @@ export default function ListCapacitations() {
           }}
         >
           <div className="bg-white rounded-2xl px-8 py-8 w-full max-w-3xl shadow-2xl relative border-2 border-[#2ecc71] overflow-y-auto max-h-[95vh]">
-            {/* Botón cerrar */}
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
@@ -337,7 +214,6 @@ export default function ListCapacitations() {
               <h2 className="text-[#2ecc71] font-bold text-2xl text-center">Detalles de Capacitación</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Información del Colaborador */}
               <div>
                 <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left">Información de los Colaboradores</h3>
                 <div className="grid grid-cols-1 gap-4">
@@ -391,7 +267,6 @@ export default function ListCapacitations() {
                   </div>
                 </div>
               </div>
-              {/* Información del Profesor */}
               <div>
                 <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left mt-8 md:mt-0">Información del Profesor</h3>
                 <div className="grid grid-cols-1 gap-4">
@@ -437,23 +312,18 @@ export default function ListCapacitations() {
           </div>
         </div>
       )}
-
       {/* Modal de comentario */}
       {showCommentModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backdropFilter: 'blur(4px)', backgroundColor: 'rgba(0,0,0,0.3)' }}>
-          <div className="bg-white rounded-2xl px-6 py-6 w-full max-w-md shadow-2xl relative border-2 border-[#2ecc71]">
-            <button
-              onClick={() => setShowCommentModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
-            >
-              <Close />
-            </button>
-            <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center">Comentario completo</h3>
-            <div className="text-gray-800 text-sm whitespace-pre-line break-words">
-              {commentToShow}
-            </div>
+        <SimpleModal
+          open={showCommentModal}
+          onClose={() => setShowCommentModal(false)}
+          title="Comentario completo"
+          widthClass="max-w-md w-full"
+        >
+          <div className="text-gray-800 text-sm whitespace-pre-line break-words">
+            {commentToShow}
           </div>
-        </div>
+        </SimpleModal>
       )}
     </div>
   );
