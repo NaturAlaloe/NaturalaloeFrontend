@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Search } from "@mui/icons-material";
-import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import FormContainer from "../../components/formComponents/FormContainer";
+import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
+import SearchBar from "../../components/globalComponents/SearchBarTable";
+import InputField from "../../components/formComponents/InputField";
+import SelectField from "../../components/formComponents/SelectField";
+import SubmitButton from "../../components/formComponents/SubmitButton";
 
-interface Participante {
+interface Colaborador {
   id: number;
   nombre: string;
   nota: string;
@@ -11,8 +14,8 @@ interface Participante {
   comentario: string;
 }
 
-const CalificarCapacitacionPage = () => {
-  const [participantes, setParticipantes] = useState<Participante[]>([
+const CalificarColaboradoresPage = () => {
+  const [colaboradores, setColaboradores] = useState<Colaborador[]>([
     { id: 1, nombre: "Juan Pérez", nota: "", seguimiento: "", comentario: "" },
     { id: 2, nombre: "Ana Gómez", nota: "", seguimiento: "", comentario: "" },
     { id: 3, nombre: "Carlos Ramírez", nota: "", seguimiento: "", comentario: "" },
@@ -22,8 +25,8 @@ const CalificarCapacitacionPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
-  const filtered = participantes.filter((p) =>
-    p.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  const filtered = colaboradores.filter((c) =>
+    c.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const paginated = filtered.slice(
@@ -33,43 +36,32 @@ const CalificarCapacitacionPage = () => {
 
   const totalPages = Math.ceil(filtered.length / rowsPerPage);
 
-  const handleNotaChange = (id: number, valor: string) => {
-    setParticipantes((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, nota: valor } : p))
-    );
-  };
-
-  const handleSeguimientoChange = (id: number, valor: string) => {
-    setParticipantes((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, seguimiento: valor } : p))
-    );
-  };
-
-  const handleComentarioChange = (id: number, valor: string) => {
-    setParticipantes((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, comentario: valor } : p))
+  const handleChange = (id: number, field: keyof Colaborador, value: string) => {
+    setColaboradores((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, [field]: value } : c))
     );
   };
 
   const handleGuardarTodos = () => {
     alert("Calificaciones y seguimientos guardados correctamente.");
-    console.log("Datos guardados:", participantes);
+    console.log("Datos guardados:", colaboradores);
   };
 
   const columns = [
     {
       name: "Nombre",
-      selector: (row: Participante) => row.nombre,
+      selector: (row: Colaborador) => row.nombre,
       sortable: true,
     },
     {
       name: "Nota",
-      cell: (row: Participante) => (
-        <input
+      cell: (row: Colaborador) => (
+        <InputField
           type="number"
+          name={`nota-${row.id}`}
           value={row.nota}
-          onChange={(e) => handleNotaChange(row.id, e.target.value)}
-          className="w-20 border border-gray-300 rounded px-2 py-1 text-sm font-normal text-[#2AAC67]"
+          onChange={(e) => handleChange(row.id, "nota", e.target.value)}
+          className="w-20 text-sm"
           min={0}
           max={100}
         />
@@ -77,102 +69,83 @@ const CalificarCapacitacionPage = () => {
     },
     {
       name: "Seguimiento",
-      cell: (row: Participante) => (
-        <select
+      cell: (row: Colaborador) => (
+        <SelectField
+          name={`seguimiento-${row.id}`}
           value={row.seguimiento}
-          onChange={(e) => handleSeguimientoChange(row.id, e.target.value)}
-          className="border border-gray-300 rounded px-2 py-1 text-sm font-normal text-[#2AAC67]"
-        >
-          <option value="">Seleccione</option>
-          <option value="satisfactorio">Satisfactorio</option>
-          <option value="reprogramar">Reprogramar</option>
-          <option value="reevaluacion">Reevaluación</option>
-        </select>
+          onChange={(e) => handleChange(row.id, "seguimiento", e.target.value)}
+          options={["Satisfactorio", "Reprogramar", "Reevaluación"]}
+        />
       ),
     },
     {
       name: "Comentario",
-      cell: (row: Participante) => (
+      cell: (row: Colaborador) => (
         <textarea
+          name={`comentario-${row.id}`}
           value={row.comentario}
-          onChange={(e) => handleComentarioChange(row.id, e.target.value)}
+          onChange={(e) => handleChange(row.id, "comentario", e.target.value)}
           rows={3}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm font-normal text-[#2AAC67] resize-none"
+          className="w-full border border-[#2AAC67] rounded-lg px-2 py-1 text-sm text-[#2AAC67] resize-none"
         />
       ),
-    }
+    },
   ];
 
   const customStyles = {
     table: {
       style: {
-        borderRadius: '8px',
-        overflow: 'hidden',
-        border: '1px solid #E5E7EB',
-      },
-    },
-    headRow: {
-      style: {
-        backgroundColor: '#F0FFF4',
-        borderBottomWidth: '1px',
-        borderBottomColor: '#E5E7EB',
-      },
-    },
-    headCells: {
-      style: {
-        color: '#2AAC67',
-        fontWeight: 'normal',
-        textTransform: 'uppercase' as const,
-        fontSize: '0.75rem',
-        letterSpacing: '0.05em',
-        paddingLeft: '1.5rem',
-        paddingRight: '1.5rem',
-        fontFamily: 'inherit',
-      },
-    },
-    cells: {
-      style: {
-        paddingLeft: '1.5rem',
-        paddingRight: '1.5rem',
-        fontWeight: 'normal',
-        fontFamily: 'inherit',
-        color: '#2AAC67',
+        border: "1px solid #D1D5DB",
+        borderRadius: "0.5rem",
+        overflow: "hidden",
       },
     },
     rows: {
       style: {
-        '&:not(:last-of-type)': {
-          borderBottomWidth: '1px',
-          borderBottomColor: '#E5E7EB',
-        },
-        cursor: 'pointer',
-        backgroundColor: 'transparent',
-        '&:hover': {
-          backgroundColor: '#F0FFF4',
-          color: '#2AAC67',
-        },
-        '& input, & select, & button': {
-          cursor: 'default',
-          fontWeight: 'normal',
+        backgroundColor: "transparent",
+        "&:hover": {
+          backgroundColor: "#F0FFF4",
+          color: "#2AAC67",
         },
       },
     },
-    pagination: {
+    headRow: {
       style: {
-        borderTopWidth: '1px',
-        borderTopColor: '#E5E7EB',
+        backgroundColor: "#F0FFF4",
+      },
+    },
+    headCells: {
+      style: {
+        color: "#2AAC67",
+        fontWeight: "normal",
+        textTransform: "uppercase",
+        fontSize: "0.75rem",
+        letterSpacing: "0.05em",
+        paddingLeft: "1.5rem",
+        paddingRight: "1.5rem",
+        fontFamily: "inherit",
+      },
+    },
+    cells: {
+      style: {
+        paddingLeft: "1.5rem",
+        paddingRight: "1.5rem",
+        fontFamily: "inherit",
+        color: "#2AAC67",
       },
     },
   };
 
-  const CustomPagination = () => (
-    <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+
+  const renderPagination = () => (
+    <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200 mt-4">
       <p className="text-sm text-gray-700">
-        Mostrando{' '}
-        <span className="font-medium">{(currentPage - 1) * rowsPerPage + 1}</span> a{' '}
+        Mostrando{" "}
+        <span className="font-medium">{(currentPage - 1) * rowsPerPage + 1}</span>{" "}
+        a{" "}
         <span className="font-medium">
           {Math.min(currentPage * rowsPerPage, filtered.length)}
-        </span>{' '}
+        </span>{" "}
         de <span className="font-medium">{filtered.length}</span> resultados
       </p>
       <nav className="inline-flex rounded-md shadow-sm -space-x-px">
@@ -188,8 +161,8 @@ const CalificarCapacitacionPage = () => {
             key={idx + 1}
             onClick={() => setCurrentPage(idx + 1)}
             className={`px-4 py-2 border text-sm ${currentPage === idx + 1
-                ? 'bg-gray-300 text-gray-900 font-bold'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? "bg-gray-300 text-gray-900 font-bold"
+                : "text-gray-600 hover:bg-gray-100"
               }`}
           >
             {idx + 1}
@@ -207,20 +180,15 @@ const CalificarCapacitacionPage = () => {
   );
 
   return (
-    <FormContainer title="Calificación de Capacitación">
-      <div className="relative mb-6">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="text-gray-400" />
-        </div>
-        <input
-          type="text"
-          placeholder="Buscar por nombre..."
+    <FormContainer title="Calificación de Colaboradores">
+      <div className="mb-6">
+        <SearchBar
           value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
+          onChange={(val) => {
+            setSearchTerm(val);
             setCurrentPage(1);
           }}
-          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
+          placeholder="Buscar por nombre..."
         />
       </div>
 
@@ -228,23 +196,19 @@ const CalificarCapacitacionPage = () => {
         columns={columns}
         data={paginated}
         pagination={false}
-        highlightOnHover={false}
-        dense
+        rowsPerPage={rowsPerPage}
         customStyles={customStyles}
       />
 
-      <CustomPagination />
+      {renderPagination()}
 
       <div className="flex justify-center mt-6">
-        <button
-          onClick={handleGuardarTodos}
-          className="px-6 py-3 rounded-md bg-[#2AAC67] text-white font-semibold hover:bg-[#259e5d] transition"
-        >
+        <SubmitButton onClick={handleGuardarTodos}>
           Guardar calificaciones
-        </button>
+        </SubmitButton>
       </div>
     </FormContainer>
   );
 };
 
-export default CalificarCapacitacionPage;
+export default CalificarColaboradoresPage;
