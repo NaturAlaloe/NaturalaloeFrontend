@@ -5,8 +5,10 @@ import SubmitButton from '../../components/formComponents/SubmitButton';
 import SimpleModal from "../../components/globalComponents/SimpleModal";
 import { useCapacitation } from '../../hooks/capacitations/useCapacitation';
 import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
+import { showCustomToast } from '../../components/globalComponents/CustomToaster';
 
 const Capacitacion = () => {
+    
     const {
         isEvaluado,
         setIsEvaluado,
@@ -31,8 +33,18 @@ const Capacitacion = () => {
         agregarPoes,
     } = useCapacitation();
 
+    const handleSubmitWithToast = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!formData.titulo||!formData.facilitador||!formData.fecha||!formData.fechaFin||!formData.duracion) {
+            showCustomToast('Error', 'Todos los campos son obligatorios', 'error');
+            return;
+        }
+        showCustomToast('Guardado', 'La capacitación fue registrada correctamente', 'success');
+        handleSubmit(e);
+    };
+
     return (
-        <FormContainer title="Registro de Capacitación" onSubmit={handleSubmit}>
+        <FormContainer title="Registro de Capacitación" onSubmit={handleSubmitWithToast}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <InputField
                     name="titulo"

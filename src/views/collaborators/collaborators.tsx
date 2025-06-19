@@ -1,51 +1,108 @@
-
-import { useNavigate } from "react-router-dom";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle"; // Cambiado a MUI
-
-const collaborators = [
-  { id: 1, name: "Ana Gómez", code: "001" },
-  { id: 2, name: "Luis Pérez", code: "002" },
-  { id: 3, name: "Carlos Mora", code: "003" },
-  { id: 4, name: "María López", code: "004" },
-  { id: 5, name: "Pedro Ruiz", code: "005" },
-  { id: 6, name: "Lucía Ramírez", code: "006" },
-];
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Box, 
+  TextField, 
+  CircularProgress, 
+  Alert, 
+  Typography,
+  InputAdornment
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import useCollaborators from '../../hooks/collaborator/useCollaborators';
+import CollaboratorCard from '../../components/globalComponents/CollaboratorCard';
 
 const Collaborators: React.FC = () => {
   const navigate = useNavigate();
+  const { collaborators, loading, error, searchTerm, setSearchTerm } = useCollaborators();
 
-  const handleCardClick = () => {
-    navigate("/collaborators/detail"); 
+  const handleCardClick = (id: string) => {
+    navigate(`/collaborators/detail/${id}`);
   };
 
   return (
-    <div className="p-6 font-sans">
-      <h1 className="text-2xl font-bold text-center mb-6">Colaboradores</h1>
+    <Box sx={{ p: 3, maxWidth: 1200, margin: '0 auto' }}>
+      <Typography variant="h4" gutterBottom sx={{ 
+        fontWeight: 'bold', 
+        mb: 4,
+        color: '#2AAC67',
+        textAlign: 'center'
+      }}>
+        Colaboradores
+      </Typography>
 
-      <div className="flex justify-center mb-6">
-        <input
-          type="text"
-          placeholder="Buscar..."
-          className="px-4 py-2 rounded-lg border border-gray-300 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Buscar por nombre o código"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{ 
+            maxWidth: 600,
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#2AAC67',
+              },
+              '&:hover fieldset': {
+                borderColor: '#13bd62',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#13bd62',
+              },
+            },
+            '& .MuiInputAdornment-root .MuiSvgIcon-root': {
+              color: '#2AAC67',
+            }
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+            endAdornment: loading && (
+              <CircularProgress size={24} color="inherit" />
+            )
+          }}
         />
-      </div>
+      </Box>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {collaborators.map((colab) => (
-          <div
-            key={colab.id}
-            onClick={handleCardClick}
-            className="cursor-pointer bg-white border border-gray-200 rounded-xl shadow p-4 flex flex-col items-center hover:shadow-lg transition"
-          >
-            <div className="bg-gray-200 rounded-full p-4 mb-3">
-              <AccountCircleIcon className="w-10 h-10 text-gray-600" /> {/* Cambiado a MUI */}
-            </div>
-            <h3 className="font-semibold text-lg">{colab.name}</h3>
-            <p className="text-sm text-gray-500">Código: {colab.code}</p>
-          </div>
-        ))}
-      </div>
-    </div>
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : collaborators.length === 0 ? (
+        <Alert severity="info" sx={{ mt: 2 }}>
+          {searchTerm ? 
+            `No se encontraron colaboradores con "${searchTerm}"` : 
+            'No hay colaboradores disponibles'}
+        </Alert>
+      ) : (
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: 3,
+          mt: 2
+        }}>
+          {collaborators.slice(0, 3).map((colab) => (
+            <CollaboratorCard
+              key={colab.id_colaborador}
+              id={colab.id_colaborador}
+              nombre={colab.nombre_completo}
+              puesto={colab.puesto}
+              onClick={handleCardClick}
+            />
+          ))}
+        </Box>
+      )}
+    </Box>
   );
 };
 

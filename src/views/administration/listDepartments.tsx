@@ -42,18 +42,18 @@ export default function DepartmentsList() {
     { name: "Área", selector: (row: any) => row.titulo_area, sortable: true },
     {
       name: "Acciones",
-      cell: (_: any, idx: number) => (
+      cell: (row: any) => (
         <div className="flex gap-2">
           <button
             className="text-[#2AAC67] hover:text-green-700"
-            onClick={() => handleOpenEdit(idx)}
+            onClick={() => handleOpenEdit(row)}
             title="Editar"
           >
             <Edit fontSize="small" />
           </button>
           <button
             className="text-red-500 hover:text-red-700"
-            onClick={() => setDeleteIndex(idx)}
+            onClick={() => setDeleteIndex(row)}
             title="Eliminar"
           >
             <Delete fontSize="small" />
@@ -165,9 +165,8 @@ export default function DepartmentsList() {
       >
         <div>¿Estás seguro de que deseas eliminar este departamento?</div>
       </GlobalModal>
-      {error && (
-        <div className="text-red-500 mt-2 text-center">{error}</div>
-      )}
+     
+      
     </TableContainer>
   );
 }

@@ -17,35 +17,14 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { Button } from '@mui/material';
 import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import Box from '@mui/material/Box';
-
-// --- Modal de Capacitación ---
 import TrainingModal from './TrainingModal';
+import type { ICollaboratorDetailRole } from '../services/manage/collaboratorService';
 
-const roles = [
-  "Operador de Lavandería",
-  "Técnico de Electricidad",
-  "Asistente de Laboratorio",
-  "Asistente Contable",
-  "Auxiliar de Bodega",
-  "Operario de Molino",
-  "Operador de Montacargas y Tractorista",
-  "Destilador",
-  "Operario PVA",
-  "Jardinero"
-];
+interface CollaboratorRolesListProps {
+  roles: ICollaboratorDetailRole[];
+}
 
-// Datos de ejemplo para cada rol
-const poePorRol: Record<string, Array<any>> = {
-  "Operador de Lavandería": [
-    { poe: "01-01", descripcion: "Uso correcto de maquinaria", version: 2, fecha: "01/03/2024", estado: true },
-    { poe: "01-02", descripcion: "Limpieza y seguridad", version: 1, fecha: "15/03/2024", estado: false }
-  ],
-  "Técnico de Electricidad": [
-    { poe: "02-01", descripcion: "Manejo de tableros", version: 3, fecha: "10/02/2024", estado: true }
-  ],
-};
-
-export default function CollaboratorRolesList() {
+export default function CollaboratorRolesList({ roles }: CollaboratorRolesListProps) {
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState<any>(null);
@@ -82,10 +61,10 @@ export default function CollaboratorRolesList() {
         component="nav"
       >
         {roles.map((role) => (
-          <React.Fragment key={role}>
+          <React.Fragment key={role.nombre_rol}>
             {/* Botón de cada rol */}
             <ListItemButton
-              onClick={() => handleClick(role)}
+              onClick={() => handleClick(role.nombre_rol)}
               sx={{
                 py: 1.2,
                 transition: 'background-color 0.3s ease, transform 0.3s ease',
@@ -96,17 +75,17 @@ export default function CollaboratorRolesList() {
               }}
             >
               <ListItemText
-                primary={role}
+                primary={role.nombre_rol}
                 primaryTypographyProps={{
                   fontWeight: 'bold',
                   color: 'black',
                   letterSpacing: '0.5px'
                 }}
               />
-              {open[role] ? <ExpandLess sx={{ color: '#2AAC67' }} /> : <ExpandMore sx={{ color: '#2AAC67' }} />}
+              {open[role.nombre_rol] ? <ExpandLess sx={{ color: '#2AAC67' }} /> : <ExpandMore sx={{ color: '#2AAC67' }} />}
             </ListItemButton>
             {/* Sección colapsable */}
-            <Collapse in={!!open[role]} timeout="auto" unmountOnExit>
+            <Collapse in={!!open[role.nombre_rol]} timeout="auto" unmountOnExit>
               <TableContainer component={Paper}
                 sx={{
                   my: 1, mx: 2,
@@ -130,7 +109,7 @@ export default function CollaboratorRolesList() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {(poePorRol[role] || []).map((row, idx) => (
+                    {(role.poes || []).map((row, idx) => (
                       <TableRow key={idx}
                         sx={{
                           transition: 'background-color 0.3s ease',
@@ -139,13 +118,15 @@ export default function CollaboratorRolesList() {
                           }
                         }}
                       >
-                        <TableCell>{row.poe}</TableCell>
+                        <TableCell>{row.codigo}</TableCell>
                         <TableCell>{row.descripcion}</TableCell>
                         <TableCell>{row.version}</TableCell>
-                        <TableCell>{row.fecha}</TableCell>
+                        <TableCell>
+                          {row.fecha_inicio ? new Date(row.fecha_inicio).toLocaleDateString() : "-"}
+                        </TableCell>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            {row.estado ? (
+                            {row.estado_capacitacion === "Capacitado" ? (
                               <CheckCircleIcon sx={{ color: '#2AAC67', fontSize: '1.6rem' }} />
                             ) : (
                               <>
@@ -173,10 +154,10 @@ export default function CollaboratorRolesList() {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {(poePorRol[role] || []).length === 0 && (
+                    {(role.poes || []).length === 0 && (
                       <TableRow>
                         <TableCell colSpan={5} align="center" sx={{ color: '#888' }}>
-                          No hay registros de capacitación para este rol.
+                          No hay registros de procedimientos para este rol.
                         </TableCell>
                       </TableRow>
                     )}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export interface Capacitation {
   id: string;
@@ -28,7 +29,7 @@ export interface Capacitation {
   };
 }
 
-export function useCapacitationListV2() {
+export function useCapacitationList() {
   const initialCapacitations: Capacitation[] = [
     {
       id: "001",
@@ -122,6 +123,7 @@ export function useCapacitationListV2() {
   const [rowsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
   const [selectedCapacitation, setSelectedCapacitation] = useState<Capacitation | null>(null);
+  const navigate = useNavigate();
 
   // Filtros únicos
   const poes = Array.from(new Set(capacitations.map((c) => c.poe)));
@@ -139,6 +141,10 @@ export function useCapacitationListV2() {
     const matchesSeguimiento = !seguimientoFilter || cap.seguimiento === seguimientoFilter;
     return matchesSearch && matchesPoe && matchesEstado && matchesSeguimiento;
   });
+
+  const navegarCapacitacionFinalizada = () => {
+    navigate("/capacitation/capacitationFinished");
+  };
 
   // Paginación
   const paginatedCapacitations = filteredCapacitations.slice(
@@ -172,6 +178,7 @@ export function useCapacitationListV2() {
     totalPages,
     showModal,
     setShowModal,
+    navegarCapacitacionFinalizada,
     selectedCapacitation,
     setSelectedCapacitation,
     handleRowClick,

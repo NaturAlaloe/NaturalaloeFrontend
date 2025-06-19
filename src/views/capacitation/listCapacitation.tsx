@@ -3,8 +3,8 @@ import type { TableColumn } from 'react-data-table-component';
 import { Search, Person, Badge, Apartment, Work, Close, Info, EditNote } from "@mui/icons-material";
 import DataTable from 'react-data-table-component';
 import { useState } from 'react';
-import { useCapacitationListV2, type Capacitation } from '../../hooks/capacitations/useCapacitationList';
-import { useNavigate } from 'react-router-dom';
+import { useCapacitationList, type Capacitation } from '../../hooks/capacitations/useCapacitationList';
+
 
 export default function ListCapacitations() {
   const {
@@ -28,24 +28,23 @@ export default function ListCapacitations() {
     setShowModal,
     selectedCapacitation,
     handleRowClick,
+    navegarCapacitacionFinalizada,
     totalCount
-  } = useCapacitationListV2();
+  } = useCapacitationList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentToShow, setCommentToShow] = useState<string | null>(null);
 
-  // Acciones
- 
-  const navigate = useNavigate();
 
-  const handleAccionClick = () => {
-    navigate("/capacitation/capacitationFinished");
-  };
-
-
-
-  // Columnas para DataTable
+  
   const columns: TableColumn<Capacitation>[] = [
+    {
+      name: 'ID',
+      selector: row => row.id,
+      sortable: true,
+      cell: row => <div className="text-sm text-gray-700">{row.id}</div>,
+
+    },
     {
       name: 'POE',
       selector: row => row.poe,
@@ -86,13 +85,6 @@ export default function ListCapacitations() {
       wrap: true,
     },
     {
-      name: 'ID',
-      selector: row => row.id,
-      sortable: true,
-      cell: row => <div className="text-sm text-gray-700">{row.id}</div>,
-
-    },
-    {
       name: 'FECHA INICIO',
       selector: row => row.fechaInicio,
       sortable: true,
@@ -124,7 +116,11 @@ export default function ListCapacitations() {
       name: 'ACCIONES',
       cell: () => (
         <div className="flex flex-col sm:flex-row gap-2 items-center justify-center">
-          <button className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold" onClick={() => handleAccionClick()} title="Calificar examen">
+          <button
+            className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
+            onClick={navegarCapacitacionFinalizada}
+            title="Calificar examen"
+          >
             <EditNote />
           </button>
         </div>

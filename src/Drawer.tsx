@@ -37,10 +37,12 @@ import Register from "./views/administration/register";
 import Manage from "./views/administration/manage";
 import ListaAreas from "./views/administration/listAreas";
 import ListaDepartamentos from "./views/administration/listDepartments";
+import ListaCategorias from "./views/administration/listCategory";
 import ListaPuestos from "./views/administration/listWorkstations";
 import SchoolIcon from "@mui/icons-material/School";
 import Politicies from "./views/politics/politicsForm";
 import VersionControlProcedures from "./views/procedures/versionControllProcedures";
+import AssignRol from "./views/collaborators/assingRol"
 
 const drawerWidth = 270;
 
@@ -492,7 +494,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/capacitationIndividualFinished"
+                to="/capacitation/capacitationFinished"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -557,6 +559,20 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
+                <ListItemButton
+                component={Link}
+                to="/collaborators/assingRol"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Asignar Rol" />
+              </ListItemButton>
             </List>
           </Collapse>
         </List>
@@ -609,6 +625,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/administration/listAreas" element={<ListaAreas />} />
           <Route path="/administration/listDepartments" element={<ListaDepartamentos />} />
           <Route path="/administration/listWorkstations" element={<ListaPuestos />} />
+          <Route path="/administration/listCategory" element={<ListaCategorias />} />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
           <Route
@@ -630,7 +647,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           />
 
           <Route
-            path="/collaborators/detail"
+            path="/collaborators/detail/:id"
             element={<CollaboratorDetail />}
           />
 
@@ -644,7 +661,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             element={<ListaFacilitadores />}
           />
           <Route
-            path="/capacitation/capacitationIndividualFinished"
+            path="/capacitation/capacitationFinished"
             element={<CapacitacionFinalizada />}
           />
           <Route
@@ -656,6 +673,10 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             path="/procedures/versionControlProcedures"
             element={<VersionControlProcedures />}
           />
+          <Route
+          path="/collaborators/assingRol"
+          element={<AssignRol/>}
+        />
         </Routes>
       </Main>
     </Box>

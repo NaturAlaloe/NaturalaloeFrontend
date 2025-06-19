@@ -1,51 +1,61 @@
-//procedures.tsx
-
 import "@fontsource/poppins/700.css";
+import { useProcedureFormLogic } from "../../hooks/procedureFormHooks/useProcedureFormLogic";
 import FormContainer from "../../components/formComponents/FormContainer";
 import InputField from "../../components/formComponents/InputField";
-import SelectField from "../../components/formComponents/SelectField";
-import PoeSearchInput from "../../components/formComponents/PoeSearchInput";
-import VigenciaToggle from "../../components/formComponents/ValidityToggle";
-import { useProceduresForm } from "../../hooks/procedureFormHooks/useProceduresForm";
-import { usePoeSearch } from "../../hooks/procedureFormHooks/usePoeSearch";
-import { useState } from "react";
 import SubmitButton from "../../components/formComponents/SubmitButton";
+import SelectAutocomplete from "../../components/formComponents/SelectAutocomplete";
+import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
+import SearchAutocompleteInput from "../../components/formComponents/SearchAutocompleteInput";
+import PdfInput from "../../components/formComponents/PdfInput";
 
 export default function Procedures() {
   const {
     formData,
-    handleSubmit,
-    pdfFile,
-    poees,
-    departamentos,
-    responsables,
-    categorias,
     handleChange,
     handlePdfChange,
+    pdfFile,
     setPdfFile,
-  } = useProceduresForm();
-
-  const {
+    departments,
+    loadingDepartments,
+    areas,
+    loadingAreas,
+    categorias,
+    loadingCategorias,
+    loadingSubmit,
+    responsibles,
+    loadingResponsibles,
+    enVigencia,
+    setEnVigencia,
     busqueda,
     setBusqueda,
     showSugerencias,
     setShowSugerencias,
-    resultados,
-  } = usePoeSearch(poees);
-
-  // Nuevo estado para el check de vigencia
-  const [enVigencia, setEnVigencia] = useState(true);
+    poeSeleccionado,
+    setPoeSeleccionado,
+    categoriaSeleccionada,
+    departamentoSeleccionado,
+    responsableSeleccionado,
+    areaSeleccionada,
+    handleAutocompleteChange,
+    handleSelectProcedimiento,
+    resultadosBusqueda,
+    handleSubmit,
+  } = useProcedureFormLogic();
 
   return (
     <FormContainer title="Registro de Procedimiento" onSubmit={handleSubmit}>
-      {/* Buscador de POE existente */}
-      <PoeSearchInput
+      <SearchAutocompleteInput
+        label="Buscar procedimiento existente"
         busqueda={busqueda}
         setBusqueda={setBusqueda}
         showSugerencias={showSugerencias}
         setShowSugerencias={setShowSugerencias}
-        resultados={resultados}
-        onSelect={(poe) => setBusqueda(poe.codigo)}
+        resultados={resultadosBusqueda}
+        onSelect={(item) => {
+          handleSelectProcedimiento(item);
+          setPoeSeleccionado(item);
+        }}
+        optionLabelKeys={["titulo", "departamento", "responsable"]}
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <InputField
@@ -56,43 +66,53 @@ export default function Procedures() {
           placeholder="Ingrese título"
           required
         />
-        <SelectField
+        <SelectAutocomplete
+          label="Área"
+          options={areas}
+          optionLabel="nombre"
+          optionValue="codigo"
+          value={areaSeleccionada}
+          onChange={(newValue) =>
+            handleAutocompleteChange("area", newValue, "codigo")
+          }
+          placeholder="Buscar o seleccionar área..."
+          disabled={loadingAreas}
+        />
+        <SelectAutocomplete
           label="Departamento"
-          name="departamento"
-          value={formData.departamento}
-          onChange={handleChange}
-          options={departamentos}
-          required
+          options={departments}
           optionLabel="nombre"
-          optionValue="nombre"
+          optionValue="codigo"
+          value={departamentoSeleccionado}
+          onChange={(newValue) =>
+            handleAutocompleteChange("departamento", newValue, "codigo")
+          }
+          placeholder="Buscar o seleccionar departamento..."
+          disabled={loadingDepartments}
         />
-        <SelectField
+        <SelectAutocomplete
           label="Categoría"
-          name="categoria"
-          value={formData.categoria}
-          onChange={handleChange}
           options={categorias}
-          required
           optionLabel="nombre"
-          optionValue="nombre"
+          optionValue="codigo"
+          value={categoriaSeleccionada}
+          onChange={(newValue) =>
+            handleAutocompleteChange("categoria", newValue, "codigo")
+          }
+          placeholder="Buscar o seleccionar categoría..."
+          disabled={loadingCategorias}
         />
-        <InputField
-          label="Número de POE"
-          name="poeNumber"
-          value={formData.poeNumber}
-          readOnly
-          onChange={() => { }}
-          required
-        />
-        <SelectField
+        <SelectAutocomplete
           label="Responsable"
-          name="responsable"
-          value={formData.responsable}
-          onChange={handleChange}
-          options={responsables.map((r) => ({ nombre: r }))}
-          required
-          optionLabel="nombre"
-          optionValue="nombre"
+          options={responsibles}
+          optionLabel="nombre_responsable"
+          optionValue="id_responsable"
+          value={responsableSeleccionado}
+          onChange={(newValue) =>
+            handleAutocompleteChange("responsable", newValue, "id_responsable")
+          }
+          placeholder="Buscar o seleccionar responsable..."
+          disabled={loadingResponsibles}
         />
         <InputField
           label="Revisión"
@@ -119,39 +139,30 @@ export default function Procedures() {
           type="date"
           required
         />
-        <div className="md:col-start-3 md:row-start-3 flex flex-row items-center justify-center gap-2">
-          <VigenciaToggle enVigencia={enVigencia} setEnVigencia={setEnVigencia} />
-        </div>
-        <div className="md:col-span-3">
-          <InputField
-            label="Seleccionar PDF"
-            name="pdfFile"
-            type="file"
-            accept="application/pdf"
-            onChange={handlePdfChange}
-            required={!pdfFile}
+        <PdfInput
+          pdfFile={pdfFile}
+          onChange={handlePdfChange}
+          onRemove={() => setPdfFile(null)}
+          required={!pdfFile}
+        />
+        {/* Mostrar el checkbox solo si hay un POE seleccionado */}
+        {poeSeleccionado && (
+          <StyledCheckbox
+            label="En vigencia"
+            checked={enVigencia}
+            onChange={setEnVigencia}
           />
-          {pdfFile && (
-            <div className="flex items-center gap-2 mt-2">
-              <p className="text-sm text-[#2AAC67] font-medium">
-                Archivo seleccionado: {pdfFile.name}
-              </p>
-              <button
-                type="button"
-                className="text-red-600 underline text-xs"
-                onClick={() => setPdfFile(null)}
-              >
-                Quitar
-              </button>
-            </div>
-          )}
-        </div>
-
+        )}
       </div>
       <div className="text-center mt-8">
-        <SubmitButton width="">{"Guardar"}</SubmitButton>
+        <SubmitButton width="" disabled={loadingSubmit}>
+          {poeSeleccionado
+            ? "Actualizar"
+            : loadingSubmit
+            ? "Guardando..."
+            : "Guardar"}
+        </SubmitButton>
       </div>
     </FormContainer>
-
   );
 }

@@ -14,16 +14,16 @@ export const addDepartment = async (department: {
   return res.data;
 };
 
-export const updateDepartment = async (id: number, department: {
-  titulo: string;
-  id_area: number;
-  codigo: number;
-}) => {
-  const res = await api.put(`/department/${id}`, department);
+// Actualiza título, código y id_departamento
+export const updateDepartment = async (
+  _id: number, // ya no se usa en la URL
+  data: { titulo: string; codigo: number; id_departamento: number; id_area: number }
+) => {
+  const res = await api.put(`/department`, data);
   return res.data;
 };
 
 export const deleteDepartment = async (id: number) => {
-  const res = await api.delete(`/department/${id}`);
+  const res = await api.put('/department/delete', { id_departamento: id });
   return res.data;
 };

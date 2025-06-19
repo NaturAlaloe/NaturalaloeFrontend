@@ -7,23 +7,32 @@ export interface Facilitador {
   estado: number;
   nombre: string;
   apellido: string;
-  identificacion: string;
+  identificacion: string; // Representa el id_colaborador (cedula)
 }
 
-// Obtener facilitadores internos
-export const getFacilitadoresInternos = async (): Promise<Facilitador[]> => {
-  const response = await api.get("/facilitadoresDisponibles");
+// Obtener colaboradores disponibles como facilitadores internos
+export const getColaboradoresDisponibles = async (): Promise<Facilitador[]> => {
+  const response = await api.get("/collaborators");
   const lista = response.data.data || [];
-  return lista.filter((f: Facilitador) => f.tipo_facilitador === "interno");
+
+  return lista.map((colab: any) => ({
+    id_facilitador: colab.id_colaborador,  // ID para el select
+    tipo_facilitador: "interno",
+    disponibilidad: 1,
+    estado: 1,
+    nombre: colab.nombre,
+    apellido: colab.apellido,
+    identificacion: colab.id_colaborador.toString(), // Cedula
+  }));
 };
 
-// Crear facilitador (POST)
+// Crear facilitador
 export const createFacilitador = async (facilitador: {
   tipo_facilitador: "interno" | "externo";
   nombre: string;
   apellido: string;
   identificacion: string;
-  id_colaborador?: number; // opcional
+  id_colaborador?: number;
 }) => {
   try {
     console.log("POST /facilitator", facilitador);

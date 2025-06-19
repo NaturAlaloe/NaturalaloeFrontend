@@ -22,6 +22,10 @@ export default function ListWorkstations() {
     setEditIndex,
     deleteIndex,
     setDeleteIndex,
+    editWorkstation,
+    setEditWorkstation,
+    deleteWorkstation,
+    setDeleteWorkstation,
     workstationInput,
     setWorkstationInput,
     departmentInput,
@@ -43,18 +47,18 @@ export default function ListWorkstations() {
     { name: "Departamento", selector: (row: any) => row.titulo_departamento, sortable: true },
     {
       name: "Acciones",
-      cell: (_: any, idx: number) => (
+      cell: (row: any) => (
         <div className="flex gap-2">
           <button
             className="text-[#2AAC67] hover:text-green-700"
-            onClick={() => handleOpenEdit(idx)}
+            onClick={() => handleOpenEdit(row)}
             title="Editar"
           >
             <Edit fontSize="small" />
           </button>
           <button
             className="text-red-500 hover:text-red-700"
-            onClick={() => setDeleteIndex(idx)}
+            onClick={() => setDeleteWorkstation(row)}
             title="Eliminar"
           >
             <Delete fontSize="small" />
@@ -64,6 +68,7 @@ export default function ListWorkstations() {
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
+      
     },
   ];
 
@@ -126,7 +131,6 @@ export default function ListWorkstations() {
             disabled={loadingDepartments}
           />
 
-
           <SubmitButton>
             {editIndex !== null ? "Guardar Cambios" : "Agregar"}
           </SubmitButton>
@@ -134,8 +138,8 @@ export default function ListWorkstations() {
       </GlobalModal>
 
       <GlobalModal
-        open={deleteIndex !== null}
-        onClose={() => setDeleteIndex(null)}
+        open={!!deleteWorkstation}
+        onClose={() => setDeleteWorkstation(null)}
         title="Eliminar Puesto"
         maxWidth="sm"
         actions={
@@ -143,7 +147,7 @@ export default function ListWorkstations() {
             <SubmitButton
               className="bg-gray-400 hover:bg-gray-500"
               type="button"
-              onClick={() => setDeleteIndex(null)}
+              onClick={() => setDeleteWorkstation(null)}
             >
               Cancelar
             </SubmitButton>

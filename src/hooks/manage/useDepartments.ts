@@ -35,9 +35,14 @@ export function useDepartments() {
       await fetchDepartments();
       showCustomToast("Éxito", "Departamento agregado correctamente", "success");
       return true;
-    } catch (err) {
-      setError("Error al agregar departamento");
-      showCustomToast("Error", "Error al agregar departamento", "error");
+    } catch (err: any) {
+      // Extrae el mensaje del backend si existe
+      const backendMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al agregar departamento";
+      setError(backendMsg);
+      showCustomToast("Error", backendMsg, "info");
       return false;
     } finally {
       setLoading(false);
@@ -46,7 +51,7 @@ export function useDepartments() {
 
   const handleEditDepartment = async (
     id: number,
-    department: { titulo: string; id_area: number; codigo: number }
+    department: { titulo: string; codigo: number; id_departamento: number; id_area: number }
   ) => {
     setLoading(true);
     setError(null);
@@ -55,9 +60,14 @@ export function useDepartments() {
       await fetchDepartments();
       showCustomToast("Éxito", "Departamento actualizado correctamente", "success");
       return true;
-    } catch (err) {
-      setError("Error al actualizar departamento");
-      showCustomToast("Error", "Error al actualizar departamento", "error");
+    } catch (err: any) {
+      // Extrae el mensaje del backend si existe
+      const backendMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al actualizar departamento";
+      setError(backendMsg);
+      showCustomToast("Error", backendMsg, "info");
       return false;
     } finally {
       setLoading(false);
@@ -68,13 +78,18 @@ export function useDepartments() {
     setLoading(true);
     setError(null);
     try {
-      await deleteDepartment(id);
+      const response = await deleteDepartment(id);
       await fetchDepartments();
       showCustomToast("Éxito", "Departamento eliminado correctamente", "success");
       return true;
-    } catch (err) {
-      setError("Error al eliminar departamento");
-      showCustomToast("Error", "Error al eliminar departamento", "error");
+    } catch (err: any) {
+      // Extrae el mensaje del backend si existe
+      const backendMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al eliminar departamento";
+      setError(backendMsg);
+      showCustomToast("Error", backendMsg, "info");
       return false;
     } finally {
       setLoading(false);
