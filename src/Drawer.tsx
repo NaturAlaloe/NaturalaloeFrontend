@@ -222,25 +222,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               <ListItemText primary="Inicio" />
             </ListItemButton>
           </ListItem>
-          {/*  perfil */}
-          <ListItem disablePadding>
-            <ListItemButton
-              component={Link}
-              to="/profile"
-              sx={{
-                color: "#fff",
-                pl: 3,
-                "&:hover": {
-                  background: "#21824f",
-                  color: "#fff",
-                  "& .MuiSvgIcon-root": { color: "#13bd62" },
-                },
-              }}
-            >
-              <AccountCircleIcon sx={{ color: "#b4ebce", mr: 2 }} />
-              <ListItemText primary="Perfil" />
-            </ListItemButton>
-          </ListItem>
+      
+         
 
           {/* Administración */}
           <ListItem disablePadding>
