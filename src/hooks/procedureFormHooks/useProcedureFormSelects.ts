@@ -2,7 +2,6 @@ import { useMemo } from "react";
 
 export function useProcedureFormSelects({
   formData,
-  setFormData,
   areas,
   departments,
   categorias,

@@ -44,8 +44,10 @@ export default function SearchAutocompleteInput({
       <Autocomplete
         freeSolo
         options={resultados}
-        getOptionLabel={(option) =>
-          optionLabelKeys.map((key) => option[key]).filter(Boolean).join(" - ")
+        getOptionLabel={(option: string | SearchOption) =>
+          typeof option === "string"
+            ? option
+            : optionLabelKeys.map((key) => option[key]).filter(Boolean).join(" - ")
         }
         inputValue={busqueda}
         onInputChange={(_, value, reason) => {
@@ -53,8 +55,8 @@ export default function SearchAutocompleteInput({
           setShowSugerencias(reason === "input" && value.length > 0);
         }}
         onChange={(_, value) => {
-          if (value) {
-            onSelect(value);
+          if (value && typeof value !== "string") {
+            onSelect(value as SearchOption);
             setShowSugerencias(false);
           }
         }}

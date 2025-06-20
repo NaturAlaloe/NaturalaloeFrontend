@@ -44,6 +44,7 @@ export default function ListProcedures() {
     name: 'ID POE',
     selector: (row: Procedure) => row.id_poe || 'N/A',
     sortable: true,
+    field: 'id_poe',
     cell: (row: Procedure) => (
       <div className="text-sm font-medium text-gray-900">
         {row.id_poe ? row.id_poe : 'No aplica'}
@@ -54,6 +55,7 @@ export default function ListProcedures() {
     name: 'TÍTULO',
     selector: (row: Procedure) => row.titulo,
     sortable: true,
+    field: 'titulo',
     cell: (row: Procedure) => (
       <div className="text-sm text-gray-700">{row.titulo}</div>
     ),
@@ -62,6 +64,7 @@ export default function ListProcedures() {
     name: 'DEPARTAMENTO',
     selector: (row: Procedure) => row.departamento,
     sortable: true,
+    field: 'departamento',
     cell: (row: Procedure) => (
       <div className="text-sm text-gray-700">{row.departamento}</div>
     ),
@@ -70,6 +73,7 @@ export default function ListProcedures() {
     name: 'RESPONSABLE',
     selector: (row: Procedure) => row.responsable,
     sortable: true,
+    field: 'responsable',
     cell: (row: Procedure) => (
       <div className="text-sm text-gray-700">{row.responsable}</div>
     ),
@@ -78,6 +82,7 @@ export default function ListProcedures() {
     name: 'REVISIÓN',
     selector: (row: Procedure) => row.revision,
     sortable: true,
+    field: 'revision',
     cell: (row: Procedure) => (
       <div className="text-sm text-gray-700">{row.revision}</div>
     ),
@@ -86,6 +91,7 @@ export default function ListProcedures() {
     name: 'FECHA VIGENCIA',
     selector: (row: Procedure) => row.fecha_vigencia,
     sortable: true,
+    field: 'fecha_vigencia',
     cell: (row: Procedure) => (
       <div className="text-sm text-gray-700">
         {new Date(row.fecha_vigencia).toLocaleDateString()}
@@ -240,7 +246,7 @@ export default function ListProcedures() {
             >
               <span className="sr-only">Siguiente</span>
               <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a 1 1 010 1.414l-4 4a1 1 01-1.414 0z" clipRule="evenodd" />
               </svg>
             </button>
           </nav>
@@ -332,12 +338,11 @@ export default function ListProcedures() {
           }
           sortServer
           onSort={(
-            column: TableColumn<Procedure>,
-            sortDirection: SortOrder
+            column: TableColumn<Procedure> & { field?: keyof Procedure },
           ) => {
-            if (typeof column.selector === "function" && typeof column.name === "string") {
-              const field = column.selector.name as keyof Procedure;
-              handleSort(field, sortDirection as "asc" | "desc");
+            if (column.field) {
+              // Llama a handleSort solo con el campo, el hook ya alterna la dirección
+              handleSort(column.field);
             }
           }}
           sortIcon={

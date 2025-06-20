@@ -92,7 +92,7 @@ export default function AssignRol() {
   };
 
   // Manejar cambio de página
-  const manejarCambioPagina = (evento: unknown, nuevaPagina: number) => {
+  const manejarCambioPagina = (_: unknown, nuevaPagina: number) => {
     setPagina(nuevaPagina);
   };
 

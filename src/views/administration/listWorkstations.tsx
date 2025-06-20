@@ -13,7 +13,6 @@ import { useDepartments } from "../../hooks/manage/useDepartments";
 export default function ListWorkstations() {
   const {
     loading,
-    error,
     search,
     setSearch,
     modalOpen,

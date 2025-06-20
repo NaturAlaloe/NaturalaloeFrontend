@@ -78,7 +78,7 @@ export function useDepartments() {
     setLoading(true);
     setError(null);
     try {
-      const response = await deleteDepartment(id);
+      await deleteDepartment(id);
       await fetchDepartments();
       showCustomToast("Éxito", "Departamento eliminado correctamente", "success");
       return true;
