@@ -5,6 +5,7 @@ import SubmitButton from '../../components/formComponents/SubmitButton';
 import SimpleModal from "../../components/globalComponents/SimpleModal";
 import { useCapacitation } from '../../hooks/capacitations/useCapacitation';
 import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
+import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 import { showCustomToast } from '../../components/globalComponents/CustomToaster';
 
 const Capacitacion = () => {
@@ -156,28 +157,25 @@ const Capacitacion = () => {
                             </button>
                         </div>
                         <div className="overflow-x-auto rounded-lg border border-[#2AAC67] shadow">
-                            <table className="min-w-full divide-y divide-[#2AAC67]">
-                                <thead className="bg-[#F0FFF4]">
-                                    <tr>
-                                        <th className="px-2 py-2 text-left text-xs font-bold text-[#2AAC67] uppercase">Nombre</th>
-                                        <th className="px-2 py-2 text-left text-xs font-bold text-[#2AAC67] uppercase">Puesto</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-[#e5e7eb]">
-                                    {colaboradoresAsignados.length > 0 ? (
-                                        colaboradoresAsignados.map((col) => (
-                                            <tr key={col.id}>
-                                                <td className="px-2 py-2">{col.nombre}</td>
-                                                <td className="px-2 py-2">{col.puesto}</td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={2} className="px-2 py-4 text-center text-gray-500">No hay colaboradores asignados</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                            <GlobalDataTable
+                                columns={columnsColaboradores}
+                                data={colaboradoresAsignados}
+                                rowsPerPage={5}
+                                dense
+                                highlightOnHover
+                                noDataComponent={<div className="px-6 py-4 text-center text-sm text-gray-500">No hay colaboradores asignados</div>}
+                                customStyles={{
+                                    headCells: {
+                                        style: {
+                                            background: "#F0FFF4",
+                                            color: "#2AAC67",
+                                            fontWeight: "bold",
+                                            fontSize: "13px",
+                                            textTransform: "uppercase",
+                                        },
+                                    },
+                                }}
+                            />
                         </div>
                     </div>
                     <div className="mb-8">
@@ -192,28 +190,25 @@ const Capacitacion = () => {
                             </button>
                         </div>
                         <div className="overflow-x-auto rounded-lg border border-[#2AAC67] shadow">
-                            <table className="min-w-full divide-y divide-[#2AAC67]">
-                                <thead className="bg-[#F0FFF4]">
-                                    <tr>
-                                        <th className="px-2 py-2 text-left text-xs font-bold text-[#2AAC67] uppercase">Código</th>
-                                        <th className="px-2 py-2 text-left text-xs font-bold text-[#2AAC67] uppercase">Título</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-[#e5e7eb]">
-                                    {poesAsignados.length > 0 ? (
-                                        poesAsignados.map((poe) => (
-                                            <tr key={poe.id}>
-                                                <td className="px-2 py-2">{poe.codigo}</td>
-                                                <td className="px-2 py-2">{poe.titulo}</td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={2} className="px-2 py-4 text-center text-gray-500">No hay POEs asignados</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                            <GlobalDataTable
+                                columns={columnsPoes}
+                                data={poesAsignados}
+                                rowsPerPage={5}
+                                dense
+                                highlightOnHover
+                                noDataComponent={<div className="px-6 py-4 text-center text-sm text-gray-500">No hay POEs asignados</div>}
+                                customStyles={{
+                                    headCells: {
+                                        style: {
+                                            background: "#F0FFF4",
+                                            color: "#2AAC67",
+                                            fontWeight: "bold",
+                                            fontSize: "13px",
+                                            textTransform: "uppercase",
+                                        },
+                                    },
+                                }}
+                            />
                         </div>
                     </div>
 
