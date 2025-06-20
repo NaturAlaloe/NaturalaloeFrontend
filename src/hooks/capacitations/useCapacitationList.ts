@@ -9,6 +9,7 @@ export interface Capacitation {
   fechaInicio: string;
   fechaFinal: string;
   comentario: string;
+  tipo: string;
   evaluado: string;
   metodo: string;
   seguimiento: string;
@@ -36,6 +37,7 @@ export function useCapacitationList() {
       poe: "POE-001",
       titulo: "Inducción a la empresa",
       duracion: 8,
+      tipo: "Individual",
       fechaInicio: "2024-06-01",
       fechaFinal: "2024-06-05",
       comentario: "Inducción general para nuevos colaboradores.",
@@ -63,9 +65,11 @@ export function useCapacitationList() {
       poe: "POE-002",
       titulo: "Capacitación en seguridad",
       duracion: 6,
+      tipo: "Individual",
       fechaInicio: "2024-06-10",
       fechaFinal: "2024-06-12",
-      comentario: "Capacitación en seguridad industrial y protocolos de emergencia.",
+      comentario:
+        "Capacitación en seguridad industrial y protocolos de emergencia.",
       evaluado: "No",
       metodo: "Práctico",
       seguimiento: "Satisfactorio",
@@ -90,6 +94,7 @@ export function useCapacitationList() {
       poe: "POE-003",
       titulo: "Actualización de procesos",
       duracion: 4,
+      tipo: "Grupal",
       fechaInicio: "2024-07-01",
       fechaFinal: "2024-07-03",
       comentario: "Actualización de procesos internos y mejores prácticas.",
@@ -118,17 +123,22 @@ export function useCapacitationList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [poeFilter, setPoeFilter] = useState("");
   const [estadoFilter, setEstadoFilter] = useState("");
+  const [tipoFilter, setTipoFilter] = useState("");
   const [seguimientoFilter, setSeguimientoFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
   const [rowsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
-  const [selectedCapacitation, setSelectedCapacitation] = useState<Capacitation | null>(null);
+  const [selectedCapacitation, setSelectedCapacitation] =
+    useState<Capacitation | null>(null);
   const navigate = useNavigate();
 
   // Filtros únicos
   const poes = Array.from(new Set(capacitations.map((c) => c.poe)));
   const estados = Array.from(new Set(capacitations.map((c) => c.estado)));
-  const seguimientos = Array.from(new Set(capacitations.map((c) => c.seguimiento)));
+  const seguimientos = Array.from(
+    new Set(capacitations.map((c) => c.seguimiento))
+  );
 
   // Filtrar por búsqueda y filtros
   const filteredCapacitations = capacitations.filter((cap) => {
@@ -139,7 +149,8 @@ export function useCapacitationList() {
     const matchesPoe = !poeFilter || cap.poe === poeFilter;
     const matchesEstado = !estadoFilter || cap.estado === estadoFilter;
     const matchesSeguimiento = !seguimientoFilter || cap.seguimiento === seguimientoFilter;
-    return matchesSearch && matchesPoe && matchesEstado && matchesSeguimiento;
+    const matchesTipo = !tipoFilter || cap.tipo === tipoFilter;
+    return matchesSearch && matchesPoe && matchesEstado && matchesSeguimiento && matchesTipo;
   });
 
   const navegarCapacitacionFinalizada = () => {
@@ -169,6 +180,7 @@ export function useCapacitationList() {
     setEstadoFilter,
     seguimientoFilter,
     setSeguimientoFilter,
+    setTipoFilter,
     poes,
     estados,
     seguimientos,

@@ -1,4 +1,4 @@
-import { Search, Person, Badge, Apartment, Work, Close, Info, EditNote } from "@mui/icons-material";
+import { Search, Person, Badge, Apartment, Work, Close, Info, EditNote, ChatBubble } from "@mui/icons-material";
 import { useState } from 'react';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 import { useCapacitationList } from '../../hooks/capacitations/useCapacitationList';
@@ -17,7 +17,7 @@ export default function ListCapacitations() {
     setSeguimientoFilter,
     poes,
     estados,
-    seguimientos,
+    seguimientos, 
     showModal,
     setShowModal,
     selectedCapacitation,
@@ -29,12 +29,6 @@ export default function ListCapacitations() {
   const [commentToShow, setCommentToShow] = useState<string | null>(null);
 
   const columns = [
-    {
-      name: 'ID',
-      selector: (row: any) => row.id,
-      sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.id}</div>,
-    },
     {
       name: 'POE',
       selector: (row: any) => row.poe,
@@ -56,31 +50,7 @@ export default function ListCapacitations() {
       cell: (row: any) => <div className="text-sm text-gray-700">{row.duracion}</div>,
       wrap: true,
     },
-    {
-      name: 'COMENTARIO',
-      selector: (row: any) => row.comentario,
-      sortable: false,
-      cell: (row: any) => (
-        <button
-          className="text-[#2AAC67] underline hover:text-[#1e8449] text-xs"
-          onClick={e => {
-            e.stopPropagation();
-            setCommentToShow(row.comentario);
-            setShowCommentModal(true);
-          }}
-        >
-          Ver comentario
-        </button>
-      ),
-      wrap: true,
-    },
-    {
-      name: 'FECHA INICIO',
-      selector: (row: any) => row.fechaInicio,
-      sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.fechaInicio}</div>,
 
-    },
     {
       name: 'FECHA FINAL',
       selector: (row: any) => row.fechaFinal,
@@ -96,6 +66,13 @@ export default function ListCapacitations() {
       wrap: true,
     },
     {
+      name: 'TIPO',
+      selector: (row: any) => row.tipo,
+      sortable: true,
+      cell: (row: any) => <div className="text-sm text-gray-700">{row.tipo}</div>,
+      wrap: true,
+    },
+    {
       name: 'SEGUIMIENTO',
       selector: (row: any) => row.seguimiento,
       sortable: true,
@@ -104,7 +81,7 @@ export default function ListCapacitations() {
     },
     {
       name: 'ACCIONES',
-      cell: () => (
+      cell: (row: any) => (
         <div className="flex flex-col sm:flex-row gap-2 items-center justify-center">
           <button
             className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
@@ -113,6 +90,16 @@ export default function ListCapacitations() {
           >
             <EditNote />
           </button>
+          <button
+            className="text-[#2AAC67] hover:text-[#1e8449] transition-colors"
+            onClick={() => {
+              setCommentToShow(row.comentario);
+              setShowCommentModal(true);
+            }}
+            title="Ver comentario"
+          >
+            <ChatBubble />
+          </button>
         </div>
       ),
       ignoreRowClick: true,
@@ -120,7 +107,6 @@ export default function ListCapacitations() {
       button: true,
     },
   ];
-
   return (
     <div className="p-4 bg-white">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
@@ -144,7 +130,7 @@ export default function ListCapacitations() {
           value={poeFilter}
           onChange={e => setPoeFilter(e.target.value)}
         >
-          <option value="">Todos los POE</option>
+          <option value="">POE</option>
           {poes.map((poe) => (
             <option key={poe} value={poe}>{poe}</option>
           ))}
@@ -154,7 +140,7 @@ export default function ListCapacitations() {
           value={estadoFilter}
           onChange={e => setEstadoFilter(e.target.value)}
         >
-          <option value="">Todos los estados</option>
+          <option value="">Estados</option>
           {estados.map((estado) => (
             <option key={estado} value={estado}>{estado}</option>
           ))}
@@ -164,7 +150,7 @@ export default function ListCapacitations() {
           value={seguimientoFilter}
           onChange={e => setSeguimientoFilter(e.target.value)}
         >
-          <option value="">Todos los seguimientos</option>
+          <option value="">Seguimientos</option>
           {seguimientos.map((seg) => (
             <option key={seg} value={seg}>{seg}</option>
           ))}
@@ -200,7 +186,7 @@ export default function ListCapacitations() {
             backgroundColor: "rgba(0,0,0,0.3)",
           }}
         >
-          <div className="bg-white rounded-2xl px-8 py-8 w-full max-w-3xl shadow-2xl relative border-2 border-[#2ecc71] overflow-y-auto max-h-[95vh]">
+          <div className="bg-white rounded-2xl px-8 py-8 w-full max-w-3xl shadow-2xl relative  overflow-y-auto max-h-[95vh]">
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
@@ -216,108 +202,45 @@ export default function ListCapacitations() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left">Información de los Colaboradores</h3>
-                <div className="grid grid-cols-1 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#2ecc71] mb-1">Nombre Completo</label>
-                    <div className="flex items-center border border-[#2ecc71] rounded-lg bg-[#f6fff6] px-3 py-2">
-                      <Person className="text-[#2ecc71] mr-2" />
-                      <input
-                        type="text"
-                        value={selectedCapacitation.colaborador.nombreCompleto}
-                        readOnly
-                        className="bg-transparent border-none p-0 text-gray-800 font-medium w-full focus:outline-none"
-                      />
+                <div className="mb-4">
+                  <details className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
+                    <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
+                      <Person className="mr-2" />
+                      {selectedCapacitation.colaborador.nombreCompleto}
+                      <span className="ml-auto text-[#2ecc71]">▼</span>
+                    </summary>
+                    <div className="px-3 pb-3 pt-2">
+                      <div className="mb-2 flex items-center"><Badge className="mr-2 text-[#2ecc71]" /> <span className="font-semibold mr-1">Cédula:</span> {selectedCapacitation.colaborador.cedula}</div>
+                      <div className="mb-2 flex items-center"><Apartment className="mr-2 text-[#2ecc71]" /> <span className="font-semibold mr-1">Departamento:</span> {selectedCapacitation.colaborador.departamento}</div>
+                      <div className="mb-2 flex items-center"><Work className="mr-2 text-[#2ecc71]" /> <span className="font-semibold mr-1">Puesto:</span> {selectedCapacitation.colaborador.puesto}</div>
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#2ecc71] mb-1">Cédula</label>
-                    <div className="flex items-center border border-[#2ecc71] rounded-lg bg-[#f6fff6] px-3 py-2">
-                      <Badge className="text-[#2ecc71] mr-2" />
-                      <input
-                        type="text"
-                        value={selectedCapacitation.colaborador.cedula}
-                        readOnly
-                        className="bg-transparent border-none p-0 text-gray-800 font-medium w-full focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#2ecc71] mb-1">Departamento</label>
-                    <div className="flex items-center border border-[#2ecc71] rounded-lg bg-[#f6fff6] px-3 py-2">
-                      <Apartment className="text-[#2ecc71] mr-2" />
-                      <input
-                        type="text"
-                        value={selectedCapacitation.colaborador.departamento}
-                        readOnly
-                        className="bg-transparent border-none p-0 text-gray-800 font-medium w-full focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#2ecc71] mb-1">Puesto</label>
-                    <div className="flex items-center border border-[#2ecc71] rounded-lg bg-[#f6fff6] px-3 py-2">
-                      <Work className="text-[#2ecc71] mr-2" />
-                      <input
-                        type="text"
-                        value={selectedCapacitation.colaborador.puesto}
-                        readOnly
-                        className="bg-transparent border-none p-0 text-gray-800 font-medium w-full focus:outline-none"
-                      />
-                    </div>
-                  </div>
+                  </details>
                 </div>
               </div>
               <div>
                 <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left mt-8 md:mt-0">Información del Profesor</h3>
-                <div className="grid grid-cols-1 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#2ecc71] mb-1">Nombre</label>
-                    <div className="flex items-center border border-[#2ecc71] rounded-lg bg-[#f6fff6] px-3 py-2">
-                      <Person className="text-[#2ecc71] mr-2" />
-                      <input
-                        type="text"
-                        value={selectedCapacitation.profesor.nombre}
-                        readOnly
-                        className="bg-transparent border-none p-0 text-gray-800 font-medium w-full focus:outline-none"
-                      />
+                <div className="mb-4">
+                  <details className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
+                    <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
+                      <Person className="mr-2" />
+                      {selectedCapacitation.profesor.nombre} {selectedCapacitation.profesor.apellido}
+                      <span className="ml-auto">▼</span>
+                    </summary>
+                    <div className="px-3 pb-3 pt-2">
+                      <div className="mb-2 flex items-center"><Badge className="mr-2 text-[#2ecc71]" /> <span className="font-semibold mr-1">Identificación:</span> {selectedCapacitation.profesor.identificacion}</div>
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#2ecc71] mb-1">Apellido</label>
-                    <div className="flex items-center border border-[#2ecc71] rounded-lg bg-[#f6fff6] px-3 py-2">
-                      <Person className="text-[#2ecc71] mr-2" />
-                      <input
-                        type="text"
-                        value={selectedCapacitation.profesor.apellido}
-                        readOnly
-                        className="bg-transparent border-none p-0 text-gray-800 font-medium w-full focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#2ecc71] mb-1">Identificación</label>
-                    <div className="flex items-center border border-[#2ecc71] rounded-lg bg-[#f6fff6] px-3 py-2">
-                      <Badge className="text-[#2ecc71] mr-2" />
-                      <input
-                        type="text"
-                        value={selectedCapacitation.profesor.identificacion}
-                        readOnly
-                        className="bg-transparent border-none p-0 text-gray-800 font-medium w-full focus:outline-none"
-                      />
-                    </div>
-                  </div>
+                  </details>
                 </div>
               </div>
             </div>
           </div>
         </div>
       )}
-      {/* Modal de comentario */}
       {showCommentModal && (
         <SimpleModal
           open={showCommentModal}
           onClose={() => setShowCommentModal(false)}
-          title="Comentario completo"
+          title="Comentario"
           widthClass="max-w-md w-full"
         >
           <div className="text-gray-800 text-sm whitespace-pre-line break-words">

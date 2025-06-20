@@ -18,7 +18,6 @@ const metodosEvaluacion = [
   { value: "", label: "Seleccione...", disabled: true },
   { value: "Teórico", label: "Teórico" },
   { value: "Práctico", label: "Práctico" },
-  { value: "Campo", label: "Campo" },
 ];
 
 const colaboradoresDisponibles = [
