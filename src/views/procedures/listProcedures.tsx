@@ -1,6 +1,6 @@
 // src/views/procedures/listProcedures.tsx
 import { useProceduresList, type Procedure } from "../../hooks/listProcedure/useProceduresList";
-import type { TableColumn, SortOrder } from 'react-data-table-component';
+import type { TableColumn } from 'react-data-table-component';
 import { Search, Check, Close, Info, Person, Badge, Apartment, Work, Edit, Delete } from "@mui/icons-material";
 import { Box } from "@mui/material";
 import { useState } from "react";

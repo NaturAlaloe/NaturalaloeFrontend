@@ -1,16 +1,20 @@
-import axios from "axios";
+import api from '../../apiConfig/api';
 
 export interface Collaborator {
-  name: string;
-  email: string;
-  // Agrega aquí los demás campos necesarios
+
+    id_colaborador: number;
+    id_puesto: number;
+    nombre: string;
+    apellido: string;
+    fecha_nacimiento: string;
+    numero: string;
+    correo: string;
 }
 
-const API_URL = "https://naturalaloebackend-production.up.railway.app/api/collaborator";
 
 export async function addCollaborator(collaboratorData: Collaborator) {
   try {
-    const response = await axios.post(API_URL, collaboratorData);
+    const response = await api.post("/collaborator", collaboratorData);
     return response.data;
   } catch (error) {
     console.error("Error al insertar el usuario:", error);
