@@ -13,7 +13,7 @@ export default function CategoriesList() {
     const ui = useCategoriesList();
 
     const [codigoInput, setCodigoInput] = useState<string>("");
-    const [page, setPage] = useState(1); // nuevo estado
+    const [page, setPage] = useState(1); 
 
     useEffect(() => {
         if (ui.editCategoryObj) {
@@ -23,7 +23,7 @@ export default function CategoriesList() {
         }
     }, [ui.editCategoryObj, ui.modalOpen]);
 
-    // Resetear página cuando cambia el filtro
+
     useEffect(() => {
         setPage(1);
     }, [ui.search]);
@@ -155,9 +155,7 @@ export default function CategoriesList() {
             >
                 <div>¿Estás seguro de que deseas eliminar esta categoría?</div>
             </GlobalModal>
-            {ui.error && (
-                <div className="text-red-500 mt-2 text-center">{ui.error}</div>
-            )}
+            
         </TableContainer>
     );
 }
