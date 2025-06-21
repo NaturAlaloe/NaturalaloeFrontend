@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAreas } from "./useAreas";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
@@ -14,6 +14,11 @@ export function useAreasList() {
   const [areaPadreInput, setAreaPadreInput] = useState<number | undefined>(undefined);
   const [deleteAreaObj, setDeleteAreaObj] = useState<any | null>(null);
   const [editAreaObj, setEditAreaObj] = useState<any | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const filteredAreas = Array.isArray(areas)
     ? areas.filter((a) => a.titulo.toLowerCase().includes(search.toLowerCase()))
@@ -108,5 +113,7 @@ export function useAreasList() {
     handleOpenDelete,
     handleSave,
     handleDelete,
+    currentPage,
+    setCurrentPage,
   };
 }

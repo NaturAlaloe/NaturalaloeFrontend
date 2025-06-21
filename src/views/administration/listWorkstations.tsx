@@ -30,6 +30,8 @@ export default function ListWorkstations() {
     handleOpenEdit,
     handleSave,
     handleDelete,
+    currentPage,
+    setCurrentPage,
   } = useWorkstationsList();
 
   const {
@@ -92,6 +94,8 @@ export default function ListWorkstations() {
         data={filteredWorkstations}
         rowsPerPage={5}
         progressPending={loading}
+        currentPage={currentPage}
+        onChangePage={setCurrentPage}
       />
 
       <GlobalModal
