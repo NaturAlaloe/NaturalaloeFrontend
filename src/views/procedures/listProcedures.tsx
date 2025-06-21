@@ -6,6 +6,7 @@ import { Box } from "@mui/material";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import DataTable from 'react-data-table-component';
+import api from '../../apiConfig/api';
 
 export default function ListProcedures() {
   const {
@@ -20,11 +21,13 @@ export default function ListProcedures() {
     setDepartmentFilter,
     departments,
   } = useProceduresList();
+  const { refetch } = useProceduresList();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedProcedure, setSelectedProcedure] = useState<Procedure | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const paginatedProcedures = procedures.slice(
     (currentPage - 1) * rowsPerPage,
@@ -32,10 +35,35 @@ export default function ListProcedures() {
   );
   const totalPages = Math.ceil(procedures.length / rowsPerPage);
 
-  const handleDelete = (id_poe: number | null, e: React.MouseEvent) => {
+  const handleDelete = async (id_poe: number | null, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!id_poe) {
+      alert('ID de documento no válido.');
+      return;
+    }
     if (confirm('¿Está seguro que desea eliminar este procedimiento?')) {
-      console.log(`Eliminar procedimiento ${id_poe}`);
+      setDeletingId(id_poe);
+      try {
+        const response = await api.post('/procedureDelete', {
+          id_documento: id_poe,
+          vigencia: 0
+        });
+        if (response.data.success) {
+          alert('Procedimiento eliminado correctamente');
+          setSelectedProcedure(null);
+          await refetch(); // Actualiza la lista sin recargar la página
+        } else {
+          alert(response.data.message || 'No se pudo eliminar el procedimiento');
+        }
+      } catch (error: any) {
+        if (error.response?.data?.message) {
+          alert(error.response.data.message);
+        } else {
+          alert('Error al eliminar el procedimiento');
+        }
+      } finally {
+        setDeletingId(null);
+      }
     }
   };
 
@@ -134,15 +162,21 @@ export default function ListProcedures() {
         <Link
           to="/procedures"
           className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()
+          }
         >
           <Edit fontSize="small" />
         </Link>
-        <button 
+        <button
           className="action-button text-[#F44336] hover:text-[#c62828] transition-colors"
           onClick={(e) => handleDelete(row.id_poe, e)}
+          disabled={deletingId === row.id_poe}
         >
-          <Delete fontSize="small" />
+          {deletingId === row.id_poe ? (
+            <span className="animate-spin h-5 w-5 border-2 border-t-2 border-[#F44336] rounded-full inline-block"></span>
+          ) : (
+            <Delete fontSize="small" />
+          )}
         </button>
       </div>
     ),
@@ -337,7 +371,7 @@ export default function ListProcedures() {
           ) => {
             if (typeof column.selector === "function" && typeof column.name === "string") {
               const field = column.selector.name as keyof Procedure;
-              handleSort(field, sortDirection as "asc" | "desc");
+              handleSort(field); // Only pass the field
             }
           }}
           sortIcon={

@@ -40,6 +40,24 @@ export function useProceduresList() {
     fetchProcedures();
   }, []);
 
+  // Refetch function to reload the list from the backend
+  const refetch = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await api.get("/procedureActive");
+      if (response.data.success) {
+        setProcedures(response.data.data);
+      } else {
+        setError("Error al obtener los procedimientos");
+      }
+    } catch (err) {
+      setError("Error de conexión con el servidor");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredProcedures = procedures.filter((procedure) => {
     const matchesSearch =
       procedure.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -89,5 +107,6 @@ export function useProceduresList() {
     departmentFilter,
     setDepartmentFilter,
     departments,
+    refetch, // expose refetch
   };
 }
