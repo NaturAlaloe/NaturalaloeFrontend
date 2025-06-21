@@ -19,7 +19,7 @@ export default function AreasList() {
     },
     {
       name: "Acciones",
-      cell: (row: any, idx: number) => (
+      cell: (row: any) => (
         <div className="flex gap-2">
           <button
             className="text-[#2AAC67] hover:text-green-700"

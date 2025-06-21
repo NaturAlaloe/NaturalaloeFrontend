@@ -2,18 +2,28 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useParams } from "react-router-dom";
+import useCollaboratorDetail from "../../hooks/collaborator/useCollaboratorDetail";
 import CollaboratorRolesList from "../../components/CollaboratorRolesList";
-//import { transform } from "framer-motion";
 
 export default function CollaboratorDetail() {
-  const collaborator = {
-    nombre: "Juan",
-    apellidos: "Pérez Gómez",
-    cedula: "0102030405",
-    compania: "Natural Aloe S.A.",
-    departamento: "Producción",
-    puesto: "Operador de Lavandería",
-  };
+  const { id } = useParams<{ id: string }>();
+  const { data, loading, error } = useCollaboratorDetail(id || "");
+
+  if (loading)
+    return <Box sx={{ p: 5, textAlign: "center" }}>Cargando...</Box>;
+  if (error || !data)
+    return (
+      <Box sx={{ p: 5, textAlign: "center", color: "red" }}>
+        No se pudo cargar el colaborador.
+      </Box>
+    );
+
+  // Tomar info personal del primer rol (todas las propiedades personales son iguales)
+  const personal = data.roles[0];
+  // Extraer apellidos (todo menos la primera palabra)
+  const nombreSplit = data.nombre_completo.trim().split(" ");
+  const apellidos = nombreSplit.length > 1 ? nombreSplit.slice(1).join(" ") : "";
 
   return (
     <Box
@@ -24,7 +34,7 @@ export default function CollaboratorDetail() {
         py: 4,
       }}
     >
-      {/*cuando blanco que contien toda la información del colaborador*/}
+      {/*Cuadro que contiene TODA la información del colaborador*/}
       <Paper
         elevation={8}
         sx={{
@@ -56,143 +66,144 @@ export default function CollaboratorDetail() {
         >
           <Typography
             variant="h6"
-            sx={{ color: "#2AAC67", 
-              fontWeight: "bold", 
+            sx={{
+              color: "#2AAC67",
+              fontWeight: "bold",
               mb: 2.5,
-              letterSpacing: "0.5px"
-             }}
+              letterSpacing: "0.5px",
+            }}
           >
             Información del Colaborador
           </Typography>
           <TextField
-            label="Nombre"
-            value={collaborator.nombre}
+            label="Cédula"
+            value={data.id_colaborador}
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
             disabled
             sx={{
-              mb: 2.5, 
-              width: '100%',
-              borderRadius: 3, 
-              backgroundColor: '#fff', 
-              WebkitTextFillColor: "#18703f", 
-              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: '#2AAC67 !important'}, 
-                '&:hover fieldset': { borderColor: 'black !important'}, 
-                transition: 'background-color 0.3s ease', 
-                '&:hover': { backgroundColor: '#E6F3EA' } 
+              mb: 2.5,
+              width: "100%",
+              borderRadius: 3,
+              backgroundColor: "#fff",
+              WebkitTextFillColor: "#18703f",
+              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#2AAC67 !important" },
+                "&:hover fieldset": { borderColor: "black !important" },
+                transition: "background-color 0.3s ease",
+                "&:hover": { backgroundColor: "#E6F3EA" },
+              },
+            }}
+          />
+          <TextField
+            label="Nombre"
+            value={nombreSplit[0]}
+            InputProps={{ readOnly: true }}
+            variant="outlined"
+            size="small"
+            disabled
+            sx={{
+              mb: 2.5,
+              width: "100%",
+              borderRadius: 3,
+              backgroundColor: "#fff",
+              WebkitTextFillColor: "#18703f",
+              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#2AAC67 !important" },
+                "&:hover fieldset": { borderColor: "black !important" },
+                transition: "background-color 0.3s ease",
+                "&:hover": { backgroundColor: "#E6F3EA" },
               },
             }}
           />
           <TextField
             label="Apellidos"
-            value={collaborator.apellidos}
+            value={apellidos}
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
             disabled
             sx={{
-              mb: 2.5, 
-              width: '100%',
-              borderRadius: 3, 
-              backgroundColor: '#fff', 
-              WebkitTextFillColor: "#18703f", 
-              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
-              '& .MuiOutlinedInput-root': { 
-                '& fieldset': { borderColor: '#2AAC67 !important'}, 
-                '&:hover fieldset': { borderColor: 'black !important'}, 
-                transition: 'background-color 0.3s ease', 
-                '&:hover': { backgroundColor: '#E6F3EA' } 
+              mb: 2.5,
+              width: "100%",
+              borderRadius: 3,
+              backgroundColor: "#fff",
+              WebkitTextFillColor: "#18703f",
+              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#2AAC67 !important" },
+                "&:hover fieldset": { borderColor: "black !important" },
+                transition: "background-color 0.3s ease",
+                "&:hover": { backgroundColor: "#E6F3EA" },
               },
             }}
           />
           <TextField
-            label="Cédula"
-            value={collaborator.cedula}
+            label="Puesto"
+            value={personal.puesto}
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
             disabled
             sx={{
-              mb: 2.5, 
-              width: '100%',
-              borderRadius: 3, 
-              backgroundColor: '#fff', 
-              WebkitTextFillColor: "#18703f", 
-              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
-              '& .MuiOutlinedInput-root': { 
-                '& fieldset': { borderColor: '#2AAC67 !important'}, 
-                '&:hover fieldset': { borderColor: 'black !important'}, 
-                transition: 'background-color 0.3s ease', 
-                '&:hover': { backgroundColor: '#E6F3EA' } 
-              },
-            }}
-          />
-          <TextField
-            label="Compañía"
-            value={collaborator.compania}
-            InputProps={{ readOnly: true }}
-            variant="outlined"
-            size="small"
-            disabled
-            sx={{
-              mb: 2.5, 
-              width: '100%',
-              borderRadius: 3, 
-              backgroundColor: '#fff', 
-              WebkitTextFillColor: "#18703f", 
-              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: '#2AAC67 !important'}, 
-                '&:hover fieldset': { borderColor: 'black !important'}, 
-                transition: 'background-color 0.3s ease', 
-                '&:hover': { backgroundColor: '#E6F3EA' } 
+              mb: 2.5,
+              width: "100%",
+              borderRadius: 3,
+              backgroundColor: "#fff",
+              WebkitTextFillColor: "#18703f",
+              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#2AAC67 !important" },
+                "&:hover fieldset": { borderColor: "black !important" },
+                transition: "background-color 0.3s ease",
+                "&:hover": { backgroundColor: "#E6F3EA" },
               },
             }}
           />
           <TextField
             label="Departamento"
-            value={collaborator.departamento}
+            value={personal.departamento}
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
             disabled
             sx={{
-              mb: 2.5, 
-              width: '100%',
-              borderRadius: 3, 
-              backgroundColor: '#fff', 
-              WebkitTextFillColor: "#18703f", 
-              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: '#2AAC67 !important'}, 
-                '&:hover fieldset': { borderColor: 'black !important'}, 
-                transition: 'background-color 0.3s ease', 
-                '&:hover': { backgroundColor: '#E6F3EA' } 
+              mb: 2.5,
+              width: "100%",
+              borderRadius: 3,
+              backgroundColor: "#fff",
+              WebkitTextFillColor: "#18703f",
+              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#2AAC67 !important" },
+                "&:hover fieldset": { borderColor: "black !important" },
+                transition: "background-color 0.3s ease",
+                "&:hover": { backgroundColor: "#E6F3EA" },
               },
             }}
           />
           <TextField
-            label="Puesto de trabajo"
-            value={collaborator.puesto}
+            label="Área"
+            value={personal.area}
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
             disabled
             sx={{
-              mb: 2.5, 
-              width: '100%',
-              borderRadius: 3, 
-              backgroundColor: '#fff', 
-              WebkitTextFillColor: "#18703f", 
-              '& .MuiInputBase-input': { WebkitTextFillColor: "#222 !important"},
-              '& .MuiOutlinedInput-root': { 
-                '& fieldset': { borderColor: '#2AAC67 !important'}, 
-                '&:hover fieldset': { borderColor: 'black !important'}, 
-                transition: 'background-color 0.3s ease', 
-                '&:hover': { backgroundColor: '#E6F3EA' } 
+              mb: 2.5,
+              width: "100%",
+              borderRadius: 3,
+              backgroundColor: "#fff",
+              WebkitTextFillColor: "#18703f",
+              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#2AAC67 !important" },
+                "&:hover fieldset": { borderColor: "black !important" },
+                transition: "background-color 0.3s ease",
+                "&:hover": { backgroundColor: "#E6F3EA" },
               },
             }}
           />
@@ -207,9 +218,9 @@ export default function CollaboratorDetail() {
               letterSpacing: "0.5px",
             }}
           >
-            Roles de Trabajo y Capacitaciones
+            Roles de Trabajo
           </Typography>
-          <CollaboratorRolesList />
+          <CollaboratorRolesList roles={data.roles} />
         </Box>
       </Paper>
     </Box>

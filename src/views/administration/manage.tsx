@@ -8,21 +8,24 @@ const cards = [
     to: "/administration/listAreas",
   },
   {
-    title: "Puestos",
-    description: "Gestiona los puestos de trabajo.",
-    to: "/administration/listWorkstations",
-  },
-  {
-    title: "Categorías",
-    description: "Gestiona las categorías de puestos.",
-    to: "/administration/categorias",
-  },
-  {
     title: "Departamentos",
     description: "Gestiona los departamentos.",
     to: "/administration/listDepartments",
   },
+  {
+    title: "Puestos",
+    description: "Gestiona los puestos de trabajo.",
+    to: "/administration/listWorkstations",
+  },
+   {
+    title: "Categorías",
+    description: "Gestiona las categorías de puestos.",
+    to: "/administration/listCategory",
+  },
+  
 ];
+
+
 
 export default function Manage() {
   const navigate = useNavigate();

@@ -14,7 +14,6 @@ export default function DepartmentsList() {
     areas,
     loading,
     loadingAreas,
-    error,
     search,
     setSearch,
     modalOpen,
@@ -165,9 +164,8 @@ export default function DepartmentsList() {
       >
         <div>¿Estás seguro de que deseas eliminar este departamento?</div>
       </GlobalModal>
-      {error && (
-        <div className="text-red-500 mt-2 text-center">{error}</div>
-      )}
+     
+      
     </TableContainer>
   );
 }

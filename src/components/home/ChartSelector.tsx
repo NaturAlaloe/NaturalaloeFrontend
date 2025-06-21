@@ -136,14 +136,64 @@ const ChartSelector = () => {
               : chartType === 'line'
               ? 'Tendencia de Capacitación por Área'
               : chartType === 'pie'
-              ? 'Personal Capacitado por Área'
+              ? 'Personal Capacitado y No Capacitado por Área'
               : chartType === 'doughnut'
-              ? 'Personal No Capacitado por Área'
+              ? 'Personal No Capacitado y Capacitado por Área'
               : 'Distribución de Personal por Área',
           font: { size: 18 },
         },
       },
     };
+
+    if (chartType === 'pie') {
+      return (
+        <div style={{ display: 'flex', gap: 40, justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <div style={{ width: '45%', height: '90%' }}>
+            <Pie data={trainedData} options={{
+              ...options,
+              plugins: {
+                ...options.plugins,
+                title: { display: true, text: 'Personal Capacitado por Área', font: { size: 16 } }
+              }
+            }} />
+          </div>
+          <div style={{ width: '45%', height: '90%' }}>
+            <Pie data={untrainedData} options={{
+              ...options,
+              plugins: {
+                ...options.plugins,
+                title: { display: true, text: 'Personal No Capacitado por Área', font: { size: 16 } }
+              }
+            }} />
+          </div>
+        </div>
+      );
+    }
+
+    if (chartType === 'doughnut') {
+      return (
+        <div style={{ display: 'flex', gap: 40, justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <div style={{ width: '45%', height: '90%' }}>
+            <Doughnut data={untrainedData} options={{
+              ...options,
+              plugins: {
+                ...options.plugins,
+                title: { display: true, text: 'Personal No Capacitado por Área', font: { size: 16 } }
+              }
+            }} />
+          </div>
+          <div style={{ width: '45%', height: '90%' }}>
+            <Doughnut data={trainedData} options={{
+              ...options,
+              plugins: {
+                ...options.plugins,
+                title: { display: true, text: 'Personal Capacitado por Área', font: { size: 16 } }
+              }
+            }} />
+          </div>
+        </div>
+      );
+    }
 
     switch (chartType) {
       case 'bar':
@@ -152,10 +202,6 @@ const ChartSelector = () => {
         return <Line data={comparativeData} options={options} />;
       case 'polar':
         return <PolarArea data={comparativeData} options={options} />;
-      case 'pie':
-        return <Pie data={trainedData} options={options} />;
-      case 'doughnut':
-        return <Doughnut data={untrainedData} options={options} />;
       default:
         return <Bar data={comparativeData} options={options} />;
     }

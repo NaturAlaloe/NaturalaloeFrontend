@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useWorkstations } from "./useWorkstations";
-import { updateWorkstation, deleteWorkstation as deleteWorkstationApi } from "../../services/manage/workstationService"; // Importa las funciones
+import { addWorkstation, updateWorkstation, deleteWorkstation as deleteWorkstationApi } from "../../services/manage/workstationService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 // Lógica de UI, modal, filtros, inputs, etc.
@@ -28,7 +28,11 @@ export function useWorkstationsList() {
   const filteredWorkstations = useMemo(
     () =>
       workstations.filter((w) =>
-        (w.titulo_puesto + " " + w.titulo_departamento)
+        (
+          (w.titulo_puesto || w.nombre_puesto || "") +
+          " " +
+          (w.titulo_departamento || w.nombre_departamento || "")
+        )
           .toLowerCase()
           .includes(search.toLowerCase())
       ),
@@ -49,7 +53,6 @@ export function useWorkstationsList() {
     setDepartmentInput(workstation?.id_departamento?.toString() || "");
     setModalOpen(true);
   };
-
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -60,7 +63,10 @@ export function useWorkstationsList() {
         });
         showCustomToast("Éxito", "Puesto actualizado correctamente", "success");
       } else {
-        // lógica para agregar
+        await addWorkstation({
+          id_departamento: Number(departmentInput),
+          nombre_puesto: workstationInput,
+        });
         showCustomToast("Éxito", "Puesto agregado correctamente", "success");
       }
       setModalOpen(false);

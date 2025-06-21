@@ -5,8 +5,10 @@ import SubmitButton from '../../components/formComponents/SubmitButton';
 import SimpleModal from "../../components/globalComponents/SimpleModal";
 import { useCapacitation } from '../../hooks/capacitations/useCapacitation';
 import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
+import { showCustomToast } from '../../components/globalComponents/CustomToaster';
 
 const Capacitacion = () => {
+    
     const {
         isEvaluado,
         setIsEvaluado,
@@ -16,7 +18,6 @@ const Capacitacion = () => {
         formData,
         handleChange,
         facilitadores,
-        tiposCapacitacion,
         metodosEvaluacion,
         colaboradoresDisponibles,
         poesDisponibles,
@@ -32,8 +33,18 @@ const Capacitacion = () => {
         agregarPoes,
     } = useCapacitation();
 
+    const handleSubmitWithToast = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!formData.titulo||!formData.facilitador||!formData.fecha||!formData.fechaFin||!formData.duracion) {
+            showCustomToast('Error', 'Todos los campos son obligatorios', 'error');
+            return;
+        }
+        showCustomToast('Guardado', 'La capacitación fue registrada correctamente', 'success');
+        handleSubmit(e);
+    };
+
     return (
-        <FormContainer title="Registro de Capacitación" onSubmit={handleSubmit}>
+        <FormContainer title="Registro de Capacitación" onSubmit={handleSubmitWithToast}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <InputField
                     name="titulo"
@@ -42,16 +53,6 @@ const Capacitacion = () => {
                     className="w-full"
                     value={formData.titulo}
                     onChange={handleChange}
-                />
-                <SelectField
-                    name="tipoCapacitacion"
-                    label="Tipo capacitación:"
-                    className="w-full"
-                    value={formData.tipoCapacitacion}
-                    onChange={handleChange}
-                    options={tiposCapacitacion}
-                    optionLabel="label"
-                    optionValue="value"
                 />
                 <SelectField
                     name="facilitador"
@@ -113,6 +114,17 @@ const Capacitacion = () => {
                         onChange={() => setIsEvaluado(!isEvaluado)}
                     />
                     <label htmlFor="evaluado" className="font-semibold text-[#2AAC67]">Es Evaluado:</label>
+                </div>
+                <div className="md:col-span-3">
+                    <label htmlFor="comentario" className="block font-semibold text-[#2AAC67] mb-1">
+                        Comentario:
+                    </label>
+                    <textarea
+                        id="comentario"
+                        name="comentario"
+                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] resize-y min-h-[80px]"
+                        placeholder="Agrega un comentario..."
+                    />
                 </div>
             </div>
             <div className="flex justify-center mt-6 gap-4">

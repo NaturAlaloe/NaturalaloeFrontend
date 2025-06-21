@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import {
-  getFacilitadoresInternos,
+  getColaboradoresDisponibles,
   createFacilitador,
   type Facilitador,
 } from "../../services/addFacilitatorService";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+
+// Este hook maneja el formulario para agregar un facilitador, ya sea interno o externo
 
 export const useFacilitatorForm = () => {
   const [tipo, setTipo] = useState("");
@@ -15,10 +18,10 @@ export const useFacilitatorForm = () => {
 
   useEffect(() => {
     if (tipo === "Interno") {
-      getFacilitadoresInternos()
+      getColaboradoresDisponibles()
         .then(setFacilitadoresInternos)
         .catch((err) => {
-          console.error("Error al cargar internos:", err);
+          console.error("Error al cargar colaboradores:", err);
           setFacilitadoresInternos([]);
         });
     }
@@ -42,7 +45,7 @@ export const useFacilitatorForm = () => {
     if (found) {
       setNombre(found.nombre);
       setApellido(found.apellido);
-      setIdentificacion(found.identificacion);
+      setIdentificacion(found.identificacion); // ← esto ya es la cédula (id_colaborador)
     }
   };
 
@@ -73,7 +76,10 @@ export const useFacilitatorForm = () => {
 
     try {
       await createFacilitador(payload);
-      alert("Facilitador guardado correctamente.");
+      showCustomToast(
+        "Éxito", "Facilitador guardado exitosamente.",
+        "success"
+      );
 
       // Limpiar formulario
       setTipo("");
@@ -82,8 +88,10 @@ export const useFacilitatorForm = () => {
       setApellido("");
       setIdentificacion("");
     } catch (error: any) {
-      console.error("Error al guardar facilitador:", error.response?.data || error.message);
-      alert("Error al guardar facilitador.");
+      showCustomToast(
+        "Error", "Error al guardar el facilitador.",
+        "error"
+      );
     }
   };
 

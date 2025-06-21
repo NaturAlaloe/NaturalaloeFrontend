@@ -23,14 +23,14 @@ export function useDepartmentsList() {
   const [areaInput, setAreaInput] = useState<number | "">("");
   const [codigoInput, setCodigoInput] = useState<number | "">("");
   const [editDepartment, setEditDepartment] = useState<any | null>(null);
-
   const filteredDepartments = useMemo(
     () =>
       Array.isArray(departments)
         ? departments.filter((d) =>
             d.titulo_departamento.toLowerCase().includes(search.toLowerCase()) ||
             d.titulo_area?.toLowerCase().includes(search.toLowerCase()) ||
-            (d.codigo?.toString() ?? "").includes(search)
+            (d.codigo?.toString() ?? "").includes(search) ||
+            (d.codigo_departamento?.toString() ?? "").includes(search)
           )
         : [],
     [departments, search]
@@ -67,7 +67,6 @@ export function useDepartmentsList() {
         id_departamento: editDepartment.id_departamento,
         id_area: Number(areaInput), // <-- AGREGA ESTA LÍNEA
       };
-      console.log("Payload enviado a updateDepartment:", payload);
       await updateDepartment(editDepartment.id_departamento, payload);
     } else {
       await addDepartment({

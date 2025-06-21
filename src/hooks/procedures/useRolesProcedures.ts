@@ -1,0 +1,54 @@
+import { useEffect, useState } from "react";
+import { getRolesWithProcedures, assignProceduresToRole } from "../../services/procedures/procedureRolesService";
+
+export interface Procedure {
+  id_documento: number;
+  codigo: string;
+  descripcion: string;
+  // ...otros campos si los necesitas
+}
+
+export interface RoleProcedures {
+  id_rol: number;
+  nombre_rol: string;
+  procedimientos: Procedure[];
+}
+
+export function useRolesProcedures() {
+  const [rolesProcedures, setRolesProcedures] = useState<RoleProcedures[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchRolesProcedures = async () => {
+    setLoading(true);
+    const data = await getRolesWithProcedures();
+    // Agrupa procedimientos por rol
+    const agrupados: { [id_rol: number]: RoleProcedures } = {};
+    data.forEach((item: any) => {
+      if (!agrupados[item.id_rol]) {
+        agrupados[item.id_rol] = {
+          id_rol: item.id_rol,
+          nombre_rol: item.nombre_rol,
+          procedimientos: [],
+        };
+      }
+      agrupados[item.id_rol].procedimientos.push({
+        id_documento: item.id_documento,
+        codigo: item.codigo,
+        descripcion: item.descripcion,
+      });
+    });
+    setRolesProcedures(Object.values(agrupados));
+    setLoading(false);
+  };
+
+  const saveProcedures = async (id_rol: number, procedimientos: number[]) => {
+    await assignProceduresToRole(id_rol, procedimientos);
+    fetchRolesProcedures();
+  };
+
+  useEffect(() => {
+    fetchRolesProcedures();
+  }, []);
+
+  return { rolesProcedures, loading, fetchRolesProcedures, saveProcedures };
+}

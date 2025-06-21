@@ -1,16 +1,6 @@
 // src/hooks/listProcedure/useProceduresList.tsx
 import { useState, useEffect } from "react";
-import api from "../../apiConfig/api";
-
-export interface Procedure {
-  id_poe: number | null;
-  titulo: string;
-  departamento: string;
-  responsable: string;
-  revision: string;
-  fecha_vigencia: string;
-  estado: string;
-}
+import { getActiveProcedures, type Procedure } from "../../services/procedures/procedureService";
 
 export function useProceduresList() {
   const [procedures, setProcedures] = useState<Procedure[]>([]);
@@ -24,12 +14,8 @@ export function useProceduresList() {
   useEffect(() => {
     const fetchProcedures = async () => {
       try {
-        const response = await api.get("/procedureActive");
-        if (response.data.success) {
-          setProcedures(response.data.data);
-        } else {
-          setError("Error al obtener los procedimientos");
-        }
+        const data = await getActiveProcedures();
+        setProcedures(data);
       } catch (err) {
         setError("Error de conexión con el servidor");
       } finally {
@@ -110,3 +96,5 @@ export function useProceduresList() {
     refetch, // expose refetch
   };
 }
+
+export type { Procedure };

@@ -8,7 +8,6 @@ import SubmitButton from "../../components/formComponents/SubmitButton";
 export default function PoliticsForm() {
   const {
     formData,
-    setFormData,
     busqueda,
     setBusqueda,
     showSugerencias,
