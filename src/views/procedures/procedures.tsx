@@ -1,11 +1,9 @@
 import "@fontsource/poppins/700.css";
-import { useProcedureFormLogic } from "../../hooks/procedureFormHooks/useProcedureFormLogic";
+import { useNewProcedureForm } from "../../hooks/procedureFormHooks/useNewProcedureForm";
 import FormContainer from "../../components/formComponents/FormContainer";
 import InputField from "../../components/formComponents/InputField";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 import SelectAutocomplete from "../../components/formComponents/SelectAutocomplete";
-import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
-import SearchAutocompleteInput from "../../components/formComponents/SearchAutocompleteInput";
 import PdfInput from "../../components/formComponents/PdfInput";
 
 export default function Procedures() {
@@ -24,39 +22,17 @@ export default function Procedures() {
     loadingSubmit,
     responsibles,
     loadingResponsibles,
-    enVigencia,
-    setEnVigencia,
-    busqueda,
-    setBusqueda,
-    showSugerencias,
-    setShowSugerencias,
-    poeSeleccionado,
-    setPoeSeleccionado,
+    handleAutocompleteChange,
     categoriaSeleccionada,
     departamentoSeleccionado,
     responsableSeleccionado,
     areaSeleccionada,
-    handleAutocompleteChange,
-    handleSelectProcedimiento,
-    resultadosBusqueda,
     handleSubmit,
-  } = useProcedureFormLogic();
+    procedureCode,
+  } = useNewProcedureForm();
 
   return (
     <FormContainer title="Registro de Procedimiento" onSubmit={handleSubmit}>
-      <SearchAutocompleteInput
-        label="Buscar procedimiento existente"
-        busqueda={busqueda}
-        setBusqueda={setBusqueda}
-        showSugerencias={showSugerencias}
-        setShowSugerencias={setShowSugerencias}
-        resultados={resultadosBusqueda}
-        onSelect={(item) => {
-          handleSelectProcedimiento(item);
-          setPoeSeleccionado(item);
-        }}
-        optionLabelKeys={["titulo", "departamento", "responsable"]}
-      />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <InputField
           label="Título"
@@ -65,6 +41,7 @@ export default function Procedures() {
           onChange={handleChange}
           placeholder="Ingrese título"
           required
+          maxLength={75}
         />
         <SelectAutocomplete
           label="Área"
@@ -82,10 +59,10 @@ export default function Procedures() {
           label="Departamento"
           options={departments}
           optionLabel="nombre"
-          optionValue="codigo"
+          optionValue="codigo_departamento"
           value={departamentoSeleccionado}
           onChange={(newValue) =>
-            handleAutocompleteChange("departamento", newValue, "codigo")
+            handleAutocompleteChange("departamento", newValue, "codigo_departamento")
           }
           placeholder="Buscar o seleccionar departamento..."
           disabled={loadingDepartments}
@@ -94,13 +71,21 @@ export default function Procedures() {
           label="Categoría"
           options={categorias}
           optionLabel="nombre"
-          optionValue="codigo"
+          optionValue="numero_categoria"
           value={categoriaSeleccionada}
           onChange={(newValue) =>
-            handleAutocompleteChange("categoria", newValue, "codigo")
+            handleAutocompleteChange("categoria", newValue, "numero_categoria")
           }
           placeholder="Buscar o seleccionar categoría..."
           disabled={loadingCategorias}
+        />
+        <InputField
+          label="Código del Procedimiento"
+          name="codigo"
+          value={procedureCode}
+          readOnly
+          placeholder="Se generará automáticamente"
+          required
         />
         <SelectAutocomplete
           label="Responsable"
@@ -119,9 +104,13 @@ export default function Procedures() {
           name="revision"
           value={formData.revision}
           onChange={handleChange}
-          placeholder="1.0"
-          pattern="^\d+(\.\d+)?$"
+          placeholder="1"
+          type="number"
+          min="1"
+          step="1"
+          pattern="^[0-9]+$"
           required
+          maxLength={75}
         />
         <InputField
           label="Fecha de Creación"
@@ -130,6 +119,7 @@ export default function Procedures() {
           onChange={handleChange}
           type="date"
           required
+          maxLength={75}
         />
         <InputField
           label="Fecha de Vigencia"
@@ -138,29 +128,20 @@ export default function Procedures() {
           onChange={handleChange}
           type="date"
           required
+          maxLength={75}
         />
+      </div>
+      <div className="col-span-1 md:col-span-3 mt-2">
         <PdfInput
           pdfFile={pdfFile}
           onChange={handlePdfChange}
           onRemove={() => setPdfFile(null)}
           required={!pdfFile}
         />
-        {/* Mostrar el checkbox solo si hay un POE seleccionado */}
-        {poeSeleccionado && (
-          <StyledCheckbox
-            label="En vigencia"
-            checked={enVigencia}
-            onChange={setEnVigencia}
-          />
-        )}
       </div>
       <div className="text-center mt-8">
         <SubmitButton width="" disabled={loadingSubmit}>
-          {poeSeleccionado
-            ? "Actualizar"
-            : loadingSubmit
-            ? "Guardando..."
-            : "Guardar"}
+          Guardar
         </SubmitButton>
       </div>
     </FormContainer>

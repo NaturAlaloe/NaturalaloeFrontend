@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getCategories } from "../../services/manage/categorieService";
 
 export function useCategories() {
-  const [categories, setCategories] = useState<{ codigo: string; nombre: string }[]>([]);
+  const [categories, setCategories] = useState<{ codigo: string; nombre: string; numero_categoria: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,6 +12,7 @@ export function useCategories() {
           data.map((c: any) => ({
             codigo: c.id_categoria?.toString() || "",
             nombre: c.nombre_categoria || c.nombre || "",
+            numero_categoria: c.numero_categoria?.toString() || "",
           }))
         );
       })
