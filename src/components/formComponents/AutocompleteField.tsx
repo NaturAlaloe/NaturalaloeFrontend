@@ -11,6 +11,7 @@ interface AutocompleteFieldProps {
   required?: boolean;
   className?: string;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export default function AutocompleteField({
@@ -22,6 +23,7 @@ export default function AutocompleteField({
   required = false,
   className = "",
   placeholder = "",
+  disabled = false,
 }: AutocompleteFieldProps) {
   return (
     <div>
@@ -29,18 +31,18 @@ export default function AutocompleteField({
         <label className="block text-sm font-semibold text-[#2AAC67] mb-2">
           {label}
         </label>
-      )}
-      <Autocomplete
+      )}      <Autocomplete
         options={options}
         value={value}
+        disabled={disabled}
         onChange={(_: SyntheticEvent, newValue: string | null) =>
           onChange(newValue || "")
-        }
-        renderInput={(params) => (
+        } renderInput={(params) => (
           <TextField
             {...params}
             name={name}
             required={required}
+            disabled={disabled}
             placeholder={placeholder}
             className={`bg-white ${className}`}
             sx={{

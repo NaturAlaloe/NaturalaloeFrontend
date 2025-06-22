@@ -17,7 +17,7 @@ export default function ListCapacitations() {
     setSeguimientoFilter,
     poes,
     estados,
-    seguimientos, 
+    seguimientos,
     showModal,
     setShowModal,
     selectedCapacitation,
@@ -108,7 +108,7 @@ export default function ListCapacitations() {
     },
   ];
   return (
-    <div className="p-4 bg-white">
+    <div className="p-4 bg-white rounded-lg ">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
         Capacitaciones de la Empresa
       </h1>

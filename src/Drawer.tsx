@@ -30,7 +30,7 @@ import ListaCapacitaciones from "./views/capacitation/listCapacitation";
 import Colaboradores from "./views/collaborators/collaborators";
 import CollaboratorDetail from "./views/collaborators/CollaboratorDetail";
 import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
-import CapacitacionFinalizada from "./views/capacitation/capacitationFinished";
+import CapacitacionFinalizada from "./views/capacitation/evaluatedTraining";
 import AddCollaborator from "./views/collaborators/addCollaborator";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
@@ -222,8 +222,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               <ListItemText primary="Inicio" />
             </ListItemButton>
           </ListItem>
-      
-         
+
+
 
           {/* Administración */}
           <ListItem disablePadding>
@@ -477,7 +477,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/capacitationFinished"
+                to="/capacitation/listCapacitationGeneral"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -487,11 +487,11 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Finalizadas" />
+                <ListItemText primary="Lista de Capacitaciones Generales" />
               </ListItemButton>
+              
             </List>
           </Collapse>
-
           {/* Colaboradores */}
           <ListItem disablePadding>
             <ListItemButton
@@ -542,7 +542,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
-                <ListItemButton
+              <ListItemButton
                 component={Link}
                 to="/collaborators/assingRol"
                 sx={{
@@ -657,9 +657,9 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             element={<VersionControlProcedures />}
           />
           <Route
-          path="/collaborators/assingRol"
-          element={<AssignRol/>}
-        />
+            path="/collaborators/assingRol"
+            element={<AssignRol />}
+          />
         </Routes>
       </Main>
     </Box>
