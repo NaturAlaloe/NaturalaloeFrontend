@@ -25,7 +25,7 @@ const useGetCollaborators = () => {
         fetchCollaborators();
     }, []);
 
-    return { collaborators, loading, error, refetch: fetchCollaborators };
+    return { collaborators, loading, error, fetchCollaborators };
 };
 
 export default useGetCollaborators;
