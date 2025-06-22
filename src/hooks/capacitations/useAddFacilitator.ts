@@ -1,3 +1,4 @@
+// useAddFacilitator.ts
 import { useEffect, useState } from "react";
 import {
   getColaboradoresDisponibles,
@@ -6,13 +7,12 @@ import {
 } from "../../services/addFacilitatorService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
-// Este hook maneja el formulario para agregar un facilitador, ya sea interno o externo
-
 export const useFacilitatorForm = () => {
   const [tipo, setTipo] = useState("");
   const [internoSeleccionado, setInternoSeleccionado] = useState("");
   const [nombre, setNombre] = useState("");
-  const [apellido, setApellido] = useState("");
+  const [apellido1, setApellido1] = useState("");
+  const [apellido2, setApellido2] = useState("");
   const [identificacion, setIdentificacion] = useState("");
   const [facilitadoresInternos, setFacilitadoresInternos] = useState<Facilitador[]>([]);
 
@@ -32,7 +32,8 @@ export const useFacilitatorForm = () => {
     setTipo(value);
     setInternoSeleccionado("");
     setNombre("");
-    setApellido("");
+    setApellido1("");
+    setApellido2("");
     setIdentificacion("");
   };
 
@@ -44,54 +45,43 @@ export const useFacilitatorForm = () => {
     );
     if (found) {
       setNombre(found.nombre);
-      setApellido(found.apellido);
-      setIdentificacion(found.identificacion); // ← esto ya es la cédula (id_colaborador)
+      setApellido1(found.apellido1);
+      setApellido2(found.apellido2);
+      setIdentificacion(found.identificacion);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!tipo || !nombre || !apellido || !identificacion) {
+    if (!tipo || !nombre || !apellido1 || !apellido2 || (tipo === "Interno" && !identificacion)) {
       alert("Por favor complete todos los campos.");
       return;
     }
 
-    const tipoFacilitador = tipo.toLowerCase() as "interno" | "externo";
-
     const payload: any = {
-      tipo_facilitador: tipoFacilitador,
+      tipo_facilitador: tipo.toLowerCase(),
       nombre,
-      apellido,
-      identificacion,
+      apellido1,
+      apellido2,
+      ...(tipo === "Interno" && {
+        identificacion,
+        id_colaborador: parseInt(internoSeleccionado),
+      }),
     };
-
-    if (tipoFacilitador === "interno") {
-      if (!internoSeleccionado) {
-        alert("Debe seleccionar un facilitador interno.");
-        return;
-      }
-      payload.id_colaborador = parseInt(internoSeleccionado);
-    }
 
     try {
       await createFacilitador(payload);
-      showCustomToast(
-        "Éxito", "Facilitador guardado exitosamente.",
-        "success"
-      );
+      showCustomToast("Éxito", "Facilitador guardado exitosamente.", "success");
 
-      // Limpiar formulario
       setTipo("");
       setInternoSeleccionado("");
       setNombre("");
-      setApellido("");
+      setApellido1("");
+      setApellido2("");
       setIdentificacion("");
     } catch (error: any) {
-      showCustomToast(
-        "Error", "Error al guardar el facilitador.",
-        "error"
-      );
+      showCustomToast("Error", "Error al guardar el facilitador.", "error");
     }
   };
 
@@ -101,8 +91,10 @@ export const useFacilitatorForm = () => {
     internoSeleccionado,
     nombre,
     setNombre,
-    apellido,
-    setApellido,
+    apellido1,
+    setApellido1,
+    apellido2,
+    setApellido2,
     identificacion,
     setIdentificacion,
     handleTipoChange,
