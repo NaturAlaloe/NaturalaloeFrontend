@@ -1,4 +1,4 @@
-import { Search, Person, Badge, Apartment, Work, Close, Info, EditNote, ChatBubble, Add } from "@mui/icons-material";
+import { Search, Person, Badge, Apartment, Work, Close, Info } from "@mui/icons-material";
 import { useState } from 'react';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 import { useCapacitationGeneralList } from '../../hooks/capacitations/useCapacitationGeneralList';
@@ -16,11 +16,10 @@ export default function ListCapacitationGeneral() {
     setShowModal,
     selectedCapacitation,
     handleRowClick,
-    navegarCapacitacionGeneral,
   } = useCapacitationGeneralList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
-  const [commentToShow, setCommentToShow] = useState<string | null>(null);
+  const [commentToShow] = useState<string | null>(null);
 
   const columns = [
     {
@@ -39,82 +38,20 @@ export default function ListCapacitationGeneral() {
       wrap: true,
     },
     {
-      name: 'FECHA CREACIÓN',
+      name: 'Fecha Creación',
       selector: (row: any) => row.fechaCreacion,
       sortable: true,
       cell: (row: any) => <div className="text-sm text-gray-700">{row.fechaCreacion}</div>,
-      width: '150px',
-    },
-    {
-      name: 'ESTADO',
-      selector: (row: any) => row.estado,
-      sortable: true,
-      cell: (row: any) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          row.estado === 'Activo' ? 'bg-green-100 text-green-800' :
-          row.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {row.estado}
-        </span>
-      ),
       wrap: true,
-      width: '120px',
     },
-    {
-      name: 'COLABORADORES',
-      selector: (row: any) => row.colaboradoresAsignados,
-      sortable: true,
-      cell: (row: any) => (
-        <div className="text-sm text-center text-gray-700 font-medium">
-          {row.colaboradoresAsignados}
-        </div>
-      ),
-      width: '130px',
-    },
-    {
-      name: 'ACCIONES',
-      cell: (row: any) => (
-        <div className="flex flex-col sm:flex-row gap-2 items-center justify-center">
-          <button
-            className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
-            onClick={() => navegarCapacitacionGeneral()}
-            title="Editar capacitación"
-          >
-            <EditNote />
-          </button>
-          <button
-            className="text-[#2AAC67] hover:text-[#1e8449] transition-colors"
-            onClick={() => {
-              setCommentToShow(row.comentario);
-              setShowCommentModal(true);
-            }}
-            title="Ver comentario"
-          >
-            <ChatBubble />
-          </button>
-        </div>
-      ),
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
-      width: '120px',
-    },
+    
   ];
-
   return (
     <div className="p-4 bg-white rounded-lg">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800 border-b-2 border-[#2AAC67] pb-2">
           Capacitaciones Generales
         </h1>
-        <button
-          onClick={navegarCapacitacionGeneral}
-          className="bg-[#2AAC67] text-white px-4 py-2 rounded-lg hover:bg-[#24965c] transition-colors flex items-center gap-2"
-        >
-          <Add />
-          Nueva Capacitación General
-        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -130,7 +67,7 @@ export default function ListCapacitationGeneral() {
             onChange={e => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <select
           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67]"
           value={estadoFilter}
@@ -141,12 +78,7 @@ export default function ListCapacitationGeneral() {
             <option key={estado} value={estado}>{estado}</option>
           ))}
         </select>
-
-        <div className="text-sm text-gray-600 flex items-center">
-          Total: {capacitations.length} capacitaciones
-        </div>
       </div>
-
       <div className="border border-gray-200 rounded-lg overflow-x-auto">
         <GlobalDataTable
           columns={columns}
@@ -173,7 +105,6 @@ export default function ListCapacitationGeneral() {
           onRowClicked={handleRowClick}
         />
       </div>
-
       {/* Modal de detalles */}
       {showModal && selectedCapacitation && (
         <div
@@ -190,7 +121,7 @@ export default function ListCapacitationGeneral() {
             >
               <Close />
             </button>
-            
+
             <div className="flex flex-col items-center mb-8">
               <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#2ecc71]/10 mb-2">
                 <Info className="text-[#2ecc71]" style={{ fontSize: 36 }} />
@@ -199,48 +130,6 @@ export default function ListCapacitationGeneral() {
                 Detalles de Capacitación General
               </h2>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <h3 className="text-[#2ecc71] font-bold text-lg mb-3">Información General</h3>
-                <div className="space-y-3">
-                  <div>
-                    <span className="font-semibold text-gray-700">ID:</span>
-                    <span className="ml-2 text-gray-600">{selectedCapacitation.id}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Título:</span>
-                    <span className="ml-2 text-gray-600">{selectedCapacitation.titulo}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Fecha de Creación:</span>
-                    <span className="ml-2 text-gray-600">{selectedCapacitation.fechaCreacion}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Estado:</span>
-                    <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                      selectedCapacitation.estado === 'Activo' ? 'bg-green-100 text-green-800' :
-                      selectedCapacitation.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {selectedCapacitation.estado}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Total Colaboradores:</span>
-                    <span className="ml-2 text-gray-600">{selectedCapacitation.colaboradoresAsignados}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-[#2ecc71] font-bold text-lg mb-3">Comentario</h3>
-                <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
-                  {selectedCapacitation.comentario}
-                </div>
-              </div>
-            </div>
-
             <div>
               <h3 className="text-[#2ecc71] font-bold text-lg mb-4">Colaboradores Asignados</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto">
@@ -274,7 +163,6 @@ export default function ListCapacitationGeneral() {
           </div>
         </div>
       )}
-
       {/* Modal de comentario */}
       {showCommentModal && (
         <SimpleModal

@@ -30,7 +30,8 @@ import ListaCapacitaciones from "./views/capacitation/listCapacitation";
 import Colaboradores from "./views/collaborators/collaborators";
 import CollaboratorDetail from "./views/collaborators/CollaboratorDetail";
 import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
-import CapacitacionFinalizada from "./views/capacitation/evaluatedTraining";
+import CapacitationGeneral  from "./views/capacitation/listCapacitationsGeneral";
+import Evaluacion from "./views/capacitation/evaluatedTraining";
 import AddCollaborator from "./views/collaborators/addCollaborator";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
@@ -625,6 +626,10 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             element={<ListaCapacitaciones />}
           />
           <Route
+            path="/capacitation/listCapacitationGeneral"
+            element={<CapacitationGeneral  />}
+          />
+          <Route
             path="/collaborators/collaborators"
             element={<Colaboradores />}
           />
@@ -644,8 +649,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             element={<ListaFacilitadores />}
           />
           <Route
-            path="/capacitation/capacitationFinished"
-            element={<CapacitacionFinalizada />}
+            path="/capacitation/evaluatedTraining"
+            element={<Evaluacion />}
           />
           <Route
             path="/collaborators/addCollaborator"
