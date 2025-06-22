@@ -15,7 +15,6 @@ export default function ViewCollaborators() {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCollaborator, setSelectedCollaborator] = useState<Collaborator | null>(null);
 
-    // Nuevo estado para eliminar
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [collaboratorToDelete, setCollaboratorToDelete] = useState<Collaborator | null>(null);
 
@@ -77,7 +76,7 @@ export default function ViewCollaborators() {
     });
 
     const columns = [
-        { name: "ID", selector: (row: Collaborator) => row.id_colaborador },
+        { name: "Cédula", selector: (row: Collaborator) => row.id_colaborador },
         {
             name: "Nombre",
             selector: (row: Collaborator) => `${row.nombre} ${row.apellido1} ${row.apellido2}`
