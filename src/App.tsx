@@ -12,11 +12,10 @@ function App() {
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Valida la sesión con el backend al montar la app
     const checkSession = async () => {
       console.log("Verificando sesión con el backend...");
       try {
-        const res = await api.get('/auth/endpoint'); // Cambia '/me' por el endpoint real
+        const res = await api.get('/auth/endpoint'); 
         console.log("Sesión válida:", res.data);
         setIsAuthenticated(true);
       } catch (err) {
@@ -30,12 +29,14 @@ function App() {
     checkSession();
   }, []);
 
-  const handleLogout = () => {
-    console.log("Cerrando sesión...");
+  const handleLogout = async () => {
+    try {
+      await api.post('/logout');
+    } catch (e) {
+      console.error("Error al cerrar sesión:", e);
+    }
     setIsAuthenticated(false);
-    // Opcional: limpiar la cookie si tu backend no lo hace
-    document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    console.log("Cookie de sesión eliminada. isAuthenticated:", isAuthenticated);
+    console.log("Sesión cerrada.");
   };
 
   useEffect(() => {
@@ -44,7 +45,7 @@ function App() {
 
   if (checkingAuth) {
     console.log("Verificando autenticación, mostrando loader...");
-    return null; // O un loader/spinner
+    return null; 
   }
 
   return (
