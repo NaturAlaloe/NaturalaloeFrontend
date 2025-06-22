@@ -160,7 +160,7 @@ export function useCapacitationList() {
   });
 
   const navegarCapacitacionFinalizada = () => {
-    navigate("/capacitation/capacitationFinished");
+    navigate("/capacitation/evaluatedTraining");
   };
 
   const paginatedCapacitations = filteredCapacitations.slice(
