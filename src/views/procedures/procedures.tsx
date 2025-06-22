@@ -29,6 +29,7 @@ export default function Procedures() {
     areaSeleccionada,
     handleSubmit,
     procedureCode,
+    loadingConsecutivo,
   } = useNewProcedureForm();
 
   return (
@@ -47,10 +48,10 @@ export default function Procedures() {
           label="Área"
           options={areas}
           optionLabel="nombre"
-          optionValue="codigo"
+          optionValue="id_area"
           value={areaSeleccionada}
           onChange={(newValue) =>
-            handleAutocompleteChange("area", newValue, "codigo")
+            handleAutocompleteChange("area", newValue, "id_area")
           }
           placeholder="Buscar o seleccionar área..."
           disabled={loadingAreas}
@@ -59,10 +60,10 @@ export default function Procedures() {
           label="Departamento"
           options={departments}
           optionLabel="nombre"
-          optionValue="codigo_departamento"
+          optionValue="id_departamento"
           value={departamentoSeleccionado}
           onChange={(newValue) =>
-            handleAutocompleteChange("departamento", newValue, "codigo_departamento")
+            handleAutocompleteChange("departamento", newValue, "id_departamento")
           }
           placeholder="Buscar o seleccionar departamento..."
           disabled={loadingDepartments}
@@ -71,10 +72,10 @@ export default function Procedures() {
           label="Categoría"
           options={categorias}
           optionLabel="nombre"
-          optionValue="numero_categoria"
+          optionValue="id_categoria"
           value={categoriaSeleccionada}
           onChange={(newValue) =>
-            handleAutocompleteChange("categoria", newValue, "numero_categoria")
+            handleAutocompleteChange("categoria", newValue, "id_categoria")
           }
           placeholder="Buscar o seleccionar categoría..."
           disabled={loadingCategorias}
@@ -86,6 +87,16 @@ export default function Procedures() {
           readOnly
           placeholder="Se generará automáticamente"
           required
+          endAdornment={
+            loadingConsecutivo ? (
+              <span className="flex items-center">
+                <svg className="animate-spin h-5 w-5 text-[#2AAC67]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+              </span>
+            ) : null
+          }
         />
         <SelectAutocomplete
           label="Responsable"

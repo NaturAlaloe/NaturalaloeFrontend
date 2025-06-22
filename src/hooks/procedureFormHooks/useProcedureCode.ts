@@ -1,13 +1,39 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
-export function useProcedureCode(departamento, categoria) {
-  const [code, setCode] = useState("");
-  useEffect(() => {
+interface Departamento {
+  codigo_departamento: string;
+}
+interface Categoria {
+  numero_categoria: string;
+}
+
+/**
+ * Hook para construir el código POE visual y el de API.
+ * @param departamento Objeto departamento seleccionado
+ * @param categoria Objeto categoría seleccionada
+ * @param consecutivo Consecutivo obtenido de la API
+ * @returns { codeVisual, codeApi }
+ */
+export function useProcedureCode(
+  departamento: Departamento | null,
+  categoria: Categoria | null,
+  consecutivo: number | null
+) {
+  const codeApi = useMemo(() => {
     if (departamento && categoria) {
-      setCode(`${departamento.codigo_departamento}-${categoria.numero_categoria}`);
-    } else {
-      setCode("");
+      return `${departamento.codigo_departamento}-${categoria.numero_categoria}`;
     }
+    return "";
   }, [departamento, categoria]);
-  return code;
+
+  const codeVisual = useMemo(() => {
+    if (departamento && categoria && consecutivo !== null && consecutivo !== undefined) {
+      return `${departamento.codigo_departamento}-${categoria.numero_categoria}-${consecutivo}`;
+    } else if (departamento && categoria) {
+      return `${departamento.codigo_departamento}-${categoria.numero_categoria}`;
+    }
+    return "";
+  }, [departamento, categoria, consecutivo]);
+
+  return { codeApi, codeVisual };
 }

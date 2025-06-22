@@ -1,13 +1,16 @@
-import { useState, type ChangeEvent } from "react";
 import { useAreas } from "./useAreas";
-import { useCreateProcedureSubmit } from "./useCreateProcedures";
 import { useDepartments } from "./useDepartments";
 import { useCategories } from "./useCategories";
 import { useResponsibles } from "./useResponsibles";
 import { useSelectField } from "./useSelectField";
-import { useProcedureCode } from "./useProcedureCode";
+import { useLastConsecutive } from "./useLastConsecutive";
 import { usePdfInput } from "./usePdfInput";
 import { useFormReset } from "./useFormReset";
+import { useCreateProcedureSubmit } from "./useCreateProcedures";
+import { useProcedureCode } from "./useProcedureCode";
+import { useProcedureFormState } from "./useProcedureFormState";
+import { useProcedureFormHandlers } from "./useProcedureFormHandlers";
+import { useEffect } from "react";
 
 interface FormData {
   titulo: string;
@@ -21,8 +24,8 @@ interface FormData {
 }
 
 export function useNewProcedureForm() {
-  // Estado del formulario
-  const [formData, setFormData] = useState<FormData>({
+  // Estado y handlers del formulario
+  const initialState: FormData = {
     titulo: "",
     area: "",
     departamento: "",
@@ -31,7 +34,9 @@ export function useNewProcedureForm() {
     revision: "",
     fechaCreacion: "",
     fechaVigencia: "",
-  });
+  };
+  const { formData, setFormData, handleChange } = useProcedureFormState(initialState);
+  const { handleAutocompleteChange } = useProcedureFormHandlers(setFormData);
 
   // Hooks de selects
   const { departments, loading: loadingDepartments } = useDepartments();
@@ -39,51 +44,29 @@ export function useNewProcedureForm() {
   const { categories: categorias, loading: loadingCategorias } = useCategories();
   const { responsibles, loading: loadingResponsibles } = useResponsibles();
 
-  // SelectFields
+  // SelectFields: buscan por ID
   const areaSeleccionada = useSelectField(areas, formData.area, "codigo");
-  const departamentoSeleccionado = useSelectField(departments, formData.departamento, "codigo_departamento");
-  const categoriaSeleccionada = useSelectField(categorias, formData.categoria, "numero_categoria");
+  const departamentoSeleccionado = useSelectField(departments, formData.departamento, "id_departamento");
+  const categoriaSeleccionada = useSelectField(categorias, formData.categoria, "id_categoria");
   const responsableSeleccionado = useSelectField(responsibles, formData.responsable, "id_responsable");
 
-  // Código POE
-  const procedureCode = useProcedureCode(departamentoSeleccionado, categoriaSeleccionada);
+  // Consecutivo
+  const { lastConsecutive, loading: loadingConsecutivo, fetchLastConsecutive } = useLastConsecutive();
+  // Buscar consecutivo cuando cambian depto/cat
+  useEffect(() => {
+    if (departamentoSeleccionado && categoriaSeleccionada) {
+      fetchLastConsecutive();
+    }
+  }, [departamentoSeleccionado, categoriaSeleccionada, fetchLastConsecutive]);
+
+  // Código POE modularizado
+  const { codeApi, codeVisual } = useProcedureCode(departamentoSeleccionado, categoriaSeleccionada, lastConsecutive);
 
   // PDF
   const { pdfFile, setPdfFile, handlePdfChange, removePdf } = usePdfInput();
 
   // Reset
-  const limpiarFormulario = useFormReset({
-    titulo: "",
-    area: "",
-    departamento: "",
-    categoria: "",
-    responsable: "",
-    revision: "",
-    fechaCreacion: "",
-    fechaVigencia: "",
-  }, setFormData, setPdfFile);
-
-  // Handlers
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  function getValueOrEmpty(newValue: any, key = "codigo") {
-    if (newValue && !Array.isArray(newValue)) return newValue[key];
-    return "";
-  }
-
-  const handleAutocompleteChange = (name: string, value: any, key = "codigo") => {
-    handleChange({
-      target: { name, value: getValueOrEmpty(value, key) },
-    } as React.ChangeEvent<HTMLInputElement>);
-  };
+  const limpiarFormulario = useFormReset(initialState, setFormData, setPdfFile);
 
   // Submit
   const { submitProcedure, loading: loadingSubmit } = useCreateProcedureSubmit();
@@ -102,7 +85,7 @@ export function useNewProcedureForm() {
         fecha_creacion: formData.fechaCreacion,
         fecha_vigencia: formData.fechaVigencia,
         documento: pdfFile,
-        codigo: procedureCode,
+        codigo: codeApi, // Solo depto-categoria
       });
       limpiarFormulario();
     } catch {
@@ -134,7 +117,8 @@ export function useNewProcedureForm() {
     responsableSeleccionado,
     areaSeleccionada,
     handleSubmit,
-    procedureCode,
+    procedureCode: codeVisual,
+    loadingConsecutivo,
     limpiarFormulario,
   };
 }
