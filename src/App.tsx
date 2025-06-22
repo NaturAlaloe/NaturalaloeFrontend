@@ -5,27 +5,31 @@ import CustomToaster from './components/globalComponents/CustomToaster';
 import Login from './views/login/login';
 import ChangePassword from './views/login/changePassword';
 import RecoverPassword from './views/login/recoverPassword';
-
-function isLoggedIn() {
-  // Busca la cookie de sesión (ajusta el nombre si es diferente)
-  const logged = document.cookie.split(';').some(c => c.trim().startsWith('session='));
-  console.log("isLoggedIn() ->", logged, "| cookies:", document.cookie);
-  return logged;
-}
+import api from './apiConfig/api';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(isLoggedIn());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    console.log("App mounted. isAuthenticated:", isAuthenticated);
-    // Si la cookie cambia, podrías volver a chequear aquí
-    // (opcional: para apps más avanzadas)
+    // Valida la sesión con el backend al montar la app
+    const checkSession = async () => {
+      console.log("Verificando sesión con el backend...");
+      try {
+        const res = await api.get('/auth/endpoint'); // Cambia '/me' por el endpoint real
+        console.log("Sesión válida:", res.data);
+        setIsAuthenticated(true);
+      } catch (err) {
+        console.log("Sesión inválida o error:", err);
+        setIsAuthenticated(false);
+      } finally {
+        setCheckingAuth(false);
+        console.log("Finalizó la verificación de sesión.");
+      }
+    };
+    checkSession();
   }, []);
 
-  const handleLoginSuccess = () => {
-    console.log("Login exitoso, autenticando usuario...");
-    setIsAuthenticated(true);
-  };
   const handleLogout = () => {
     console.log("Cerrando sesión...");
     setIsAuthenticated(false);
@@ -38,6 +42,11 @@ function App() {
     console.log("isAuthenticated cambió:", isAuthenticated);
   }, [isAuthenticated]);
 
+  if (checkingAuth) {
+    console.log("Verificando autenticación, mostrando loader...");
+    return null; // O un loader/spinner
+  }
+
   return (
     <>
       <CustomToaster />
@@ -46,7 +55,7 @@ function App() {
           <Routes>
             <Route path="/login/recoverPassword" element={<RecoverPassword />} />
             <Route path="/login/changePassword" element={<ChangePassword />} />
-            <Route path="*" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+            <Route path="*" element={<Login onLoginSuccess={() => setIsAuthenticated(true)} />} />
           </Routes>
         ) : (
           <Drawer onLogout={handleLogout} />
