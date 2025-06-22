@@ -1,38 +1,34 @@
-import { useEffect, useState } from 'react';
-import api from '../../apiConfig/api';
-
+import React from 'react';
 
 type Stat = {
   area: string;
-  capacitados: number;
-  no_capacitados: number;
+  certificados: number;
+  no_certificados: number;
+  cumplimiento: number;
 };
 
 const StatsCards = () => {
-  const [datos, setDatos] = useState<Stat[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Función para obtener los datos del gráfico
-  const getDataForGraphic = async () => {
-    try {
-      const response = await api.get('/dataForGraphic');
-      return response.data; // { success, data, message }
-    } catch (error) {
-      throw error;
+  // Static data for certification KPI
+  const datos: Stat[] = [
+    {
+      area: "Operaciones",
+      certificados: 40,
+      no_certificados: 5,
+      cumplimiento: 88.9
+    },
+    {
+      area: "Logística",
+      certificados: 32,
+      no_certificados: 3,
+      cumplimiento: 91.4
+    },
+    {
+      area: "Calidad",
+      certificados: 28,
+      no_certificados: 2,
+      cumplimiento: 93.3
     }
-  };
-
-  useEffect(() => {
-    getDataForGraphic()
-      .then((res) => {
-        if (res.success) {
-          setDatos(res.data);
-        }
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <div>Cargando...</div>;
+  ];
 
   return (
     <div className="flex flex-wrap justify-center gap-6 p-4">
@@ -41,13 +37,22 @@ const StatsCards = () => {
           <h3 className="text-lg font-semibold text-green-800 mb-4">{stat.area}</h3>
           
           <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600">Capacitados</span>
-            <span className="font-bold text-green-700">{stat.capacitados}</span>
+            <span className="text-gray-600">Certificados</span>
+            <span className="font-bold text-green-700">{stat.certificados}</span>
           </div>
           
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-gray-600">No capacitados</span>
-            <span className="font-bold text-red-600">{stat.no_capacitados}</span>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-gray-600">No certificados</span>
+            <span className="font-bold text-red-600">{stat.no_certificados}</span>
+          </div>
+
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-gray-600">Cumplimiento</span>
+            <span className="font-bold text-blue-600">{stat.cumplimiento}%</span>
+          </div>
+
+          <div className="text-xs text-gray-400 mt-4">
+            Última actualización: 2023-11-15
           </div>
         </div>
       ))}

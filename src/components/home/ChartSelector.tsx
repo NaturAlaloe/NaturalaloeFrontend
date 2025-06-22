@@ -1,6 +1,5 @@
-// src/components/ChartSelector.tsx
-import  { useEffect, useState } from 'react';
-import { Bar, Pie, Doughnut, Line, PolarArea } from 'react-chartjs-2';
+import React, { useState } from 'react';
+import { Bar, Pie, Doughnut, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,7 +13,6 @@ import {
   Legend,
 } from 'chart.js';
 import { Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
-import api from '../../apiConfig/api';
 
 ChartJS.register(
   CategoryScale,
@@ -28,75 +26,99 @@ ChartJS.register(
   Legend
 );
 
-const ChartSelector = () => {
+const areaOptions = [
+  { value: 'todas', label: 'Todas las áreas' },
+  { value: 'operaciones', label: 'Operaciones' },
+  { value: 'logistica', label: 'Logística' },
+  { value: 'calidad', label: 'Calidad' },
+];
+
+const proceduresDataByArea: Record<string, any> = {
+  todas: {
+    labels: ['Actualizados', 'Obsoletos', 'Sin cambios'],
+    datasets: [{
+      label: 'Procedimientos',
+      data: [42, 8, 15],
+      backgroundColor: ['#4ade80', '#f87171', '#fbbf24'],
+      borderWidth: 1,
+    }]
+  },
+  operaciones: {
+    labels: ['Actualizados', 'Obsoletos', 'Sin cambios'],
+    datasets: [{
+      label: 'Operaciones',
+      data: [20, 3, 5],
+      backgroundColor: ['#4ade80', '#f87171', '#fbbf24'],
+      borderWidth: 1,
+    }]
+  },
+  logistica: {
+    labels: ['Actualizados', 'Obsoletos', 'Sin cambios'],
+    datasets: [{
+      label: 'Logística',
+      data: [12, 2, 6],
+      backgroundColor: ['#4ade80', '#f87171', '#fbbf24'],
+      borderWidth: 1,
+    }]
+  },
+  calidad: {
+    labels: ['Actualizados', 'Obsoletos', 'Sin cambios'],
+    datasets: [{
+      label: 'Calidad',
+      data: [10, 3, 4],
+      backgroundColor: ['#4ade80', '#f87171', '#fbbf24'],
+      borderWidth: 1,
+    }]
+  },
+};
+
+const trainingDataByArea: Record<string, any> = {
+  todas: {
+    labels: ['Completadas', 'Pendientes'],
+    datasets: [{
+      label: 'Capacitaciones',
+      data: [85, 15],
+      backgroundColor: ['#4ade80', '#f87171'],
+      borderWidth: 1,
+    }]
+  },
+  operaciones: {
+    labels: ['Completadas', 'Pendientes'],
+    datasets: [{
+      label: 'Operaciones',
+      data: [40, 5],
+      backgroundColor: ['#4ade80', '#f87171'],
+      borderWidth: 1,
+    }]
+  },
+  logistica: {
+    labels: ['Completadas', 'Pendientes'],
+    datasets: [{
+      label: 'Logística',
+      data: [28, 4],
+      backgroundColor: ['#4ade80', '#f87171'],
+      borderWidth: 1,
+    }]
+  },
+  calidad: {
+    labels: ['Completadas', 'Pendientes'],
+    datasets: [{
+      label: 'Calidad',
+      data: [17, 6],
+      backgroundColor: ['#4ade80', '#f87171'],
+      borderWidth: 1,
+    }]
+  },
+};
+
+const ChartSelector = ({ chartData }: { chartData: 'procedures' | 'training' }) => {
   const [chartType, setChartType] = useState('bar');
-  const [labels, setLabels] = useState<string[]>([]);
-  const [capData, setCapData] = useState<number[]>([]);
-  const [noCapData, setNoCapData] = useState<number[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedArea, setSelectedArea] = useState('todas');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await api.get('/dataForGraphic');
-        if (res.data.success) {
-          const data = res.data.data;
-          setLabels(data.map((item: any) => item.area));
-          setCapData(data.map((item: any) => Number(item.capacitados)));
-          setNoCapData(data.map((item: any) => Number(item.no_capacitados)));
-        }
-      } catch (error) {
-        setLabels([]);
-        setCapData([]);
-        setNoCapData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  // Datos para gráficos comparativos (barras, líneas, polar)
-  const comparativeData = {
-    labels,
-    datasets: [
-      {
-        label: 'Capacitados',
-        data: capData,
-        backgroundColor: '#4ade80',
-        borderColor: '#16a34a',
-        borderWidth: 1,
-      },
-      {
-        label: 'No capacitados',
-        data: noCapData,
-        backgroundColor: '#f87171',
-        borderColor: '#dc2626',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  // Datos para gráficos individuales (pie/doughnut)
-  const trainedData = {
-    labels,
-    datasets: [{
-      label: 'Capacitados',
-      data: capData,
-      backgroundColor: ['#4ade80', '#86efac', '#16a34a'],
-      borderWidth: 1,
-    }]
-  };
-
-  const untrainedData = {
-    labels,
-    datasets: [{
-      label: 'No capacitados',
-      data: noCapData,
-      backgroundColor: ['#f87171', '#fca5a5', '#dc2626'],
-      borderWidth: 1,
-    }]
-  };
+  const selectedData =
+    chartData === 'procedures'
+      ? proceduresDataByArea[selectedArea]
+      : trainingDataByArea[selectedArea];
 
   const commonOptions = {
     responsive: true,
@@ -119,117 +141,79 @@ const ChartSelector = () => {
             return `${label}: ${value} (${percentage}%)`;
           }
         }
-      }
+      },
+      title: {
+        display: true,
+        text: chartData === 'procedures'
+          ? 'Estado de los Procedimientos'
+          : 'Cumplimiento de Capacitaciones',
+        font: { size: 18 },
+      },
     },
   };
 
   const renderChart = () => {
-    const options = {
-      ...commonOptions,
-      plugins: {
-        ...commonOptions.plugins,
-        title: {
-          display: true,
-          text:
-            chartType === 'bar'
-              ? 'Personal Capacitado vs No Capacitado por Área'
-              : chartType === 'line'
-              ? 'Tendencia de Capacitación por Área'
-              : chartType === 'pie'
-              ? 'Personal Capacitado y No Capacitado por Área'
-              : chartType === 'doughnut'
-              ? 'Personal No Capacitado y Capacitado por Área'
-              : 'Distribución de Personal por Área',
-          font: { size: 18 },
-        },
-      },
-    };
-
-    if (chartType === 'pie') {
-      return (
-        <div style={{ display: 'flex', gap: 40, justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          <div style={{ width: '45%', height: '90%' }}>
-            <Pie data={trainedData} options={{
-              ...options,
-              plugins: {
-                ...options.plugins,
-                title: { display: true, text: 'Personal Capacitado por Área', font: { size: 16 } }
-              }
-            }} />
-          </div>
-          <div style={{ width: '45%', height: '90%' }}>
-            <Pie data={untrainedData} options={{
-              ...options,
-              plugins: {
-                ...options.plugins,
-                title: { display: true, text: 'Personal No Capacitado por Área', font: { size: 16 } }
-              }
-            }} />
-          </div>
-        </div>
-      );
-    }
-
-    if (chartType === 'doughnut') {
-      return (
-        <div style={{ display: 'flex', gap: 40, justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          <div style={{ width: '45%', height: '90%' }}>
-            <Doughnut data={untrainedData} options={{
-              ...options,
-              plugins: {
-                ...options.plugins,
-                title: { display: true, text: 'Personal No Capacitado por Área', font: { size: 16 } }
-              }
-            }} />
-          </div>
-          <div style={{ width: '45%', height: '90%' }}>
-            <Doughnut data={trainedData} options={{
-              ...options,
-              plugins: {
-                ...options.plugins,
-                title: { display: true, text: 'Personal Capacitado por Área', font: { size: 16 } }
-              }
-            }} />
-          </div>
-        </div>
-      );
-    }
-
     switch (chartType) {
       case 'bar':
-        return <Bar data={comparativeData} options={options} />;
+        return <Bar data={selectedData} options={commonOptions} />;
+      case 'pie':
+        return <Pie data={selectedData} options={commonOptions} />;
+      case 'doughnut':
+        return <Doughnut data={selectedData} options={commonOptions} />;
       case 'line':
-        return <Line data={comparativeData} options={options} />;
-      case 'polar':
-        return <PolarArea data={comparativeData} options={options} />;
+        return <Line data={selectedData} options={commonOptions} />;
       default:
-        return <Bar data={comparativeData} options={options} />;
+        return <Bar data={selectedData} options={commonOptions} />;
     }
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md w-full">
-      <div className="flex justify-center mb-8">
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel id="chart-select-label">Tipo de Gráfico</InputLabel>
-          <Select
-            labelId="chart-select-label"
-            value={chartType}
-            label="Tipo de Gráfico"
-            onChange={(e) => setChartType(e.target.value)}
-          >
-            <MenuItem value="bar">Barras</MenuItem>
-            <MenuItem value="pie">Circular (Pie)</MenuItem>
-            <MenuItem value="doughnut">Dona (Doughnut)</MenuItem>
-            <MenuItem value="line">Líneas</MenuItem>
-          </Select>
-        </FormControl>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+        <h2 className="text-xl font-semibold text-gray-800">
+          {chartData === 'procedures' ? 'KPI de Procedimientos' : 'KPI de Capacitaciones'}
+        </h2>
+        <div className="flex gap-4">
+          <FormControl sx={{ minWidth: 180 }}>
+            <InputLabel id="area-select-label">Área</InputLabel>
+            <Select
+              labelId="area-select-label"
+              value={selectedArea}
+              label="Área"
+              onChange={(e) => setSelectedArea(e.target.value)}
+            >
+              {areaOptions.map((area) => (
+                <MenuItem key={area.value} value={area.value}>{area.label}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl sx={{ minWidth: 200 }}>
+            <InputLabel id="chart-select-label">Tipo de Gráfico</InputLabel>
+            <Select
+              labelId="chart-select-label"
+              value={chartType}
+              label="Tipo de Gráfico"
+              onChange={(e) => setChartType(e.target.value)}
+            >
+              <MenuItem value="bar">Barras</MenuItem>
+              <MenuItem value="pie">Circular (Pie)</MenuItem>
+              <MenuItem value="doughnut">Dona (Doughnut)</MenuItem>
+              <MenuItem value="line">Líneas</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
       </div>
 
-      <div style={{ height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Box sx={{ width: '100%', height: '100%' }}>
-          {loading ? 'Cargando...' : renderChart()}
-        </Box>
+      <div className="p-4 bg-gray-50 rounded-lg">
+        <div style={{ height: '400px' }}>
+          <Box sx={{ width: '100%', height: '100%' }}>
+            {renderChart()}
+          </Box>
+        </div>
+      </div>
+
+      <div className="text-xs text-gray-400 mt-4">
+        Última actualización: 2023-11-15
       </div>
     </div>
   );
