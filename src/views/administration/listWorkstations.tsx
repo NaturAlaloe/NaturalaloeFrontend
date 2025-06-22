@@ -13,17 +13,12 @@ import { useDepartments } from "../../hooks/manage/useDepartments";
 export default function ListWorkstations() {
   const {
     loading,
-    error,
     search,
     setSearch,
     modalOpen,
     setModalOpen,
     editIndex,
     setEditIndex,
-    deleteIndex,
-    setDeleteIndex,
-    editWorkstation,
-    setEditWorkstation,
     deleteWorkstation,
     setDeleteWorkstation,
     workstationInput,
@@ -163,9 +158,6 @@ export default function ListWorkstations() {
       >
         <div>¿Estás seguro de que deseas eliminar este puesto?</div>
       </GlobalModal>
-      {error && (
-        <div className="text-red-500 mt-2 text-center">{error}</div>
-      )}
     </TableContainer>
   );
 }

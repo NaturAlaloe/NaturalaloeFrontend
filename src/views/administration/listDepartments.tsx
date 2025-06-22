@@ -14,7 +14,6 @@ export default function DepartmentsList() {
     areas,
     loading,
     loadingAreas,
-    error,
     search,
     setSearch,
     modalOpen,
