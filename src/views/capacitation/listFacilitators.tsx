@@ -1,13 +1,9 @@
 import { Edit, Delete, Search } from "@mui/icons-material";
-import {
-  useFacilitadoresList,
-  type Facilitador,
-} from "../../hooks/capacitations/useListFacilitators";
+import { useFacilitadoresList, type Facilitador } from "../../hooks/capacitations/useListFacilitators";
 import { useFacilitadorActions } from "../../hooks/capacitations/useFacilitadorActions";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import InputField from "../../components/formComponents/InputField";
-import SelectField from "../../components/formComponents/SelectField";
 import TableContainer from "../../components/TableContainer";
 
 export default function ListFacilitadores() {
@@ -35,7 +31,8 @@ export default function ListFacilitadores() {
 
   const columns = [
     { name: "NOMBRE", selector: (row: Facilitador) => row.nombre, sortable: true },
-    { name: "APELLIDO", selector: (row: Facilitador) => row.apellido, sortable: true },
+    { name: "PRIMER APELLIDO", selector: (row: Facilitador) => row.apellido1, sortable: true },
+    { name: "SEGUNDO APELLIDO", selector: (row: Facilitador) => row.apellido2, sortable: true },
     { name: "TIPO DE FACILITADOR", selector: (row: Facilitador) => row.tipo_facilitador, sortable: true },
     {
       name: "ACCIONES",
@@ -89,21 +86,17 @@ export default function ListFacilitadores() {
                 required
               />
               <InputField
-                label="Apellido"
-                name="apellido"
-                value={facilitadorEditando.apellido}
+                label="Primer Apellido"
+                name="apellido1"
+                value={facilitadorEditando.apellido1}
                 onChange={handleEditChange}
                 required
               />
-              <SelectField
-                label="Tipo de Facilitador"
-                name="tipo_facilitador"
-                value={facilitadorEditando.tipo_facilitador || "interno"}
+              <InputField
+                label="Segundo Apellido"
+                name="apellido2"
+                value={facilitadorEditando.apellido2}
                 onChange={handleEditChange}
-                options={[
-                  { value: "interno", label: "Interno" },
-                  { value: "externo", label: "Externo" },
-                ]}
                 required
               />
             </div>
@@ -123,7 +116,7 @@ export default function ListFacilitadores() {
           </>
         )}>
           <p className="text-sm text-gray-700">
-            ¿Estás seguro de eliminar al facilitador <strong>{facilitadorAEliminar.nombre} {facilitadorAEliminar.apellido}</strong>?
+            ¿Estás seguro de eliminar al facilitador <strong>{facilitadorAEliminar.nombre} {facilitadorAEliminar.apellido1} {facilitadorAEliminar.apellido2}</strong>?
           </p>
         </GlobalModal>
       )}
