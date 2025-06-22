@@ -1,25 +1,16 @@
-import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useEvaluatedTraining, type Colaborador } from "../../hooks/capacitations/useEvaluatedTraining";
 import FormContainer from "../../components/formComponents/FormContainer";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 
-interface Colaborador {
-  id: number;
-  nombre: string;
-  nota: string;
-  seguimiento: string;
-  comentario: string;
-}
+const EvaluatedTraining = () => {
+  const { idCapacitacion } = useParams();
+  const numericId = Number(idCapacitacion);
 
-const CalificarColaboradoresPage = () => {
-  const [colaboradores, setColaboradores] = useState<Colaborador[]>([
-    { id: 1, nombre: "Juan Pérez", nota: "", seguimiento: "", comentario: "" },
-    { id: 2, nombre: "Ana Gómez", nota: "", seguimiento: "", comentario: "" },
-    { id: 3, nombre: "Carlos Ramírez", nota: "", seguimiento: "", comentario: "" },
-    
-  ]);
+  const { colaboradores, loading, error, setColaboradores } = useEvaluatedTraining(numericId);
 
   const handleChange = (id: number, field: keyof Colaborador, value: string) => {
     setColaboradores((prev) =>
@@ -121,9 +112,11 @@ const CalificarColaboradoresPage = () => {
     },
   };
 
+  if (loading) return <p className="text-center">Cargando colaboradores...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+
   return (
     <FormContainer title="Calificación de Colaboradores">
-
       <GlobalDataTable
         columns={columns}
         data={colaboradores}
@@ -141,4 +134,4 @@ const CalificarColaboradoresPage = () => {
   );
 };
 
-export default CalificarColaboradoresPage;
+export default EvaluatedTraining;
