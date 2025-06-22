@@ -4,8 +4,7 @@ import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 import { useCapacitationList } from '../../hooks/capacitations/useCapacitationList';
 import SimpleModal from "../../components/globalComponents/SimpleModal";
 
-export default function ListCapacitations() {
-  const {
+export default function ListCapacitations() {  const {
     capacitations,
     searchTerm,
     setSearchTerm,
@@ -13,10 +12,13 @@ export default function ListCapacitations() {
     setPoeFilter,
     estadoFilter,
     setEstadoFilter,
+    tipoFilter,
+    setTipoFilter,
     seguimientoFilter,
     setSeguimientoFilter,
     poes,
     estados,
+    tipos,
     seguimientos,
     showModal,
     setShowModal,
@@ -112,7 +114,7 @@ export default function ListCapacitations() {
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
         Capacitaciones de la Empresa
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="text-gray-400" />
@@ -134,8 +136,7 @@ export default function ListCapacitations() {
           {poes.map((poe) => (
             <option key={poe} value={poe}>{poe}</option>
           ))}
-        </select>
-        <select
+        </select>        <select
           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67]"
           value={estadoFilter}
           onChange={e => setEstadoFilter(e.target.value)}
@@ -143,6 +144,16 @@ export default function ListCapacitations() {
           <option value="">Estados</option>
           {estados.map((estado) => (
             <option key={estado} value={estado}>{estado}</option>
+          ))}
+        </select>
+        <select
+          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67]"
+          value={tipoFilter}
+          onChange={e => setTipoFilter(e.target.value)}
+        >
+          <option value="">Tipos</option>
+          {tipos.map((tipo) => (
+            <option key={tipo} value={tipo}>{tipo}</option>
           ))}
         </select>
         <select
