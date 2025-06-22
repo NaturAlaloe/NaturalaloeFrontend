@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 // Datos quemados de ejemplo
 const facilitadores = [
@@ -18,7 +19,6 @@ const metodosEvaluacion = [
   { value: "", label: "Seleccione...", disabled: true },
   { value: "Teórico", label: "Teórico" },
   { value: "Práctico", label: "Práctico" },
-  { value: "Campo", label: "Campo" },
 ];
 
 const colaboradoresDisponibles = [
@@ -57,6 +57,7 @@ export function useCapacitation() {
   const [showFacilitadorModal, setShowFacilitadorModal] = useState(false);
   const [isEvaluado, setIsEvaluado] = useState(false);
   const [showAsignacionesModal, setShowAsignacionesModal] = useState(false);
+  const [isGeneralMode, setIsGeneralMode] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     titulo: "",
@@ -107,12 +108,52 @@ export function useCapacitation() {
       [name]: value,
     }));
   };
+  const toggleGeneralMode = () => {
+    setIsGeneralMode(!isGeneralMode);
+  };
+
+  const getFormTitle = () => {
+    return `Registro de Capacitación${isGeneralMode ? " - Modo General" : ""}`;
+  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Aquí puedes manejar el submit real
-  };
 
+    if (isGeneralMode) {
+      // En modo General, solo se requiere el título
+      if (!formData.titulo) {
+        showCustomToast("Error", "El título es obligatorio", "error");
+        return;
+      }
+    } else {
+      // En modo normal, todos los campos son obligatorios
+      if (
+        !formData.titulo ||
+        !formData.facilitador ||
+        !formData.fecha ||
+        !formData.fechaFin ||
+        !formData.duracion
+      ) {
+        showCustomToast("Error", "Todos los campos son obligatorios", "error");
+        return;
+      }
+    }
+
+    const modeText = isGeneralMode ? "general" : "completa";
+    showCustomToast(
+      "Guardado",
+      `La capacitación ${modeText} fue registrada correctamente`,
+      "success"
+    );
+
+    // Aquí puedes manejar el submit real con la API
+    console.log("Formulario enviado:", {
+      formData,
+      colaboradoresAsignados,
+      poesAsignados,
+      isGeneralMode,
+    });
+  };
   return {
     showColaboradorModal,
     setShowColaboradorModal,
@@ -147,5 +188,9 @@ export function useCapacitation() {
     setSelectedPoes,
     agregarColaboradores,
     agregarPoes,
+    isGeneralMode,
+    setIsGeneralMode,
+    toggleGeneralMode,
+    getFormTitle,
   };
 }

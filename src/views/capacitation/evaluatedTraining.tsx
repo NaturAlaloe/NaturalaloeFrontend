@@ -1,7 +1,6 @@
 import { useState } from "react";
 import FormContainer from "../../components/formComponents/FormContainer";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
-import SearchBar from "../../components/globalComponents/SearchBarTable";
 import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
 import SubmitButton from "../../components/formComponents/SubmitButton";
@@ -21,12 +20,6 @@ const CalificarColaboradoresPage = () => {
     { id: 3, nombre: "Carlos Ramírez", nota: "", seguimiento: "", comentario: "" },
     
   ]);
-
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const filtered = colaboradores.filter((c) =>
-    c.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleChange = (id: number, field: keyof Colaborador, value: string) => {
     setColaboradores((prev) =>
@@ -130,19 +123,12 @@ const CalificarColaboradoresPage = () => {
 
   return (
     <FormContainer title="Calificación de Colaboradores">
-      <div className="mb-6">
-        <SearchBar
-          value={searchTerm}
-          onChange={(val) => setSearchTerm(val)}
-          placeholder="Buscar por nombre..."
-        />
-      </div>
 
       <GlobalDataTable
         columns={columns}
-        data={filtered}
-        pagination
-        rowsPerPage={5}
+        data={colaboradores}
+        pagination={true}
+        rowsPerPage={10}
         customStyles={customStyles}
       />
 
