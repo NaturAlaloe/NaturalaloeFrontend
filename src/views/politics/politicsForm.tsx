@@ -1,111 +1,97 @@
-import { usePoliticsForm } from "../../hooks/politics/usePoliticsForm";
 import FormContainer from "../../components/formComponents/FormContainer";
 import InputField from "../../components/formComponents/InputField";
-import SelectField from "../../components/formComponents/SelectField";
-import PoeSearchInput from "../../components/formComponents/PoeSearchInput";
 import SubmitButton from "../../components/formComponents/SubmitButton";
+import SelectAutocomplete from "../../components/formComponents/SelectAutocomplete";
+import PdfInput from "../../components/formComponents/PdfInput";
+import { usePolitics } from "../../hooks/politics/usePolitics";
 
 export default function PoliticsForm() {
   const {
     formData,
-    busqueda,
-    setBusqueda,
-    showSugerencias,
-    setShowSugerencias,
-    resultados,
     handleChange,
     handleSubmit,
+    pdfFile,
+    setPdfFile,
+    handlePdfChange,
     responsables,
-    categorias,
-  } = usePoliticsForm();
+    loadingResponsables,
+  } = usePolitics();
 
   return (
     <FormContainer title="Registro de Política" onSubmit={handleSubmit}>
-      {/* Buscador de política existente */}
-      <PoeSearchInput
-        label="Buscar política existente"
-        busqueda={busqueda}
-        setBusqueda={setBusqueda}
-        showSugerencias={showSugerencias}
-        setShowSugerencias={setShowSugerencias}
-        resultados={resultados.map(pol => ({
-          ...pol,
-          titulo: pol.descripcion // agrega la propiedad 'titulo' usando 'descripcion'
-        }))}
-        onSelect={(pol: { codigo: string }) => setBusqueda(pol.codigo)}
-      />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <InputField
           label="Código"
           name="codigo"
           value={formData.codigo}
-          onChange={handleChange}
-          required
-          pattern=""
+          onChange={() => { }}
+          disabled
         />
         <InputField
           label="Descripción"
           name="descripcion"
           value={formData.descripcion}
           onChange={handleChange}
-          required
-          pattern=""
+          placeholder="Ingrese la descripción"
         />
-        <SelectField
-          label="Área"
-          name="area"
-          value={formData.area || ""}
-          onChange={handleChange}
-          options={[
-            { nombre: "Administrativa" },
-            { nombre: "Operativa" },
-            { nombre: "Gerencial" },
-            { nombre: "Comercial" },
-            { nombre: "Calidad" },
-          ]}
-          required
-          optionLabel="nombre"
-          optionValue="nombre"
-        />
-        <SelectField
-          label="Departamento"
-          name="departamento"
-          value={formData.departamento || ""}
-          onChange={handleChange}
-          options={[
-            { nombre: "Recursos Humanos" },
-            { nombre: "Finanzas" },
-            { nombre: "Producción" },
-            { nombre: "Ventas" },
-            { nombre: "Logística" },
-          ]}
-          required
-          optionLabel="nombre"
-          optionValue="nombre"
-        />
-        <SelectField
-          label="Categoría"
-          name="categoria"
-          value={formData.categoria}
-          onChange={handleChange}
-          options={categorias}
-          required
-          optionLabel="nombre"
-          optionValue="nombre"
-        />
-        <SelectField
+
+        <SelectAutocomplete
           label="Responsable"
-          name="responsable"
-          value={formData.responsable}
-          onChange={handleChange}
           options={responsables}
+          optionLabel="nombre_responsable"
+          optionValue="id_responsable"
+          value={
+            responsables.find(r => r.id_responsable === Number(formData.id_responsable)) || null
+          }
+          onChange={(selected) => {
+            // selected puede ser null o un objeto
+            handleChange({
+              target: {
+                name: "id_responsable",
+                value: selected && !Array.isArray(selected) ? selected.id_responsable : "",
+              },
+            });
+          }}
+          placeholder="Selecciona un responsable"
+          disabled={loadingResponsables}
+          fullWidth
+        />
+        <InputField
+          label="Versión"
+          name="version"
+          type="number"
+          value={formData.version}
+          onChange={handleChange}
+          placeholder="1.0"
           required
-          optionLabel="nombre"
-          optionValue="nombre"
+        />
+        <InputField
+          label="Fecha de Creación"
+          name="fecha_creacion"
+          value={formData.fecha_creacion}
+          onChange={handleChange}
+          type="date"
+          required
+        />
+        <InputField
+          label="Fecha de Vigencia"
+          name="fecha_vigencia"
+          value={formData.fecha_vigencia}
+          onChange={handleChange}
+          type="date"
+          required
+        />
+        <PdfInput
+          pdfFile={pdfFile}
+          onChange={handlePdfChange}
+          onRemove={() => setPdfFile(null)}
+          required={!pdfFile}
         />
       </div>
       <div className="text-center mt-8">
-        <SubmitButton width="">{"Guardar"}</SubmitButton>
+        <SubmitButton width="">
+          Guardar
+        </SubmitButton>
       </div>
     </FormContainer>
   );

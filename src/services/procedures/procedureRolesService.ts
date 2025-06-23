@@ -5,10 +5,9 @@ export const getRolesWithProcedures = async () => {
   return res.data.data;
 };
 
-export const assignProceduresToRole = async (roleId: number, procedureIds: number[]) => {
-  // Cambia la URL aquí:
-  return api.post("/asignarProcedimientos", {
-    roleId,
-    procedureIds,
+export const assignProceduresToRole = async (id_rol: number, id_documento: number[]) => {
+  return api.put("/procedures/assign", {
+    id_rol,
+    id_documento,
   });
 };

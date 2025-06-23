@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { getAreas } from "../../services/manage/areaService";
 
 export function useAreas() {
-  const [areas, setAreas] = useState<{ codigo: string; nombre: string }[]>([]);
+  const [areas, setAreas] = useState<{
+    id_area: string;
+    nombre: string;
+    codigo: string;
+  }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -10,8 +14,9 @@ export function useAreas() {
       .then((data) => {
         setAreas(
           data.map((a: any) => ({
-            codigo: a.id_area?.toString() || a.id || a.codigo || a.codigo_area || "",
+            id_area: a.id_area?.toString() || a.id || a.codigo || a.codigo_area || "",
             nombre: a.nombre || a.titulo || a.titulo_area || "",
+            codigo: a.codigo_area?.toString() || a.codigo || a.id_area?.toString() || ""
           }))
         );
       })
