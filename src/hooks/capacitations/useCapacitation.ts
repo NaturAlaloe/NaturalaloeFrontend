@@ -1,5 +1,10 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+import { 
+  createCapacitacion, 
+  validateCapacitacionData,
+  type CreateCapacitacionRequest 
+} from "../../services/capacitations/addCapacitationsService";
 
 // Datos quemados de ejemplo
 const facilitadores = [
@@ -42,6 +47,8 @@ const columnsPoes = [
   { name: "Título", selector: (row: any) => row.titulo, sortable: true },
 ];
 
+
+
 interface FormData {
   titulo: string;
   tipoCapacitacion: string;
@@ -50,6 +57,7 @@ interface FormData {
   fechaFin: string;
   duracion: string;
   metodoEvaluacion: string;
+  comentario?: string;
 }
 
 export function useCapacitation() {
@@ -58,6 +66,7 @@ export function useCapacitation() {
   const [isEvaluado, setIsEvaluado] = useState(false);
   const [showAsignacionesModal, setShowAsignacionesModal] = useState(false);
   const [isGeneralMode, setIsGeneralMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     titulo: "",
@@ -67,6 +76,7 @@ export function useCapacitation() {
     fechaFin: "",
     duracion: "",
     metodoEvaluacion: "",
+    comentario: "",
   });
 
   // Estado para tablas de selección en el modal
@@ -98,9 +108,8 @@ export function useCapacitation() {
     ]);
     setShowPoesTable(false);
   };
-
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -115,46 +124,106 @@ export function useCapacitation() {
   const getFormTitle = () => {
     return `Registro de Capacitación${isGeneralMode ? " - Modo General" : ""}`;
   };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    if (isGeneralMode) {
-      // En modo General, solo se requiere el título
-      if (!formData.titulo) {
-        showCustomToast("Error", "El título es obligatorio", "error");
+    try {
+      // Validaciones básicas del formulario
+      if (isGeneralMode) {
+        // En modo General, solo se requiere el título
+        if (!formData.titulo) {
+          showCustomToast("Error", "El título es obligatorio", "error");
+          return;
+        }
+      } else {
+        // En modo normal, todos los campos son obligatorios
+        if (
+          !formData.titulo ||
+          !formData.facilitador ||
+          !formData.fecha ||
+          !formData.fechaFin ||
+          !formData.duracion
+        ) {
+          showCustomToast("Error", "Todos los campos son obligatorios", "error");
+          return;
+        }
+      }
+
+      // Validar que hay colaboradores y POEs asignados
+      if (colaboradoresAsignados.length === 0) {
+        showCustomToast("Error", "Debe asignar al menos un colaborador", "error");
         return;
       }
-    } else {
-      // En modo normal, todos los campos son obligatorios
-      if (
-        !formData.titulo ||
-        !formData.facilitador ||
-        !formData.fecha ||
-        !formData.fechaFin ||
-        !formData.duracion
-      ) {
-        showCustomToast("Error", "Todos los campos son obligatorios", "error");
+
+      if (poesAsignados.length === 0) {
+        showCustomToast("Error", "Debe asignar al menos un documento normativo (POE)", "error");
         return;
       }
+
+      // Preparar datos para el API
+      const capacitacionData: CreateCapacitacionRequest = {
+        id_colaborador: colaboradoresAsignados.map(c => c.id),
+        id_facilitador: formData.facilitador ? parseInt(formData.facilitador) : undefined,
+        id_documento_normativo: poesAsignados.map(p => p.id),
+        titulo_capacitacion: formData.titulo,
+        fecha_inicio: formData.fecha,
+        fecha_fin: formData.fechaFin,
+        comentario: formData.comentario || undefined,
+        is_evaluado: isEvaluado,
+        metodo_empleado: formData.metodoEvaluacion,
+        duracion: parseFloat(formData.duracion)
+      };
+
+      // Validar datos antes de enviar
+      const validationErrors = validateCapacitacionData(capacitacionData);
+      if (validationErrors.length > 0) {
+        showCustomToast("Error de validación", validationErrors[0], "error");
+        return;
+      }
+
+      // Enviar a la API
+      const result = await createCapacitacion(capacitacionData);
+
+      if (result.success) {
+        const modeText = isGeneralMode ? "general" : "completa";
+        showCustomToast(
+          "Éxito",
+          `La capacitación ${modeText} fue registrada correctamente`,
+          "success"
+        );
+
+        // Limpiar formulario después del éxito
+        resetForm();
+      } else {
+        showCustomToast("Error", result.message, "error");
+      }
+
+    } catch (error) {
+      console.error("Error al enviar capacitación:", error);
+      showCustomToast("Error", "Error inesperado al registrar la capacitación", "error");
+    } finally {
+      setIsLoading(false);
     }
-
-    const modeText = isGeneralMode ? "general" : "completa";
-    showCustomToast(
-      "Guardado",
-      `La capacitación ${modeText} fue registrada correctamente`,
-      "success"
-    );
-
-    // Aquí puedes manejar el submit real con la API
-    console.log("Formulario enviado:", {
-      formData,
-      colaboradoresAsignados,
-      poesAsignados,
-      isGeneralMode,
-    });
   };
-  return {
+
+  // Función para limpiar el formulario
+  const resetForm = () => {
+    setFormData({
+      titulo: "",
+      tipoCapacitacion: "",
+      facilitador: "",
+      fecha: "",
+      fechaFin: "",
+      duracion: "",
+      metodoEvaluacion: "",
+      comentario: "",
+    });
+    setColaboradoresAsignados([]);
+    setPoesAsignados([]);
+    setIsEvaluado(false);
+    setIsGeneralMode(false);
+  };  return {
     showColaboradorModal,
     setShowColaboradorModal,
     showFacilitadorModal,
@@ -192,5 +261,7 @@ export function useCapacitation() {
     setIsGeneralMode,
     toggleGeneralMode,
     getFormTitle,
+    isLoading,
+    resetForm,
   };
 }

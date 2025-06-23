@@ -8,8 +8,7 @@ import { useCapacitation } from '../../hooks/capacitations/useCapacitation';
 import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 
-const Capacitacion = () => {
-    const {
+const Capacitacion = () => {    const {
         isEvaluado,
         setIsEvaluado,
         showAsignacionesModal,
@@ -34,6 +33,7 @@ const Capacitacion = () => {
         isGeneralMode,
         toggleGeneralMode,
         getFormTitle,
+        isLoading,
     } = useCapacitation();
 
     return (<FormContainer
@@ -83,13 +83,13 @@ const Capacitacion = () => {
                 value={formData.fechaFin}
                 onChange={handleChange}
                 disabled={isGeneralMode}
-            />
-            <InputField
+            />            <InputField
                 name="duracion"
                 label="Duración (horas):"
-                type="time"
-                min="00:01"
-                step="60"
+                type="number"
+                min="0.1"
+                step="0.1"
+                placeholder="Ej: 2.5"
                 className="w-full"
                 value={formData.duracion}
                 onChange={handleChange}
@@ -118,8 +118,7 @@ const Capacitacion = () => {
                     disabled={isGeneralMode}
                 />
                 <label htmlFor="evaluado" className="font-semibold text-[#2AAC67]">Es Evaluado:</label>
-            </div>
-            <div className="md:col-span-3">
+            </div>            <div className="md:col-span-3">
                 <label htmlFor="comentario" className="block font-semibold text-[#2AAC67] mb-1">
                     Comentario:
                 </label>
@@ -128,23 +127,28 @@ const Capacitacion = () => {
                     name="comentario"
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] resize-y min-h-[80px]"
                     placeholder="Agrega un comentario..."
+                    value={formData.comentario || ""}
+                    onChange={handleChange}
                     disabled={isGeneralMode}
                 />
             </div>
-        </div>
-        <div className="flex justify-center mt-6 gap-4">
-            <SubmitButton width="w-40">
-                Guardar
+        </div>        <div className="flex justify-center mt-6 gap-4">
+            <SubmitButton width="w-40" disabled={isLoading}>
+                {isLoading ? "Guardando..." : "Guardar"}
             </SubmitButton>
             <SubmitButton
                 type="button"
                 onClick={() => setShowAsignacionesModal(true)}
-                width="w-40">
+                width="w-40"
+                disabled={isLoading}>
                 Asignar
-            </SubmitButton>                <SubmitButton
+            </SubmitButton>
+
+            <SubmitButton
                 type="button"
                 onClick={toggleGeneralMode}
                 width="w-40"
+                disabled={isLoading}
                 className={isGeneralMode ? "bg-orange-500 hover:bg-orange-600" : ""}>
                 {isGeneralMode ? 'Normal' : 'General'}
             </SubmitButton>
