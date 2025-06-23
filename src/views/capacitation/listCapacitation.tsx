@@ -4,7 +4,8 @@ import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 import { useCapacitationList } from '../../hooks/capacitations/useCapacitationList';
 import SimpleModal from "../../components/globalComponents/SimpleModal";
 
-export default function ListCapacitations() {  const {
+export default function ListCapacitations() {
+  const {
     capacitations,
     searchTerm,
     setSearchTerm,
@@ -25,6 +26,11 @@ export default function ListCapacitations() {  const {
     selectedCapacitation,
     handleRowClick,
     navegarCapacitacionFinalizada,
+    // Nuevos estados para manejar carga y errores
+    isLoading,
+    error,
+    loadCapacitations,
+    totalCount,
   } = useCapacitationList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -165,8 +171,38 @@ export default function ListCapacitations() {  const {
           {seguimientos.map((seg) => (
             <option key={seg} value={seg}>{seg}</option>
           ))}
-        </select>
-      </div>
+        </select>      </div>
+
+      {/* Indicador de carga */}      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2AAC67]"></div>
+          <span className="ml-2 text-gray-600">Cargando capacitaciones...</span>
+        </div>
+      )}
+
+      {/* Manejo de errores */}
+      {error && !isLoading && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+          <div className="flex items-center">
+            <div className="text-red-600 font-medium">Error al cargar capacitaciones</div>
+            <button
+              onClick={() => loadCapacitations()}
+              className="ml-auto px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+            >
+              Reintentar
+            </button>
+          </div>
+          <div className="text-red-600 text-sm mt-1">{error}</div>
+        </div>
+      )}
+
+      {/* Información de resultados */}
+      {!isLoading && !error && (
+        <div className="mb-4 text-sm text-gray-600">
+          Mostrando {capacitations.length} de {totalCount} capacitaciones
+        </div>
+      )}
+
       <div className="border border-gray-200 rounded-lg overflow-x-auto">
         <GlobalDataTable
           columns={columns}
@@ -174,7 +210,11 @@ export default function ListCapacitations() {  const {
           rowsPerPage={10}
           dense
           highlightOnHover
-          noDataComponent={<div className="px-6 py-4 text-center text-sm text-gray-500">No se encontraron capacitaciones</div>}
+          noDataComponent={
+            <div className="px-6 py-4 text-center text-sm text-gray-500">
+              {isLoading ? "Cargando capacitaciones..." : "No se encontraron capacitaciones"}
+            </div>
+          }
           customStyles={{
             headCells: {
               style: {
@@ -187,6 +227,7 @@ export default function ListCapacitations() {  const {
             },
           }}
           onRowClicked={handleRowClick}
+          progressPending={isLoading}
         />
       </div>
       {showModal && selectedCapacitation && (

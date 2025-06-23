@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getCapacitationList, type CapacitationList } from "../../services/capacitations/getCapacitationList";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export interface Capacitation {
   id: string;
@@ -31,95 +33,12 @@ export interface Capacitation {
 }
 
 export function useCapacitationList() {
-  const initialCapacitations: Capacitation[] = [
-    {
-      id: "001",
-      poe: "POE-001",
-      titulo: "Inducción a la empresa",
-      duracion: 8,
-      tipo: "Individual",
-      fechaInicio: "2024-06-01",
-      fechaFinal: "2024-06-05",
-      comentario: "Inducción general para nuevos colaboradores.",
-      evaluado: "Sí",
-      metodo: "Teórico",
-      seguimiento: "Reprogramar",
-      estado: "Finalizado",
-      colaborador: {
-        nombreCompleto: "Juan Pérez",
-        cedula: "123456789",
-        correo: "juan.perez@email.com",
-        telefono: "555-1234",
-        area: "Producción",
-        departamento: "Operaciones",
-        puesto: "Operador",
-      },
-      profesor: {
-        nombre: "Ana",
-        apellido: "García",
-        identificacion: "987654321",
-      },
-    },
-    {
-      id: "002",
-      poe: "POE-002",
-      titulo: "Capacitación en seguridad",
-      duracion: 6,
-      tipo: "Individual",
-      fechaInicio: "2024-06-10",
-      fechaFinal: "2024-06-12",
-      comentario:
-        "Capacitación en seguridad industrial y protocolos de emergencia.",
-      evaluado: "No",
-      metodo: "Práctico",
-      seguimiento: "Satisfactorio",
-      estado: "Pendiente",
-      colaborador: {
-        nombreCompleto: "María López",
-        cedula: "987654321",
-        correo: "maria.lopez@email.com",
-        telefono: "555-5678",
-        area: "Calidad",
-        departamento: "Control",
-        puesto: "Supervisora",
-      },
-      profesor: {
-        nombre: "Carlos",
-        apellido: "Ramírez",
-        identificacion: "123123123",
-      },
-    },
-    {
-      id: "003",
-      poe: "POE-003",
-      titulo: "Actualización de procesos",
-      duracion: 4,
-      tipo: "Grupal",
-      fechaInicio: "2024-07-01",
-      fechaFinal: "2024-07-03",
-      comentario: "Actualización de procesos internos y mejores prácticas.",
-      evaluado: "Sí",
-      metodo: "Mixto",
-      seguimiento: "Reevaluación",
-      estado: "Finalizado",
-      colaborador: {
-        nombreCompleto: "Pedro Sánchez",
-        cedula: "456789123",
-        correo: "pedro.sanchez@email.com",
-        telefono: "555-8765",
-        area: "Logística",
-        departamento: "Almacén",
-        puesto: "Encargado",
-      },
-      profesor: {
-        nombre: "Lucía",
-        apellido: "Fernández",
-        identificacion: "321321321",
-      },
-    },
-  ];
-
-  const [capacitations] = useState<Capacitation[]>(initialCapacitations);
+  // Estados para datos de la API
+  const [capacitations, setCapacitations] = useState<Capacitation[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Estados para filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState("");
   const [poeFilter, setPoeFilter] = useState("");
   const [estadoFilter, setEstadoFilter] = useState("");
@@ -129,16 +48,84 @@ export function useCapacitationList() {
 
   const [rowsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
-  const [selectedCapacitation, setSelectedCapacitation] =
-    useState<Capacitation | null>(null);
+  const [selectedCapacitation, setSelectedCapacitation] = useState<Capacitation | null>(null);
   const navigate = useNavigate();
 
+  // Función para transformar datos de la API al formato de la interfaz
+  const transformApiDataToCapacitation = (apiData: CapacitationList): Capacitation => {
+    return {
+      id: apiData.id_capacitacion.toString(),
+      poe: apiData.codigo_documento || "N/A",
+      titulo: apiData.descripcion_documento || "Sin título",
+      duracion: parseFloat(apiData.duracion) || 0,
+      fechaInicio: new Date(apiData.fecha_inicio).toISOString().split('T')[0],
+      fechaFinal: new Date(apiData.fecha_fin).toISOString().split('T')[0],
+      comentario: apiData.comentario || "Sin comentarios",
+      tipo: apiData.tipo_capacitacion || "Individual",
+      evaluado: apiData.is_evaluado === "1" ? "Sí" : "No",
+      metodo: apiData.metodo_empleado || "N/A",
+      seguimiento: apiData.seguimiento || "N/A",
+      estado: apiData.estado || "N/A",
+      colaborador: {
+        nombreCompleto: apiData.nombre_colaborador || "Sin nombre",
+        cedula: apiData.id_colaborador || "N/A",
+        correo: "N/A", // No viene en la API
+        telefono: "N/A", // No viene en la API
+        area: "N/A", // No viene en la API
+        departamento: "N/A", // No viene en la API
+        puesto: "N/A", // No viene en la API
+      },
+      profesor: {
+        nombre: apiData.nombre_facilitador?.split(' ')[0] || "Sin nombre",
+        apellido: apiData.nombre_facilitador?.split(' ').slice(1).join(' ') || "",
+        identificacion: apiData.id_facilitador.toString() || "N/A",
+      },
+    };
+  };
+
+  // Función para cargar capacitaciones desde la API
+  const loadCapacitations = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      console.log("Cargando capacitaciones desde la API...");
+      
+      const apiData = await getCapacitationList();
+      console.log("Datos recibidos de la API:", apiData);
+      
+      if (!Array.isArray(apiData)) {
+        throw new Error("Los datos recibidos no son un array válido");
+      }
+
+      const transformedData = apiData.map(transformApiDataToCapacitation);
+      console.log("Datos transformados:", transformedData);
+      
+      setCapacitations(transformedData);
+      
+      if (transformedData.length === 0) {
+        showCustomToast("Info", "No se encontraron capacitaciones", "info");
+      }
+      
+    } catch (error) {
+      console.error("Error al cargar capacitaciones:", error);
+      setError("No se pudieron cargar las capacitaciones");
+      showCustomToast("Error", "No se pudieron cargar las capacitaciones", "error");
+      setCapacitations([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    loadCapacitations();
+  }, []);
+
+  // Generar listas únicas para filtros
   const poes = Array.from(new Set(capacitations.map((c) => c.poe)));
   const estados = Array.from(new Set(capacitations.map((c) => c.estado)));
   const tipos = Array.from(new Set(capacitations.map((c) => c.tipo)));
-  const seguimientos = Array.from(
-    new Set(capacitations.map((c) => c.seguimiento))
-  );
+  const seguimientos = Array.from(new Set(capacitations.map((c) => c.seguimiento)));
 
   const filteredCapacitations = capacitations.filter((cap) => {
     const matchesSearch =
@@ -172,8 +159,7 @@ export function useCapacitationList() {
   const handleRowClick = (cap: Capacitation) => {
     setSelectedCapacitation(cap);
     setShowModal(true);
-  };
-  return {
+  };  return {
     capacitations: paginatedCapacitations,
     searchTerm,
     setSearchTerm,
@@ -200,5 +186,11 @@ export function useCapacitationList() {
     setSelectedCapacitation,
     handleRowClick,
     totalCount: filteredCapacitations.length,
+    // Nuevas propiedades para manejar el estado de carga
+    isLoading,
+    error,
+    loadCapacitations, // Función para recargar datos manualmente
   };
 }
+
+
