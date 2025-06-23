@@ -1,26 +1,67 @@
+// src/views/capacitations/EvaluatedTraining.tsx
 import { useParams } from "react-router-dom";
-import { useEvaluatedTraining, type Colaborador } from "../../hooks/capacitations/useEvaluatedTraining";
+import {
+  useEvaluatedTraining,
+  type Colaborador,
+} from "../../hooks/capacitations/useEvaluatedTraining";
+import { useAddEvaluatedTraining } from "../../hooks/capacitations/useAddEvaluatedTraining";
 import FormContainer from "../../components/formComponents/FormContainer";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
 import SubmitButton from "../../components/formComponents/SubmitButton";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+import CustomToaster from "../../components/globalComponents/CustomToaster";
+import { addEvaluatedTraining } from "../../services/capacitations/addEvaluatedTrainingService";
 
 const EvaluatedTraining = () => {
   const { idCapacitacion } = useParams();
   const numericId = Number(idCapacitacion);
+  const { colaboradores, loading, error, setColaboradores } =
+    useEvaluatedTraining(numericId);
+  const { submitEvaluatedTraining } = useAddEvaluatedTraining();
 
-  const { colaboradores, loading, error, setColaboradores } = useEvaluatedTraining(numericId);
-
-  const handleChange = (id: number, field: keyof Colaborador, value: string) => {
+  const handleChange = (
+    id: number,
+    field: keyof Colaborador,
+    value: string
+  ) => {
     setColaboradores((prev) =>
       prev.map((c) => (c.id === id ? { ...c, [field]: value } : c))
     );
   };
 
-  const handleGuardarTodos = () => {
-    alert("Calificaciones y seguimientos guardados correctamente.");
-    console.log("Datos guardados:", colaboradores);
+  const handleGuardarTodos = async () => {
+    if (colaboradores.length === 0) {
+      showCustomToast(
+        "No hay colaboradores para calificar",
+        "Asegúrese de que esta capacitación tenga colaboradores asignados.",
+        "info"
+      );
+      return;
+    }
+
+    try {
+      const dataToSend = colaboradores.map((colab) => ({
+        id_capacitacion: numericId,
+        seguimiento: colab.seguimiento.toLowerCase(),
+        nota: Number(colab.nota),
+        comentario_final: colab.comentario,
+      }));
+
+      await addEvaluatedTraining(dataToSend);
+      showCustomToast(
+        "Datos guardados con éxito",
+        "Las calificaciones han sido almacenadas correctamente.",
+        "success"
+      );
+    } catch (err) {
+      showCustomToast(
+        "Error al guardar",
+        "No se pudieron guardar las calificaciones.",
+        "error"
+      );
+    }
   };
 
   const columns = [
@@ -49,7 +90,9 @@ const EvaluatedTraining = () => {
         <SelectField
           name={`seguimiento-${row.id}`}
           value={row.seguimiento}
-          onChange={(e) => handleChange(row.id, "seguimiento", e.target.value)}
+          onChange={(e) =>
+            handleChange(row.id, "seguimiento", e.target.value)
+          }
           options={["Satisfactorio", "Reprogramar", "Reevaluación"]}
         />
       ),
@@ -60,7 +103,9 @@ const EvaluatedTraining = () => {
         <textarea
           name={`comentario-${row.id}`}
           value={row.comentario}
-          onChange={(e) => handleChange(row.id, "comentario", e.target.value)}
+          onChange={(e) =>
+            handleChange(row.id, "comentario", e.target.value)
+          }
           rows={3}
           className="w-full border border-[#2AAC67] rounded-lg px-2 py-1 text-sm text-[#2AAC67] resize-none"
         />
@@ -113,24 +158,29 @@ const EvaluatedTraining = () => {
   };
 
   if (loading) return <p className="text-center">Cargando colaboradores...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (error)
+    return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <FormContainer title="Calificación de Colaboradores">
-      <GlobalDataTable
-        columns={columns}
-        data={colaboradores}
-        pagination={true}
-        rowsPerPage={10}
-        customStyles={customStyles}
-      />
+    <>
+      <FormContainer title="Calificación de Colaboradores">
+        <GlobalDataTable
+          columns={columns}
+          data={colaboradores}
+          pagination={true}
+          rowsPerPage={10}
+          customStyles={customStyles}
+        />
 
-      <div className="flex justify-center mt-6">
-        <SubmitButton onClick={handleGuardarTodos}>
-          Guardar calificaciones
-        </SubmitButton>
-      </div>
-    </FormContainer>
+        <div className="flex justify-center mt-6">
+          <SubmitButton onClick={handleGuardarTodos}>
+            Guardar calificaciones
+          </SubmitButton>
+        </div>
+      </FormContainer>
+
+      <CustomToaster />
+    </>
   );
 };
 
