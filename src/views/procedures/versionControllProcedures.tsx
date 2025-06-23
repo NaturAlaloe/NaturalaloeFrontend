@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Visibility } from "@mui/icons-material";
 import { useProceduresVersions, type ProcedureRow } from "../../hooks/proceduresVersionControll/useProceduresVersions";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import SearchBar from "../../components/globalComponents/SearchBarTable";
+import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner"; // <-- Importa el spinner
 
 export default function VersionControlProcedures() {
   const { procedures, loading } = useProceduresVersions();
@@ -112,6 +113,11 @@ export default function VersionControlProcedures() {
       width: "120px",
     },
   ];
+
+  // Muestra el spinner a pantalla completa mientras loading sea true
+  if (loading) {
+    return <FullScreenSpinner />;
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
