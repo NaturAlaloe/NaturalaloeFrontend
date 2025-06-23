@@ -9,12 +9,14 @@ export default function FacilitatorTraining() {
     tipo,
     internoSeleccionado,
     nombre,
-    apellido,
+    apellido1,
+    apellido2,
     identificacion,
     handleTipoChange,
     handleInternoChange,
     setNombre,
-    setApellido,
+    setApellido1,
+    setApellido2,
     setIdentificacion,
     handleSubmit,
     facilitadoresInternos,
@@ -44,7 +46,7 @@ export default function FacilitatorTraining() {
             value={internoSeleccionado}
             onChange={handleInternoChange}
             options={facilitadoresInternos.map((f) => ({
-              nombre: `${f.nombre} ${f.apellido}`,
+              nombre: `${f.nombre} ${f.apellido1} ${f.apellido2}`,
               value: f.id_facilitador.toString(),
             }))}
             required
@@ -55,15 +57,17 @@ export default function FacilitatorTraining() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-        <InputField
-          label="Identificación"
-          name="identificacion"
-          value={identificacion}
-          onChange={(e) => setIdentificacion(e.target.value)}
-          required
-          readOnly={tipo === "Interno"}
-          placeholder="Identificación"
-        />
+        {tipo === "Interno" && (
+          <InputField
+            label="Identificación"
+            name="identificacion"
+            value={identificacion}
+            onChange={(e) => setIdentificacion(e.target.value)}
+            required
+            readOnly
+            placeholder="Identificación"
+          />
+        )}
 
         <InputField
           label="Nombre"
@@ -76,13 +80,23 @@ export default function FacilitatorTraining() {
         />
 
         <InputField
-          label="Apellido"
-          name="apellido"
-          value={apellido}
-          onChange={(e) => setApellido(e.target.value)}
+          label="Primer Apellido"
+          name="apellido1"
+          value={apellido1}
+          onChange={(e) => setApellido1(e.target.value)}
           required
           readOnly={tipo === "Interno"}
-          placeholder="Apellido del facilitador"
+          placeholder="Primer Apellido"
+        />
+
+        <InputField
+          label="Segundo Apellido"
+          name="apellido2"
+          value={apellido2}
+          onChange={(e) => setApellido2(e.target.value)}
+          required
+          readOnly={tipo === "Interno"}
+          placeholder="Segundo Apellido"
         />
       </div>
 
