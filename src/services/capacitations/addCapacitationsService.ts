@@ -1,17 +1,16 @@
 import api from "../../apiConfig/api";
 
-// Interfaces para capacitaciones
 export interface CreateCapacitacionRequest {
-  id_colaborador: number[]; // Array de IDs de colaboradores
-  id_facilitador?: number; // Opcional
-  id_documento_normativo: number[]; // Array de IDs de documentos normativos
+  id_colaborador: number[];
+  id_facilitador?: number;
+  id_documento_normativo: number[];
   titulo_capacitacion: string;
-  fecha_inicio: string; // Formato: "YYYY-MM-DD"
-  fecha_fin: string; // Formato: "YYYY-MM-DD"
-  comentario?: string; // Opcional
-  is_evaluado: boolean; // true o false
-  metodo_empleado: string; // Ej: "teórico", "práctico", etc.
-  duracion: number; // En horas (puede ser decimal como 2.5)
+  fecha_inicio: string;
+  fecha_fin: string;
+  comentario?: string;
+  is_evaluado: boolean;
+  metodo_empleado: string;
+  duracion: number;
 }
 
 export interface CreateCapacitacionResponse {
@@ -20,43 +19,69 @@ export interface CreateCapacitacionResponse {
   data?: any;
 }
 
-// Crear/Agendar nueva capacitación
-export const createCapacitacion = async (capacitacion: CreateCapacitacionRequest): Promise<CreateCapacitacionResponse> => {
+export const createCapacitacion = async (
+  capacitacion: CreateCapacitacionRequest
+): Promise<CreateCapacitacionResponse> => {
   try {
     console.log("POST /training", capacitacion);
     const response = await api.post("/training", capacitacion);
     return {
       success: true,
       message: "Capacitación agendada exitosamente",
-      data: response.data
+      data: response.data,
     };
   } catch (error: any) {
     console.error("Error al crear capacitación:", error);
-    
-    const errorMessage = error.response?.data?.message || "Error al agendar la capacitación";
-    
+
+    const errorMessage =
+      error.response?.data?.message || "Error al agendar la capacitación";
+
     return {
       success: false,
       message: errorMessage,
-      data: error.response?.data
+      data: error.response?.data,
     };
   }
 };
 
+export interface Capacitation_General {
+  id_capacitacion_general: number;
+  titulo: string;
+  fecha_capacitacion: Date;
+  id_colaborador: number;
+  nombre_completo: string;
+}
 
-export const formatDateForAPI = (date: Date): string => {
-  return date.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+export const createCapacitacionGeneral = async (data: {
+  titulo: string;
+  id_colaborador: number[];
+}): Promise<any> => {
+  try {
+    const response = await api.post("/training/general", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error al crear capacitación general:", error);
+    throw error;
+  }
 };
 
+export const formatDateForAPI = (date: Date): string => {
+  return date.toISOString().split("T")[0];
+};
 
-export const validateCapacitacionData = (data: CreateCapacitacionRequest): string[] => {
+export const validateCapacitacionData = (
+  data: CreateCapacitacionRequest
+): string[] => {
   const errors: string[] = [];
 
   if (!data.id_colaborador || data.id_colaborador.length === 0) {
     errors.push("Debe seleccionar al menos un colaborador");
   }
 
-  if (!data.id_documento_normativo || data.id_documento_normativo.length === 0) {
+  if (
+    !data.id_documento_normativo ||
+    data.id_documento_normativo.length === 0
+  ) {
     errors.push("Debe seleccionar al menos un documento normativo");
   }
 
@@ -72,7 +97,11 @@ export const validateCapacitacionData = (data: CreateCapacitacionRequest): strin
     errors.push("La fecha de fin es requerida");
   }
 
-  if (data.fecha_inicio && data.fecha_fin && data.fecha_inicio > data.fecha_fin) {
+  if (
+    data.fecha_inicio &&
+    data.fecha_fin &&
+    data.fecha_inicio > data.fecha_fin
+  ) {
     errors.push("La fecha de inicio no puede ser posterior a la fecha de fin");
   }
 

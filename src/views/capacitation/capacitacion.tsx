@@ -36,19 +36,18 @@ const Capacitacion = () => {
         isLoading,
         loadingFacilitadores,
         getFacilitadoresOptions,
-    } = useCapacitation();
-
-    return (<FormContainer
+        handleSubmitGeneral,
+    } = useCapacitation(); return (<FormContainer
         title={getFormTitle()}
-        onSubmit={handleSubmit}
-    >
-        {isGeneralMode && (
-            <div className="mb-4 p-3 bg-orange-100 border border-orange-300 rounded-lg">
-                <p className="text-orange-800 text-sm">
-                    <strong>Modo General:</strong> Solo se puede editar el título y asignar colaboradores. Los demás campos están deshabilitados.
-                </p>
-            </div>
-        )}
+        onSubmit={isGeneralMode ? handleSubmitGeneral : handleSubmit}
+    >        {isGeneralMode && (
+        <div className="mb-4 p-3 bg-orange-100 border border-orange-300 rounded-lg">
+            <p className="text-orange-800 text-sm">
+                <strong>Modo General:</strong> Solo se puede editar el título y asignar colaboradores.
+                Los demás campos están deshabilitados. No se requieren POEs ni facilitadores para capacitaciones generales.
+            </p>
+        </div>
+    )}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <InputField
                 name="titulo"
@@ -247,8 +246,6 @@ const Capacitacion = () => {
                         onAdd={agregarPoes}
                     />
                 )}
-
-
             </SimpleModal>
         )}
     </FormContainer>

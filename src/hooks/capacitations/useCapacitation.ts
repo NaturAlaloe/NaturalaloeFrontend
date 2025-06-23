@@ -4,6 +4,7 @@ import {
   createCapacitacion,
   validateCapacitacionData,
   type CreateCapacitacionRequest,
+  createCapacitacionGeneral,
 } from "../../services/capacitations/addCapacitationsService";
 import {
   getFacilitadores,
@@ -12,7 +13,7 @@ import {
   type Colaboradores,
   getProcedimientos,
   type Procedimientos,
-} from "../../services/capacitations/getCapacitations";
+} from "../../services/capacitations/getCapacitationsService";
 
 const metodosEvaluacion = [
   { value: "", label: "Seleccione...", disabled: true },
@@ -146,7 +147,8 @@ export function useCapacitation() {
           if (!proc) {
             console.warn("Procedimiento es null/undefined");
             return null;
-          }          return {
+          }
+          return {
             ...proc,
             id: proc.id_documento, // Para compatibilidad con la lógica existente
             titulo: `Documento ${proc.codigo}`, // Como solo viene código, crear un título
@@ -306,9 +308,7 @@ export function useCapacitation() {
           );
           return;
         }
-      }
-
-      // Validar que hay colaboradores y POEs asignados
+      } // Validar que hay colaboradores y POEs asignados
       if (colaboradoresAsignados.length === 0) {
         showCustomToast(
           "Error",
@@ -318,7 +318,8 @@ export function useCapacitation() {
         return;
       }
 
-      if (poesAsignados.length === 0) {
+      // Solo validar POEs en modo normal (no general)
+      if (!isGeneralMode && poesAsignados.length === 0) {
         showCustomToast(
           "Error",
           "Debe asignar al menos un documento normativo (POE)",
@@ -370,7 +371,75 @@ export function useCapacitation() {
     } finally {
       setIsLoading(false);
     }
+  }; // Función para enviar capacitación general
+  const handleSubmitGeneral = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      // Validaciones básicas para capacitación general
+      if (!formData.titulo || formData.titulo.trim() === "") {
+        showCustomToast("Error", "El título es obligatorio", "error");
+        return;
+      }
+
+      if (colaboradoresAsignados.length === 0) {
+        showCustomToast(
+          "Error",
+          "Debe asignar al menos un colaborador",
+          "error"
+        );
+        return;
+      }
+
+      // Preparar datos para capacitación general
+      const capacitacionGeneralData = {
+        titulo: formData.titulo.trim(),
+        id_colaborador: colaboradoresAsignados.map((c) => c.id),
+      };
+
+      console.log("Enviando capacitación general:", capacitacionGeneralData);
+
+      // Enviar a la API
+      const result = await createCapacitacionGeneral(capacitacionGeneralData);
+
+      console.log("Respuesta del servidor:", result);
+
+      // Verificar si la respuesta indica éxito
+      if (result && result.success !== false) {
+        showCustomToast(
+          "Éxito",
+          "La capacitación general fue registrada correctamente",
+          "success"
+        );
+
+        // Limpiar formulario después del éxito
+        resetForm();
+      } else {
+        const errorMessage =
+          result?.message ||
+          "Error desconocido al registrar la capacitación general";
+        showCustomToast("Error", errorMessage, "error");
+      }
+    } catch (error: any) {
+      console.error("Error al enviar capacitación general:", error);
+
+      // Manejar diferentes tipos de errores
+      let errorMessage =
+        "Error inesperado al registrar la capacitación general";
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      showCustomToast("Error", errorMessage, "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   // Función para limpiar el formulario
   const resetForm = () => {
     setFormData({
@@ -388,8 +457,6 @@ export function useCapacitation() {
     setIsEvaluado(false);
     setIsGeneralMode(false);
   };
-  
- 
 
   return {
     showColaboradorModal,
@@ -408,7 +475,6 @@ export function useCapacitation() {
     metodosEvaluacion,
     colaboradoresDisponibles,
     columnsColaboradores,
-    
     procedimientosDisponibles,
     columnsPoes,
     loadingProcedimientos,
@@ -439,5 +505,6 @@ export function useCapacitation() {
     getFacilitadorIdByNombre,
     loadingColaboradores,
     loadColaboradores,
+    handleSubmitGeneral,
   };
 }

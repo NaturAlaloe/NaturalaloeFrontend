@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCapacitationList, type CapacitationList } from "../../services/capacitations/getCapacitationList";
+import { getCapacitationList, type CapacitationList } from "../../services/capacitations/getCapacitationListService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export interface Capacitation {
