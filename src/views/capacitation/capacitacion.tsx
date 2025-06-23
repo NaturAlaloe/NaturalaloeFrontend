@@ -8,7 +8,8 @@ import { useCapacitation } from '../../hooks/capacitations/useCapacitation';
 import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 
-const Capacitacion = () => {    const {
+const Capacitacion = () => {
+    const {
         isEvaluado,
         setIsEvaluado,
         showAsignacionesModal,
@@ -16,12 +17,11 @@ const Capacitacion = () => {    const {
         handleSubmit,
         formData,
         handleChange,
-        facilitadores,
         metodosEvaluacion,
         colaboradoresDisponibles,
-        poesDisponibles,
-        columnsColaboradores,
+        procedimientosDisponibles,
         columnsPoes,
+        columnsColaboradores,
         showColaboradoresTable,
         setShowColaboradoresTable,
         showPoesTable,
@@ -34,6 +34,8 @@ const Capacitacion = () => {    const {
         toggleGeneralMode,
         getFormTitle,
         isLoading,
+        loadingFacilitadores,
+        getFacilitadoresOptions,
     } = useCapacitation();
 
     return (<FormContainer
@@ -59,12 +61,14 @@ const Capacitacion = () => {    const {
                 name="facilitador"
                 label="Facilitador:"
                 value={formData.facilitador}
-                onChange={(value) => handleChange({ target: { name: 'facilitador', value } } as any)}
-                options={facilitadores.map(f => f.nombre)}
-                placeholder="Escriba o seleccione..."
+                onChange={(value) => {
+                    handleChange({ target: { name: 'facilitador', value } } as any);
+                }}
+                options={getFacilitadoresOptions()}
+                placeholder={loadingFacilitadores ? "Cargando facilitadores..." : "Escriba o seleccione..."}
                 className="w-full"
                 required
-                disabled={isGeneralMode}
+                disabled={isGeneralMode || loadingFacilitadores}
             />
             <InputField
                 name="fecha"
@@ -239,7 +243,7 @@ const Capacitacion = () => {    const {
                         onClose={() => setShowPoesTable(false)}
                         title="Selecciona POEs para agregar"
                         columns={columnsPoes}
-                        data={poesDisponibles}
+                        data={procedimientosDisponibles}
                         onAdd={agregarPoes}
                     />
                 )}
