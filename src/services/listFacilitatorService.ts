@@ -12,18 +12,16 @@ export interface Facilitador {
 export async function getFacilitadores(): Promise<Facilitador[]> {
   try {
     const response = await api.get("/facilitatorsList");
-    return response.data.data 
+    return response.data.data;
   } catch (error) {
     console.error("Error al obtener facilitadores:", error);
     return [];
   }
 }
 
-
-export async function deletefacilitator(id_facilitador: number): Promise<boolean> {
+export async function deleteFacilitador(id_facilitador: number): Promise<boolean> {
   try {
-    await api.delete(`/facilitador/${id_facilitador}`);
-    console.log(`Facilitador con ID ${id_facilitador} eliminado.`);
+    await api.delete(`/facilitators/${id_facilitador}`);
     return true;
   } catch (error) {
     console.error("Error al eliminar facilitador:", error);
@@ -31,21 +29,8 @@ export async function deletefacilitator(id_facilitador: number): Promise<boolean
   }
 }
 
-export async function updateFacilitadorById(
-  id_facilitador: number,
-  data: {
-    nombre: string;
-    apellido1: string;
-    apellido2: string;
-  }
-): Promise<boolean> {
-  try {
-    await api.put(`/facilitator/${id_facilitador}`, data);
-    console.log(`Facilitador con ID ${id_facilitador} actualizado.`);
-    return true;
-  } catch (error) {
-    console.error("Error al actualizar facilitador:", error);
-    return false;
-  }
-}
 
+export const updateFacilitadorById = async (id_facilitador: number, data: { nombre: string; apellido1: string, apellido2: string }) => {
+  const response = await api.put( `/facilitator/${id_facilitador}`, data);
+  return response.data;
+};
