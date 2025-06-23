@@ -63,10 +63,6 @@ export default function AssignRol() {
   };
 
 
-  // Manejar cambio de página
-  const manejarCambioPagina = (_: unknown, nuevaPagina: number) => {
-    setPagina(nuevaPagina);
-
   // Manejar asignación y desasignación de roles
   const manejarAsignarRoles = async () => {
     if (!colaboradorSeleccionado) {
@@ -261,5 +257,4 @@ export default function AssignRol() {
       <CustomToaster />
     </Box>
   );
-}
 }
