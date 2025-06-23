@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { getRolesWithProcedures, assignProceduresToRole } from "../../services/procedures/procedureRolesService";
 
+// Este hook maneja la lógica de roles y procedimientos
+// y proporciona una interfaz para interactuar con los roles y sus procedimientos asignados.
+
 export interface Procedure {
   id_documento: number;
   codigo: string;
   descripcion: string;
-  // ...otros campos si los necesitas
 }
 
 export interface RoleProcedures {
@@ -38,6 +40,7 @@ export function useRolesProcedures() {
       });
     });
     setRolesProcedures(Object.values(agrupados));
+    console.log("Roles y procedimientos:", Object.values(agrupados)); // Para depuración
     setLoading(false);
   };
 

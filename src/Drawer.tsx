@@ -42,6 +42,7 @@ import ListaCategorias from "./views/administration/listCategory";
 import ListaPuestos from "./views/administration/listWorkstations";
 import SchoolIcon from "@mui/icons-material/School";
 import Politicies from "./views/politics/politicsForm";
+import PoliticiesLista from "./views/politics/politicsList";
 import VersionControlProcedures from "./views/procedures/versionControllProcedures";
 import AssignRol from "./views/collaborators/assingRol"
 
@@ -397,6 +398,22 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                 <ListItemText primary="Agregar Políticas" />
               </ListItemButton>
             </List>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/politics/politicsList"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Lista de Políticas" />
+              </ListItemButton>
+            </List>
           </Collapse>
 
           {/* Capacitaciones */}
@@ -612,15 +629,10 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/administration/listCategory" element={<ListaCategorias />} />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
-          <Route
-            path="/procedures/listProcedures"
-            element={<ListaProcedimientos />}
-          />
-          <Route
-            path="/procedures/assignmentProcedures"
-            element={<AsignacionProcedimientos />}
-          />
+          <Route path="/procedures/listProcedures"element={<ListaProcedimientos />}/>
+          <Route path="/procedures/assignmentProcedures"element={<AsignacionProcedimientos />}/>
           <Route path="/capacitation/" element={<Capacitaciones />} />
+
           <Route
             path="/capacitation/listCapacitation"
             element={<ListaCapacitaciones />}
@@ -665,6 +677,9 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             path="/collaborators/assingRol"
             element={<AssignRol />}
           />
+
+          <Route path="/politics/politicsList" element={<PoliticiesLista />} />
+
         </Routes>
       </Main>
     </Box>
