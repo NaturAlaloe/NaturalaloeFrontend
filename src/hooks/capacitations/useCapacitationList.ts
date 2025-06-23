@@ -133,14 +133,13 @@ export function useCapacitationList() {
     useState<Capacitation | null>(null);
   const navigate = useNavigate();
 
-  // Filtros únicos
   const poes = Array.from(new Set(capacitations.map((c) => c.poe)));
   const estados = Array.from(new Set(capacitations.map((c) => c.estado)));
+  const tipos = Array.from(new Set(capacitations.map((c) => c.tipo)));
   const seguimientos = Array.from(
     new Set(capacitations.map((c) => c.seguimiento))
   );
 
-  // Filtrar por búsqueda y filtros
   const filteredCapacitations = capacitations.filter((cap) => {
     const matchesSearch =
       cap.poe.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -148,28 +147,32 @@ export function useCapacitationList() {
       cap.seguimiento.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPoe = !poeFilter || cap.poe === poeFilter;
     const matchesEstado = !estadoFilter || cap.estado === estadoFilter;
-    const matchesSeguimiento = !seguimientoFilter || cap.seguimiento === seguimientoFilter;
+    const matchesSeguimiento =
+      !seguimientoFilter || cap.seguimiento === seguimientoFilter;
     const matchesTipo = !tipoFilter || cap.tipo === tipoFilter;
-    return matchesSearch && matchesPoe && matchesEstado && matchesSeguimiento && matchesTipo;
+    return (
+      matchesSearch &&
+      matchesPoe &&
+      matchesEstado &&
+      matchesSeguimiento &&
+      matchesTipo
+    );
   });
 
   const navegarCapacitacionFinalizada = () => {
-    navigate("/capacitation/capacitationFinished");
+    navigate("/capacitation/evaluatedTraining");
   };
 
-  // Paginación
   const paginatedCapacitations = filteredCapacitations.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
   const totalPages = Math.ceil(filteredCapacitations.length / rowsPerPage);
 
-  // Acciones
   const handleRowClick = (cap: Capacitation) => {
     setSelectedCapacitation(cap);
     setShowModal(true);
   };
-
   return {
     capacitations: paginatedCapacitations,
     searchTerm,
@@ -178,11 +181,13 @@ export function useCapacitationList() {
     setPoeFilter,
     estadoFilter,
     setEstadoFilter,
+    tipoFilter,
+    setTipoFilter,
     seguimientoFilter,
     setSeguimientoFilter,
-    setTipoFilter,
     poes,
     estados,
+    tipos,
     seguimientos,
     currentPage,
     setCurrentPage,
