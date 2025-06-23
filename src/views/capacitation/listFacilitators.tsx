@@ -5,6 +5,7 @@ import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import InputField from "../../components/formComponents/InputField";
 import TableContainer from "../../components/TableContainer";
+import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 
 export default function ListFacilitadores() {
   const {
@@ -22,7 +23,10 @@ export default function ListFacilitadores() {
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
+    loading, // <-- usa loading
   } = useFacilitadores();
+
+  if (loading) return <FullScreenSpinner />; // <-- muestra spinner
 
   const columns = [
     { name: "NOMBRE", selector: (row: Facilitador) => row.nombre, sortable: true },

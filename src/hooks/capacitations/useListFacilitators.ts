@@ -10,6 +10,7 @@ import { showCustomToast } from "../../components/globalComponents/CustomToaster
 export function useFacilitadores() {
   const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true); // <-- nuevo estado
 
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [facilitadorEditando, setFacilitadorEditando] = useState<Facilitador | null>(null);
@@ -18,9 +19,11 @@ export function useFacilitadores() {
   const [facilitadorAEliminar, setFacilitadorAEliminar] = useState<Facilitador | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     getFacilitadores()
       .then((data) => setFacilitadores(data))
-      .catch(() => showCustomToast("Error", "No se pudieron cargar los facilitadores", "error"));
+      .catch(() => showCustomToast("Error", "No se pudieron cargar los facilitadores", "error"))
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = useMemo(() => {
@@ -130,5 +133,6 @@ export function useFacilitadores() {
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
+    loading, // <-- retorna loading
   };
 }
