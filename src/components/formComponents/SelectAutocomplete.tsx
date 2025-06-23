@@ -5,9 +5,9 @@ import type { SxProps } from "@mui/material";
 export interface GenericAutocompleteProps<T> {
   label?: string;
   options: T[];
-  optionLabel: keyof T;
-  optionValue: keyof T;
-  value: T | T[] | null;
+  optionLabel: string;
+  optionValue: string;
+  value: string | object | object[] | null;
   onChange: (value: T | T[] | null) => void;
   multiple?: boolean;
   placeholder?: string;

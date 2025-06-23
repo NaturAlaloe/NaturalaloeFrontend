@@ -13,7 +13,6 @@ export default function CategoriesList() {
     const ui = useCategoriesList();
 
     const [codigoInput, setCodigoInput] = useState<string>("");
-    const [page, setPage] = useState(1); 
 
     useEffect(() => {
         if (ui.editCategoryObj) {
@@ -22,11 +21,6 @@ export default function CategoriesList() {
             setCodigoInput("");
         }
     }, [ui.editCategoryObj, ui.modalOpen]);
-
-
-    useEffect(() => {
-        setPage(1);
-    }, [ui.search]);
 
     const columns = [
         {
@@ -90,9 +84,8 @@ export default function CategoriesList() {
                 data={ui.filteredCategories}
                 rowsPerPage={5}
                 progressPending={ui.loading}
-                pagination
-                paginationDefaultPage={page}
-                onChangePage={setPage}
+                currentPage={ui.currentPage}
+                onChangePage={ui.setCurrentPage}
             />
 
             <GlobalModal
