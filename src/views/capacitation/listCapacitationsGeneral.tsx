@@ -16,6 +16,10 @@ export default function ListCapacitationGeneral() {
     setShowModal,
     selectedCapacitation,
     handleRowClick,
+    isLoading,
+    error,
+    loadCapacitationsGeneral,
+    totalCount,
   } = useCapacitationGeneralList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -44,7 +48,7 @@ export default function ListCapacitationGeneral() {
       cell: (row: any) => <div className="text-sm text-gray-700">{row.fechaCreacion}</div>,
       wrap: true,
     },
-    
+
   ];
   return (
     <div className="p-4 bg-white rounded-lg">
@@ -76,9 +80,40 @@ export default function ListCapacitationGeneral() {
           <option value="">Todos los Estados</option>
           {estados.map((estado) => (
             <option key={estado} value={estado}>{estado}</option>
-          ))}
-        </select>
+          ))}        </select>
       </div>
+
+      {/* Indicador de carga */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2AAC67]"></div>
+          <span className="ml-2 text-gray-600">Cargando capacitaciones generales...</span>
+        </div>
+      )}
+
+      {/* Manejo de errores */}
+      {error && !isLoading && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+          <div className="flex items-center">
+            <div className="text-red-600 font-medium">Error al cargar capacitaciones generales</div>
+            <button
+              onClick={() => loadCapacitationsGeneral()}
+              className="ml-auto px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+            >
+              Reintentar
+            </button>
+          </div>
+          <div className="text-red-600 text-sm mt-1">{error}</div>
+        </div>
+      )}
+
+      {/* Información de resultados */}
+      {!isLoading && !error && (
+        <div className="mb-4 text-sm text-gray-600">
+          Mostrando {capacitations.length} de {totalCount} capacitaciones generales
+        </div>
+      )}
+
       <div className="border border-gray-200 rounded-lg overflow-x-auto">
         <GlobalDataTable
           columns={columns}
@@ -88,7 +123,7 @@ export default function ListCapacitationGeneral() {
           highlightOnHover
           noDataComponent={
             <div className="px-6 py-4 text-center text-sm text-gray-500">
-              No se encontraron capacitaciones generales
+              {isLoading ? "Cargando capacitaciones generales..." : "No se encontraron capacitaciones generales"}
             </div>
           }
           customStyles={{
@@ -103,6 +138,7 @@ export default function ListCapacitationGeneral() {
             },
           }}
           onRowClicked={handleRowClick}
+          progressPending={isLoading}
         />
       </div>
       {/* Modal de detalles */}

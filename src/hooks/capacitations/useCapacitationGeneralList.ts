@@ -1,4 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  getCapacitationGeneralList,
+  type Capacitation_General,
+} from "../../services/capacitations/getCapacitationGeneral";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export interface CapacitationGeneral {
   id: string;
@@ -14,84 +19,10 @@ export interface CapacitationGeneral {
   }[];
 }
 export function useCapacitationGeneralList() {
-  const initialCapacitations: CapacitationGeneral[] = [
-    {
-      id: "GEN-001",
-      titulo: "Capacitación General de Seguridad Industrial",
-      estado: "Finalizado",
-      fechaCreacion: "2023-10-01",
-      colaboradores: [
-        {
-          id: 1,
-          nombre: "Juan Pérez",
-          puesto: "Operador",
-          departamento: "Producción",
-          cedula: "123456789",
-        },
-        {
-          id: 2,
-          nombre: "Ana Gómez",
-          puesto: "Supervisora",
-          departamento: "Calidad",
-          cedula: "987654321",
-        },
-        {
-          id: 3,
-          nombre: "Carlos Ramírez",
-          puesto: "Técnico",
-          departamento: "Mantenimiento",
-          cedula: "456789123",
-        },
-      ],
-    },
-    {
-      id: "GEN-002",
-      titulo: "Inducción Corporativa",
-      estado: "Pendiente",
-      fechaCreacion: "2023-10-05",
-      colaboradores: [
-        {
-          id: 4,
-          nombre: "María López",
-          puesto: "Analista",
-          departamento: "Administración",
-          cedula: "789123456",
-        },
-        {
-          id: 5,
-          nombre: "Pedro Sánchez",
-          puesto: "Contador",
-          departamento: "Finanzas",
-          cedula: "321654987",
-        },
-      ],
-    },
-    {
-      id: "GEN-003",
-      titulo: "Actualización de Políticas Internas",
+  const [capacitations, setCapacitations] = useState<CapacitationGeneral[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-      estado: "Finalizado",
-      fechaCreacion: "2023-10-10",
-      colaboradores: [
-        {
-          id: 6,
-          nombre: "Laura Rodríguez",
-          puesto: "Jefe de Área",
-          departamento: "Recursos Humanos",
-          cedula: "654987321",
-        },
-        {
-          id: 7,
-          nombre: "Miguel Torres",
-          puesto: "Coordinador",
-          departamento: "Logística",
-          cedula: "147258369",
-        },
-      ],
-    },
-  ];
-
-  const [capacitations] = useState<CapacitationGeneral[]>(initialCapacitations);
   const [searchTerm, setSearchTerm] = useState("");
   const [estadoFilter, setEstadoFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -99,6 +30,87 @@ export function useCapacitationGeneralList() {
   const [showModal, setShowModal] = useState(false);
   const [selectedCapacitation, setSelectedCapacitation] =
     useState<CapacitationGeneral | null>(null);
+
+  const transformApiDataToCapacitationGeneral = (
+    apiData: Capacitation_General[]
+  ): CapacitationGeneral[] => {
+    const groupedData = apiData.reduce((acc, item) => {
+      const id = item.id_capacitacion_general.toString();
+
+      if (!acc[id]) {
+        acc[id] = {
+          id: id,
+          titulo: item.titulo,
+          estado: "Finalizado",
+          fechaCreacion: new Date(item.fecha_capacitacion)
+            .toISOString()
+            .split("T")[0],
+          colaboradores: [],
+        };
+      }
+
+      const colaboradorExiste = acc[id].colaboradores.some(
+        (c) => c.id === item.id_colaborador
+      );
+      if (!colaboradorExiste) {
+        acc[id].colaboradores.push({
+          id: item.id_colaborador,
+          nombre: item.nombre_completo,
+          puesto: "N/A",
+          departamento: "N/A",
+          cedula: item.id_colaborador.toString(),
+        });
+      }
+
+      return acc;
+    }, {} as Record<string, CapacitationGeneral>);
+
+    return Object.values(groupedData);
+  };
+
+  const loadCapacitationsGeneral = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      console.log("Cargando capacitaciones generales desde la API...");
+
+      const apiData = await getCapacitationGeneralList();
+      console.log("Datos recibidos de la API:", apiData);
+
+      if (!Array.isArray(apiData)) {
+        throw new Error("Los datos recibidos no son un array válido");
+      }
+
+      const transformedData = transformApiDataToCapacitationGeneral(apiData);
+      console.log("Datos transformados:", transformedData);
+
+      setCapacitations(transformedData);
+
+      if (transformedData.length === 0) {
+        showCustomToast(
+          "Info",
+          "No se encontraron capacitaciones generales",
+          "info"
+        );
+      }
+    } catch (error) {
+      console.error("Error al cargar capacitaciones generales:", error);
+      setError("No se pudieron cargar las capacitaciones generales");
+      showCustomToast(
+        "Error",
+        "No se pudieron cargar las capacitaciones generales",
+        "error"
+      );
+      setCapacitations([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCapacitationsGeneral();
+  }, []);
+
   const estados = Array.from(new Set(capacitations.map((c) => c.estado)));
 
   const filteredCapacitations = capacitations.filter((cap) => {
@@ -139,5 +151,8 @@ export function useCapacitationGeneralList() {
     setSelectedCapacitation,
     handleRowClick,
     totalCount: filteredCapacitations.length,
+    isLoading,
+    error,
+    loadCapacitationsGeneral,
   };
 }
