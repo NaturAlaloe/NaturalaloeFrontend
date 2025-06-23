@@ -2,7 +2,7 @@ import { useState } from "react";
 import DataTable, { type TableColumn } from "react-data-table-component";
 import { Checkbox } from "@mui/material";
 
-export type Procedimiento = { poe: string; titulo: string };
+export type Procedimiento = { poe: string; titulo: string; codigo: string };
 
 interface ProceduresTableModalProps {
   procedimientos: Procedimiento[];
@@ -47,7 +47,7 @@ export default function ProceduresTableModal({
     },
     {
       name: "Código POE",
-      selector: (row) => row.poe,
+      selector: (row) => row.codigo,
       sortable: true,
       width: "150px",
     },
