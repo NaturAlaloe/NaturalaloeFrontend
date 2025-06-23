@@ -8,10 +8,12 @@ export interface ICollaborator {
   puesto: string;
 }
 
-export const getCollaborators = async (search?: string): Promise<ICollaborator[]> => {
+export const getCollaborators = async (
+  search?: string
+): Promise<ICollaborator[]> => {
   try {
-    const response = await api.get('/collaborator', {
-      params: { search }
+    const response = await api.get("/collaborator", {
+      params: { search },
     });
     if (Array.isArray(response.data.data)) {
       return response.data.data.map((item: any) => ({
@@ -24,7 +26,7 @@ export const getCollaborators = async (search?: string): Promise<ICollaborator[]
     }
     return [];
   } catch (error) {
-    console.error('Error fetching collaborators:', error);
+    console.error("Error fetching collaborators:", error);
     return [];
   }
 };
@@ -56,15 +58,17 @@ export interface ICollaboratorDetail {
   id_colaborador: number;
   nombre_completo: string;
   roles: ICollaboratorDetailRole[];
+  id_documento: number;
 }
 
-export const getCollaboratorDetail = async (id_colaborador: string | number): Promise<ICollaboratorDetail | null> => {
+export const getCollaboratorDetail = async (
+  id_colaborador: string | number
+): Promise<ICollaboratorDetail | null> => {
   try {
     const response = await api.get(`/collaboratorList/${id_colaborador}`);
     const data = response.data.data;
     if (!Array.isArray(data) || data.length === 0) return null;
 
-    // Agrupar por nombre_rol
     const rolesMap: Record<string, ICollaboratorDetailRole> = {};
     data.forEach((item: any) => {
       if (!rolesMap[item.nombre_rol]) {
@@ -96,9 +100,10 @@ export const getCollaboratorDetail = async (id_colaborador: string | number): Pr
       id_colaborador: data[0].id_colaborador,
       nombre_completo: data[0].nombre_completo,
       roles: Object.values(rolesMap),
+      id_documento: data[0].id_documento,
     };
   } catch (error) {
-    console.error('Error fetching collaborator detail:', error);
+    console.error("Error fetching collaborator detail:", error);
     return null;
   }
 };
