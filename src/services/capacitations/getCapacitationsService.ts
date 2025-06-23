@@ -1,4 +1,4 @@
-import api from '../../apiConfig/api';
+import api from "../../apiConfig/api";
 
 export interface Facilitador {
   id_facilitador: number;
@@ -15,7 +15,7 @@ export async function getFacilitadores(): Promise<Facilitador[]> {
     return [];
   }
 }
-export interface Colaboradores{
+export interface Colaboradores {
   id_colaborador: number;
   id_puesto: number;
   id_capacitacion: number;
@@ -35,13 +35,14 @@ export async function getColaboradores(): Promise<Colaboradores[]> {
     return [];
   }
 }
-export interface Procedimientos{
+export interface Procedimientos {
   id_documento: number;
   codigo: string;
+  descripcion: string;
 }
 export async function getProcedimientos(): Promise<Procedimientos[]> {
   try {
-    const response = await api.get(`/procedureActive`);
+    const response = await api.get("/training/pending");
     if (!response.data || !response.data.data) {
       return [];
     }

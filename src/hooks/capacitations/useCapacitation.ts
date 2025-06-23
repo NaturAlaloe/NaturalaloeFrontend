@@ -138,9 +138,6 @@ export function useCapacitation() {
         setProcedimientosDisponibles([]);
         return;
       }
-
-      console.log("Procedimientos recibidos:", data);
-
       // Transformar los datos para que tengan el formato esperado por la tabla
       const procedimientosTransformados = data
         .map((proc) => {
@@ -150,12 +147,11 @@ export function useCapacitation() {
           }
           return {
             ...proc,
-            id: proc.id_documento, // Para compatibilidad con la lógica existente
-            titulo: `Documento ${proc.codigo}`, // Como solo viene código, crear un título
+            id: proc.id_documento, 
+            titulo: `Documento ${proc.descripcion}`,
           };
         })
         .filter((proc) => proc !== null);
-
       // Filtrar procedimientos únicos por ID
       const procedimientosUnicos = procedimientosTransformados.filter(
         (proc, index, array) => {

@@ -16,7 +16,7 @@ export interface CapacitationList {
   nombre_colaborador: string;
   id_documento: number;
   codigo_documento: string;
-  descripcion_documento: string;
+  titulo_capacitacion: string;
   id_facilitador: number;
   tipo_facilitador: string;
   nombre_facilitador: string;

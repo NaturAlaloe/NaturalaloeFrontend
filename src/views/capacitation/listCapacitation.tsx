@@ -26,11 +26,8 @@ export default function ListCapacitations() {
     selectedCapacitation,
     handleRowClick,
     navegarCapacitacionFinalizada,
-    // Nuevos estados para manejar carga y errores
     isLoading,
-    error,
-    loadCapacitations,
-    totalCount,
+   
   } = useCapacitationList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -50,15 +47,13 @@ export default function ListCapacitations() {
       sortable: true,
       cell: (row: any) => <div className="text-sm text-gray-700">{row.titulo}</div>,
       wrap: true,
-    },
-    {
+    }, {
       name: 'DURACIÓN (h)',
       selector: (row: any) => row.duracion,
       sortable: true,
       cell: (row: any) => <div className="text-sm text-gray-700">{row.duracion}</div>,
       wrap: true,
     },
-
     {
       name: 'FECHA FINAL',
       selector: (row: any) => row.fechaFinal,
@@ -172,41 +167,12 @@ export default function ListCapacitations() {
             <option key={seg} value={seg}>{seg}</option>
           ))}
         </select>      </div>
-
-      {/* Indicador de carga */}      {isLoading && (
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2AAC67]"></div>
-          <span className="ml-2 text-gray-600">Cargando capacitaciones...</span>
-        </div>
-      )}
-
-      {/* Manejo de errores */}
-      {error && !isLoading && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <div className="flex items-center">
-            <div className="text-red-600 font-medium">Error al cargar capacitaciones</div>
-            <button
-              onClick={() => loadCapacitations()}
-              className="ml-auto px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-            >
-              Reintentar
-            </button>
-          </div>
-          <div className="text-red-600 text-sm mt-1">{error}</div>
-        </div>
-      )}
-
-      {/* Información de resultados */}
-      {!isLoading && !error && (
-        <div className="mb-4 text-sm text-gray-600">
-          Mostrando {capacitations.length} de {totalCount} capacitaciones
-        </div>
-      )}
-
+   
       <div className="border border-gray-200 rounded-lg overflow-x-auto">
         <GlobalDataTable
           columns={columns}
           data={capacitations}
+          pagination={true}
           rowsPerPage={10}
           dense
           highlightOnHover
@@ -250,23 +216,35 @@ export default function ListCapacitations() {
                 <Info className="text-[#2ecc71]" style={{ fontSize: 36 }} />
               </div>
               <h2 className="text-[#2ecc71] font-bold text-2xl text-center">Detalles de Capacitación</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            </div>            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left">Información de los Colaboradores</h3>
-                <div className="mb-4">
-                  <details className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
-                    <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
-                      <Person className="mr-2" />
-                      {selectedCapacitation.colaborador.nombreCompleto}
-                      <span className="ml-auto text-[#2ecc71]">▼</span>
-                    </summary>
-                    <div className="px-3 pb-3 pt-2">
-                      <div className="mb-2 flex items-center"><Badge className="mr-2 text-[#2ecc71]" /> <span className="font-semibold mr-1">Cédula:</span> {selectedCapacitation.colaborador.cedula}</div>
-                      <div className="mb-2 flex items-center"><Apartment className="mr-2 text-[#2ecc71]" /> <span className="font-semibold mr-1">Departamento:</span> {selectedCapacitation.colaborador.departamento}</div>
-                      <div className="mb-2 flex items-center"><Work className="mr-2 text-[#2ecc71]" /> <span className="font-semibold mr-1">Puesto:</span> {selectedCapacitation.colaborador.puesto}</div>
-                    </div>
-                  </details>
+                <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left">
+                  Información de los Colaboradores
+                </h3>
+                <div className="space-y-3">
+                  {selectedCapacitation.colaboradores.map((colaborador, index) => (
+                    <details key={index} className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
+                      <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
+                        <Person className="mr-2" />
+                        {colaborador.nombreCompleto}
+                        <span className="ml-auto text-[#2ecc71]">▼</span>
+                      </summary>
+                      <div className="px-3 pb-3 pt-2">
+                        <div className="mb-2 flex items-center">
+                          <Badge className="mr-2 text-[#2ecc71]" />
+                          <span className="font-semibold mr-1">Cédula:</span> {colaborador.cedula}
+                        </div>
+                        <div className="mb-2 flex items-center">
+                          <Apartment className="mr-2 text-[#2ecc71]" />
+                          <span className="font-semibold mr-1">Departamento:</span> {colaborador.departamento}
+                        </div>
+                        <div className="mb-2 flex items-center">
+                          <Work className="mr-2 text-[#2ecc71]" />
+                          <span className="font-semibold mr-1">Puesto:</span> {colaborador.puesto}
+                        </div>
+                      </div>
+                    </details>
+                  ))}
                 </div>
               </div>
               <div>
