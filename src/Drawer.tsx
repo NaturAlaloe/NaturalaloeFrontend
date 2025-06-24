@@ -659,9 +659,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route
             path="/capacitation/listFacilitators"
             element={<ListaFacilitadores />}
-          />
-          <Route
-            path="/capacitation/evaluatedTraining"
+          />          <Route
+            path="/capacitation/evaluatedTraining/:codigo_documento"
             element={<Evaluacion />}
           />
           <Route

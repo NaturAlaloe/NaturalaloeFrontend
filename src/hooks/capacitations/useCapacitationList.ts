@@ -155,9 +155,8 @@ export function useCapacitationList() {
       matchesTipo
     );
   });
-
-  const navegarCapacitacionFinalizada = () => {
-    navigate("/capacitation/evaluatedTraining");
+  const navegarCapacitacionFinalizada = (codigoDocumento: string) => {
+    navigate(`/capacitation/evaluatedTraining/${codigoDocumento}`);
   };
 
 

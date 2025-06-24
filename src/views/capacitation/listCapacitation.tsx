@@ -85,10 +85,9 @@ export default function ListCapacitations() {
     {
       name: 'ACCIONES',
       cell: (row: any) => (
-        <div className="flex flex-col sm:flex-row gap-2 items-center justify-center">
-          <button
+        <div className="flex flex-col sm:flex-row gap-2 items-center justify-center">          <button
             className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
-            onClick={navegarCapacitacionFinalizada}
+            onClick={() => navegarCapacitacionFinalizada(row.poe)}
             title="Calificar examen"
           >
             <EditNote />

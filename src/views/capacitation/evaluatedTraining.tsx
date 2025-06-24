@@ -4,7 +4,6 @@ import {
   useEvaluatedTraining,
   type Colaborador,
 } from "../../hooks/capacitations/useEvaluatedTraining";
-import { useAddEvaluatedTraining } from "../../hooks/capacitations/useAddEvaluatedTraining";
 import FormContainer from "../../components/formComponents/FormContainer";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import InputField from "../../components/formComponents/InputField";
@@ -12,14 +11,18 @@ import SelectField from "../../components/formComponents/SelectField";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import CustomToaster from "../../components/globalComponents/CustomToaster";
-import { addEvaluatedTraining } from "../../services/capacitations/addEvaluatedTrainingService";
 
 const EvaluatedTraining = () => {
-  const { idCapacitacion } = useParams();
-  const numericId = Number(idCapacitacion);
-  const { colaboradores, loading, error, setColaboradores } =
-    useEvaluatedTraining(numericId);
-  const { submitEvaluatedTraining } = useAddEvaluatedTraining();
+  const { codigo_documento } = useParams();
+  const { 
+    colaboradores, 
+    trainingInfo,
+    loading, 
+    error, 
+    saving,
+    setColaboradores,
+    saveEvaluations
+  } = useEvaluatedTraining(codigo_documento || "");
 
   const handleChange = (
     id: number,
@@ -41,20 +44,47 @@ const EvaluatedTraining = () => {
       return;
     }
 
-    try {
-      const dataToSend = colaboradores.map((colab) => ({
-        id_capacitacion: numericId,
-        seguimiento: colab.seguimiento.toLowerCase(),
-        nota: Number(colab.nota),
-        comentario_final: colab.comentario,
-      }));
-
-      await addEvaluatedTraining(dataToSend);
+    // Validar que todas las notas estén llenas
+    const colaboradoresSinNota = colaboradores.filter(c => !c.nota || c.nota.trim() === "");
+    if (colaboradoresSinNota.length > 0) {
       showCustomToast(
-        "Datos guardados con éxito",
-        "Las calificaciones han sido almacenadas correctamente.",
-        "success"
+        "Notas incompletas",
+        "Por favor, complete todas las notas antes de guardar.",
+        "info"
       );
+      return;
+    }
+
+    // Validar que las notas estén en el rango correcto
+    const notasInvalidas = colaboradores.filter(c => {
+      const nota = parseFloat(c.nota);
+      return isNaN(nota) || nota < 0 || nota > 100;
+    });
+    
+    if (notasInvalidas.length > 0) {
+      showCustomToast(
+        "Notas inválidas",
+        "Las notas deben estar entre 0 y 100.",
+        "info"
+      );
+      return;
+    }
+
+    try {
+      const success = await saveEvaluations();
+      if (success) {
+        showCustomToast(
+          "Datos guardados con éxito",
+          "Las calificaciones han sido almacenadas correctamente.",
+          "success"
+        );
+      } else {
+        showCustomToast(
+          "Error al guardar",
+          "No se pudieron guardar las calificaciones.",
+          "error"
+        );
+      }
     } catch (err) {
       showCustomToast(
         "Error al guardar",
@@ -156,14 +186,50 @@ const EvaluatedTraining = () => {
       },
     },
   };
-
   if (loading) return <p className="text-center">Cargando colaboradores...</p>;
   if (error)
     return <p className="text-center text-red-500">{error}</p>;
 
+  const getTitle = () => {
+    if (trainingInfo) {
+      return `Calificación de Colaboradores - ${trainingInfo.titulo_capacitacion}`;
+    }
+    return "Calificación de Colaboradores";
+  };
+
   return (
     <>
-      <FormContainer title="Calificación de Colaboradores">
+      <FormContainer title={getTitle()}>
+        {trainingInfo && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <h3 className="text-lg font-semibold text-green-700 mb-2">
+              Información de la Capacitación
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="font-medium text-green-600">Código:</span>{" "}
+                <span className="text-green-800">{trainingInfo.codigo_documento}</span>
+              </div>
+              <div>
+                <span className="font-medium text-green-600">Tipo:</span>{" "}
+                <span className="text-green-800">{trainingInfo.tipo_capacitacion}</span>
+              </div>
+              <div>
+                <span className="font-medium text-green-600">Fecha Inicio:</span>{" "}
+                <span className="text-green-800">{new Date(trainingInfo.fecha_inicio).toLocaleDateString()}</span>
+              </div>
+              <div>
+                <span className="font-medium text-green-600">Fecha Fin:</span>{" "}
+                <span className="text-green-800">{new Date(trainingInfo.fecha_fin).toLocaleDateString()}</span>
+              </div>
+              <div>
+                <span className="font-medium text-green-600">Estado:</span>{" "}
+                <span className="text-green-800">{trainingInfo.estado}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <GlobalDataTable
           columns={columns}
           data={colaboradores}
@@ -173,8 +239,11 @@ const EvaluatedTraining = () => {
         />
 
         <div className="flex justify-center mt-6">
-          <SubmitButton onClick={handleGuardarTodos}>
-            Guardar calificaciones
+          <SubmitButton 
+            onClick={handleGuardarTodos}
+            disabled={saving}
+          >
+            {saving ? "Guardando..." : "Guardar calificaciones"}
           </SubmitButton>
         </div>
       </FormContainer>
