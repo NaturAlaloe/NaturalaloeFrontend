@@ -505,7 +505,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Capacitaciones Generales" />
+                <ListItemText primary="Lista de Generales" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -572,7 +572,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Asignar Rol" />
+                <ListItemText primary="Asignar Roles" />
               </ListItemButton>
             </List>
           </Collapse>

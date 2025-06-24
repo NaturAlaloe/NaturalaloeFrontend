@@ -1,4 +1,3 @@
-// useAddFacilitator.ts
 import { useEffect, useState } from "react";
 import {
   getColaboradoresDisponibles,

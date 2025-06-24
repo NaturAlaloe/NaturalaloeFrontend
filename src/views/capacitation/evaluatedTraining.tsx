@@ -1,4 +1,3 @@
-// src/views/capacitations/EvaluatedTraining.tsx
 import { useParams } from "react-router-dom";
 import {
   useEvaluatedTraining,

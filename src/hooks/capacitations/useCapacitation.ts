@@ -1,19 +1,7 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
-import {
-  createCapacitacion,
-  validateCapacitacionData,
-  type CreateCapacitacionRequest,
-  createCapacitacionGeneral,
-} from "../../services/capacitations/addCapacitationsService";
-import {
-  getFacilitadores,
-  type Facilitador,
-  getColaboradores,
-  type Colaboradores,
-  getProcedimientos,
-  type Procedimientos,
-} from "../../services/capacitations/getCapacitationsService";
+import {createCapacitacion, validateCapacitacionData, type CreateCapacitacionRequest, createCapacitacionGeneral,} from "../../services/capacitations/addCapacitationsService";
+import {getFacilitadores, type Facilitador, getColaboradores, type Colaboradores, getProcedimientos, type Procedimientos,} from "../../services/capacitations/getCapacitationsService";
 
 const metodosEvaluacion = [
   { value: "", label: "Seleccione...", disabled: true },
@@ -39,13 +27,9 @@ export function useCapacitation() {
   const [isGeneralMode, setIsGeneralMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);  const [loadingFacilitadores, setLoadingFacilitadores] = useState(false);
-  const [colaboradoresDisponibles, setColaboradoresDisponibles] = useState<
-    Colaboradores[]
-  >([]);
+  const [colaboradoresDisponibles, setColaboradoresDisponibles] = useState<Colaboradores[]>([]);
   const [loadingColaboradores, setLoadingColaboradores] = useState(false);
-  const [procedimientosDisponibles, setProcedimientosDisponibles] = useState<
-    Procedimientos[]
-  >([]);
+  const [procedimientosDisponibles, setProcedimientosDisponibles] = useState<Procedimientos[]>([]);
   const [loadingProcedimientos, setLoadingProcedimientos] = useState(false);
   const [loadingInitialData, setLoadingInitialData] = useState(true);
   const [formData, setFormData] = useState<FormData>({
@@ -61,9 +45,7 @@ export function useCapacitation() {
 
   const [showColaboradoresTable, setShowColaboradoresTable] = useState(false);
   const [showPoesTable, setShowPoesTable] = useState(false);
-  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>(
-    []
-  );
+  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>([]);
   const [poesAsignados, setPoesAsignados] = useState<any[]>([]);
   const [selectedColaboradores, setSelectedColaboradores] = useState<any[]>([]);
   const [selectedPoes, setSelectedPoes] = useState<any[]>([]);
@@ -106,7 +88,6 @@ export function useCapacitation() {
         setLoadingInitialData(false);
       }
     };
-    
     loadInitialData();
   }, []);
   const loadFacilitadores = async () => {
@@ -116,11 +97,6 @@ export function useCapacitation() {
       setFacilitadores(data);
     } catch (error) {
       console.error("Error al cargar facilitadores:", error);
-      showCustomToast(
-        "Error",
-        "No se pudieron cargar los facilitadores",
-        "error"
-      );
     } finally {
       setLoadingFacilitadores(false);
     }
@@ -129,13 +105,6 @@ export function useCapacitation() {
     try {
       setLoadingProcedimientos(true);
       const data = await getProcedimientos();
-
-      if (!Array.isArray(data)) {
-        console.error("Los datos de procedimientos no son un array:", data);
-        setProcedimientosDisponibles([]);
-        return;
-      }
-
       const procedimientosTransformados = data
         .filter((proc) => proc)
         .map((proc) => ({
@@ -152,11 +121,6 @@ export function useCapacitation() {
       setProcedimientosDisponibles(procedimientosUnicos);
     } catch (error) {
       console.error("Error al cargar procedimientos:", error);
-      showCustomToast(
-        "Error",
-        "No se pudieron cargar los procedimientos",
-        "error"
-      );
       setProcedimientosDisponibles([]);
     } finally {
       setLoadingProcedimientos(false);
@@ -166,13 +130,6 @@ export function useCapacitation() {
     try {
       setLoadingColaboradores(true);
       const data = await getColaboradores();
-
-      if (!Array.isArray(data)) {
-        console.error("Los datos de colaboradores no son un array:", data);
-        setColaboradoresDisponibles([]);
-        return;
-      }
-
       const colaboradoresTransformados = data
         .filter((colab) => colab)
         .map((colab) => ({
@@ -190,11 +147,6 @@ export function useCapacitation() {
       setColaboradoresDisponibles(colaboradoresUnicos);
     } catch (error) {
       console.error("Error al cargar colaboradores:", error);
-      showCustomToast(
-        "Error",
-        "No se pudieron cargar los colaboradores",
-        "error"
-      );
       setColaboradoresDisponibles([]);
     } finally {
       setLoadingColaboradores(false);
@@ -277,24 +229,7 @@ export function useCapacitation() {
         }
       }
 
-      if (colaboradoresAsignados.length === 0) {
-        showCustomToast(
-          "Error",
-          "Debe asignar al menos un colaborador",
-          "error"
-        );
-        return;
-      }
-
-      if (!isGeneralMode && poesAsignados.length === 0) {
-        showCustomToast(
-          "Error",
-          "Debe asignar al menos un documento normativo (POE)",
-          "error"
-        );
-        return;
-      }
-
+    
       const facilitadorId = getFacilitadorIdByNombre(formData.facilitador);
       const capacitacionData: CreateCapacitacionRequest = {
         id_colaborador: colaboradoresAsignados.map((c) => c.id),
@@ -329,11 +264,6 @@ export function useCapacitation() {
       }
     } catch (error) {
       console.error("Error al enviar capacitación:", error);
-      showCustomToast(
-        "Error",
-        "Error inesperado al registrar la capacitación",
-        "error"
-      );
     } finally {
       setIsLoading(false);
     }
@@ -348,15 +278,6 @@ export function useCapacitation() {
         return;
       }
 
-      if (colaboradoresAsignados.length === 0) {
-        showCustomToast(
-          "Error",
-          "Debe asignar al menos un colaborador",
-          "error"
-        );
-        return;
-      }
-
       const capacitacionGeneralData = {
         titulo: formData.titulo.trim(),
         id_colaborador: colaboradoresAsignados.map((c) => c.id),
@@ -368,7 +289,6 @@ export function useCapacitation() {
         showCustomToast(
           "Éxito",
           "La capacitación general fue registrada correctamente",
-          "success"
         );
         resetForm();
       } else {
