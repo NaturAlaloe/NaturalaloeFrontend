@@ -28,7 +28,8 @@ export function useProcedureCode(
 
   const codeVisual = useMemo(() => {
     if (departamento && categoria && consecutivo !== null && consecutivo !== undefined) {
-      return `${departamento.codigo_departamento}-${categoria.numero_categoria}-${consecutivo}`;
+      const consecutivoStr = String(consecutivo).padStart(3, "0");
+      return `${departamento.codigo_departamento}-${categoria.numero_categoria}-${consecutivoStr}`;
     } else if (departamento && categoria) {
       return `${departamento.codigo_departamento}-${categoria.numero_categoria}`;
     }
