@@ -1,25 +1,17 @@
 import { Edit, Delete, Search } from "@mui/icons-material";
-import {
-  useFacilitadoresList,
-  type Facilitador,
-} from "../../hooks/capacitations/useListFacilitators";
-import { useFacilitadorActions } from "../../hooks/capacitations/useFacilitadorActions";
+import { useFacilitadores } from "../../hooks/capacitations/useListFacilitators";
+import type { Facilitador } from "../../services/listFacilitatorService";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import InputField from "../../components/formComponents/InputField";
-import SelectField from "../../components/formComponents/SelectField";
 import TableContainer from "../../components/TableContainer";
+import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 
 export default function ListFacilitadores() {
   const {
     searchTerm,
     setSearchTerm,
     filtered,
-    updateFacilitador,
-    removeFacilitador,
-  } = useFacilitadoresList();
-
-  const {
     showEditModal,
     facilitadorEditando,
     handleEditClick,
@@ -31,11 +23,15 @@ export default function ListFacilitadores() {
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
-  } = useFacilitadorActions(updateFacilitador, removeFacilitador);
+    loading, // <-- usa loading
+  } = useFacilitadores();
+
+  if (loading) return <FullScreenSpinner />; // <-- muestra spinner
 
   const columns = [
     { name: "NOMBRE", selector: (row: Facilitador) => row.nombre, sortable: true },
-    { name: "APELLIDO", selector: (row: Facilitador) => row.apellido, sortable: true },
+    { name: "PRIMER APELLIDO", selector: (row: Facilitador) => row.apellido1, sortable: true },
+    { name: "SEGUNDO APELLIDO", selector: (row: Facilitador) => row.apellido2, sortable: true },
     { name: "TIPO DE FACILITADOR", selector: (row: Facilitador) => row.tipo_facilitador, sortable: true },
     {
       name: "ACCIONES",
@@ -48,7 +44,7 @@ export default function ListFacilitadores() {
             <Delete fontSize="small" />
           </button>
         </div>
-      )
+      ),
     },
   ];
 
@@ -62,68 +58,52 @@ export default function ListFacilitadores() {
           type="text"
           placeholder="Buscar por nombre, apellido o tipo..."
           value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-          }}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
         />
       </div>
 
-      <GlobalDataTable
-        columns={columns}
-        data={filtered}
-        pagination={true}
-        highlightOnHover
-        dense
-      />
+      <GlobalDataTable columns={columns} data={filtered} pagination highlightOnHover dense />
 
       {showEditModal && facilitadorEditando && (
         <GlobalModal open={showEditModal} onClose={handleCancelEdit} title="Editar Facilitador" maxWidth="sm">
           <form onSubmit={handleSaveEdit}>
             <div className="space-y-4">
-              <InputField
-                label="Nombre"
-                name="nombre"
-                value={facilitadorEditando.nombre}
-                onChange={handleEditChange}
-                required
-              />
-              <InputField
-                label="Apellido"
-                name="apellido"
-                value={facilitadorEditando.apellido}
-                onChange={handleEditChange}
-                required
-              />
-              <SelectField
-                label="Tipo de Facilitador"
-                name="tipo_facilitador"
-                value={facilitadorEditando.tipo_facilitador || "interno"}
-                onChange={handleEditChange}
-                options={[
-                  { value: "interno", label: "Interno" },
-                  { value: "externo", label: "Externo" },
-                ]}
-                required
-              />
+              <InputField label="Nombre" name="nombre" value={facilitadorEditando.nombre} onChange={handleEditChange} required />
+              <InputField label="Primer Apellido" name="apellido1" value={facilitadorEditando.apellido1} onChange={handleEditChange} required />
+              <InputField label="Segundo Apellido" name="apellido2" value={facilitadorEditando.apellido2} onChange={handleEditChange} required />
             </div>
             <div className="flex justify-center gap-2 mt-6">
-              <button type="button" onClick={handleCancelEdit} className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">Cancelar</button>
-              <button type="submit" className="px-4 py-2 rounded-md bg-[#2AAC67] text-white hover:bg-[#259e5d]">Guardar</button>
+              <button type="button" onClick={handleCancelEdit} className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">
+                Cancelar
+              </button>
+              <button type="submit" className="px-4 py-2 rounded-md bg-[#2AAC67] text-white hover:bg-[#259e5d]">
+                Guardar
+              </button>
             </div>
           </form>
         </GlobalModal>
       )}
 
       {showDeleteModal && facilitadorAEliminar && (
-        <GlobalModal open={showDeleteModal} onClose={handleCancelDelete} title="Confirmar eliminación" maxWidth="sm" actions={(
-          <>
-            <button onClick={handleCancelDelete} className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">Cancelar</button>
-            <button onClick={handleConfirmDelete} className="px-4 py-2 rounded-md bg-[#F44336] text-white hover:bg-red-600">Eliminar</button>
-          </>
-        )}>
+        <GlobalModal
+          open={showDeleteModal}
+          onClose={handleCancelDelete}
+          title="Confirmar eliminación"
+          maxWidth="sm"
+          actions={
+            <>
+              <button onClick={handleCancelDelete} className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">
+                Cancelar
+              </button>
+              <button onClick={handleConfirmDelete} className="px-4 py-2 rounded-md bg-[#F44336] text-white hover:bg-red-600">
+                Eliminar
+              </button>
+            </>
+          }
+        >
           <p className="text-sm text-gray-700">
-            ¿Estás seguro de eliminar al facilitador <strong>{facilitadorAEliminar.nombre} {facilitadorAEliminar.apellido}</strong>?
+            ¿Estás seguro de eliminar al facilitador <strong>{facilitadorAEliminar.nombre} {facilitadorAEliminar.apellido1} {facilitadorAEliminar.apellido2}</strong>?
           </p>
         </GlobalModal>
       )}

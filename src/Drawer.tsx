@@ -30,7 +30,8 @@ import ListaCapacitaciones from "./views/capacitation/listCapacitation";
 import Colaboradores from "./views/collaborators/collaborators";
 import CollaboratorDetail from "./views/collaborators/CollaboratorDetail";
 import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
-import CapacitacionFinalizada from "./views/capacitation/capacitationFinished";
+import CapacitationGeneral  from "./views/capacitation/listCapacitationsGeneral";
+import Evaluacion from "./views/capacitation/evaluatedTraining";
 import AddCollaborator from "./views/collaborators/addCollaborator";
 import ListCollaborator from "./views/collaborators/viewCollaborators";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
@@ -495,7 +496,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/capacitationFinished"
+                to="/capacitation/listCapacitationGeneral"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -505,11 +506,11 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Finalizadas" />
+                <ListItemText primary="Lista de Capacitaciones Generales" />
               </ListItemButton>
+              
             </List>
           </Collapse>
-
           {/* Colaboradores */}
           <ListItem disablePadding>
             <ListItemButton
@@ -647,22 +648,52 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/procedures/listProcedures"element={<ListaProcedimientos />}/>
           <Route path="/procedures/assignmentProcedures"element={<AsignacionProcedimientos />}/>
           <Route path="/capacitation/" element={<Capacitaciones />} />
-          <Route path="/capacitation/listCapacitation"element={<ListaCapacitaciones />} />
-          <Route path="/collaborators/collaborators" element={<Colaboradores />} />
-          <Route path="/collaborators/detail/:id" element={<CollaboratorDetail />} />
-          <Route path="/capacitation/facilitatorTraining" element={<RegistroFacilitadores />} />
-          <Route path="/capacitation/listFacilitators" element={<ListaFacilitadores />} />
-          <Route path="/capacitation/capacitationFinished" element={<CapacitacionFinalizada />} />
-          <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
+
+          <Route
+            path="/capacitation/listCapacitation"
+            element={<ListaCapacitaciones />}
+          />
+          <Route
+            path="/capacitation/listCapacitationGeneral"
+            element={<CapacitationGeneral  />}
+          />
+          <Route
+            path="/collaborators/collaborators"
+            element={<Colaboradores />}
+          />
+
+          <Route
+            path="/collaborators/detail/:id"
+            element={<CollaboratorDetail />}
+          />
+
+          <Route
+            path="/capacitation/facilitatorTraining"
+            element={<RegistroFacilitadores />}
+          />
+
+          <Route
+            path="/capacitation/listFacilitators"
+            element={<ListaFacilitadores />}
+          />          <Route
+            path="/capacitation/evaluatedTraining/:codigo_documento"
+            element={<Evaluacion />}
+          />
+          <Route
+            path="/collaborators/addCollaborator"
+            element={<AddCollaborator />}
+          />
           <Route path="/politics/politicsForm" element={<Politicies />} />
           <Route
             path="/procedures/versionControlProcedures"
             element={<VersionControlProcedures />}
           />
           <Route
+
           path="/collaborators/assingRol"
           element={<AssignRol/>}
         />
+
         </Routes>
       </Main>
     </Box>
