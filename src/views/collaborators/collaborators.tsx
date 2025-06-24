@@ -32,7 +32,7 @@ const Collaborators: React.FC = () => {
   };
 
   // Solo muestra el spinner a pantalla completa en la primera carga
-  if (loading && firstLoad.current) {
+  if (loading) {
     return <FullScreenSpinner />;
   }
 
@@ -77,9 +77,7 @@ const Collaborators: React.FC = () => {
                 <SearchIcon />
               </InputAdornment>
             ),
-            endAdornment: loading && (
-              <CircularProgress size={24} color="inherit" />
-            )
+            endAdornment: null
           }}
         />
       </Box>
