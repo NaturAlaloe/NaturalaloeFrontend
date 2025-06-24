@@ -44,6 +44,7 @@ import PoliticiesLista from "./views/politics/politicsList";
 import VersionControlProcedures from "./views/procedures/versionControllProcedures";
 import CapacitacionesGenerales from "./views/capacitation/listCapacitationsGeneral";
 import Evaluacion from "./views/capacitation/evaluatedTraining";
+import Estadistica from "./views/estadisticas/AllStatsCards";
 
 
 import AssignRol from "./views/collaborators/assingRol"
@@ -641,6 +642,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/collaborators/assingRol" element={<AssignRol/>} />
           <Route path="/capacitation/listCapacitationsGeneral" element={<CapacitacionesGenerales/>} />
           <Route path="/capacitation/evaluatedTraining/:codigo_documento" element={<Evaluacion/>} />
+          <Route path="/estadisticas" element={<Estadistica/>} />
           
         </Routes>
       </Main>
