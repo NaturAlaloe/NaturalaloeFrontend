@@ -1,6 +1,7 @@
 import { Search, Person, Badge, Apartment, Work, Close, Info, EditNote, ChatBubble } from "@mui/icons-material";
 import { useState } from 'react';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
+import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
 import { useCapacitationList } from '../../hooks/capacitations/useCapacitationList';
 import SimpleModal from "../../components/globalComponents/SimpleModal";
 
@@ -27,11 +28,12 @@ export default function ListCapacitations() {
     handleRowClick,
     navegarCapacitacionFinalizada,
     isLoading,
-   
-  } = useCapacitationList();
+     } = useCapacitationList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentToShow, setCommentToShow] = useState<string | null>(null);
+
+  if (isLoading) return <FullScreenSpinner />;
 
   const columns = [
     {
