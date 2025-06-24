@@ -2,7 +2,9 @@ import api from "../../apiConfig/api";
 
 export interface ICollaborator {
   id_colaborador: string;
-  nombre_completo: string;
+  nombre: string;
+  apellido1: string;
+  apellido2: string;
   puesto: string;
 }
 
@@ -14,10 +16,11 @@ export const getCollaborators = async (search?: string): Promise<ICollaborator[]
     if (Array.isArray(response.data.data)) {
       return response.data.data.map((item: any) => ({
         id_colaborador: String(item.id_colaborador),
-        nombre_completo: item.nombre_completo,
+        nombre: item.nombre,
+        apellido1: item.apellido1,
+        apellido2: item.apellido2,
         puesto: item.puesto,
       }));
-      console.log(response.data.data);
     }
     return [];
   } catch (error) {
