@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCategories } from "../../services/manage/categorieService";
+import { getCategories } from "../../services/manage/categoryService";
 
 export function useCategories() {
   const [categories, setCategories] = useState<{

@@ -11,7 +11,6 @@ interface Politics {
   version_actual: number;
   fecha_creacion: string;
   fecha_vigencia: string;
-  ruta_documento: string;
   id_responsable: number;
   responsable: string;
 }
@@ -95,39 +94,25 @@ export default function usePoliticsList() {
     setDeletePoliticsObj(row);
   };
 
-
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editPoliticsObj) return;
     try {
       setLoading(true);
 
-      // Usar FormData para enviar el archivo
+      // Construye el FormData con los campos requeridos
       const formData = new FormData();
-      formData.append("id_politica", String(editPoliticsObj.id_politica));
+      formData.append("id_politica", String(editPoliticsObj.id_politica)); // <-- El id va en el body
       formData.append("descripcion", descripcionInput);
       formData.append("id_responsable", responsableInput);
       formData.append("version", versionInput);
       formData.append("fecha_vigencia", fechaVigenciaInput);
-      formData.append("vigente", "true");
-
-
       if (pdfFile) {
         formData.append("documento", pdfFile);
-      } else {
-        formData.append("ruta_documento", editPoliticsObj.ruta_documento);
       }
 
-      const updateData = {
-        id_politica: editPoliticsObj.id_politica,
-        descripcion: descripcionInput,
-        id_responsable: Number(responsableInput),
-        version: Number(versionInput),
-        fecha_vigencia: fechaVigenciaInput,
-        path: pdfFile ? pdfFile.name : editPoliticsObj.ruta_documento,
-        vigente: true,
-      };
-      await updatePolitics(editPoliticsObj.id_politica, updateData);
+      await updatePolitics(formData); // <-- Solo el formData
+
       showCustomToast("Éxito", "Política actualizada", "success");
       const data = await getPoliticsList();
       setPolitics(data);

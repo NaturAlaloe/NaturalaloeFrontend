@@ -20,18 +20,9 @@ export async function getPoliticsList() {
 }
 
 export const updatePolitics = async (
-  _id: number,
-  data: {
-    id_politica: number;
-    descripcion: string;
-    id_responsable: number;
-    version: number;
-    fecha_vigencia: string;
-    path: string;
-    vigente: boolean;
-  }
+  formData: FormData
 ) => {
-    const response = await api.put(`/police`, data, {
+  const response = await api.put(`/police`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
