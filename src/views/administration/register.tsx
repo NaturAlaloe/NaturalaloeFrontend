@@ -4,6 +4,7 @@ import LogoNaturaloe from "../../assets/img/Logo_Naturaloe.png";
 import InputField from "../../components/formComponents/InputField";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 import useAddUser from "../../hooks/users/useAddUser";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -40,8 +41,6 @@ export default function Register() {
     };
 
     await insertUser(userInfo);
-
-
   };
 
   useEffect(() => {
@@ -53,8 +52,12 @@ export default function Register() {
         contrasena: "",
         confirmarContrasena: "",
       });
+      showCustomToast("¡Usuario registrado con éxito!", undefined, "success"); // <-- Toast de éxito
     }
-  }, [success]);
+    if (error) {
+      showCustomToast("Error al registrar usuario", error, "error"); // <-- Toast de error
+    }
+  }, [success, error]);
 
   return (
     <div className="min-h-screen bg-[#DEF7E9] flex items-center justify-center px-4 py-12 font-[Poppins]">
@@ -142,17 +145,6 @@ export default function Register() {
               {loading ? "Registrando..." : "Registrar"}
             </SubmitButton>
           </div>
-
-          {error && (
-            <p className="text-red-600 text-sm text-center">{error}</p>
-          )}
-          {success && (
-            <p className="text-green-600 text-sm text-center">
-              ¡Usuario registrado con éxito!
-            </p>
-
-
-          )}
         </form>
       </motion.div>
     </div>

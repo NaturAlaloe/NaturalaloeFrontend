@@ -23,7 +23,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
   const { login, error, success, loading } = useLogin();
 
-  // Llama a onLoginSuccess cuando el login sea exitoso
   useEffect(() => {
     if (success) {
       onLoginSuccess();
