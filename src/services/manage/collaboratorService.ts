@@ -56,7 +56,9 @@ export interface ICollaboratorDetailRole {
 
 export interface ICollaboratorDetail {
   id_colaborador: number;
-  nombre_completo: string;
+  nombre: string;
+  apellido1: string;
+  apellido2: string;
   roles: ICollaboratorDetailRole[];
   id_documento: number;
 }
@@ -98,7 +100,9 @@ export const getCollaboratorDetail = async (
 
     return {
       id_colaborador: data[0].id_colaborador,
-      nombre_completo: data[0].nombre_completo,
+      nombre: data[0].nombre,
+      apellido1: data[0].apellido1,
+      apellido2: data[0].apellido2,
       roles: Object.values(rolesMap),
       id_documento: data[0].id_documento,
     };

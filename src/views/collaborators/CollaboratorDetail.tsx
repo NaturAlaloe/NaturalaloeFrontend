@@ -21,9 +21,7 @@ export default function CollaboratorDetail() {
     );
 
   const personal = data.roles[0];
-  const nombreSplit = data.nombre_completo.trim().split(" ");
-  const apellidos =
-    nombreSplit.length > 1 ? nombreSplit.slice(1).join(" ") : "";
+  const apellidos = [data.apellido1, data.apellido2].filter(Boolean).join(" ");
 
   return (
     <Box
@@ -101,7 +99,7 @@ export default function CollaboratorDetail() {
           />
           <TextField
             label="Nombre"
-            value={nombreSplit[0]}
+            value={data.nombre}
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
