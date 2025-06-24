@@ -32,6 +32,7 @@ import CollaboratorDetail from "./views/collaborators/CollaboratorDetail";
 import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
 import CapacitacionFinalizada from "./views/capacitation/capacitationFinished";
 import AddCollaborator from "./views/collaborators/addCollaborator";
+import ListCollaborator from "./views/collaborators/viewCollaborators";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
 import Manage from "./views/administration/manage";
@@ -223,8 +224,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               <ListItemText primary="Inicio" />
             </ListItemButton>
           </ListItem>
-      
-         
+
+
 
           {/* Administración */}
           <ListItem disablePadding>
@@ -559,7 +560,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
-                <ListItemButton
+              <ListItemButton
                 component={Link}
                 to="/collaborators/assingRol"
                 sx={{
@@ -572,6 +573,21 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                 }}
               >
                 <ListItemText primary="Asignar Rol" />
+              </ListItemButton>
+
+              <ListItemButton
+                component={Link}
+                to="/collaborators/viewCollaborators"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Lista Colaboradores" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -639,9 +655,14 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/capacitation/capacitationFinished" element={<CapacitacionFinalizada />} />
           <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
           <Route path="/politics/politicsForm" element={<Politicies />} />
-          <Route path="/politics/politicsList" element={<PoliticiesLista />} />
-          <Route path="/procedures/versionControlProcedures" element={<VersionControlProcedures />} />
-          <Route path="/collaborators/assingRol" element={<AssignRol/>} />
+          <Route
+            path="/procedures/versionControlProcedures"
+            element={<VersionControlProcedures />}
+          />
+          <Route
+          path="/collaborators/assingRol"
+          element={<AssignRol/>}
+        />
         </Routes>
       </Main>
     </Box>
