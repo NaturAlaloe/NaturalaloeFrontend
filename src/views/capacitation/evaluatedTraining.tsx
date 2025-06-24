@@ -13,7 +13,8 @@ import { showCustomToast } from "../../components/globalComponents/CustomToaster
 import CustomToaster from "../../components/globalComponents/CustomToaster";
 
 const EvaluatedTraining = () => {
-  const { codigo_documento } = useParams();  const { 
+  const { codigo_documento } = useParams();
+  const { 
     colaboradores, 
     trainingInfo,
     loading, 
@@ -70,8 +71,10 @@ const EvaluatedTraining = () => {
     }
 
     try {
-      const success = await saveEvaluations();      if (success) {        showCustomToast(
-          "Calificaciones guardadas con éxito",
+      const success = await saveEvaluations();
+      if (success) {
+        showCustomToast(
+          "Datos guardados con éxito",
           "Las calificaciones han sido almacenadas correctamente.",
           "success"
         );
@@ -87,7 +90,8 @@ const EvaluatedTraining = () => {
         "Error al guardar",
         "No se pudieron guardar las calificaciones.",
         "error"
-      );    }
+      );
+    }
   };
 
   const columns = [
@@ -111,14 +115,15 @@ const EvaluatedTraining = () => {
       ),
     },
     {
-      name: "Seguimiento",      cell: (row: Colaborador) => (
+      name: "Seguimiento",
+      cell: (row: Colaborador) => (
         <SelectField
           name={`seguimiento-${row.id}`}
           value={row.seguimiento}
           onChange={(e) =>
             handleChange(row.id, "seguimiento", e.target.value)
           }
-          options={["satisfactorio", "reprogramar", "reevaluacion"]}
+          options={["Satisfactorio", "Reprogramar", "Reevaluación"]}
         />
       ),
     },
@@ -184,15 +189,13 @@ const EvaluatedTraining = () => {
   if (loading) return <p className="text-center">Cargando colaboradores...</p>;
   if (error)
     return <p className="text-center text-red-500">{error}</p>;
+
   const getTitle = () => {
     if (trainingInfo) {
       return `Calificación de Colaboradores - ${trainingInfo.titulo_capacitacion}`;
     }
     return "Calificación de Colaboradores";
   };
-
-  // Verificar si la capacitación está finalizada
-  const isTrainingFinalized = trainingInfo?.estado === "Finalizada";
 
   return (
     <>
@@ -218,25 +221,12 @@ const EvaluatedTraining = () => {
               <div>
                 <span className="font-medium text-green-600">Fecha Fin:</span>{" "}
                 <span className="text-green-800">{new Date(trainingInfo.fecha_fin).toLocaleDateString()}</span>
-              </div>              <div>
+              </div>
+              <div>
                 <span className="font-medium text-green-600">Estado:</span>{" "}
-                <span className={`${isTrainingFinalized ? 'text-red-600' : 'text-green-800'}`}>
-                  {trainingInfo.estado}
-                </span>
+                <span className="text-green-800">{trainingInfo.estado}</span>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Mensaje para capacitaciones finalizadas */}
-        {isTrainingFinalized && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <h3 className="text-lg font-semibold text-red-700 mb-2">
-              Capacitación Finalizada
-            </h3>
-            <p className="text-red-600">
-              Esta capacitación ya ha sido finalizada y no se puede calificar nuevamente.
-            </p>
           </div>
         )}
 
@@ -246,10 +236,14 @@ const EvaluatedTraining = () => {
           pagination={true}
           rowsPerPage={10}
           customStyles={customStyles}
-        />        <div className="flex justify-center mt-6">
+        />
+
+        <div className="flex justify-center mt-6">
           <SubmitButton 
             onClick={handleGuardarTodos}
-            disabled={saving || isTrainingFinalized}          >            {saving ? "Guardando..." : "Guardar Calificaciones"}
+            disabled={saving}
+          >
+            {saving ? "Guardando..." : "Guardar calificaciones"}
           </SubmitButton>
         </div>
       </FormContainer>

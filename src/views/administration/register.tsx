@@ -52,7 +52,7 @@ export default function Register() {
         contrasena: "",
         confirmarContrasena: "",
       });
-      showCustomToast("¡Usuario registrado con éxito!", undefined, "success"); // <-- Toast de éxito
+      showCustomToast("¡Éxito!", "¡Usuario registrado con éxito!", "success"); // <-- Toast de éxito
     }
     if (error) {
       showCustomToast("Error al registrar usuario", error, "error"); // <-- Toast de error

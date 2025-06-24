@@ -4,7 +4,7 @@ import ChartSelector from '../../components/home/ChartSelector';
 
 export default function HomeScreen() {
   return (
-    <div className="min-h-[80vh] bg-[#f4fcec] p-4">
+    <div className="min-h-[80vh] bg-[#DEF6E9] p-4">
       <div className="max-w-6xl mx-auto mb-12">
     
         <StatsCards />
