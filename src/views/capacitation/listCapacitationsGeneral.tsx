@@ -1,6 +1,7 @@
 import { Search, Person, Badge, Apartment, Work, Close, Info } from "@mui/icons-material";
 import { useState } from 'react';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
+import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
 import { useCapacitationGeneralList } from '../../hooks/capacitations/useCapacitationGeneralList';
 import SimpleModal from "../../components/globalComponents/SimpleModal";
 
@@ -19,11 +20,12 @@ export default function ListCapacitationGeneral() {
     isLoading,
     error,
     loadCapacitationsGeneral,
-    totalCount,
   } = useCapacitationGeneralList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentToShow] = useState<string | null>(null);
+
+  if (isLoading) return <FullScreenSpinner />;
 
   const columns = [
     {
@@ -104,13 +106,6 @@ export default function ListCapacitationGeneral() {
             </button>
           </div>
           <div className="text-red-600 text-sm mt-1">{error}</div>
-        </div>
-      )}
-
-      {/* Información de resultados */}
-      {!isLoading && !error && (
-        <div className="mb-4 text-sm text-gray-600">
-          Mostrando {capacitations.length} de {totalCount} capacitaciones generales
         </div>
       )}
 

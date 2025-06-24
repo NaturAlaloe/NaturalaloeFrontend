@@ -136,9 +136,7 @@ const Capacitacion = () => {
                 />
             </div>
         </div>        <div className="flex justify-center mt-6 gap-4">
-            <SubmitButton width="w-40" disabled={isLoading}>
-                {isLoading ? "Guardando..." : "Guardar"}
-            </SubmitButton>
+
             <SubmitButton
                 type="button"
                 onClick={() => setShowAsignacionesModal(true)}
@@ -154,6 +152,10 @@ const Capacitacion = () => {
                 disabled={isLoading}
                 className={isGeneralMode ? "bg-orange-500 hover:bg-orange-600" : ""}>
                 {isGeneralMode ? 'Normal' : 'General'}
+            </SubmitButton>
+            
+            <SubmitButton width="w-40" disabled={isLoading}>
+                {isLoading ? "Guardando..." : "Guardar"}
             </SubmitButton>
         </div>
         {showAsignacionesModal && (
