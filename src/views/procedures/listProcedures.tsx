@@ -11,6 +11,8 @@ import SubmitButton from "../../components/formComponents/SubmitButton";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import CustomToaster, { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { useResponsibles } from "../../hooks/procedureFormHooks/useResponsibles";
+import PdfInput from "../../components/formComponents/PdfInput";
+import { deleteProcedure } from "../../services/procedures/procedureService";
 
 const formatDateToBackend = (dateString: string | Date | undefined): string => {
   if (!dateString) return '';
@@ -41,7 +43,8 @@ export default function ListProcedures() {
     setDepartmentFilter,
     departments,
     updateProcedure,
-    fetchProcedures
+    fetchProcedures,
+  
   } = useProceduresList();
 
   const { responsibles, loading: loadingResponsibles } = useResponsibles() as { responsibles: Array<{ id_responsable: string; nombre_responsable: string }>, loading: boolean };
@@ -52,6 +55,8 @@ export default function ListProcedures() {
   const [editData, setEditData] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [procedureToDelete, setProcedureToDelete] = useState<Procedure | null>(null);
 
   // Edit handler
   const handleEdit = (row: Procedure) => {
@@ -100,6 +105,24 @@ export default function ListProcedures() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleDeleteClick = (row: Procedure) => {
+    setProcedureToDelete(row);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!procedureToDelete) return;
+    try {
+      const res = await deleteProcedure(procedureToDelete.id_documento);
+      showCustomToast("Éxito", res.message || "Procedimiento eliminado lógicamente correctamente", "success");
+      fetchProcedures();
+    } catch (err: any) {
+      showCustomToast("Error", err.message || "No se pudo eliminar el procedimiento", "error");
+    }
+    setDeleteModalOpen(false);
+    setProcedureToDelete(null);
   };
 
   const columns: TableColumn<Procedure>[] = [
@@ -173,7 +196,7 @@ export default function ListProcedures() {
             className="action-button text-red-600 hover:text-red-800 transition-colors"
             onClick={(e) => {
               e.stopPropagation();
-              showCustomToast("Funcionalidad de eliminar no implementada", "", "info");
+              handleDeleteClick(row);
             }}
             title="Eliminar"
           >
@@ -186,6 +209,20 @@ export default function ListProcedures() {
       button: true,
     },
   ];
+
+  // Antes de paginar, filtra:
+const filteredProcedures = procedures.filter((proc) => {
+  const matchesSearch = 
+    proc.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    proc.revision.toLowerCase().includes(searchTerm.toLowerCase());
+  
+  const matchesDepartment = 
+    !departmentFilter || 
+    proc.departamento === departmentFilter;
+  
+  return matchesSearch && matchesDepartment;
+});
+  // Luego, pasa filteredProcedures a la tabla y la paginación.
 
   if (loading) return <FullScreenSpinner />;
   if (error) {
@@ -220,16 +257,11 @@ export default function ListProcedures() {
         </div>
         <GlobalDataTable
           columns={columns}
-          data={procedures}
+          data={filteredProcedures}
           highlightOnHover
           pagination
           paginationPerPage={10}
           paginationRowsPerPageOptions={[10, 25, 50, 100]}
-          sortServer
-          onSort={(column: TableColumn<Procedure> & { field?: keyof Procedure }) => {
-            if (column.field) handleSort(column.field);
-          }}
-          sortIcon={<span className="ml-1">{sortDirection === "asc" ? "↑" : "↓"}</span>}
           noDataComponent={
             <div className="p-4 text-center text-gray-500">
               No se encontraron procedimientos
@@ -391,8 +423,13 @@ export default function ListProcedures() {
                   name="path"
                   value={editData.path}
                   onChange={e => setEditData({ ...editData, path: e.target.value })}
-                  disabled={saving}
+                  disabled={true} // <-- Cambia esto a true para que NO se pueda editar
                 />
+                <PdfInput
+                  label="Documento PDF"
+                  onChange={file => setEditData({ ...editData, pdf: file })} pdfFile={null} onRemove={function (): void {
+                    throw new Error("Function not implemented.");
+                  } }                />
               </div>
               <div className="flex justify-end space-x-3 pt-4 w-full">
                 <button
@@ -411,6 +448,32 @@ export default function ListProcedures() {
               </div>
             </form>
           )}
+        </GlobalModal>
+        {/* Modal de confirmación de eliminación */}
+        <GlobalModal
+          open={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          title="Confirmar eliminación"
+        >
+          <div className="p-4 text-center">
+            <p className="text-sm text-gray-700 mb-4">
+              ¿Está seguro que desea eliminar este procedimiento?
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
         </GlobalModal>
       </TableContainer>
     </>
