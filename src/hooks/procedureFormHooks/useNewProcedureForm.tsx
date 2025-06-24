@@ -35,23 +35,43 @@ export function useNewProcedureForm() {
     fechaCreacion: "",
     fechaVigencia: "",
   };
-  const { formData, setFormData, handleChange } = useProcedureFormState(initialState);
+
+  const { formData, setFormData, handleChange } =
+    useProcedureFormState(initialState);
   const { handleAutocompleteChange } = useProcedureFormHandlers(setFormData);
 
   // Hooks de selects
   const { departments, loading: loadingDepartments } = useDepartments();
   const { areas, loading: loadingAreas } = useAreas();
-  const { categories: categorias, loading: loadingCategorias } = useCategories();
+  const { categories: categorias, loading: loadingCategorias } =
+    useCategories();
   const { responsibles, loading: loadingResponsibles } = useResponsibles();
 
   // SelectFields: buscan por ID
   const areaSeleccionada = useSelectField(areas, formData.area, "codigo");
-  const departamentoSeleccionado = useSelectField(departments, formData.departamento, "id_departamento");
-  const categoriaSeleccionada = useSelectField(categorias, formData.categoria, "id_categoria");
-  const responsableSeleccionado = useSelectField(responsibles, formData.responsable, "id_responsable");
+  const departamentoSeleccionado = useSelectField(
+    departments,
+    formData.departamento,
+    "id_departamento"
+  );
+  const categoriaSeleccionada = useSelectField(
+    categorias,
+    formData.categoria,
+    "id_categoria"
+  );
+  const responsableSeleccionado = useSelectField(
+    responsibles,
+    formData.responsable,
+    "id_responsable"
+  );
 
   // Consecutivo
-  const { lastConsecutive, loading: loadingConsecutivo, fetchLastConsecutive } = useLastConsecutive();
+  const {
+    lastConsecutive,
+    loading: loadingConsecutivo,
+    fetchLastConsecutive,
+  } = useLastConsecutive();
+  
   // Buscar consecutivo cuando cambian depto/cat
   useEffect(() => {
     if (departamentoSeleccionado && categoriaSeleccionada) {
@@ -60,7 +80,11 @@ export function useNewProcedureForm() {
   }, [departamentoSeleccionado, categoriaSeleccionada, fetchLastConsecutive]);
 
   // Código POE modularizado
-  const { codeApi, codeVisual } = useProcedureCode(departamentoSeleccionado, categoriaSeleccionada, lastConsecutive);
+  const { codeApi, codeVisual } = useProcedureCode(
+    departamentoSeleccionado,
+    categoriaSeleccionada,
+    lastConsecutive
+  );
 
   // PDF
   const { pdfFile, setPdfFile, handlePdfChange, removePdf } = usePdfInput();
@@ -69,7 +93,8 @@ export function useNewProcedureForm() {
   const limpiarFormulario = useFormReset(initialState, setFormData, setPdfFile);
 
   // Submit
-  const { submitProcedure, loading: loadingSubmit } = useCreateProcedureSubmit();
+  const { submitProcedure, loading: loadingSubmit } =
+    useCreateProcedureSubmit();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!pdfFile) return;

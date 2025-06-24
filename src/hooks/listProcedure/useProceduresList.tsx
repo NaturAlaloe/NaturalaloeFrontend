@@ -1,6 +1,7 @@
 // src/hooks/listProcedure/useProceduresList.tsx
 import { useState, useEffect } from "react";
 import { getActiveProcedures, type Procedure } from "../../services/procedures/procedureService";
+import api from "../../apiConfig/api";
 
 export function useProceduresList() {
   const [procedures, setProcedures] = useState<Procedure[]>([]);
@@ -11,18 +12,21 @@ export function useProceduresList() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [departmentFilter, setDepartmentFilter] = useState<string>("");
 
-  useEffect(() => {
-    const fetchProcedures = async () => {
-      try {
-        const data = await getActiveProcedures();
-        setProcedures(data);
-      } catch (err) {
-        setError("Error de conexión con el servidor");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProcedures = async () => {
+    try {
+      setLoading(true);
+      const data = await getActiveProcedures();
+      setProcedures(data);
+      setError(null);
+    } catch (err) {
+      setError("Error al cargar los procedimientos");
+      console.error("Error fetching procedures:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProcedures();
   }, []);
 
@@ -63,6 +67,52 @@ export function useProceduresList() {
     }
   };
 
+  const updateProcedure = async (procedureUpdate: {
+    id_documento: number;
+    descripcion: string;
+    id_responsable: number;
+    fecha_creacion: string;
+    fecha_vigencia: string;
+    path: string;
+  }) => {
+    try {
+      const response = await api.put("/procedureList", {
+        procedimientos: [{
+          id_documento: procedureUpdate.id_documento,
+          descripcion: procedureUpdate.descripcion,
+          id_responsable: procedureUpdate.id_responsable,
+          fecha_creacion: procedureUpdate.fecha_creacion,
+          fecha_vigencia: procedureUpdate.fecha_vigencia,
+          path: procedureUpdate.path
+        }],
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Error al actualizar");
+      }
+
+      // Actualizar la lista después de la edición
+      await fetchProcedures();
+      
+      return { 
+        success: true, 
+        message: "Procedimiento actualizado correctamente" 
+      };
+    } catch (error: any) {
+      console.error("Error updating procedure:", {
+        error: error.response?.data || error.message,
+        sentData: procedureUpdate
+      });
+      
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 
+              error.message || 
+              "Error al comunicarse con el servidor" 
+      };
+    }
+  };
+
   return {
     procedures: sortedProcedures,
     loading,
@@ -75,6 +125,8 @@ export function useProceduresList() {
     departmentFilter,
     setDepartmentFilter,
     departments,
+    updateProcedure,
+    fetchProcedures // Exportar para poder refrescar manualmente
   };
 }
 
