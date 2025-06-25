@@ -45,7 +45,7 @@ import VersionControlProcedures from "./views/procedures/versionControllProcedur
 import CapacitacionesGenerales from "./views/capacitation/listCapacitationsGeneral";
 import Evaluacion from "./views/capacitation/evaluatedTraining";
 import Estadistica from "./views/estadisticas/AllStatsCards";
-
+import ListaColaboradores from "./views/collaborators/viewCollaborators";
 
 import AssignRol from "./views/collaborators/assingRol"
 
@@ -545,7 +545,20 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Añadir Colaborador" />
               </ListItemButton>
-
+ <ListItemButton
+                component={Link}
+                to="/collaborators/viewCollaborators"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Lista de Colaboradores" />
+              </ListItemButton>
               <ListItemButton
                 component={Link}
                 to="/collaborators/collaborators"
@@ -640,6 +653,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/politics/politicsList" element={<PoliticiesLista />} />
           <Route path="/procedures/versionControlProcedures" element={<VersionControlProcedures />} />
           <Route path="/collaborators/assingRol" element={<AssignRol/>} />
+          <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores/>} />
           <Route path="/capacitation/listCapacitationsGeneral" element={<CapacitacionesGenerales/>} />
           <Route path="/capacitation/evaluatedTraining/:codigo_documento" element={<Evaluacion/>} />
           <Route path="/estadisticas" element={<Estadistica/>} />
