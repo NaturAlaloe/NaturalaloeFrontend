@@ -14,7 +14,6 @@ const useCollaborators = () => {
     
     try {
       const data = await getCollaborators(term);
-      // Aseguramos que siempre sea un array
       setCollaborators(Array.isArray(data) ? data : []);
     } catch (err) {
       setError('Error al cargar colaboradores');
@@ -35,8 +34,13 @@ const useCollaborators = () => {
   // Filtrado en frontend si searchTerm existe
   const filteredCollaborators = searchTerm
     ? collaborators.filter(colab =>
-        colab.nombre_completo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        colab.id_colaborador.includes(searchTerm)
+        (
+          `${colab.nombre || ''} ${colab.apellido1 || ''} ${colab.apellido2 || ''}`
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+        ) ||
+        String(colab.id_colaborador || '').includes(searchTerm) ||
+        (colab.puesto || '').toLowerCase().includes(searchTerm.toLowerCase())
       )
     : collaborators;
 

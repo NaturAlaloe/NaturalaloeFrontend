@@ -1,5 +1,5 @@
 import DataTable, { type TableColumn } from "react-data-table-component";
-import React, { useState } from "react";
+import React from "react";
 
 interface AppDataTableProps<T> {
   columns: TableColumn<T>[];
@@ -10,6 +10,8 @@ interface AppDataTableProps<T> {
   dense?: boolean;
   highlightOnHover?: boolean;
   rowsPerPage?: number;
+  currentPage?: number; // <-- Add this
+  onChangePage?: (page: number) => void; // <-- Add this
   [key: string]: any;
 }
 
@@ -36,13 +38,18 @@ export default function GlobalDataTable<T>({
   dense = false,
   highlightOnHover = false,
   rowsPerPage = 10,
+  currentPage, // <-- Use this
+  onChangePage, // <-- Use this
   ...rest
 }: AppDataTableProps<T>) {
-  const [currentPage, setCurrentPage] = useState(1);
+  // Use controlled pagination if props provided, otherwise fallback to internal state
+  const [internalPage, setInternalPage] = React.useState(1);
+  const page = currentPage ?? internalPage;
+  const setPage = onChangePage ?? setInternalPage;
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const paginatedData = pagination
-    ? data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+    ? data.slice((page - 1) * rowsPerPage, page * rowsPerPage)
     : data;
 
   const CustomPagination = () => (
@@ -50,8 +57,8 @@ export default function GlobalDataTable<T>({
       <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
         <button
           className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
+          onClick={() => setPage(Math.max(page - 1, 1))}
+          disabled={page === 1}
         >
           <span className="sr-only">Anterior</span>
           <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -61,22 +68,22 @@ export default function GlobalDataTable<T>({
         {[...Array(totalPages)].map((_, idx) => (
           <button
             key={idx + 1}
-            aria-current={currentPage === idx + 1 ? "page" : undefined}
+            aria-current={page === idx + 1 ? "page" : undefined}
             className={
-              currentPage === idx + 1
+              page === idx + 1
                 ? "bg-gray-300 border-gray-500 text-gray-900 font-bold shadow-md relative inline-flex items-center px-4 py-2 border text-sm rounded-md z-10"
                 : "bg-white border-gray-300 text-gray-500 hover:bg-gray-100 relative inline-flex items-center px-4 py-2 border text-sm rounded-md"
             }
-            onClick={() => setCurrentPage(idx + 1)}
-            style={currentPage === idx + 1 ? { pointerEvents: 'none' } : {}}
+            onClick={() => setPage(idx + 1)}
+            style={page === idx + 1 ? { pointerEvents: 'none' } : {}}
           >
             {idx + 1}
           </button>
         ))}
         <button
           className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
+          onClick={() => setPage(Math.min(page + 1, totalPages))}
+          disabled={page === totalPages}
         >
           <span className="sr-only">Siguiente</span>
           <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

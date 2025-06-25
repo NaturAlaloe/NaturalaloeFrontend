@@ -14,9 +14,8 @@ export const addDepartment = async (department: {
   return res.data;
 };
 
-// Actualiza título, código y id_departamento
 export const updateDepartment = async (
-  _id: number, // ya no se usa en la URL
+  _id: number, 
   data: { titulo: string; codigo: number; id_departamento: number; id_area: number }
 ) => {
   const res = await api.put(`/department`, data);

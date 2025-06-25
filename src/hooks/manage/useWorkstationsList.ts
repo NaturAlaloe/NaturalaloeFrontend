@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useWorkstations } from "./useWorkstations";
 import { addWorkstation, updateWorkstation, deleteWorkstation as deleteWorkstationApi } from "../../services/manage/workstationService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
@@ -19,6 +19,11 @@ export function useWorkstationsList() {
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
   const [editWorkstation, setEditWorkstation] = useState<any | null>(null);
   const [deleteWorkstation, setDeleteWorkstation] = useState<any | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   // Form states
   const [workstationInput, setWorkstationInput] = useState("");
@@ -115,5 +120,7 @@ export function useWorkstationsList() {
     handleOpenEdit,
     handleSave,
     handleDelete,
+    currentPage,
+    setCurrentPage,
   };
 }
