@@ -1,4 +1,5 @@
 import { useRolesProceduresList } from "../../hooks/procedures/useRolesProceduresList";
+import { useRolesProcedures } from "../../hooks/procedures/useRolesProcedures"; // Importa el hook real
 import {
   Button,
   Box,
@@ -12,6 +13,7 @@ import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import type { TableColumn } from "react-data-table-component";
 import SearchBar from "../../components/globalComponents/SearchBarTable";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
+import React from "react";
 
 export default function RolesProcedures() {
   const {
@@ -30,6 +32,8 @@ export default function RolesProcedures() {
     procedimientosFiltradosModal,
     handleSaveProcedimientos,
   } = useRolesProceduresList();
+
+  const { saveProcedures, removeProcedures } = useRolesProcedures();
 
   const columns: TableColumn<any>[] = [
     {
@@ -88,6 +92,27 @@ export default function RolesProcedures() {
     },
   ];
 
+  // Guarda la selección anterior en un ref para comparar
+  const prevSeleccionRef = React.useRef<number[]>(procedimientosSeleccionados);
+
+  // Nueva función para manejar el cambio de selección
+  const handleSeleccionChange = (seleccion: number[]) => {
+    const prevSeleccion = prevSeleccionRef.current;
+    const nuevos = seleccion.filter(id => !prevSeleccion.includes(id));
+    const quitados = prevSeleccion.filter(id => !seleccion.includes(id));
+
+    if (rolActual) {
+      if (nuevos.length > 0) {
+        saveProcedures(rolActual.id_rol, nuevos);
+      }
+      if (quitados.length > 0) {
+        removeProcedures(rolActual.id_rol, quitados);
+      }
+    }
+    setProcedimientosSeleccionados(seleccion);
+    prevSeleccionRef.current = seleccion;
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
        
@@ -138,7 +163,7 @@ export default function RolesProcedures() {
             procedimientos={procedimientosFiltradosModal}
             procedimientosSeleccionados={procedimientosSeleccionados.map(String)}
             onSeleccionChange={seleccion =>
-              setProcedimientosSeleccionados(seleccion.map(Number))
+              handleSeleccionChange(seleccion.map(Number))
             }
           />
         </div>

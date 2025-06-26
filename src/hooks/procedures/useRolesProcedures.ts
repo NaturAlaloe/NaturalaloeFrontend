@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { getRolesWithProcedures, assignProceduresToRole } from "../../services/procedures/procedureRolesService";
+import {
+  getRolesWithProcedures,
+  assignProceduresToRole,
+  unassignProceduresFromRole, // <-- Importa la función
+} from "../../services/procedures/procedureRolesService";
 
 // Este hook maneja la lógica de roles y procedimientos
 // y proporciona una interfaz para interactuar con los roles y sus procedimientos asignados.
@@ -40,7 +44,7 @@ export function useRolesProcedures() {
       });
     });
     setRolesProcedures(Object.values(agrupados));
-    console.log("Roles y procedimientos:", Object.values(agrupados)); // Para depuración
+  
     setLoading(false);
   };
 
@@ -49,9 +53,16 @@ export function useRolesProcedures() {
     fetchRolesProcedures();
   };
 
+  // Nueva función para desasignar procedimientos
+  const removeProcedures = async (id_rol: number, procedimientos: number[]) => {
+    await unassignProceduresFromRole(id_rol, procedimientos);
+    fetchRolesProcedures();
+  };
+
   useEffect(() => {
     fetchRolesProcedures();
   }, []);
 
-  return { rolesProcedures, loading, fetchRolesProcedures, saveProcedures };
+  // Exporta la nueva función
+  return { rolesProcedures, loading, fetchRolesProcedures, saveProcedures, removeProcedures };
 }
