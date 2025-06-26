@@ -236,7 +236,7 @@ export default function ListCapacitations() {
               </div>
             </div>
             <div>
-              <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left mt-8 md:mt-0">Información del Profesor</h3>
+              <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left mt-8 md:mt-0">Información del Facilitador</h3>
               <div className="mb-4">
                 <details className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
                   <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
@@ -262,7 +262,7 @@ export default function ListCapacitations() {
           open={showCommentModal}
           onClose={() => setShowCommentModal(false)}
           title="Comentario"
-          maxWidth="sm"
+          maxWidth="xs"
         >
           <div className="text-gray-800 text-sm whitespace-pre-line break-words">
             {commentToShow}

@@ -46,9 +46,10 @@ export default function ListCapacitationGeneral() {
   ];
   return (
     <div className="p-4 bg-white rounded-lg">
+
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 border-b-2 border-[#2AAC67] pb-2">
-          Capacitaciones Generales
+        <h1 className="text-2xl font-bold text-gray-800 w-full border-b-2 border-[#2AAC67] pb-2">
+          Generales
         </h1>
       </div>
 

@@ -13,11 +13,11 @@ import CustomToaster from "../../components/globalComponents/CustomToaster";
 
 const EvaluatedTraining = () => {
   const { codigo_documento } = useParams();
-  const { 
-    colaboradores, 
+  const {
+    colaboradores,
     trainingInfo,
-    loading, 
-    error, 
+    loading,
+    error,
     saving,
     setColaboradores,
     saveEvaluations
@@ -59,7 +59,7 @@ const EvaluatedTraining = () => {
       const nota = parseFloat(c.nota);
       return isNaN(nota) || nota < 0 || nota > 100;
     });
-    
+
     if (notasInvalidas.length > 0) {
       showCustomToast(
         "Notas inválidas",
@@ -189,22 +189,20 @@ const EvaluatedTraining = () => {
   if (error)
     return <p className="text-center text-red-500">{error}</p>;
 
-  const getTitle = () => {
-    if (trainingInfo) {
-      return `Calificación de Colaboradores - ${trainingInfo.titulo_capacitacion}`;
-    }
-    return "Calificación de Colaboradores";
-  };
-
+ 
   return (
     <>
-      <FormContainer title={getTitle()}>
+      <FormContainer title={"Capacitación Evaluada"}>
         {trainingInfo && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
             <h3 className="text-lg font-semibold text-green-700 mb-2">
               Información de la Capacitación
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="font-medium text-green-600">Titulo Capacitación:</span>{" "}
+                <span className="text-green-800">{trainingInfo.titulo_capacitacion}</span>
+              </div>
               <div>
                 <span className="font-medium text-green-600">Código:</span>{" "}
                 <span className="text-green-800">{trainingInfo.codigo_documento}</span>
@@ -238,7 +236,7 @@ const EvaluatedTraining = () => {
         />
 
         <div className="flex justify-center mt-6">
-          <SubmitButton 
+          <SubmitButton
             onClick={handleGuardarTodos}
             disabled={saving}
           >
