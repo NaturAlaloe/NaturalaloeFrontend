@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import type { General } from "../../services/capacitations/generalListService";
+import type { General } from "../../services/trainings/generalListService";
 import {
   getGenerales,
   createGeneral,
   updateGeneralById,
   deleteGeneralById,
-} from "../../services/capacitations/generalListService";
+} from "../../services/trainings/generalListService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export function useGenerales() {

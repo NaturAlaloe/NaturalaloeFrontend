@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   getCapacitationGeneralList,
   type Capacitation_General,
-} from "../../services/capacitations/getCapacitationGeneralService";
+} from "../../services/trainings/getTrainigGeneralService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export interface CapacitationGeneral {

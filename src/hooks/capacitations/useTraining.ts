@@ -1,7 +1,7 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
-import {createCapacitacion,validateCapacitacionData,type CreateCapacitacionRequest,} from "../../services/capacitations/addCapacitationsService";
-import {getFacilitadores,type Facilitador,getColaboradores,type Colaboradores,getProcedimientos,type Procedimientos,} from "../../services/capacitations/getCapacitationsService";
+import {createCapacitacion,validateCapacitacionData,type CreateCapacitacionRequest,} from "../../services/trainings/addTrainingsService";
+import {getFacilitadores,type Facilitador,getColaboradores,type Colaboradores,getProcedimientos,type Procedimientos,} from "../../services/trainings/getTrainingsService";
 
 const metodosEvaluacion = [
   { value: "", label: "Seleccione...", disabled: true },

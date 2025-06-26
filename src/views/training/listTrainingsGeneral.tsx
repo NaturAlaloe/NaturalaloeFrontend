@@ -1,5 +1,5 @@
 import { Edit, Delete, Search, Add } from "@mui/icons-material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useGenerales } from "../../hooks/capacitations/useGeneralList";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";

@@ -3,7 +3,7 @@ import InputField from '../../components/formComponents/InputField';
 import SelectField from '../../components/formComponents/SelectField';
 import AutocompleteField from '../../components/formComponents/AutocompleteField';
 import SubmitButton from '../../components/formComponents/SubmitButton';
-import { useCapacitation } from '../../hooks/capacitations/useCapacitation';
+import { useCapacitation } from '../../hooks/capacitations/useTraining';
 import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 import GlobalModal from '../../components/globalComponents/GlobalModal';
