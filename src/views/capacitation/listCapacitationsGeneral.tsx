@@ -1,181 +1,181 @@
-import { Search, Person, Badge, Apartment, Work, Close, Info } from "@mui/icons-material";
-import { useState } from 'react';
-import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
-import { useCapacitationGeneralList } from '../../hooks/capacitations/useCapacitationGeneralList';
-import SimpleModal from "../../components/globalComponents/SimpleModal";
+import { Edit, Delete, Search, Add } from "@mui/icons-material";
+import { useState, useEffect } from "react";
+import { useGenerales } from "../../hooks/capacitations/useGeneralList";
+import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
+import GlobalModal from "../../components/globalComponents/GlobalModal";
+import InputField from "../../components/formComponents/InputField";
+import TableContainer from "../../components/TableContainer";
+import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 
 export default function ListCapacitationGeneral() {
   const {
-    capacitations,
-    searchTerm,
-    setSearchTerm,
-    estadoFilter,
-    setEstadoFilter,
-    estados,
-    showModal,
-    setShowModal,
-    selectedCapacitation,
-    handleRowClick,
-  } = useCapacitationGeneralList();
+    generales,
+    modalOpen,
+    editing,
+    selected,
+    deleteModalOpen,
+    loading,
+    setEditing,
+    openAdd,
+    openEdit,
+    openDelete,
+    closeModal,
+    closeDeleteModal,
+    updateGeneral,
+    deleteGeneral,
+  } = useGenerales();
 
-  const [showCommentModal, setShowCommentModal] = useState(false);
-  const [commentToShow] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filtrar toda la lista según búsqueda (sin paginar aquí)
+  const filtered = generales.filter((item) => {
+    const codigo = (item.codigo ?? "").toLowerCase().trim();
+    const titulo = (item.titulo ?? "").toLowerCase().trim();
+    const search = searchTerm.toLowerCase().trim();
+    return codigo.includes(search) || titulo.includes(search);
+  });
+
+  if (loading) return <FullScreenSpinner />;
 
   const columns = [
+    { name: "CÓDIGO", selector: (row: any) => row.codigo, sortable: true },
+    { name: "TÍTULO", selector: (row: any) => row.titulo, sortable: true },
     {
-      name: 'ID',
-      selector: (row: any) => row.id,
-      sortable: true,
-      cell: (row: any) => <div className="text-sm font-medium text-gray-900">{row.id}</div>,
-      wrap: true,
-      width: '120px',
+      name: "ACCIONES",
+      cell: (row: any) => (
+        <div className="flex items-center space-x-2">
+          <button
+            type="button"
+            className="text-[#2AAC67]"
+            onClick={() => openEdit(row)}
+          >
+            <Edit fontSize="small" />
+          </button>
+          <button
+            type="button"
+            className="text-[#F44336]"
+            onClick={() => openDelete(row)}
+          >
+            <Delete fontSize="small" />
+          </button>
+        </div>
+      ),
+      right: true,
     },
-    {
-      name: 'TÍTULO',
-      selector: (row: any) => row.titulo,
-      sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.titulo}</div>,
-      wrap: true,
-    },
-    {
-      name: 'Fecha Creación',
-      selector: (row: any) => row.fechaCreacion,
-      sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.fechaCreacion}</div>,
-      wrap: true,
-    },
-    
   ];
-  return (
-    <div className="p-4 bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 border-b-2 border-[#2AAC67] pb-2">
-          Capacitaciones Generales
-        </h1>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="relative">
+  return (
+    <TableContainer title="Lista de Generales">
+      <div className="relative mb-6 flex items-center space-x-4">
+        <div className="relative flex-grow">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="text-gray-400" />
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
-            placeholder="Buscar por título, ID o estado..."
+            placeholder="Buscar por código o título..."
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
           />
         </div>
-
-        <select
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67]"
-          value={estadoFilter}
-          onChange={e => setEstadoFilter(e.target.value)}
+        <button
+          type="button"
+          onClick={openAdd}
+          className="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#2AAC67] hover:bg-[#259e5d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2AAC67]"
+          aria-label="Agregar general"
+          title="Agregar general"
         >
-          <option value="">Todos los Estados</option>
-          {estados.map((estado) => (
-            <option key={estado} value={estado}>{estado}</option>
-          ))}
-        </select>
+          <Add fontSize="small" />
+        </button>
       </div>
-      <div className="border border-gray-200 rounded-lg overflow-x-auto">
-        <GlobalDataTable
-          columns={columns}
-          data={capacitations}
-          rowsPerPage={10}
-          dense
-          highlightOnHover
-          noDataComponent={
-            <div className="px-6 py-4 text-center text-sm text-gray-500">
-              No se encontraron capacitaciones generales
+
+      <GlobalDataTable
+        columns={columns}
+        data={filtered} // PASAMOS toda la lista filtrada completa
+        pagination // paginación nativa del componente
+        highlightOnHover
+        dense
+      />
+
+      {/* Modal Agregar/Editar */}
+      {modalOpen && editing && (
+        <GlobalModal
+          open={modalOpen}
+          onClose={closeModal}
+          title={editing.id === 0 ? "Agregar General" : "Editar General"}
+          maxWidth="sm"
+        >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              updateGeneral(editing);
+            }}
+          >
+            <div className="space-y-4">
+              <InputField
+                label="Código"
+                name="codigo"
+                value={editing.codigo}
+                onChange={(e) => setEditing({ ...editing, codigo: e.target.value })}
+                required
+              />
+              <InputField
+                label="Título"
+                name="titulo"
+                value={editing.titulo}
+                onChange={(e) => setEditing({ ...editing, titulo: e.target.value })}
+                required
+              />
             </div>
+            <div className="flex justify-center gap-2 mt-6">
+              <button
+                type="button"
+                onClick={closeModal}
+                className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-md bg-[#2AAC67] text-white hover:bg-[#259e5d]"
+              >
+                Guardar
+              </button>
+            </div>
+          </form>
+        </GlobalModal>
+      )}
+
+      {/* Modal Eliminar */}
+      {deleteModalOpen && selected && (
+        <GlobalModal
+          open={deleteModalOpen}
+          onClose={closeDeleteModal}
+          title="¿Eliminar General?"
+          maxWidth="sm"
+          actions={
+            <>
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => deleteGeneral(selected.id)}
+                className="px-4 py-2 rounded-md bg-[#F44336] text-white hover:bg-red-600"
+              >
+                Eliminar
+              </button>
+            </>
           }
-          customStyles={{
-            headCells: {
-              style: {
-                background: "#F0FFF4",
-                color: "#2AAC67",
-                fontWeight: "bold",
-                fontSize: "13px",
-                textTransform: "uppercase",
-              },
-            },
-          }}
-          onRowClicked={handleRowClick}
-        />
-      </div>
-      {/* Modal de detalles */}
-      {showModal && selectedCapacitation && (
-        <div
-          className="fixed mt-15 inset-0 flex items-center justify-center z-50"
-          style={{
-            backdropFilter: "blur(4px)",
-            backgroundColor: "rgba(0,0,0,0.3)",
-          }}
         >
-          <div className="bg-white rounded-2xl px-8 py-8 w-full max-w-4xl shadow-2xl relative overflow-y-auto max-h-[95vh]">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
-            >
-              <Close />
-            </button>
-
-            <div className="flex flex-col items-center mb-8">
-              <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#2ecc71]/10 mb-2">
-                <Info className="text-[#2ecc71]" style={{ fontSize: 36 }} />
-              </div>
-              <h2 className="text-[#2ecc71] font-bold text-2xl text-center">
-                Detalles de Capacitación General
-              </h2>
-            </div>
-            <div>
-              <h3 className="text-[#2ecc71] font-bold text-lg mb-4">Colaboradores Asignados</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto">
-                {selectedCapacitation.colaboradores.map((colaborador) => (
-                  <div key={colaborador.id} className="border border-[#2ecc71] rounded-lg p-3 bg-[#f6fff6]">
-                    <div className="flex items-center mb-2">
-                      <Person className="mr-2 text-[#2ecc71]" />
-                      <span className="font-semibold text-[#2ecc71]">{colaborador.nombre}</span>
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex items-center">
-                        <Badge className="mr-2 text-[#2ecc71] text-sm" />
-                        <span className="font-medium">Cédula:</span>
-                        <span className="ml-1 text-gray-600">{colaborador.cedula}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Work className="mr-2 text-[#2ecc71] text-sm" />
-                        <span className="font-medium">Puesto:</span>
-                        <span className="ml-1 text-gray-600">{colaborador.puesto}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Apartment className="mr-2 text-[#2ecc71] text-sm" />
-                        <span className="font-medium">Departamento:</span>
-                        <span className="ml-1 text-gray-600">{colaborador.departamento}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+          <p className="text-gray-800 text-center">
+            ¿Estás seguro que deseas eliminar el general <strong>{selected.titulo}</strong> con código <strong>{selected.codigo}</strong>?
+          </p>
+        </GlobalModal>
       )}
-      {/* Modal de comentario */}
-      {showCommentModal && (
-        <SimpleModal
-          open={showCommentModal}
-          onClose={() => setShowCommentModal(false)}
-          title="Comentario"
-          widthClass="max-w-md w-full"
-        >
-          <div className="text-gray-800 text-sm whitespace-pre-line break-words">
-            {commentToShow}
-          </div>
-        </SimpleModal>
-      )}
-    </div>
+    </TableContainer>
   );
 }
