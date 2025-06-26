@@ -3,6 +3,9 @@ import { useRolesProcedures } from "./useRolesProcedures";
 import { getActiveProcedures } from "../../services/procedures/procedureService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
+// Este hook maneja la lógica de roles y procedimientos
+// y proporciona una interfaz para interactuar con los roles y sus procedimientos asignados.
+
 export function useRolesProceduresList() {
   const { rolesProcedures, loading, saveProcedures } = useRolesProcedures();
 
@@ -18,12 +21,11 @@ export function useRolesProceduresList() {
   useEffect(() => {
     if (modalOpen) {
       getActiveProcedures().then((procedimientos) => {
-        // Mapear para que tengan los campos que espera el modal
-        console.log("Procedimientos activos:", procedimientos); // Para depuración
         setProcedimientosActivos(
           procedimientos.map((p: any) => ({
             id_documento: p.id_documento,
-            poe: p.id_documento?.toString(), // Usar id_documento como clave de selección
+            poe: p.id_documento?.toString(), // clave de selección
+            codigo: p.codigo,                // mostrar en tabla
             titulo: p.titulo,
           }))
         );

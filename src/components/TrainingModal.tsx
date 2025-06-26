@@ -6,6 +6,7 @@ import InputField from "./formComponents/InputField";
 import SelectField from "./formComponents/SelectField";
 import AutocompleteField from "./formComponents/AutocompleteField";
 import useCollaboratorFacilitator from "../hooks/collaborator/useCollaboratorFacilitator";
+import { useTrainingRegister } from "../hooks/training/useTrainingRegister";
 
 interface TrainingModalProps {
   open: boolean;
@@ -14,7 +15,7 @@ interface TrainingModalProps {
 }
 
 const tipoCapacitacionOptions = ["Interna", "Externa"];
-const metodoEvaluacionOptions = ["Teórico", "Práctico", "Campo"];
+const metodoEvaluacionOptions = ["Teórico", "Práctico"];
 const seguimientoOptions = ["Satisfactorio", "Reprogramar", "Reevaluación"];
 
 export default function TrainingModal({
@@ -36,6 +37,18 @@ export default function TrainingModal({
     nota: initialData?.nota || "",
   });
 
+  const { facilitadores, nombres: facilitadoresList } =
+    useCollaboratorFacilitator();
+
+  const { errorMsg, loading, handleRegister } =
+    useTrainingRegister({
+      facilitadores,
+      isEvaluado,
+      form,
+      initialData,
+      onClose,
+    });
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -53,10 +66,8 @@ export default function TrainingModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onClose();
+    handleRegister(isEvaluado, form);
   };
-
-  const { nombres: facilitadoresList } = useCollaboratorFacilitator();
 
   return (
     <Modal
@@ -99,6 +110,11 @@ export default function TrainingModal({
                 Registro de Capacitación
               </h2>
             </div>
+            {errorMsg && (
+              <div className="mb-4 text-red-600 text-center font-semibold">
+                {errorMsg}
+              </div>
+            )}
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <InputField
@@ -153,8 +169,6 @@ export default function TrainingModal({
                   required
                   className="bg-white"
                   placeholder="Selecciona un facilitador"
-                  // Puedes deshabilitar mientras carga si lo deseas:
-                  // disabled={loadingFacilitadores}
                 />
                 <SelectField
                   label="Seguimiento"
@@ -210,8 +224,9 @@ export default function TrainingModal({
                 <button
                   type="submit"
                   className="bg-[#2ecc71] text-white font-bold rounded-full px-12 py-3 text-lg shadow-md hover:bg-[#27ae60] transition"
+                  disabled={loading}
                 >
-                  Guardar
+                  {loading ? "Guardando..." : "Guardar"}
                 </button>
               </div>
             </form>

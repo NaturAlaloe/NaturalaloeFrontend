@@ -1,11 +1,13 @@
-import api from '../../apiConfig/api';
+import api from "../../apiConfig/api";
+
 
 export interface Collaborator {
 
     id_colaborador: number;
     id_puesto: number;
     nombre: string;
-    apellido: string;
+    apellido1: string;
+    apellido2: string;
     fecha_nacimiento: string;
     numero: string;
     correo: string;

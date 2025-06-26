@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -11,14 +11,30 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import useCollaborators from '../../hooks/collaborator/useCollaborators';
 import CollaboratorCard from '../../components/globalComponents/CollaboratorCard';
+import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner'; // <-- Importa el spinner
+
+
 
 const Collaborators: React.FC = () => {
   const navigate = useNavigate();
   const { collaborators, loading, error, searchTerm, setSearchTerm } = useCollaborators();
+  const firstLoad = useRef(true);
+
+  // Cuando loading pasa de true a false, ya no es la primera carga
+  React.useEffect(() => {
+    if (!loading) {
+      firstLoad.current = false;
+    }
+  }, [loading]);
 
   const handleCardClick = (id: string) => {
     navigate(`/collaborators/detail/${id}`);
   };
+
+  // Solo muestra el spinner a pantalla completa en la primera carga
+  if (loading) {
+    return <FullScreenSpinner />;
+  }
 
   return (
     <Box sx={{ p: 3, maxWidth: 1200, margin: '0 auto' }}>
@@ -61,25 +77,19 @@ const Collaborators: React.FC = () => {
                 <SearchIcon />
               </InputAdornment>
             ),
-            endAdornment: loading && (
-              <CircularProgress size={24} color="inherit" />
-            )
+            endAdornment: null
           }}
         />
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" color="success" sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
 
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : collaborators.length === 0 ? (
-        <Alert severity="info" sx={{ mt: 2 }}>
+      {collaborators.length === 0 ? (
+        <Alert severity="info" color="success" sx={{ mt: 2 }}>
           {searchTerm ? 
             `No se encontraron colaboradores con "${searchTerm}"` : 
             'No hay colaboradores disponibles'}
@@ -95,7 +105,7 @@ const Collaborators: React.FC = () => {
             <CollaboratorCard
               key={colab.id_colaborador}
               id={colab.id_colaborador}
-              nombre={colab.nombre_completo}
+              nombre={`${colab.nombre} ${colab.apellido1} ${colab.apellido2}`}
               puesto={colab.puesto}
               onClick={handleCardClick}
             />

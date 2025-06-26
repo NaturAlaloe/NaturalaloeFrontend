@@ -1,45 +1,12 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
-
-// Datos quemados de ejemplo
-const facilitadores = [
-  { nombre: "Juan Pérez" },
-  { nombre: "Ana Gómez" },
-  { nombre: "Luis Martínez" },
-  { nombre: "Marta Díaz" },
-];
-
-const tiposCapacitacion = [
-  { value: "", label: "Seleccione...", disabled: true },
-  { value: "Interna", label: "Interna" },
-  { value: "Externa", label: "Externa" },
-];
+import {createCapacitacion, validateCapacitacionData, type CreateCapacitacionRequest, createCapacitacionGeneral,} from "../../services/capacitations/addCapacitationsService";
+import {getFacilitadores, type Facilitador, getColaboradores, type Colaboradores, getProcedimientos, type Procedimientos,} from "../../services/capacitations/getCapacitationsService";
 
 const metodosEvaluacion = [
   { value: "", label: "Seleccione...", disabled: true },
   { value: "Teórico", label: "Teórico" },
   { value: "Práctico", label: "Práctico" },
-];
-
-const colaboradoresDisponibles = [
-  { id: 1, nombre: "Juan Pérez", puesto: "Operador" },
-  { id: 2, nombre: "Ana Gómez", puesto: "Supervisor" },
-  { id: 3, nombre: "Luis Martínez", puesto: "Analista" },
-];
-
-const poesDisponibles = [
-  { id: 1, codigo: "700-30-0001", titulo: "POE Ventas" },
-  { id: 2, codigo: "900-30-0001", titulo: "POE Calidad" },
-];
-
-const columnsColaboradores = [
-  { name: "Nombre", selector: (row: any) => row.nombre, sortable: true },
-  { name: "Puesto", selector: (row: any) => row.puesto, sortable: true },
-];
-
-const columnsPoes = [
-  { name: "Código", selector: (row: any) => row.codigo, sortable: true },
-  { name: "Título", selector: (row: any) => row.titulo, sortable: true },
 ];
 
 interface FormData {
@@ -50,15 +17,21 @@ interface FormData {
   fechaFin: string;
   duracion: string;
   metodoEvaluacion: string;
+  comentario?: string;
 }
-
 export function useCapacitation() {
   const [showColaboradorModal, setShowColaboradorModal] = useState(false);
   const [showFacilitadorModal, setShowFacilitadorModal] = useState(false);
   const [isEvaluado, setIsEvaluado] = useState(false);
   const [showAsignacionesModal, setShowAsignacionesModal] = useState(false);
   const [isGeneralMode, setIsGeneralMode] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);  const [loadingFacilitadores, setLoadingFacilitadores] = useState(false);
+  const [colaboradoresDisponibles, setColaboradoresDisponibles] = useState<Colaboradores[]>([]);
+  const [loadingColaboradores, setLoadingColaboradores] = useState(false);
+  const [procedimientosDisponibles, setProcedimientosDisponibles] = useState<Procedimientos[]>([]);
+  const [loadingProcedimientos, setLoadingProcedimientos] = useState(false);
+  const [loadingInitialData, setLoadingInitialData] = useState(true);
   const [formData, setFormData] = useState<FormData>({
     titulo: "",
     tipoCapacitacion: "",
@@ -67,18 +40,134 @@ export function useCapacitation() {
     fechaFin: "",
     duracion: "",
     metodoEvaluacion: "",
+    comentario: "",
   });
 
-  // Estado para tablas de selección en el modal
   const [showColaboradoresTable, setShowColaboradoresTable] = useState(false);
   const [showPoesTable, setShowPoesTable] = useState(false);
-  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>(
-    []
-  );
+  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>([]);
   const [poesAsignados, setPoesAsignados] = useState<any[]>([]);
   const [selectedColaboradores, setSelectedColaboradores] = useState<any[]>([]);
   const [selectedPoes, setSelectedPoes] = useState<any[]>([]);
 
+  const columnsColaboradores = [
+    {
+      name: "Nombre",
+      selector: (row: any) => row?.nombreCompleto || "Sin nombre",
+      sortable: true,
+    },
+    {
+      name: "Puesto",
+      selector: (row: any) => row?.puesto || "Sin puesto",
+      sortable: true,
+    },
+  ];
+
+  const columnsPoes = [
+    {
+      name: "Código",
+      selector: (row: any) => row?.codigo || "Sin código",
+      sortable: true,
+    },
+    {
+      name: "Título",
+      selector: (row: any) => row?.titulo || "Sin título",
+      sortable: true,
+    },
+  ];
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setLoadingInitialData(true);
+      try {
+        await Promise.all([
+          loadFacilitadores(),
+          loadColaboradores(),
+          loadProcedimientos()
+        ]);
+      } finally {
+        setLoadingInitialData(false);
+      }
+    };
+    loadInitialData();
+  }, []);
+  const loadFacilitadores = async () => {
+    try {
+      setLoadingFacilitadores(true);
+      const data = await getFacilitadores();
+      setFacilitadores(data);
+    } catch (error) {
+      console.error("Error al cargar facilitadores:", error);
+    } finally {
+      setLoadingFacilitadores(false);
+    }
+  };
+  const loadProcedimientos = async () => {
+    try {
+      setLoadingProcedimientos(true);
+      const data = await getProcedimientos();
+      const procedimientosTransformados = data
+        .filter((proc) => proc)
+        .map((proc) => ({
+          ...proc,
+          id: proc.id_documento,
+          titulo: `Documento ${proc.descripcion}`,
+        }));
+
+      const procedimientosUnicos = procedimientosTransformados.filter(
+        (proc, index, array) =>
+          array.findIndex((p) => p.id === proc.id) === index
+      );
+
+      setProcedimientosDisponibles(procedimientosUnicos);
+    } catch (error) {
+      console.error("Error al cargar procedimientos:", error);
+      setProcedimientosDisponibles([]);
+    } finally {
+      setLoadingProcedimientos(false);
+    }
+  };
+  const loadColaboradores = async () => {
+    try {
+      setLoadingColaboradores(true);
+      const data = await getColaboradores();
+      const colaboradoresTransformados = data
+        .filter((colab) => colab)
+        .map((colab) => ({
+          ...colab,
+          id: colab.id_colaborador,
+          nombreCompleto: `${colab.nombre_completo}`.trim(),
+          nombre: colab.nombre_completo,
+        }));
+
+      const colaboradoresUnicos = colaboradoresTransformados.filter(
+        (colab, index, array) =>
+          array.findIndex((c) => c.id === colab.id) === index
+      );
+
+      setColaboradoresDisponibles(colaboradoresUnicos);
+    } catch (error) {
+      console.error("Error al cargar colaboradores:", error);
+      setColaboradoresDisponibles([]);
+    } finally {
+      setLoadingColaboradores(false);
+    }
+  };
+  const getNombreCompletoFacilitador = (facilitador: Facilitador): string => {
+    return `${facilitador.nombre} ${facilitador.apellido1} ${facilitador.apellido2}`.trim();
+  };
+
+  const getFacilitadorIdByNombre = (
+    nombreCompleto: string
+  ): number | undefined => {
+    const facilitador = facilitadores.find(
+      (f) => getNombreCompletoFacilitador(f) === nombreCompleto
+    );
+    return facilitador?.id_facilitador;
+  };
+
+  const getFacilitadoresOptions = (): string[] => {
+    return facilitadores.map((f) => getNombreCompletoFacilitador(f));
+  };
   const agregarColaboradores = (seleccionados: any[]) => {
     setColaboradoresAsignados((prev) => [
       ...prev,
@@ -100,14 +189,12 @@ export function useCapacitation() {
   };
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
   const toggleGeneralMode = () => {
     setIsGeneralMode(!isGeneralMode);
   };
@@ -115,45 +202,135 @@ export function useCapacitation() {
   const getFormTitle = () => {
     return `Registro de Capacitación${isGeneralMode ? " - Modo General" : ""}`;
   };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    if (isGeneralMode) {
-      // En modo General, solo se requiere el título
-      if (!formData.titulo) {
+    try {
+      if (isGeneralMode) {
+        if (!formData.titulo) {
+          showCustomToast("Error", "El título es obligatorio", "error");
+          return;
+        }
+      } else {
+        if (
+          !formData.titulo ||
+          !formData.facilitador ||
+          !formData.fecha ||
+          !formData.fechaFin ||
+          !formData.duracion
+        ) {
+          showCustomToast(
+            "Error",
+            "Todos los campos son obligatorios",
+            "error"
+          );
+          return;
+        }
+      }
+
+    
+      const facilitadorId = getFacilitadorIdByNombre(formData.facilitador);
+      const capacitacionData: CreateCapacitacionRequest = {
+        id_colaborador: colaboradoresAsignados.map((c) => c.id),
+        id_facilitador: facilitadorId,
+        id_documento_normativo: poesAsignados.map((p) => p.id),
+        titulo_capacitacion: formData.titulo,
+        fecha_inicio: formData.fecha,
+        fecha_fin: formData.fechaFin,
+        comentario: formData.comentario || undefined,
+        is_evaluado: isEvaluado,
+        metodo_empleado: formData.metodoEvaluacion,
+        duracion: parseFloat(formData.duracion),
+      };
+
+      const validationErrors = validateCapacitacionData(capacitacionData);
+      if (validationErrors.length > 0) {
+        showCustomToast("Error de validación", validationErrors[0], "error");
+        return;
+      }
+
+      const result = await createCapacitacion(capacitacionData);
+      if (result.success) {
+        const modeText = isGeneralMode ? "general" : "completa";
+        showCustomToast(
+          "Éxito",
+          `La capacitación ${modeText} fue registrada correctamente`,
+          "success"
+        );
+        resetForm();
+      } else {
+        showCustomToast("Error", result.message, "error");
+      }
+    } catch (error) {
+      console.error("Error al enviar capacitación:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleSubmitGeneral = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      if (!formData.titulo || formData.titulo.trim() === "") {
         showCustomToast("Error", "El título es obligatorio", "error");
         return;
       }
-    } else {
-      // En modo normal, todos los campos son obligatorios
-      if (
-        !formData.titulo ||
-        !formData.facilitador ||
-        !formData.fecha ||
-        !formData.fechaFin ||
-        !formData.duracion
-      ) {
-        showCustomToast("Error", "Todos los campos son obligatorios", "error");
-        return;
+
+      const capacitacionGeneralData = {
+        titulo: formData.titulo.trim(),
+        id_colaborador: colaboradoresAsignados.map((c) => c.id),
+      };
+
+      const result = await createCapacitacionGeneral(capacitacionGeneralData);
+
+      if (result && result.success !== false) {
+        showCustomToast(
+          "Éxito",
+          "La capacitación general fue registrada correctamente",
+        );
+        resetForm();
+      } else {
+        const errorMessage =
+          result?.message ||
+          "Error desconocido al registrar la capacitación general";
+        showCustomToast("Error", errorMessage, "error");
       }
+    } catch (error: any) {
+      console.error("Error al enviar capacitación general:", error);
+      let errorMessage =
+        "Error inesperado al registrar la capacitación general";
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      showCustomToast("Error", errorMessage, "error");
+    } finally {
+      setIsLoading(false);
     }
-
-    const modeText = isGeneralMode ? "general" : "completa";
-    showCustomToast(
-      "Guardado",
-      `La capacitación ${modeText} fue registrada correctamente`,
-      "success"
-    );
-
-    // Aquí puedes manejar el submit real con la API
-    console.log("Formulario enviado:", {
-      formData,
-      colaboradoresAsignados,
-      poesAsignados,
-      isGeneralMode,
-    });
   };
+
+  const resetForm = () => {
+    setFormData({
+      titulo: "",
+      tipoCapacitacion: "",
+      facilitador: "",
+      fecha: "",
+      fechaFin: "",
+      duracion: "",
+      metodoEvaluacion: "",
+      comentario: "",
+    });
+    setColaboradoresAsignados([]);
+    setPoesAsignados([]);
+    setIsEvaluado(false);
+    setIsGeneralMode(false);
+  };
+
   return {
     showColaboradorModal,
     setShowColaboradorModal,
@@ -168,12 +345,13 @@ export function useCapacitation() {
     handleChange,
     handleSubmit,
     facilitadores,
-    tiposCapacitacion,
     metodosEvaluacion,
     colaboradoresDisponibles,
-    poesDisponibles,
     columnsColaboradores,
+    procedimientosDisponibles,
     columnsPoes,
+    loadingProcedimientos,
+    loadProcedimientos,
     showColaboradoresTable,
     setShowColaboradoresTable,
     showPoesTable,
@@ -192,5 +370,14 @@ export function useCapacitation() {
     setIsGeneralMode,
     toggleGeneralMode,
     getFormTitle,
+    isLoading,    resetForm,
+    loadingFacilitadores,
+    loadingInitialData,
+    getNombreCompletoFacilitador,
+    getFacilitadoresOptions,
+    getFacilitadorIdByNombre,
+    loadingColaboradores,
+    loadColaboradores,
+    handleSubmitGeneral,
   };
 }

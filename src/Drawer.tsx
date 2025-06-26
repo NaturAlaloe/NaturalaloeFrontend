@@ -30,8 +30,6 @@ import ListaCapacitaciones from "./views/capacitation/listCapacitation";
 import Colaboradores from "./views/collaborators/collaborators";
 import CollaboratorDetail from "./views/collaborators/CollaboratorDetail";
 import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
-import CapacitationGeneral  from "./views/capacitation/listCapacitationsGeneral";
-import Evaluacion from "./views/capacitation/evaluatedTraining";
 import AddCollaborator from "./views/collaborators/addCollaborator";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
@@ -42,7 +40,13 @@ import ListaCategorias from "./views/administration/listCategory";
 import ListaPuestos from "./views/administration/listWorkstations";
 import SchoolIcon from "@mui/icons-material/School";
 import Politicies from "./views/politics/politicsForm";
+import PoliticiesLista from "./views/politics/politicsList";
 import VersionControlProcedures from "./views/procedures/versionControllProcedures";
+import CapacitacionesGenerales from "./views/capacitation/listCapacitationsGeneral";
+import Evaluacion from "./views/capacitation/evaluatedTraining";
+import Estadistica from "./views/estadisticas/AllStatsCards";
+import ListaColaboradores from "./views/collaborators/viewCollaborators";
+
 import AssignRol from "./views/collaborators/assingRol"
 
 const drawerWidth = 270;
@@ -104,7 +108,6 @@ interface DrawerProps {
 export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
   const [open, setOpen] = React.useState(false);
 
-  // Estados para submenús
 
   const [openLogin, setOpenLogin] = React.useState(false);
   const [openProcedimientos, setOpenProcedimientos] = React.useState(false);
@@ -144,7 +147,6 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             display: "flex",
             flexDirection: "column",
             boxShadow: "0 2px 24px 0 #304328",
-            // Scrollbar personalizado:
             "& *::-webkit-scrollbar": {
               width: "8px",
               background: "transparent",
@@ -159,7 +161,6 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             "& *::-webkit-scrollbar-track": {
               background: "transparent",
             },
-            // Firefox
             scrollbarWidth: "thin",
             scrollbarColor: "#ccc transparent",
           },
@@ -223,8 +224,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               <ListItemText primary="Inicio" />
             </ListItemButton>
           </ListItem>
-
-
+      
+         
 
           {/* Administración */}
           <ListItem disablePadding>
@@ -397,6 +398,22 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                 <ListItemText primary="Agregar Políticas" />
               </ListItemButton>
             </List>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/politics/politicsList"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Lista de Políticas" />
+              </ListItemButton>
+            </List>
           </Collapse>
 
           {/* Capacitaciones */}
@@ -478,7 +495,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/listCapacitationGeneral"
+                to="/capacitation/listCapacitationsGeneral"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -488,11 +505,11 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Lista de Capacitaciones Generales" />
+                <ListItemText primary="Lista de Generales" />
               </ListItemButton>
-              
             </List>
           </Collapse>
+
           {/* Colaboradores */}
           <ListItem disablePadding>
             <ListItemButton
@@ -528,7 +545,20 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Añadir Colaborador" />
               </ListItemButton>
-
+ <ListItemButton
+                component={Link}
+                to="/collaborators/viewCollaborators"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Lista de Colaboradores" />
+              </ListItemButton>
               <ListItemButton
                 component={Link}
                 to="/collaborators/collaborators"
@@ -543,7 +573,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
-              <ListItemButton
+                <ListItemButton
                 component={Link}
                 to="/collaborators/assingRol"
                 sx={{
@@ -555,14 +585,12 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Asignar Rol" />
+                <ListItemText primary="Asignar Roles" />
               </ListItemButton>
             </List>
           </Collapse>
         </List>
-        {/* Divider bien posicionado antes del botón */}
         <Divider sx={{ borderColor: "#fff", opacity: 0.7, my: 2, mx: 0 }} />
-        {/* Botón cerrar sesión abajo, diseño destacado */}
         <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
           <Box
             component="button"
@@ -612,59 +640,24 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/administration/listCategory" element={<ListaCategorias />} />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
-          <Route
-            path="/procedures/listProcedures"
-            element={<ListaProcedimientos />}
-          />
-          <Route
-            path="/procedures/assignmentProcedures"
-            element={<AsignacionProcedimientos />}
-          />
+          <Route path="/procedures/listProcedures"element={<ListaProcedimientos />}/>
+          <Route path="/procedures/assignmentProcedures"element={<AsignacionProcedimientos />}/>
           <Route path="/capacitation/" element={<Capacitaciones />} />
-          <Route
-            path="/capacitation/listCapacitation"
-            element={<ListaCapacitaciones />}
-          />
-          <Route
-            path="/capacitation/listCapacitationGeneral"
-            element={<CapacitationGeneral  />}
-          />
-          <Route
-            path="/collaborators/collaborators"
-            element={<Colaboradores />}
-          />
-
-          <Route
-            path="/collaborators/detail/:id"
-            element={<CollaboratorDetail />}
-          />
-
-          <Route
-            path="/capacitation/facilitatorTraining"
-            element={<RegistroFacilitadores />}
-          />
-
-          <Route
-            path="/capacitation/listFacilitators"
-            element={<ListaFacilitadores />}
-          />
-          <Route
-            path="/capacitation/evaluatedTraining"
-            element={<Evaluacion />}
-          />
-          <Route
-            path="/collaborators/addCollaborator"
-            element={<AddCollaborator />}
-          />
+          <Route path="/capacitation/listCapacitation"element={<ListaCapacitaciones />} />
+          <Route path="/collaborators/collaborators" element={<Colaboradores />} />
+          <Route path="/collaborators/detail/:id" element={<CollaboratorDetail />} />
+          <Route path="/capacitation/facilitatorTraining" element={<RegistroFacilitadores />} />
+          <Route path="/capacitation/listFacilitators" element={<ListaFacilitadores />} />
+          <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
           <Route path="/politics/politicsForm" element={<Politicies />} />
-          <Route
-            path="/procedures/versionControlProcedures"
-            element={<VersionControlProcedures />}
-          />
-          <Route
-            path="/collaborators/assingRol"
-            element={<AssignRol />}
-          />
+          <Route path="/politics/politicsList" element={<PoliticiesLista />} />
+          <Route path="/procedures/versionControlProcedures" element={<VersionControlProcedures />} />
+          <Route path="/collaborators/assingRol" element={<AssignRol/>} />
+          <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores/>} />
+          <Route path="/capacitation/listCapacitationsGeneral" element={<CapacitacionesGenerales/>} />
+          <Route path="/capacitation/evaluatedTraining/:codigo_documento" element={<Evaluacion/>} />
+          <Route path="/estadisticas" element={<Estadistica/>} />
+          
         </Routes>
       </Main>
     </Box>

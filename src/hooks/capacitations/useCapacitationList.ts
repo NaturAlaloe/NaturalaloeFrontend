@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getCapacitationList, type CapacitationList } from "../../services/capacitations/getCapacitationListService";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export interface Capacitation {
   id: string;
@@ -14,7 +16,7 @@ export interface Capacitation {
   metodo: string;
   seguimiento: string;
   estado: string;
-  colaborador: {
+  colaboradores: {
     nombreCompleto: string;
     cedula: string;
     correo: string;
@@ -22,7 +24,7 @@ export interface Capacitation {
     area: string;
     departamento: string;
     puesto: string;
-  };
+  }[];
   profesor: {
     nombre: string;
     apellido: string;
@@ -31,114 +33,109 @@ export interface Capacitation {
 }
 
 export function useCapacitationList() {
-  const initialCapacitations: Capacitation[] = [
-    {
-      id: "001",
-      poe: "POE-001",
-      titulo: "Inducción a la empresa",
-      duracion: 8,
-      tipo: "Individual",
-      fechaInicio: "2024-06-01",
-      fechaFinal: "2024-06-05",
-      comentario: "Inducción general para nuevos colaboradores.",
-      evaluado: "Sí",
-      metodo: "Teórico",
-      seguimiento: "Reprogramar",
-      estado: "Finalizado",
-      colaborador: {
-        nombreCompleto: "Juan Pérez",
-        cedula: "123456789",
-        correo: "juan.perez@email.com",
-        telefono: "555-1234",
-        area: "Producción",
-        departamento: "Operaciones",
-        puesto: "Operador",
-      },
-      profesor: {
-        nombre: "Ana",
-        apellido: "García",
-        identificacion: "987654321",
-      },
-    },
-    {
-      id: "002",
-      poe: "POE-002",
-      titulo: "Capacitación en seguridad",
-      duracion: 6,
-      tipo: "Individual",
-      fechaInicio: "2024-06-10",
-      fechaFinal: "2024-06-12",
-      comentario:
-        "Capacitación en seguridad industrial y protocolos de emergencia.",
-      evaluado: "No",
-      metodo: "Práctico",
-      seguimiento: "Satisfactorio",
-      estado: "Pendiente",
-      colaborador: {
-        nombreCompleto: "María López",
-        cedula: "987654321",
-        correo: "maria.lopez@email.com",
-        telefono: "555-5678",
-        area: "Calidad",
-        departamento: "Control",
-        puesto: "Supervisora",
-      },
-      profesor: {
-        nombre: "Carlos",
-        apellido: "Ramírez",
-        identificacion: "123123123",
-      },
-    },
-    {
-      id: "003",
-      poe: "POE-003",
-      titulo: "Actualización de procesos",
-      duracion: 4,
-      tipo: "Grupal",
-      fechaInicio: "2024-07-01",
-      fechaFinal: "2024-07-03",
-      comentario: "Actualización de procesos internos y mejores prácticas.",
-      evaluado: "Sí",
-      metodo: "Mixto",
-      seguimiento: "Reevaluación",
-      estado: "Finalizado",
-      colaborador: {
-        nombreCompleto: "Pedro Sánchez",
-        cedula: "456789123",
-        correo: "pedro.sanchez@email.com",
-        telefono: "555-8765",
-        area: "Logística",
-        departamento: "Almacén",
-        puesto: "Encargado",
-      },
-      profesor: {
-        nombre: "Lucía",
-        apellido: "Fernández",
-        identificacion: "321321321",
-      },
-    },
-  ];
-
-  const [capacitations] = useState<Capacitation[]>(initialCapacitations);
+  const [capacitations, setCapacitations] = useState<Capacitation[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [poeFilter, setPoeFilter] = useState("");
   const [estadoFilter, setEstadoFilter] = useState("");
   const [tipoFilter, setTipoFilter] = useState("");
   const [seguimientoFilter, setSeguimientoFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
   const [rowsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
-  const [selectedCapacitation, setSelectedCapacitation] =
-    useState<Capacitation | null>(null);
+  const [selectedCapacitation, setSelectedCapacitation] = useState<Capacitation | null>(null);
   const navigate = useNavigate();
+  const groupCapacitationsByCollaborators = (apiData: CapacitationList[]): Capacitation[] => {
+    const capacitationMap = new Map<string, Capacitation>();
 
+    apiData.forEach((item) => {
+      const capacitationId = item.id_capacitacion.toString();
+      
+      if (capacitationMap.has(capacitationId)) {
+        const existingCapacitation = capacitationMap.get(capacitationId)!;
+        existingCapacitation.colaboradores.push({
+          nombreCompleto: item.nombre_colaborador || "Sin nombre",
+          cedula: item.id_colaborador || "N/A",
+          correo: "N/A", 
+          telefono: "N/A", 
+          area: "N/A", 
+          departamento: "N/A",
+          puesto: "N/A",
+        });
+      } else {
+        capacitationMap.set(capacitationId, {
+          id: capacitationId,
+          poe: item.codigo_documento || "N/A",
+          titulo: item.titulo_capacitacion || "Sin título",
+          duracion: parseFloat(item.duracion) || 0,
+          fechaInicio: new Date(item.fecha_inicio).toISOString().split('T')[0],
+          fechaFinal: new Date(item.fecha_fin).toISOString().split('T')[0],
+          comentario: item.comentario || "Sin comentarios",
+          tipo: item.tipo_capacitacion || "Individual",
+          evaluado: item.is_evaluado === "1" ? "Sí" : "No",
+          metodo: item.metodo_empleado || "N/A",
+          seguimiento: item.seguimiento || "N/A",
+          estado: item.estado || "N/A",
+          colaboradores: [{
+            nombreCompleto: item.nombre_colaborador || "Sin nombre",
+            cedula: item.id_colaborador || "N/A",
+            correo: "N/A", 
+            telefono: "N/A", 
+            area: "N/A", 
+            departamento: "N/A", 
+            puesto: "N/A",
+          }],
+          profesor: {
+            nombre: item.nombre_facilitador?.split(' ')[0] || "Sin nombre",
+            apellido: item.nombre_facilitador?.split(' ').slice(1).join(' ') || "",
+            identificacion: item.id_facilitador.toString() || "N/A",
+          },
+        });
+      }
+    });
+
+    return Array.from(capacitationMap.values());
+  };
+ 
+  const loadCapacitations = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      console.log("Cargando capacitaciones desde la API...");
+      
+      const apiData = await getCapacitationList();
+      console.log("Datos recibidos de la API:", apiData);
+      
+      if (!Array.isArray(apiData)) {
+        throw new Error("Los datos recibidos no son un array válido");
+      }
+
+      const groupedData = groupCapacitationsByCollaborators(apiData);
+      console.log("Datos agrupados:", groupedData);
+      
+      setCapacitations(groupedData);
+      
+      if (groupedData.length === 0) {
+        showCustomToast("Info", "No se encontraron capacitaciones", "info");
+      }
+      
+    } catch (error) {
+      console.error("Error al cargar capacitaciones:", error);
+      setError("No se pudieron cargar las capacitaciones");
+      showCustomToast("Error", "No se pudieron cargar las capacitaciones", "error");
+      setCapacitations([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    loadCapacitations();
+  }, []);
   const poes = Array.from(new Set(capacitations.map((c) => c.poe)));
   const estados = Array.from(new Set(capacitations.map((c) => c.estado)));
   const tipos = Array.from(new Set(capacitations.map((c) => c.tipo)));
-  const seguimientos = Array.from(
-    new Set(capacitations.map((c) => c.seguimiento))
-  );
+  const seguimientos = Array.from(new Set(capacitations.map((c) => c.seguimiento)));
 
   const filteredCapacitations = capacitations.filter((cap) => {
     const matchesSearch =
@@ -158,23 +155,18 @@ export function useCapacitationList() {
       matchesTipo
     );
   });
-
-  const navegarCapacitacionFinalizada = () => {
-    navigate("/capacitation/evaluatedTraining");
+  const navegarCapacitacionFinalizada = (codigoDocumento: string) => {
+    navigate(`/capacitation/evaluatedTraining/${codigoDocumento}`);
   };
 
-  const paginatedCapacitations = filteredCapacitations.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
+
   const totalPages = Math.ceil(filteredCapacitations.length / rowsPerPage);
 
   const handleRowClick = (cap: Capacitation) => {
     setSelectedCapacitation(cap);
     setShowModal(true);
-  };
-  return {
-    capacitations: paginatedCapacitations,
+  };  return {
+    capacitations: filteredCapacitations,
     searchTerm,
     setSearchTerm,
     poeFilter,
@@ -200,5 +192,10 @@ export function useCapacitationList() {
     setSelectedCapacitation,
     handleRowClick,
     totalCount: filteredCapacitations.length,
+    isLoading,
+    error,
+    loadCapacitations,
   };
 }
+
+

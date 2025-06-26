@@ -33,6 +33,8 @@ export default function DepartmentsList() {
     handleOpenEdit,
     handleSave,
     handleDelete,
+    currentPage,
+    setCurrentPage,
   } = useDepartmentsList();
 
   const columns = [
@@ -90,6 +92,8 @@ export default function DepartmentsList() {
         data={filteredDepartments}
         rowsPerPage={5}
         progressPending={loading}
+        currentPage={currentPage}
+        onChangePage={setCurrentPage}
       />
 
       <GlobalModal
@@ -164,8 +168,6 @@ export default function DepartmentsList() {
       >
         <div>¿Estás seguro de que deseas eliminar este departamento?</div>
       </GlobalModal>
-     
-      
     </TableContainer>
   );
 }

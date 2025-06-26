@@ -3,10 +3,10 @@ import InputField from '../../components/formComponents/InputField';
 import SelectField from '../../components/formComponents/SelectField';
 import AutocompleteField from '../../components/formComponents/AutocompleteField';
 import SubmitButton from '../../components/formComponents/SubmitButton';
-import SimpleModal from "../../components/globalComponents/SimpleModal";
 import { useCapacitation } from '../../hooks/capacitations/useCapacitation';
 import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
+import GlobalModal from '../../components/globalComponents/GlobalModal';
 
 const Capacitacion = () => {
     const {
@@ -17,12 +17,11 @@ const Capacitacion = () => {
         handleSubmit,
         formData,
         handleChange,
-        facilitadores,
         metodosEvaluacion,
         colaboradoresDisponibles,
-        poesDisponibles,
-        columnsColaboradores,
+        procedimientosDisponibles,
         columnsPoes,
+        columnsColaboradores,
         showColaboradoresTable,
         setShowColaboradoresTable,
         showPoesTable,
@@ -34,19 +33,21 @@ const Capacitacion = () => {
         isGeneralMode,
         toggleGeneralMode,
         getFormTitle,
-    } = useCapacitation();
-
-    return (<FormContainer
+        isLoading,
+        loadingFacilitadores,
+        getFacilitadoresOptions,
+        handleSubmitGeneral,
+    } = useCapacitation(); return (<FormContainer
         title={getFormTitle()}
-        onSubmit={handleSubmit}
-    >
-        {isGeneralMode && (
-            <div className="mb-4 p-3 bg-orange-100 border border-orange-300 rounded-lg">
-                <p className="text-orange-800 text-sm">
-                    <strong>Modo General:</strong> Solo se puede editar el título y asignar colaboradores. Los demás campos están deshabilitados.
-                </p>
-            </div>
-        )}
+        onSubmit={isGeneralMode ? handleSubmitGeneral : handleSubmit}
+    >        {isGeneralMode && (
+        <div className="mb-4 p-3 bg-orange-100 border border-orange-300 rounded-lg">
+            <p className="text-orange-800 text-sm">
+                <strong>Modo General:</strong> Solo se puede editar el título y asignar colaboradores.
+                Los demás campos están deshabilitados. No se requieren POEs ni facilitadores para capacitaciones generales.
+            </p>
+        </div>
+    )}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <InputField
                 name="titulo"
@@ -59,12 +60,14 @@ const Capacitacion = () => {
                 name="facilitador"
                 label="Facilitador:"
                 value={formData.facilitador}
-                onChange={(value) => handleChange({ target: { name: 'facilitador', value } } as any)}
-                options={facilitadores.map(f => f.nombre)}
-                placeholder="Escriba o seleccione..."
+                onChange={(value) => {
+                    handleChange({ target: { name: 'facilitador', value } } as any);
+                }}
+                options={getFacilitadoresOptions()}
+                placeholder={loadingFacilitadores ? "Cargando facilitadores..." : "Escriba o seleccione..."}
                 className="w-full"
                 required
-                disabled={isGeneralMode}
+                disabled={isGeneralMode || loadingFacilitadores}
             />
             <InputField
                 name="fecha"
@@ -83,13 +86,13 @@ const Capacitacion = () => {
                 value={formData.fechaFin}
                 onChange={handleChange}
                 disabled={isGeneralMode}
-            />
-            <InputField
+            />            <InputField
                 name="duracion"
                 label="Duración (horas):"
-                type="time"
-                min="00:01"
-                step="60"
+                type="number"
+                min="0.1"
+                step="0.1"
+                placeholder="Ej: 2.5"
                 className="w-full"
                 value={formData.duracion}
                 onChange={handleChange}
@@ -118,8 +121,7 @@ const Capacitacion = () => {
                     disabled={isGeneralMode}
                 />
                 <label htmlFor="evaluado" className="font-semibold text-[#2AAC67]">Es Evaluado:</label>
-            </div>
-            <div className="md:col-span-3">
+            </div>            <div className="md:col-span-3">
                 <label htmlFor="comentario" className="block font-semibold text-[#2AAC67] mb-1">
                     Comentario:
                 </label>
@@ -128,32 +130,40 @@ const Capacitacion = () => {
                     name="comentario"
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] resize-y min-h-[80px]"
                     placeholder="Agrega un comentario..."
+                    value={formData.comentario || ""}
+                    onChange={handleChange}
                     disabled={isGeneralMode}
                 />
             </div>
-        </div>
-        <div className="flex justify-center mt-6 gap-4">
-            <SubmitButton width="w-40">
-                Guardar
-            </SubmitButton>
+        </div>        <div className="flex justify-center mt-6 gap-4">
+
             <SubmitButton
                 type="button"
                 onClick={() => setShowAsignacionesModal(true)}
-                width="w-40">
+                width="w-40"
+                disabled={isLoading}>
                 Asignar
-            </SubmitButton>                <SubmitButton
+            </SubmitButton>
+
+            <SubmitButton
                 type="button"
                 onClick={toggleGeneralMode}
                 width="w-40"
+                disabled={isLoading}
                 className={isGeneralMode ? "bg-orange-500 hover:bg-orange-600" : ""}>
                 {isGeneralMode ? 'Normal' : 'General'}
             </SubmitButton>
+
+            <SubmitButton width="w-40" disabled={isLoading}>
+                {isLoading ? "Guardando..." : "Guardar"}
+            </SubmitButton>
         </div>
         {showAsignacionesModal && (
-            <SimpleModal
+            <GlobalModal
                 open={showAsignacionesModal}
                 title="Progreso"
                 onClose={() => setShowAsignacionesModal(false)}
+                maxWidth="md"
             >
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
@@ -235,13 +245,11 @@ const Capacitacion = () => {
                         onClose={() => setShowPoesTable(false)}
                         title="Selecciona POEs para agregar"
                         columns={columnsPoes}
-                        data={poesDisponibles}
+                        data={procedimientosDisponibles}
                         onAdd={agregarPoes}
                     />
                 )}
-
-
-            </SimpleModal>
+            </GlobalModal>
         )}
     </FormContainer>
     );
