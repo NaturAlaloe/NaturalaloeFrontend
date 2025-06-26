@@ -3,7 +3,7 @@ import { useState } from 'react';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
 import GlobalModal from '../../components/globalComponents/GlobalModal';
-import { useCapacitationList } from '../../hooks/capacitations/useTrainingList';
+import { useCapacitationList } from '../../hooks/trainings/useTrainingList';
 
 export default function ListCapacitations() {
   const {

@@ -46,7 +46,7 @@ import CapacitacionesGenerales from "./views/training/listTrainingsGeneral";
 import Evaluacion from "./views/training/evaluatedTraining";
 import Estadistica from "./views/estadisticas/AllStatsCards";
 import ListaColaboradores from "./views/collaborators/viewCollaborators";
-
+import AddTrainingGeneral from "./views/training/generalTraining";
 import AssignRol from "./views/collaborators/assingRol"
 
 const drawerWidth = 270;
@@ -451,6 +451,20 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Agregar Capacitaciones" />
               </ListItemButton>
+                            <ListItemButton
+                component={Link}
+                to="/training/generalTraining"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Agregar Capacitaciones Generales" />
+              </ListItemButton>
               <ListItemButton
                 component={Link}
                 to="/training/facilitatorTraining"
@@ -657,6 +671,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/training/listTrainingsGeneral" element={<CapacitacionesGenerales/>} />
           <Route path="/training/evaluatedTraining/:codigo_documento" element={<Evaluacion/>} />
           <Route path="/estadisticas" element={<Estadistica/>} />
+          <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
           
         </Routes>
       </Main>

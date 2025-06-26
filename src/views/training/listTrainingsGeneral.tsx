@@ -1,6 +1,6 @@
 import { Edit, Delete, Search, Add } from "@mui/icons-material";
 import { useState } from "react";
-import { useGenerales } from "../../hooks/capacitations/useGeneralList";
+import { useGenerales } from "../../hooks/trainings/useGeneralList";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import InputField from "../../components/formComponents/InputField";

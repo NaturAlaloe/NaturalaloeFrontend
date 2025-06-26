@@ -8,7 +8,7 @@ export interface Facilitador {
 }
 export async function getFacilitadores(): Promise<Facilitador[]> {
   try {
-    const response = await api.get("/facilitatorsList");
+    const response = await api.get("/facilitators");
     return response.data.data;
   } catch (error) {
     console.error("Error al obtener facilitadores:", error);
