@@ -1,4 +1,5 @@
 import type { ChangeEventHandler, InputHTMLAttributes, ReactNode } from "react";
+import { forwardRef } from "react";
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -9,7 +10,7 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   endAdornment?: ReactNode;
 }
 
-export default function InputField({
+const InputField = forwardRef<HTMLInputElement, InputFieldProps>(({
   label,
   name,
   value,
@@ -22,7 +23,7 @@ export default function InputField({
   className = "",
   endAdornment,
   ...props
-}: InputFieldProps) {
+}, ref) => {
   return (
     <div>
       {label && (
@@ -32,6 +33,7 @@ export default function InputField({
       )}
       <div className="relative flex items-center">
         <input
+          ref={ref}
           type={type}
           name={name}
           {...(type !== "file" ? { value } : {})}
@@ -49,4 +51,8 @@ export default function InputField({
       </div>
     </div>
   );
-}
+});
+
+InputField.displayName = "InputField";
+
+export default InputField;
