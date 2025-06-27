@@ -39,7 +39,7 @@ export default function StyledCheckbox({
             padding: "0 8px 0 0",
           }}
         />
-        <span className="ml-2 font-medium">Activo</span>
+        <span className="ml-2 font-medium">Sí</span>
       </div>
     </div>
   );
