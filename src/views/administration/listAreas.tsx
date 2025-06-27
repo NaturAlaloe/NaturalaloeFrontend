@@ -123,7 +123,7 @@ export default function AreasList() {
           </div>
         }
       >
-        <div>¿Estás seguro de que deseas eliminar esta área?</div>
+        <div className="flex justify-center items-center text-center">¿Estás seguro de que deseas eliminar esta área?</div>
       </GlobalModal>
     
     </TableContainer>

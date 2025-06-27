@@ -98,7 +98,7 @@ export function useWorkstationsList() {
       } else if (err?.message) {
         message = err.message;
       }
-      showCustomToast("Error al eliminar", message, "info");
+      showCustomToast("Error al eliminar", message, "info");  
     }
   };
 

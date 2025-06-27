@@ -160,7 +160,7 @@ export default function ListWorkstations() {
           </div>
         }
       >
-        <div>¿Estás seguro de que deseas eliminar este puesto?</div>
+         <div className="flex justify-center items-center text-center">¿Estás seguro de que deseas eliminar este puesto?</div>
       </GlobalModal>
     </TableContainer>
   );
