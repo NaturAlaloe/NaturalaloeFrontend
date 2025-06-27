@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useProceduresVersions } from "../proceduresVersionControll/useProceduresVersions";
 import { useResponsibles } from "../procedureFormHooks/useResponsibles";
 import { useProcedureActions } from "./useProcedureActions";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export function useVersionedProceduresController() {
   // Hook principal de datos con versiones
@@ -68,6 +69,33 @@ export function useVersionedProceduresController() {
     new Set(versionProcedures.map((p) => p.departamento).filter(Boolean))
   );
 
+  // Función para ver PDF
+  const handleViewPdf = useCallback((procedure: any) => {
+    // Obtener la versión seleccionada del procedimiento
+    const versionIndex = selectedRevision[procedure.codigo] ?? procedure.versiones.length - 1;
+    const selectedVersion = procedure.versiones[versionIndex];
+    
+    if (selectedVersion?.pdf) {
+      // TODO: Abrir el PDF en una nueva ventana cuando se resuelvan los problemas de rutas
+      // window.open(selectedVersion.pdf, '_blank');
+      console.log('Ruta del archivo PDF:', selectedVersion.pdf);
+      console.log('Versión seleccionada:', selectedVersion.version);
+      console.log('Código del procedimiento:', procedure.codigo);
+      showCustomToast(
+        'PDF disponible',
+        `El PDF de la versión ${selectedVersion.version} del procedimiento ${procedure.codigo} está disponible.`,
+        'success'
+      );
+    } else {
+      console.warn('No hay archivo PDF disponible para esta versión', selectedVersion);
+      showCustomToast(
+        'PDF no disponible',
+        'No hay archivo PDF disponible para esta versión del procedimiento.',
+        'error'
+      );
+    }
+  }, [selectedRevision]);
+
   return {
     // Datos
     procedures: filteredProcedures,
@@ -91,6 +119,7 @@ export function useVersionedProceduresController() {
     // Acciones
     handleEdit: procedureActions.handleEdit,
     handleDelete: procedureActions.handleDelete,
+    handleViewPdf,
 
     // Props para modales
     editModal: procedureActions.editModal,

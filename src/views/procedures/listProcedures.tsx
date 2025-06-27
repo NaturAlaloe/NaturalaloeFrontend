@@ -24,6 +24,7 @@ export default function ListProcedures() {
   const columns = useVersionedTableColumns({
     onEdit: controller.handleEdit,
     onDelete: controller.handleDelete,
+    onViewPdf: controller.handleViewPdf,
     selectedRevision: controller.selectedRevision,
     onVersionChange: controller.handleVersionChange,
     getSelectedVersionData: controller.getSelectedVersionData,
