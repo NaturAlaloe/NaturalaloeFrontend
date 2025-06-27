@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   getRolesWithProcedures,
+  getAllRoles,
   assignProceduresToRole,
   unassignProceduresFromRole, // <-- Importa la función
 } from "../../services/procedures/procedureRolesService";
@@ -26,26 +27,40 @@ export function useRolesProcedures() {
 
   const fetchRolesProcedures = async () => {
     setLoading(true);
-    const data = await getRolesWithProcedures();
-    // Agrupa procedimientos por rol
-    const agrupados: { [id_rol: number]: RoleProcedures } = {};
-    data.forEach((item: any) => {
-      if (!agrupados[item.id_rol]) {
-        agrupados[item.id_rol] = {
-          id_rol: item.id_rol,
-          nombre_rol: item.nombre_rol,
-          procedimientos: [],
-        };
-      }
-      agrupados[item.id_rol].procedimientos.push({
-        id_documento: item.id_documento,
-        codigo: item.codigo,
-        descripcion: item.descripcion,
+    try {
+      // Obtener todos los roles
+      const allRoles = await getAllRoles();
+      
+      // Obtener roles con procedimientos asignados
+      const rolesWithProcedures = await getRolesWithProcedures();
+      
+      // Crear un mapa de procedimientos por rol
+      const proceduresByRole: { [id_rol: number]: Procedure[] } = {};
+      rolesWithProcedures.forEach((item: any) => {
+        if (!proceduresByRole[item.id_rol]) {
+          proceduresByRole[item.id_rol] = [];
+        }
+        proceduresByRole[item.id_rol].push({
+          id_documento: item.id_documento,
+          codigo: item.codigo,
+          descripcion: item.descripcion,
+        });
       });
-    });
-    setRolesProcedures(Object.values(agrupados));
-  
-    setLoading(false);
+      
+      // Combinar todos los roles con sus procedimientos (o array vacío si no tienen)
+      const rolesProceduresComplete = allRoles.map((role: any) => ({
+        id_rol: role.id_rol,
+        nombre_rol: role.nombre_rol,
+        procedimientos: proceduresByRole[role.id_rol] || [],
+      }));
+      
+      setRolesProcedures(rolesProceduresComplete);
+    } catch (error) {
+      console.error('Error al obtener roles y procedimientos:', error);
+      setRolesProcedures([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const saveProcedures = async (id_rol: number, procedimientos: number[]) => {

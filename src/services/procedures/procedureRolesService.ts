@@ -5,6 +5,11 @@ export const getRolesWithProcedures = async () => {
   return res.data.data;
 };
 
+export const getAllRoles = async () => {
+  const res = await api.get("/rols");
+  return res.data.data;
+};
+
   export const assignProceduresToRole = async (id_rol: number, id_documento: number[]) => {
     console.log("POST /procedures/assignProcedures", { id_rol, id_documento });
     return api.post("/assignProcedures", {
