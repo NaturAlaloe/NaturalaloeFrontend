@@ -37,8 +37,6 @@ export default function ListProcedures() {
     error,
     searchTerm,
     setSearchTerm,
-    sortDirection,
-    handleSort,
     departmentFilter,
     setDepartmentFilter,
     departments,
