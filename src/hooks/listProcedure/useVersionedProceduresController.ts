@@ -1,8 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
 import { useProceduresVersions } from "../proceduresVersionControll/useProceduresVersions";
 import { useResponsibles } from "../procedureFormHooks/useResponsibles";
-import { useProcedureActions } from "./useProcedureActions";
+import { useProcedureEdit } from "./useProcedureEdit";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+import { updateProcedure } from "../../services/procedures/updateProcedureService";
+import { increaseVersion } from "../../services/procedures/increaseVersionService";
 
 export function useVersionedProceduresController() {
   // Hook principal de datos con versiones
@@ -10,6 +12,7 @@ export function useVersionedProceduresController() {
     procedures: versionProcedures, 
     loading: versionLoading, 
     error: versionError,
+    refetch: refetchProcedures
   } = useProceduresVersions();
 
   // Hook de responsables
@@ -28,16 +31,86 @@ export function useVersionedProceduresController() {
     setCurrentPage(1);
   }, [searchTerm, departmentFilter]);
 
-  // Función mock para refetch (hasta implementar actualización de versiones)
-  const refetchProcedures = useCallback(async () => {
-    console.log("Refetching procedures...");
-    // TODO: Implementar refetch real cuando se implemente el update
-  }, []);
+  // Inicializar versiones seleccionadas por defecto con la versión vigente
+  useEffect(() => {
+    if (versionProcedures.length > 0) {
+      const initialSelection: Record<string, number> = {};
+      versionProcedures.forEach((proc) => {
+        // Buscar la versión vigente (vigente = 1)
+        const vigenteIndex = proc.versiones.findIndex(v => v.vigente === 1);
+        // Si no hay versión vigente, usar la última versión
+        initialSelection[proc.codigo_poe] = vigenteIndex !== -1 ? vigenteIndex : proc.versiones.length - 1;
+      });
+      setSelectedRevision(initialSelection);
+    }
+  }, [versionProcedures]);
 
-  // Acciones unificadas (edit, delete)
-  const procedureActions = useProcedureActions({
+  // Acciones de edición
+  const editActions = useProcedureEdit({
     responsibles,
-    refetchProcedures,
+    updateProcedure: async (data: any) => {
+      try {
+        // Verificar si es nueva versión o actualización existente
+        if (data.es_nueva_version) {
+          // Crear nueva versión del procedimiento
+          const newVersionData = {
+            codigo: data.codigo,
+            descripcion: data.descripcion,
+            id_responsable: Number(data.id_responsable),
+            nueva_version: Number(data.revision),
+            fecha_creacion: data.fecha_creacion,
+            fecha_vigencia: data.fecha_vigencia,
+            vigente: data.es_vigente ? 1 : 0,
+            version_actual: data.es_vigente ? 1 : 0, // Si es vigente, también es versión actual
+            documento: data.pdf || undefined,
+          };
+          
+          await increaseVersion(newVersionData);
+          return { success: true };
+        } else {
+          // Actualizar procedimiento existente usando PUT /procedureList
+          const updateData = {
+            id_documento: data.id_documento,
+            codigo: data.codigo,
+            descripcion: data.descripcion,
+            id_area: data.id_area,
+            id_responsable: Number(data.id_responsable),
+            version: Number(data.revision),
+            fecha_creacion: data.fecha_creacion,
+            fecha_vigencia: data.fecha_vigencia,
+            vigente: data.es_vigente ? 1 : 0,
+            version_actual: data.es_vigente ? 1 : 0, // Si es vigente, también es versión actual
+            documento: data.pdf || undefined,
+          };
+          
+          await updateProcedure(updateData);
+          return { success: true };
+        }
+      } catch (error: any) {
+        console.error("Error al actualizar procedimiento:", error);
+        
+        // Mejorar el manejo de errores con mensajes más específicos
+        let errorMessage = "Error inesperado al actualizar el procedimiento";
+        
+        if (error?.response?.status === 400) {
+          errorMessage = "Datos inválidos. Verifique que todos los campos estén correctos";
+        } else if (error?.response?.status === 404) {
+          errorMessage = "El procedimiento no fue encontrado";
+        } else if (error?.response?.status === 500) {
+          errorMessage = "Error interno del servidor. Intente nuevamente";
+        } else if (error?.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error?.message) {
+          errorMessage = error.message;
+        }
+        
+        return { 
+          success: false, 
+          error: errorMessage
+        };
+      }
+    },
+    fetchProcedures: refetchProcedures,
   });
 
   // Handler estable para cambiar versión seleccionada
@@ -51,7 +124,7 @@ export function useVersionedProceduresController() {
   // Helper para obtener datos de la versión seleccionada
   const getSelectedVersionData = useCallback((row: any, field: string) => {
     if (row.versiones && Array.isArray(row.versiones)) {
-      const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
+      const idx = selectedRevision[row.codigo_poe] ?? row.versiones.length - 1;
       return row.versiones[idx]?.[field] || "";
     }
     return null;
@@ -61,7 +134,7 @@ export function useVersionedProceduresController() {
   const filteredProcedures = versionProcedures.filter((proc) => {
     const matchesSearch = 
       proc.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proc.codigo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      proc.codigo_poe?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       false;
 
     const matchesDepartment = 
@@ -78,25 +151,21 @@ export function useVersionedProceduresController() {
   // Función para ver PDF
   const handleViewPdf = useCallback((procedure: any) => {
     // Obtener la versión seleccionada del procedimiento
-    const versionIndex = selectedRevision[procedure.codigo] ?? procedure.versiones.length - 1;
+    const versionIndex = selectedRevision[procedure.codigo_poe] ?? procedure.versiones.length - 1;
     const selectedVersion = procedure.versiones[versionIndex];
     
-    if (selectedVersion?.pdf) {
-      // TODO: Abrir el PDF en una nueva ventana cuando se resuelvan los problemas de rutas
-      // window.open(selectedVersion.pdf, '_blank');
-      console.log('Ruta del archivo PDF:', selectedVersion.pdf);
-      console.log('Versión seleccionada:', selectedVersion.version);
-      console.log('Código del procedimiento:', procedure.codigo);
+    if (selectedVersion?.ruta_documento) {
+      window.open(selectedVersion.ruta_documento, '_blank');
       showCustomToast(
-        'PDF disponible',
-        `El PDF de la versión ${selectedVersion.version} del procedimiento ${procedure.codigo} está disponible.`,
+        'Documento abierto exitosamente',
+        `Procedimiento ${procedure.codigo_poe} - Versión ${selectedVersion.revision}`,
         'success'
       );
     } else {
       console.warn('No hay archivo PDF disponible para esta versión', selectedVersion);
       showCustomToast(
-        'PDF no disponible',
-        'No hay archivo PDF disponible para esta versión del procedimiento.',
+        'Documento no disponible',
+        `No se encontró el archivo PDF para la versión ${selectedVersion?.revision || 'actual'} del procedimiento ${procedure.codigo_poe}`,
         'error'
       );
     }
@@ -125,12 +194,121 @@ export function useVersionedProceduresController() {
     setCurrentPage,
 
     // Acciones
-    handleEdit: procedureActions.handleEdit,
-    handleDelete: procedureActions.handleDelete,
+    handleEdit: (procedure: any) => {
+      // Obtener la versión seleccionada del procedimiento
+      const versionIndex = selectedRevision[procedure.codigo_poe] ?? procedure.versiones.length - 1;
+      const selectedVersion = procedure.versiones[versionIndex];
+      
+      // Preparar los datos en el formato que espera useProcedureEdit
+      const editData = {
+        // Campos requeridos por la interfaz Procedure
+        id_documento: selectedVersion.id_documento,
+        descripcion: selectedVersion.titulo,
+        fecha_creacion: procedure.fecha_creacion,
+        codigo: procedure.codigo_poe,
+        id_poe: null, // No disponible en la nueva estructura
+        titulo: selectedVersion.titulo, // useProcedureEdit usa este campo para el mapeo
+        departamento: procedure.departamento,
+        responsable: selectedVersion.responsable, // useProcedureEdit usa este campo para buscar el ID
+        revision: selectedVersion.revision.toString(),
+        fecha_vigencia: selectedVersion.fecha_vigencia,
+        estado: selectedVersion.vigente === 1 ? 'activo' : 'inactivo',
+        path: selectedVersion.ruta_documento || undefined, // Ruta del PDF actual
+        // Agregar campos adicionales necesarios para la actualización
+        categoria: procedure.categoria,
+        id_area: procedure.id_area,
+      };
+      
+      editActions.startEdit(editData);
+    },
     handleViewPdf,
 
-    // Props para modales
-    editModal: procedureActions.editModal,
-    deleteModal: procedureActions.deleteModal,
+    // Props para modal de edición
+    editModal: {
+      isOpen: editActions.editModalOpen,
+      onClose: editActions.closeEdit,
+      onSubmit: editActions.handleSubmit,
+      data: editActions.editData ? {
+        ...editActions.editData,
+      } : null,
+      saving: editActions.saving,
+      handlers: {
+        handleCheckboxChange: (field: 'es_vigente' | 'es_nueva_version', checked: boolean) => {
+          if (editActions.editData) {
+            const updatedData = {
+              ...editActions.editData,
+              [field]: checked,
+            };
+
+            // Si se marca "es_nueva_version", calcular automáticamente la próxima versión
+            if (field === 'es_nueva_version' && checked) {
+              const currentCode = editActions.editData.codigo;
+              if (currentCode) {
+                // Buscar el procedimiento en la lista para obtener todas sus versiones
+                const procedure = versionProcedures.find(p => p.codigo_poe === currentCode);
+                if (procedure && procedure.versiones && procedure.versiones.length > 0) {
+                  // Encontrar la versión más alta
+                  const maxVersion = Math.max(...procedure.versiones.map(v => v.revision));
+                  updatedData.revision = (maxVersion + 1).toString();
+                  
+                  showCustomToast(
+                    "Nueva versión calculada",
+                    `Se ha asignado automáticamente la versión ${maxVersion + 1}`,
+                    "info"
+                  );
+                }
+              }
+              
+              // Marcar automáticamente como vigente cuando es nueva versión
+              updatedData.es_vigente = true;
+            }
+
+            editActions.setEditData(updatedData);
+          }
+        },
+        handleInputChange: (field: any, value: string) => {
+          if (editActions.editData) {
+            const updatedData = {
+              ...editActions.editData,
+              [field]: value,
+            };
+
+            // Validación especial para el campo de revisión cuando es nueva versión
+            if (field === 'revision' && editActions.editData.es_nueva_version) {
+              const currentCode = editActions.editData.codigo;
+              const newVersion = Number(value);
+              
+              if (currentCode && newVersion > 0) {
+                // Buscar el procedimiento en la lista para validar que no exista esa versión
+                const procedure = versionProcedures.find(p => p.codigo_poe === currentCode);
+                if (procedure && procedure.versiones) {
+                  const versionExists = procedure.versiones.some(v => v.revision === newVersion);
+                  if (versionExists) {
+                    showCustomToast(
+                      "Versión duplicada",
+                      `La versión ${newVersion} ya existe para este procedimiento`,
+                      "error"
+                    );
+                    return; // No actualizar si la versión ya existe
+                  }
+                }
+              }
+            }
+
+            editActions.setEditData(updatedData);
+          }
+        },
+        handleFileChange: (file: File | null) => {
+          if (editActions.editData) {
+            editActions.setEditData({
+              ...editActions.editData,
+              pdf: file,
+            });
+          }
+        },
+      },
+      responsibles,
+      loadingResponsibles: false,
+    },
   };
 }

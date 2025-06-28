@@ -1,11 +1,10 @@
 import { useMemo, useCallback } from "react";
 import { type TableColumn } from "react-data-table-component";
-import { Edit, Delete, Visibility } from "@mui/icons-material";
+import { Edit, Visibility } from "@mui/icons-material";
 import { type ProcedureRow } from "../proceduresVersionControll/useProceduresVersions";
 
 interface UseVersionedTableColumnsProps {
   onEdit: (procedure: any) => void;
-  onDelete: (procedure: any) => void;
   onViewPdf: (procedure: any) => void;
   selectedRevision: Record<string, number>;
   onVersionChange: (codigo: string, versionIndex: number) => void;
@@ -14,7 +13,6 @@ interface UseVersionedTableColumnsProps {
 
 export function useVersionedTableColumns({
   onEdit,
-  onDelete,
   onViewPdf,
   selectedRevision,
   onVersionChange,
@@ -24,19 +22,31 @@ export function useVersionedTableColumns({
   const renderRevisionCell = useCallback(
     (row: ProcedureRow) => {
       if (row.versiones && Array.isArray(row.versiones)) {
-        const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
+        const idx = selectedRevision[row.codigo_poe] ?? row.versiones.length - 1;
+        const selectedVersion = row.versiones[idx];
+        const isVigente = selectedVersion?.vigente === 1;
+        
         return (
           <select
-            className="border border-gray-300 rounded px-2 py-1 text-sm text-[#2AAC67] bg-white"
+            className={`border border-gray-300 rounded px-2 py-1 text-sm bg-white ${
+              isVigente ? 'text-green-600 font-medium' : 'text-[#2AAC67]'
+            }`}
             value={idx}
             onChange={(e) =>
-              onVersionChange(row.codigo, Number(e.target.value))
+              onVersionChange(row.codigo_poe, Number(e.target.value))
             }
             style={{ minWidth: 80 }}
           >
             {row.versiones.map((ver, i) => (
-              <option key={ver.codigo || i} value={i}>
-                {ver.version}
+              <option 
+                key={ver.id_documento} 
+                value={i}
+                style={{ 
+                  color: ver.vigente === 1 ? '#16a34a' : '#2AAC67',
+                  fontWeight: ver.vigente === 1 ? 'bold' : 'normal'
+                }}
+              >
+                {ver.revision} {ver.vigente === 1 ? '(Vigente)' : ''}
               </option>
             ))}
           </select>
@@ -45,6 +55,18 @@ export function useVersionedTableColumns({
       return <div className="text-sm text-gray-700">1</div>;
     },
     [selectedRevision, onVersionChange]
+  );
+
+  // Renderer para título con datos de versión
+  const renderTituloCell = useCallback(
+    (row: ProcedureRow) => {
+      const versionData = getSelectedVersionData(row, "titulo");
+      if (versionData !== null) {
+        return <div className="text-sm text-gray-700">{versionData}</div>;
+      }
+      return <div className="text-sm text-gray-700">{row.titulo}</div>;
+    },
+    [getSelectedVersionData]
   );
 
   // Renderer para responsable con datos de versión
@@ -95,40 +117,31 @@ export function useVersionedTableColumns({
         >
           <Edit fontSize="small" />
         </button>
-        <button
-          className="action-button text-red-600 hover:text-red-800 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(row);
-          }}
-          title="Eliminar"
-        >
-          <Delete fontSize="small" />
-        </button>
       </div>
     ),
-    [onEdit, onDelete, onViewPdf]
+    [onEdit, onViewPdf]
   );
 
   const columns: TableColumn<ProcedureRow>[] = useMemo(
     () => [
       {
-        name: "CÓDIGO",
-        selector: (row) => row.codigo || "No aplica",
+        name: "CÓDIGO POE",
+        selector: (row) => row.codigo_poe || "No aplica",
         sortable: true,
         cell: (row) => (
           <div className="text-sm font-medium text-gray-900">
-            {row.codigo || "No aplica"}
+            {row.codigo_poe || "No aplica"}
           </div>
         ),
       },
       {
         name: "TÍTULO",
-        selector: (row) => row.titulo,
+        selector: (row) => {
+          const versionData = getSelectedVersionData(row, "titulo");
+          return versionData || row.titulo;
+        },
         sortable: true,
-        cell: (row) => (
-          <div className="text-sm text-gray-700">{row.titulo}</div>
-        ),
+        cell: renderTituloCell,
       },
       {
         name: "DEPARTAMENTO",
@@ -136,6 +149,14 @@ export function useVersionedTableColumns({
         sortable: true,
         cell: (row) => (
           <div className="text-sm text-gray-700">{row.departamento}</div>
+        ),
+      },
+      {
+        name: "CATEGORÍA",
+        selector: (row) => row.categoria,
+        sortable: true,
+        cell: (row) => (
+          <div className="text-sm text-gray-700">{row.categoria}</div>
         ),
       },
       {
@@ -148,10 +169,10 @@ export function useVersionedTableColumns({
         cell: renderResponsableCell,
       },
       {
-        name: "REVISION",
+        name: "REVISIÓN",
         selector: (row) => {
-          const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
-          return row.versiones[idx]?.version || 1;
+          const idx = selectedRevision[row.codigo_poe] ?? row.versiones.length - 1;
+          return row.versiones[idx]?.revision || 1;
         },
         sortable: true,
         cell: renderRevisionCell,
@@ -177,6 +198,7 @@ export function useVersionedTableColumns({
       selectedRevision,
       getSelectedVersionData,
       renderRevisionCell,
+      renderTituloCell,
       renderResponsableCell,
       renderFechaVigenciaCell,
       renderActionsCell,
