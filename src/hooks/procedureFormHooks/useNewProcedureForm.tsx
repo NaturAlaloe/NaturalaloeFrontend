@@ -75,7 +75,11 @@ export function useNewProcedureForm() {
   // Buscar consecutivo cuando cambian depto/cat
   useEffect(() => {
     if (departamentoSeleccionado && categoriaSeleccionada) {
-      fetchLastConsecutive();
+      console.log("Departamento seleccionado:", departamentoSeleccionado);
+      console.log("Categoría seleccionada:", categoriaSeleccionada);
+      const prefix = `${departamentoSeleccionado.codigo_departamento}-${categoriaSeleccionada.numero_categoria}`;
+      console.log("Prefijo construido:", prefix);
+      fetchLastConsecutive(prefix);
     }
   }, [departamentoSeleccionado, categoriaSeleccionada, fetchLastConsecutive]);
 

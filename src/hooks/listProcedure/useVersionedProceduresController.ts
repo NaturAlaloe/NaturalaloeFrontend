@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useProceduresVersions } from "../proceduresVersionControll/useProceduresVersions";
 import { useResponsibles } from "../procedureFormHooks/useResponsibles";
 import { useProcedureActions } from "./useProcedureActions";
@@ -21,6 +21,12 @@ export function useVersionedProceduresController() {
   // Estados de filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Resetear página cuando cambien los filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, departmentFilter]);
 
   // Función mock para refetch (hasta implementar actualización de versiones)
   const refetchProcedures = useCallback(async () => {
@@ -115,6 +121,8 @@ export function useVersionedProceduresController() {
     setSearchTerm,
     departmentFilter,
     setDepartmentFilter,
+    currentPage,
+    setCurrentPage,
 
     // Acciones
     handleEdit: procedureActions.handleEdit,
