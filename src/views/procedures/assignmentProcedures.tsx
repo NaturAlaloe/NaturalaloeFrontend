@@ -1,10 +1,13 @@
 import { useRolesProceduresList } from "../../hooks/procedures/useRolesProceduresList";
-import { useRolesProcedures } from "../../hooks/procedures/useRolesProcedures"; // Importa el hook real
 import {
   Button,
   Box,
   Chip,
   Tooltip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import ProceduresTableModal from "../../components/ProceduresTableModal";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
@@ -13,7 +16,6 @@ import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import type { TableColumn } from "react-data-table-component";
 import SearchBar from "../../components/globalComponents/SearchBarTable";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
-import React from "react";
 
 export default function RolesProcedures() {
   const {
@@ -31,9 +33,10 @@ export default function RolesProcedures() {
     setModalSearch,
     procedimientosFiltradosModal,
     handleSaveProcedimientos,
+    resetPaginationToggle,
+    tipoAsignacion,
+    setTipoAsignacion,
   } = useRolesProceduresList();
-
-  const { saveProcedures, removeProcedures } = useRolesProcedures();
 
   const columns: TableColumn<any>[] = [
     {
@@ -43,7 +46,7 @@ export default function RolesProcedures() {
       grow: 2,
     },
     {
-      name: "Procedimientos Asignados",
+      name: "POE Asignados",
       cell: (rol) =>
         rol.procedimientos && rol.procedimientos.length > 0 ? (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -53,18 +56,38 @@ export default function RolesProcedures() {
                 label={p.codigo}
                 size="small"
                 color="success"
+                sx={{ borderRadius: 1 }}
               />
             ))}
           </Box>
         ) : (
-          <span className="text-gray-400">Sin procedimientos</span>
+          <span className="text-gray-400">Sin POE</span>
         ),
-      grow: 3,
+      grow: 2,
+    },
+    {
+      name: "Políticas Asignadas",
+      cell: (rol) =>
+        rol.politicas && rol.politicas.length > 0 ? (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {rol.politicas.map((p: any) => (
+              <Chip
+                key={p.id_politica}
+                label={p.codigo}
+                size="small"
+                color="success"
+              />
+            ))}
+          </Box>
+        ) : (
+          <span className="text-gray-400">Sin políticas</span>
+        ),
+      grow: 2,
     },
     {
       name: "",
       cell: (rol) => (
-        <Tooltip title="Asignar procedimientos" arrow>
+        <Tooltip title="Asignar procedimientos/políticas" arrow>
           <Button
             onClick={() => handleOpenModal(rol)}
             variant="contained"
@@ -92,39 +115,26 @@ export default function RolesProcedures() {
     },
   ];
 
-  // Guarda la selección anterior en un ref para comparar
-  const prevSeleccionRef = React.useRef<number[]>(procedimientosSeleccionados);
-
-  // Nueva función para manejar el cambio de selección
-  const handleSeleccionChange = (seleccion: number[]) => {
-    const prevSeleccion = prevSeleccionRef.current;
-    const nuevos = seleccion.filter(id => !prevSeleccion.includes(id));
-    const quitados = prevSeleccion.filter(id => !seleccion.includes(id));
-
-    if (rolActual) {
-      if (nuevos.length > 0) {
-        saveProcedures(rolActual.id_rol, nuevos);
-      }
-      if (quitados.length > 0) {
-        removeProcedures(rolActual.id_rol, quitados);
-      }
-    }
-    setProcedimientosSeleccionados(seleccion);
-    prevSeleccionRef.current = seleccion;
+  const handleSeleccionChange = (seleccion: string[]) => {
+    const numericSeleccion = seleccion.map(Number);
+    console.log('🔄 Cambio de selección:', {
+      anterior: procedimientosSeleccionados,
+      nueva: numericSeleccion
+    });
+    setProcedimientosSeleccionados(numericSeleccion);
   };
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
-       
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
-        Asignar Procedimientos a Roles
+        Asignar Procedimientos y Políticas a Roles
       </h1>
 
       <div className="relative mb-6">
         <SearchBar
           value={search}
           onChange={setSearch}
-          placeholder="Buscar roles por nombre..."
+          placeholder="Buscar roles por nombre, código POE o número de política..."
         />
       </div>
 
@@ -132,39 +142,59 @@ export default function RolesProcedures() {
         <FullScreenSpinner />
       ) : (
         <GlobalDataTable
+          key={search}
           columns={columns}
           data={rolesFiltrados}
           pagination={true}
+          paginationResetDefaultPage={resetPaginationToggle}
         />
       )}
 
       <GlobalModal
         open={modalOpen}
         onClose={handleCloseModal}
-        title={`Asignar procedimientos a ${rolActual?.nombre_rol || ""}`}
+        title={`Asignar ${tipoAsignacion === "poe" ? "procedimientos" : "políticas"} a ${
+          rolActual?.nombre_rol || ""
+        }`}
         maxWidth="md"
         actions={
           <div className="flex justify-center items-center gap-2">
             <SubmitButton onClick={handleSaveProcedimientos}>
-              Guardar
+              Guardar Cambios
             </SubmitButton>
           </div>
         }
       >
+        <div className="mb-4">
+          <FormControl fullWidth size="small">
+            <InputLabel>Tipo de asignación</InputLabel>
+            <Select
+              value={tipoAsignacion}
+              label="Tipo de asignación"
+              onChange={(e) => setTipoAsignacion(e.target.value as "poe" | "politica")}
+            >
+              <MenuItem value="poe">Procedimientos (POE)</MenuItem>
+              <MenuItem value="politica">Políticas</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+
         <div className="relative mb-4">
           <SearchBar
             value={modalSearch}
             onChange={setModalSearch}
-            placeholder="Buscar procedimientos por código o descripción..."
+            placeholder={`Buscar ${
+              tipoAsignacion === "poe" ? "procedimientos por código POE" : "políticas por número"
+            } o descripción...`}
           />
         </div>
+
         <div style={{ maxHeight: 350, overflowY: "auto" }}>
           <ProceduresTableModal
             procedimientos={procedimientosFiltradosModal}
             procedimientosSeleccionados={procedimientosSeleccionados.map(String)}
-            onSeleccionChange={seleccion =>
-              handleSeleccionChange(seleccion.map(Number))
-            }
+            onSeleccionChange={handleSeleccionChange}
+            tipo={tipoAsignacion}
           />
         </div>
       </GlobalModal>

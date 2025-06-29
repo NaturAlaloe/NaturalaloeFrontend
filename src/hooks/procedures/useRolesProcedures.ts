@@ -65,13 +65,13 @@ export function useRolesProcedures() {
 
   const saveProcedures = async (id_rol: number, procedimientos: number[]) => {
     await assignProceduresToRole(id_rol, procedimientos);
-    fetchRolesProcedures();
+    await fetchRolesProcedures(); // Agregar await aquí
   };
 
   // Nueva función para desasignar procedimientos
   const removeProcedures = async (id_rol: number, procedimientos: number[]) => {
     await unassignProceduresFromRole(id_rol, procedimientos);
-    fetchRolesProcedures();
+    await fetchRolesProcedures(); // Agregar await aquí
   };
 
   useEffect(() => {
@@ -79,5 +79,12 @@ export function useRolesProcedures() {
   }, []);
 
   // Exporta la nueva función
-  return { rolesProcedures, loading, fetchRolesProcedures, saveProcedures, removeProcedures };
+  return { 
+    rolesProcedures, 
+    loading, 
+    fetchRolesProcedures, 
+    saveProcedures, 
+    removeProcedures,
+    refreshData: fetchRolesProcedures // Agregar esta línea
+  };
 }
