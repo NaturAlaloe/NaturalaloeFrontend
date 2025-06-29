@@ -103,7 +103,7 @@ export default function PoliticsList() {
             href={row.ruta_documento}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#2AAC67] hover:text-blue-700"
+            className="text-[#2AAC67] hover:text-green-700"
             title="Ver documento"
           >
             <Visibility fontSize="small" />
@@ -171,7 +171,6 @@ export default function PoliticsList() {
             onSubmit={ui.handleSave}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Información cuando es nueva versión */}
               {ui.esNuevaVersion && (
                 <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <h4 className="font-semibold text-gray-800 mb-2">📋 Creando Nueva Versión</h4>
@@ -182,22 +181,21 @@ export default function PoliticsList() {
                 </div>
               )}
 
-              {/* Checkbox para nueva versión */}
               <StyledCheckbox
                 label="¿Es una nueva versión?"
                 checked={ui.esNuevaVersion || false}
                 onChange={(checked) => ui.setEsNuevaVersion(checked)}
-                disabled={ui.saving}
+   
               />
 
               <StyledCheckbox
                 label="¿Es Vigente?"
                 checked={ui.esVigente || false}
                 onChange={(checked) => ui.setEsVigente(checked)}
-                disabled={ui.saving}
+   
               />
               
-              {/* CAMPOS DE SOLO LECTURA */}
+   
               <InputField
                 label="Código"
                 name="codigo"
@@ -215,7 +213,7 @@ export default function PoliticsList() {
                 disabled
               />
 
-              {/* CAMPOS EDITABLES */}
+      
               <InputField
                 label="Título"
                 name="titulo"
@@ -253,8 +251,8 @@ export default function PoliticsList() {
                 label="Revisión"
                 name="revision"
                 type="number"
-                step="0.1"
-                min="0.1"
+                  min="1"
+                  step="1"
                 value={ui.versionInput}
                 onChange={(e) => ui.setVersionInput(e.target.value)}
                 placeholder="1.0"
@@ -314,8 +312,11 @@ export default function PoliticsList() {
             </div>
 
             <div className="text-center mt-8">
-              <SubmitButton width="w-40" disabled={ui.saving}>
-                {ui.saving ? "Guardando..." : "Guardar Cambios"}
+              <SubmitButton width="w-40" disabled={ui.saving} >
+                {ui.saving 
+                  ? (ui.esNuevaVersion ? "Creando Versión..." : "Actualizando...") 
+                  : (ui.esNuevaVersion ? "Crear Nueva Versión" : "Guardar Cambios")
+                }
               </SubmitButton>
             </div>
           </FormContainer>

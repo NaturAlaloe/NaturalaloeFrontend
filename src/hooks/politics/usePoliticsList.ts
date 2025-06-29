@@ -1,5 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
-import { getPoliticsList, updatePolitics, deletePolitics } from "../../services/politics/politicsService";
+import { 
+  getPoliticsList, 
+  updatePolitics, 
+  createNewPoliticsVersion, 
+  deletePolitics 
+} from "../../services/politics/politicsService";
 import { getResponsibles } from "../../services/responsibles/getResponsibles";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
@@ -26,16 +31,13 @@ export default function usePoliticsList() {
   const [saving, setSaving] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-
-  // Estado para versiones seleccionadas
+  
   const [selectedVersions, setSelectedVersions] = useState<Record<string, number>>({});
 
-  // Modal states
   const [modalOpen, setModalOpen] = useState(false);
   const [editPoliticsObj, setEditPoliticsObj] = useState<PoliticsVersion | null>(null);
   const [deletePoliticsObj, setDeletePoliticsObj] = useState<PoliticsVersion | null>(null);
 
-  // Form states
   const [descripcionInput, setDescripcionInput] = useState("");
   const [responsableInput, setResponsableInput] = useState("");
   const [versionInput, setVersionInput] = useState("");
@@ -59,7 +61,6 @@ export default function usePoliticsList() {
     getPoliticsList()
       .then((data) => {
         setPolitics(data);
-        // Inicializar versiones seleccionadas con la versión vigente
         const initialSelections: Record<string, number> = {};
         data.forEach((politica: Politics) => {
           const versionVigente = politica.versiones.find(v => v.vigente === 1);
@@ -79,7 +80,7 @@ export default function usePoliticsList() {
       .finally(() => setLoadingResponsables(false));
   }, []);
 
-  // Función para manejar el cambio de versión
+
   const handleVersionChange = (codigoPolitica: string, versionId: string) => {
     setSelectedVersions(prev => ({
       ...prev,
@@ -87,7 +88,6 @@ export default function usePoliticsList() {
     }));
   };
 
-  // Crear datos expandidos para la tabla
   const expandedPolitics = useMemo(() => {
     return politics.flatMap(politica => {
       const selectedVersionId = selectedVersions[politica.codigo_politica];
@@ -101,7 +101,6 @@ export default function usePoliticsList() {
         codigo_politica: politica.codigo_politica,
         fecha_creacion: politica.fecha_creacion,
         versiones: politica.versiones,
-        // Mapear campos para compatibilidad con la tabla actual
         codigo: politica.codigo_politica,
         descripcion: selectedVersion.titulo,
         responsable: selectedVersion.responsable,
@@ -131,7 +130,6 @@ export default function usePoliticsList() {
     setEditPoliticsObj(row);
     setDescripcionInput(row.titulo || row.descripcion);
     
-    // Buscar el responsable correcto por nombre
     const responsableEncontrado = responsables.find(
       (r) => r.nombre_responsable === row.responsable
     );
@@ -142,45 +140,99 @@ export default function usePoliticsList() {
     setFechaCreacionInput(row.fecha_creacion?.slice(0, 10) || "");
     setEsVigente(row.vigente === 1);
     setModalOpen(true);
+    showCustomToast(
+      "Editor de política",
+      `Abriendo editor para: ${row.codigo || 'Política'}`,
+      "info"
+    );
   };
 
   const handleOpenDelete = (row: any) => {
     setDeletePoliticsObj(row);
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editPoliticsObj) return;
+
+ const formatDateToBackend = (dateString: string | Date | undefined): string => {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      if (
+        typeof dateString === "string" &&
+        /^\d{4}-\d{2}-\d{2}$/.test(dateString)
+      ) {
+        return dateString;
+      }
+      throw new Error("Fecha inválida");
+    }
+    return date.toISOString().split("T")[0];
+  } catch {
+    return "";
+  }
+};
+const handleSave = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!editPoliticsObj) return;
+  
+  try {
+    setSaving(true);
+    const formData = new FormData();
     
-    try {
-      setSaving(true);
-      const formData = new FormData();
+    if (esNuevaVersion) {
+    
+      
+      const codigo = politics.find(p => p.versiones.some(v => v.id_documento === editPoliticsObj?.id_documento))?.codigo_politica || "";
+      
+      formData.append("codigo", codigo);
+      formData.append("descripcion", descripcionInput);
+      formData.append("id_responsable", Number(responsableInput).toString());
+      formData.append("nueva_version", parseFloat(versionInput).toString());
+      formData.append("fecha_creacion",formatDateToBackend(fechaCreacionInput));
+      formData.append("fecha_vigencia", formatDateToBackend(fechaVigenciaInput));
+      formData.append("vigente", esVigente ? "1" : "0");
+      formData.append("version_actual", esVigente ? "1" : "0");
+      
+      if (pdfFile) {
+        formData.append("documento", pdfFile);
+      }
+
+      await createNewPoliticsVersion(formData);
+      showCustomToast("Éxito", "Nueva versión creada exitosamente", "success");
+
+    } else { 
       formData.append("id_documento", String(editPoliticsObj.id_documento));
       formData.append("titulo", descripcionInput);
       formData.append("id_responsable", responsableInput);
       formData.append("revision", versionInput);
       formData.append("fecha_vigencia", fechaVigenciaInput);
       formData.append("vigente", esVigente ? "1" : "0");
-      formData.append("es_nueva_version", esNuevaVersion ? "1" : "0");
       
       if (pdfFile) {
         formData.append("documento", pdfFile);
       }
 
       await updatePolitics(formData);
-      showCustomToast("Éxito", "Política actualizada", "success");
-      
-      const data = await getPoliticsList();
-      setPolitics(data);
-      setModalOpen(false);
-      setEditPoliticsObj(null);
-      setPdfFile(null);
-    } catch (error: any) {
-      showCustomToast("Error", "No se pudo actualizar", "error");
-    } finally {
-      setSaving(false);
+      showCustomToast("Éxito", "Política actualizada exitosamente", "success");
     }
-  };
+    
+    const data = await getPoliticsList();
+    setPolitics(data);
+    setModalOpen(false);
+    setEditPoliticsObj(null);
+    setPdfFile(null);
+    setEsNuevaVersion(false);
+    setEsVigente(false);
+  } catch (error: any) {
+    
+    showCustomToast(
+      "Error", 
+      error?.response?.data?.message || "No se pudo guardar los cambios", 
+      "error"
+    );
+  } finally {
+    setSaving(false);
+  }
+};
 
   const handleDelete = async () => {
     if (!deletePoliticsObj) return;
