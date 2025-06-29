@@ -31,6 +31,15 @@ export default function usePoliticsList() {
   const [responsableInput, setResponsableInput] = useState("");
   const [versionInput, setVersionInput] = useState("");
   const [fechaVigenciaInput, setFechaVigenciaInput] = useState("");
+  const [fechaCreacionInput, setFechaCreacionInput] = useState("");
+
+  useEffect(() => {
+    if (editPoliticsObj) {
+      setFechaCreacionInput(editPoliticsObj.fecha_creacion.slice(0, 10));
+    } else {
+      setFechaCreacionInput("");
+    }
+  }, [editPoliticsObj]);
   const [responsables, setResponsables] = useState<{ id_responsable: number; nombre_responsable: string }[]>([]);
   const [loadingResponsables, setLoadingResponsables] = useState(false);
 
@@ -164,6 +173,8 @@ export default function usePoliticsList() {
     setVersionInput,
     fechaVigenciaInput,
     setFechaVigenciaInput,
+    fechaCreacionInput,
+    setFechaCreacionInput,
     responsables,
     loadingResponsables,
     handleOpenAdd,
