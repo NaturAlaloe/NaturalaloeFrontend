@@ -14,8 +14,9 @@ export async function getPoliticsConsecutive() {
   return response.data.data[0]?.consecutivo_actual || "";
 }
 
+
 export async function getPoliticsList() {
-  const response = await api.get("/police");
+  const response = await api.get("/police/versions");
   return response.data.data; 
 }
 
