@@ -8,11 +8,14 @@ function getCookie(name: string) {
 export function useUserFromToken() {
   return useMemo(() => {
     const token = getCookie("token");
+    console.log("JWT token from cookie:", token);
     if (!token) return null;
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
+      console.log("Decoded JWT payload:", payload);
       return payload.tokenPayload || null;
-    } catch {
+    } catch (error) {
+      console.error("Error decoding JWT:", error);
       return null;
     }
   }, []);
