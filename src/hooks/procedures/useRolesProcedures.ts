@@ -9,16 +9,27 @@ import {
 // Este hook maneja la lógica de roles y procedimientos
 // y proporciona una interfaz para interactuar con los roles y sus procedimientos asignados.
 
+
 export interface Procedure {
   id_documento: number;
   codigo: string;
   descripcion: string;
 }
 
+export interface Politica {
+  id_politica: number;
+  codigo: string;
+  numero_politica: string;
+  titulo: string;
+  nombre: string;
+}
+
+// Actualizar la interfaz para incluir políticas
 export interface RoleProcedures {
   id_rol: number;
   nombre_rol: string;
   procedimientos: Procedure[];
+  politicas: Politica[]; // Agregar esta línea
 }
 
 export function useRolesProcedures() {

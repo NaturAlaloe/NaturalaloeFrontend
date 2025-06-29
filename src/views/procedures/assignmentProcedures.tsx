@@ -4,11 +4,8 @@ import {
   Box,
   Chip,
   Tooltip,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress"; 
 import ProceduresTableModal from "../../components/ProceduresTableModal";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import SubmitButton from "../../components/formComponents/SubmitButton";
@@ -16,6 +13,7 @@ import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import type { TableColumn } from "react-data-table-component";
 import SearchBar from "../../components/globalComponents/SearchBarTable";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
+import SelectField from "../../components/formComponents/SelectField"; 
 
 export default function RolesProcedures() {
   const {
@@ -36,6 +34,7 @@ export default function RolesProcedures() {
     resetPaginationToggle,
     tipoAsignacion,
     setTipoAsignacion,
+    modalLoading, // Agregar el nuevo estado
   } = useRolesProceduresList();
 
   const columns: TableColumn<any>[] = [
@@ -124,6 +123,15 @@ export default function RolesProcedures() {
     setProcedimientosSeleccionados(numericSeleccion);
   };
 
+  const handleTipoAsignacionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTipoAsignacion(e.target.value as "poe" | "politica");
+  };
+
+  const opcionesTipoAsignacion = [
+    { value: "poe", label: "Procedimientos (POE)" },
+    { value: "politica", label: "Políticas" }
+  ];
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
@@ -165,18 +173,16 @@ export default function RolesProcedures() {
           </div>
         }
       >
-        <div className="mb-4">
-          <FormControl fullWidth size="small">
-            <InputLabel>Tipo de asignación</InputLabel>
-            <Select
-              value={tipoAsignacion}
-              label="Tipo de asignación"
-              onChange={(e) => setTipoAsignacion(e.target.value as "poe" | "politica")}
-            >
-              <MenuItem value="poe">Procedimientos (POE)</MenuItem>
-              <MenuItem value="politica">Políticas</MenuItem>
-            </Select>
-          </FormControl>
+        <div className="mb-2">
+          <SelectField
+            label="Tipo de asignación"
+            name="tipoAsignacion"
+            value={tipoAsignacion}
+            onChange={handleTipoAsignacionChange}
+            options={opcionesTipoAsignacion}
+            optionLabel="label"
+            optionValue="value"
+          />
         </div>
 
         <div className="relative mb-4">
@@ -184,18 +190,30 @@ export default function RolesProcedures() {
             value={modalSearch}
             onChange={setModalSearch}
             placeholder={`Buscar ${
-              tipoAsignacion === "poe" ? "procedimientos por código POE" : "políticas por número"
+              tipoAsignacion === "poe" 
+                ? "procedimientos por ID, código POE" 
+                : "políticas por ID, número"
             } o descripción...`}
           />
         </div>
 
         <div style={{ maxHeight: 350, overflowY: "auto" }}>
-          <ProceduresTableModal
-            procedimientos={procedimientosFiltradosModal}
-            procedimientosSeleccionados={procedimientosSeleccionados.map(String)}
-            onSeleccionChange={handleSeleccionChange}
-            tipo={tipoAsignacion}
-          />
+          {modalLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <CircularProgress 
+                size={40} 
+                style={{ color: "#2AAC67" }}
+              />
+             
+            </div>
+          ) : (
+            <ProceduresTableModal
+              procedimientos={procedimientosFiltradosModal}
+              procedimientosSeleccionados={procedimientosSeleccionados.map(String)}
+              onSeleccionChange={handleSeleccionChange}
+              tipo={tipoAsignacion}
+            />
+          )}
         </div>
       </GlobalModal>
     </div>
