@@ -1,26 +1,20 @@
+// src/services/capacitations/addCapacitationQualifyService.ts
 import api from "../../apiConfig/api";
 
-export interface CapacitationQualify {
+export interface QualifyPayload {
   id_capacitacion: number;
-  seguimiento: string;
+  seguimiento: "satisfactorio" | "reprogramar" | "revaluacion";
   nota: number;
   comentario_final: string;
 }
 
-export async function addCapacitationQualifyService(
-  data: CapacitationQualify
-): Promise<boolean> {
+export const addQualifyTraining = async (
+  data: QualifyPayload[]
+): Promise<void> => {
   try {
-    console.log("addCapacitationQualifyService: enviando datos:", data);
-    const response = await api.post("/training/qualify", data);
-
-    console.log(
-      "addCapacitationQualifyService: respuesta de la API:",
-      response.data
-    );
-    return response.data.success || false;
+    await api.post("/training/qualify", data);
   } catch (error) {
-    console.error("Error al agregar calificación de capacitación:", error);
+    console.error("Error al calificar la capacitación:", error);
     throw error;
   }
-}
+};
