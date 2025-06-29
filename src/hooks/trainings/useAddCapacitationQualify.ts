@@ -1,9 +1,8 @@
-// src/hooks/capacitations/useAddCapacitationQualify.ts
 import { useState } from "react";
 import {
   addQualifyTraining,
   type QualifyPayload,
-} from "../../services/capacitations/addCapacitationQualifyService";
+} from "../../services/trainings/addTrainingQualifyService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export const useAddQualifyTraining = () => {

@@ -1,9 +1,8 @@
-// src/hooks/capacitations/useEvaluatedTraining.ts
 import { useEffect, useState } from "react";
 import {
   getEvaluatedTraining,
   type TrainingItem,
-} from "../../services/capacitations/getEvaluatedCapacitationService";
+} from "../../services/trainings/getEvaluatedTrainingService";
 
 export interface Colaborador {
   id: number;
@@ -59,7 +58,6 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
   comentario: item.comentario ?? "",
   id_capacitacion: item.id_capacitacion,
 }));
-
 
         const first = allData[0];
         setTrainingInfo({

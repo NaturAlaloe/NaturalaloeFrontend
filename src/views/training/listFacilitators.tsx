@@ -1,5 +1,5 @@
 import { Edit, Delete, Search } from "@mui/icons-material";
-import { useFacilitadores } from "../../hooks/capacitations/useListFacilitators";
+import { useFacilitadores } from "../../hooks/trainings/useListFacilitators";
 import type { Facilitador } from "../../services/listFacilitatorService";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";

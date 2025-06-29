@@ -9,7 +9,7 @@ import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 import CustomToaster, { showCustomToast } from "../../components/globalComponents/CustomToaster";
-import { useAddQualifyTraining } from "../../hooks/capacitations/useAddCapacitationQualify";
+import { useAddQualifyTraining } from "../../hooks/trainings/useAddCapacitationQualify";
 import { useParams } from "react-router-dom";
 
 const Evaluacion = () => {

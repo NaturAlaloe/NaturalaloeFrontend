@@ -1,4 +1,4 @@
-import { useFacilitatorForm } from "../../hooks/capacitations/useAddFacilitator";
+import { useFacilitatorForm } from "../../hooks/trainings/useAddFacilitator";
 import FormContainer from "../../components/formComponents/FormContainer";
 import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
