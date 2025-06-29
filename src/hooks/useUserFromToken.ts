@@ -1,22 +1,51 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
+import api from "../apiConfig/api";
 
-function getCookie(name: string) {
-  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? decodeURIComponent(match[2]) : null;
+
+interface UserData {
+  id: number;
+  nombre: string;
+  apellido: string;
+  email: string;
+}
+
+interface AuthResponse {
+  success: boolean;
+  message: string;
+  data: UserData;
 }
 
 export function useUserFromToken() {
-  return useMemo(() => {
-    const token = getCookie("token");
-    console.log("JWT token from cookie:", token);
-    if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      console.log("Decoded JWT payload:", payload);
-      return payload.tokenPayload || null;
-    } catch (error) {
-      console.error("Error decoding JWT:", error);
-      return null;
-    }
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const validateToken = async () => {
+      try {
+        const response = await api.get<AuthResponse>('/auth/endpoint');
+        
+        if (response.data.success) {
+          setUserData(response.data.data);
+        } else {
+          setUserData(null);
+        }
+      } catch (error) {
+        console.error("Error validating token:", error);
+        setUserData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    validateToken();
   }, []);
+
+  return {
+    user: userData,
+    loading,
+    nombre: userData?.nombre || null,
+    apellido: userData?.apellido || null,
+    email: userData?.email || null,
+    fullName: userData ? `${userData.nombre} ${userData.apellido}` : null
+  };
 }

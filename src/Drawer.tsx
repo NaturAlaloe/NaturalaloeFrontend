@@ -113,7 +113,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
   const [openCapacitaciones, setOpenCapacitaciones] = React.useState(false);
   const [openColaboradores, setOpenColaboradores] = React.useState(false);
 
-  const user = useUserFromToken();
+  const { user, loading, fullName } = useUserFromToken();
+
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -200,7 +201,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             sx={{ fontSize: 48, color: "#ddebd7", mb: 1, mt: 1 }}
           />
           <Box sx={{ fontWeight: "bold", color: "#fff", fontSize: 18, mt: 1 }}>
-            {user ? `${user.nombre} ${user.apellido}` : "Usuario"}
+          {loading ? "Cargando..." : fullName || "Usuario"}
           </Box>
         </Box>
         <Divider sx={{ borderColor: "#fff", opacity: 0.7, my: 2, mx: 0 }} />
