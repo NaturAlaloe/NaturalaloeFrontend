@@ -15,7 +15,12 @@ export function useAreas() {
       const data = await getAreas();
       setAreas(Array.isArray(data) ? data : []);
     } catch (err: any) {
-      setError("Error al cargar áreas");
+      // Extrae el mensaje del backend si existe
+      const backendMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al cargar áreas";
+      setError(backendMsg);
     } finally {
       setLoading(false);
     }
@@ -28,7 +33,13 @@ export function useAreas() {
       await createArea(area);
       await fetchAreas(); // Refresca la lista desde el backend
     } catch (err: any) {
-      setError("Error al agregar área");
+      // Extrae el mensaje del backend si existe
+      const backendMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al agregar área";
+      setError(backendMsg);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -41,7 +52,13 @@ export function useAreas() {
       await updateAreaApi(area);
       await fetchAreas(); // Refresca la lista desde el backend
     } catch (err: any) {
-      setError("Error al actualizar área");
+      // Extrae el mensaje del backend si existe
+      const backendMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al actualizar área";
+      setError(backendMsg);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -54,7 +71,13 @@ export function useAreas() {
       await deleteAreaApi(id);
       await fetchAreas(); // Refresca la lista desde el backend
     } catch (err: any) {
-      setError("Error al eliminar área");
+      // Extrae el mensaje del backend si existe
+      const backendMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al eliminar área";
+      setError(backendMsg);
+      throw err; // Re-throw para que useAreasList pueda manejar el error específico
     } finally {
       setLoading(false);
     }

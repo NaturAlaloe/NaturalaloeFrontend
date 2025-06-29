@@ -26,7 +26,7 @@ export function useWorkstations() {
     }
   };
 
-  // Aquí puedes agregar lógica de add, update, delete si la necesitas
+
 
   useEffect(() => {
     fetchWorkstations();

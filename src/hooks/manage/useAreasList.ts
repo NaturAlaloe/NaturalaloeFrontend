@@ -58,8 +58,13 @@ export function useAreasList() {
         setEditAreaObj(null);
         setAreaInput("");
         setAreaPadreInput(undefined);
-      } catch (err) {
-        showCustomToast("Error", "Error al actualizar área", "error");
+      } catch (err: any) {
+        // Extrae el mensaje del backend si existe
+        const backendMsg =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          "Error al actualizar área";
+        showCustomToast("Atención", backendMsg, "info");
       }
     } else {
       try {
@@ -71,8 +76,13 @@ export function useAreasList() {
         setModalOpen(false);
         setAreaInput("");
         setAreaPadreInput(undefined);
-      } catch (err) {
-        showCustomToast("Error", "Error al agregar área", "error");
+      } catch (err: any) {
+        // Extrae el mensaje del backend si existe
+        const backendMsg =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          "Error al agregar área";
+        showCustomToast("Atención", backendMsg, "info");
       }
     }
   };
@@ -82,8 +92,13 @@ export function useAreasList() {
       try {
         await removeArea(deleteAreaObj.id_area);
         showCustomToast("Éxito", "Área eliminada correctamente", "success");
-      } catch (err) {
-        showCustomToast("Error", "Error al eliminar área", "error");
+      } catch (err: any) {
+        // Extrae el mensaje del backend si existe
+        const backendMsg =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          "Error al eliminar área";
+        showCustomToast("Atención", backendMsg, "info");
       }
       setDeleteAreaObj(null);
     }

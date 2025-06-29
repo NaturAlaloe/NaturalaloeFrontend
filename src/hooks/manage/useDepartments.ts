@@ -42,7 +42,7 @@ export function useDepartments() {
         err?.response?.data?.error ||
         "Error al agregar departamento";
       setError(backendMsg);
-      showCustomToast("Error", backendMsg, "info");
+      showCustomToast("Atención", backendMsg, "info");
       return false;
     } finally {
       setLoading(false);
@@ -67,7 +67,7 @@ export function useDepartments() {
         err?.response?.data?.error ||
         "Error al actualizar departamento";
       setError(backendMsg);
-      showCustomToast("Error", backendMsg, "info");
+      showCustomToast("Atención", backendMsg, "info");
       return false;
     } finally {
       setLoading(false);
@@ -89,7 +89,7 @@ export function useDepartments() {
         err?.response?.data?.error ||
         "Error al eliminar departamento";
       setError(backendMsg);
-      showCustomToast("Error", backendMsg, "info");
+      showCustomToast("Atención", backendMsg, "info");
       return false;
     } finally {
       setLoading(false);

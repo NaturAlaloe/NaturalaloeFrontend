@@ -2,12 +2,20 @@ import { useState } from "react";
 import DataTable, { type TableColumn } from "react-data-table-component";
 import { Checkbox } from "@mui/material";
 
-export type Procedimiento = { poe: string; titulo: string; codigo: string };
+export type Procedimiento = { 
+  poe?: string; 
+  titulo: string; 
+  codigo: string;
+  id_documento?: number;
+  id_politica?: number;
+  numero_politica?: string;
+};
 
 interface ProceduresTableModalProps {
   procedimientos: Procedimiento[];
   procedimientosSeleccionados: string[];
   onSeleccionChange: (seleccion: string[]) => void;
+  tipo?: 'poe' | 'politica';
 }
 
 // Helper para generar el rango de páginas con puntos suspensivos
@@ -42,6 +50,7 @@ export default function ProceduresTableModal({
   procedimientos,
   procedimientosSeleccionados,
   onSeleccionChange,
+  tipo = 'poe',
 }: ProceduresTableModalProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
@@ -52,30 +61,42 @@ export default function ProceduresTableModal({
     currentPage * rowsPerPage
   );
 
+  // Función para obtener el identificador único según el tipo
+  const getItemId = (row: Procedimiento): string => {
+    if (tipo === 'poe') {
+      return row.poe || row.id_documento?.toString() || '';
+    } else {
+      return row.numero_politica || row.id_politica?.toString() || '';
+    }
+  };
+
   const columns: TableColumn<Procedimiento>[] = [
     {
       name: "",
-      cell: (row) => (
-        <Checkbox
-          checked={procedimientosSeleccionados.includes(row.poe)}
-          onChange={(e) => {
-            if (e.target.checked) {
-              onSeleccionChange([...procedimientosSeleccionados, row.poe]);
-            } else {
-              onSeleccionChange(
-                procedimientosSeleccionados.filter((poe) => poe !== row.poe)
-              );
-            }
-          }}
-          style={{ color: "#2AAC67" }}
-        />
-      ),
+      cell: (row) => {
+        const itemId = getItemId(row);
+        return (
+          <Checkbox
+            checked={procedimientosSeleccionados.includes(itemId)}
+            onChange={(e) => {
+              if (e.target.checked) {
+                onSeleccionChange([...procedimientosSeleccionados, itemId]);
+              } else {
+                onSeleccionChange(
+                  procedimientosSeleccionados.filter((id) => id !== itemId)
+                );
+              }
+            }}
+            style={{ color: "#2AAC67" }}
+          />
+        );
+      },
       width: "60px",
       sortable: false,
     },
     {
-      name: "Código POE",
-      selector: (row) => row.codigo,
+      name: tipo === 'poe' ? "Código POE" : "Número Política",
+      selector: (row) => tipo === 'poe' ? row.codigo : row.numero_politica || row.codigo,
       sortable: true,
       width: "150px",
     },
@@ -87,6 +108,10 @@ export default function ProceduresTableModal({
     },
   ];
 
+  const noDataMessage = tipo === 'poe' 
+    ? "No se encontraron procedimientos" 
+    : "No se encontraron políticas";
+
   return (
     <>
       <DataTable
@@ -94,7 +119,7 @@ export default function ProceduresTableModal({
         data={paginatedProcedimientos}
         noDataComponent={
           <div className="px-6 py-4 text-center text-sm text-gray-500">
-            No se encontraron procedimientos
+            {noDataMessage}
           </div>
         }
         customStyles={{

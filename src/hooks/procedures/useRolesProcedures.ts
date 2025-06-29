@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
-import { getRolesWithProcedures, assignProceduresToRole } from "../../services/procedures/procedureRolesService";
+import {
+  getRolesWithProcedures,
+  getAllRoles,
+  assignProceduresToRole,
+  unassignProceduresFromRole, // <-- Importa la función
+} from "../../services/procedures/procedureRolesService";
 
 // Este hook maneja la lógica de roles y procedimientos
 // y proporciona una interfaz para interactuar con los roles y sus procedimientos asignados.
+
 
 export interface Procedure {
   id_documento: number;
@@ -10,10 +16,20 @@ export interface Procedure {
   descripcion: string;
 }
 
+export interface Politica {
+  id_politica: number;
+  codigo: string;
+  numero_politica: string;
+  titulo: string;
+  nombre: string;
+}
+
+// Actualizar la interfaz para incluir políticas
 export interface RoleProcedures {
   id_rol: number;
   nombre_rol: string;
   procedimientos: Procedure[];
+  politicas: Politica[]; // Agregar esta línea
 }
 
 export function useRolesProcedures() {
@@ -22,36 +38,64 @@ export function useRolesProcedures() {
 
   const fetchRolesProcedures = async () => {
     setLoading(true);
-    const data = await getRolesWithProcedures();
-    // Agrupa procedimientos por rol
-    const agrupados: { [id_rol: number]: RoleProcedures } = {};
-    data.forEach((item: any) => {
-      if (!agrupados[item.id_rol]) {
-        agrupados[item.id_rol] = {
-          id_rol: item.id_rol,
-          nombre_rol: item.nombre_rol,
-          procedimientos: [],
-        };
-      }
-      agrupados[item.id_rol].procedimientos.push({
-        id_documento: item.id_documento,
-        codigo: item.codigo,
-        descripcion: item.descripcion,
+    try {
+      // Obtener todos los roles
+      const allRoles = await getAllRoles();
+      
+      // Obtener roles con procedimientos asignados
+      const rolesWithProcedures = await getRolesWithProcedures();
+      
+      // Crear un mapa de procedimientos por rol
+      const proceduresByRole: { [id_rol: number]: Procedure[] } = {};
+      rolesWithProcedures.forEach((item: any) => {
+        if (!proceduresByRole[item.id_rol]) {
+          proceduresByRole[item.id_rol] = [];
+        }
+        proceduresByRole[item.id_rol].push({
+          id_documento: item.id_documento,
+          codigo: item.codigo,
+          descripcion: item.descripcion,
+        });
       });
-    });
-    setRolesProcedures(Object.values(agrupados));
-    console.log("Roles y procedimientos:", Object.values(agrupados)); // Para depuración
-    setLoading(false);
+      
+      // Combinar todos los roles con sus procedimientos (o array vacío si no tienen)
+      const rolesProceduresComplete = allRoles.map((role: any) => ({
+        id_rol: role.id_rol,
+        nombre_rol: role.nombre_rol,
+        procedimientos: proceduresByRole[role.id_rol] || [],
+      }));
+      
+      setRolesProcedures(rolesProceduresComplete);
+    } catch (error) {
+      console.error('Error al obtener roles y procedimientos:', error);
+      setRolesProcedures([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const saveProcedures = async (id_rol: number, procedimientos: number[]) => {
     await assignProceduresToRole(id_rol, procedimientos);
-    fetchRolesProcedures();
+    await fetchRolesProcedures(); // Agregar await aquí
+  };
+
+  // Nueva función para desasignar procedimientos
+  const removeProcedures = async (id_rol: number, procedimientos: number[]) => {
+    await unassignProceduresFromRole(id_rol, procedimientos);
+    await fetchRolesProcedures(); // Agregar await aquí
   };
 
   useEffect(() => {
     fetchRolesProcedures();
   }, []);
 
-  return { rolesProcedures, loading, fetchRolesProcedures, saveProcedures };
+  // Exporta la nueva función
+  return { 
+    rolesProcedures, 
+    loading, 
+    fetchRolesProcedures, 
+    saveProcedures, 
+    removeProcedures,
+    refreshData: fetchRolesProcedures // Agregar esta línea
+  };
 }
