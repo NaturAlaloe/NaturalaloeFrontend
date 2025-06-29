@@ -156,7 +156,7 @@ export default function PoliticsList() {
         open={ui.modalOpen}
         onClose={() => !ui.saving && ui.setModalOpen(false)}
         title={
-         ""
+          ""
         }
         maxWidth="lg"
         backgroundColor="#DDF6E8"
@@ -164,8 +164,8 @@ export default function PoliticsList() {
         {ui.editPoliticsObj && (
           <FormContainer
             title={
-              ui.esNuevaVersion 
-                ? "Crear Nueva Versión" 
+              ui.esNuevaVersion
+                ? "Crear Nueva Versión"
                 : "Editar Política"
             }
             onSubmit={ui.handleSave}
@@ -175,7 +175,7 @@ export default function PoliticsList() {
                 <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <h4 className="font-semibold text-gray-800 mb-2">📋 Creando Nueva Versión</h4>
                   <p className="text-gray-700 text-sm">
-                    Se creará una nueva versión de la política <strong>{ui.editPoliticsObj.codigo_politica}</strong>. 
+                    Se creará una nueva versión de la política <strong>{ui.editPoliticsObj.codigo_politica}</strong>.
                     Si marca esta versión como vigente, todas las versiones anteriores se desactivarán automáticamente.
                   </p>
                 </div>
@@ -185,25 +185,25 @@ export default function PoliticsList() {
                 label="¿Es una nueva versión?"
                 checked={ui.esNuevaVersion || false}
                 onChange={(checked) => ui.setEsNuevaVersion(checked)}
-   
+
               />
 
               <StyledCheckbox
                 label="¿Es Vigente?"
                 checked={ui.esVigente || false}
                 onChange={(checked) => ui.setEsVigente(checked)}
-   
+
               />
-              
-   
+
+
               <InputField
                 label="Código"
                 name="codigo"
-                value={ui.editPoliticsObj.codigo_politica || "No aplica"}
+                value={ui.editPoliticsObj.codigo || "No aplica"}
                 readOnly
                 disabled
               />
-              
+
               <InputField
                 label="Fecha de Creación"
                 name="fecha_creacion"
@@ -213,7 +213,7 @@ export default function PoliticsList() {
                 disabled
               />
 
-      
+
               <InputField
                 label="Título"
                 name="titulo"
@@ -251,8 +251,8 @@ export default function PoliticsList() {
                 label="Revisión"
                 name="revision"
                 type="number"
-                  min="1"
-                  step="1"
+                min="1"
+                step="1"
                 value={ui.versionInput}
                 onChange={(e) => ui.setVersionInput(e.target.value)}
                 placeholder="1.0"
@@ -281,8 +281,8 @@ export default function PoliticsList() {
                 {ui.editPoliticsObj?.ruta_documento ? (
                   <div className="mt-2 p-2 bg-gray-50 rounded border">
                     <p className="text-sm text-gray-600">
-                      <strong>PDF actual:</strong> 
-                      <button 
+                      <strong>PDF actual:</strong>
+                      <button
                         type="button"
                         onClick={() => {
                           if (ui.editPoliticsObj?.ruta_documento) {
@@ -313,8 +313,8 @@ export default function PoliticsList() {
 
             <div className="text-center mt-8">
               <SubmitButton width="w-40" disabled={ui.saving} >
-                {ui.saving 
-                  ? (ui.esNuevaVersion ? "Creando Versión..." : "Actualizando...") 
+                {ui.saving
+                  ? (ui.esNuevaVersion ? "Creando Versión..." : "Actualizando...")
                   : (ui.esNuevaVersion ? "Crear Nueva Versión" : "Guardar Cambios")
                 }
               </SubmitButton>

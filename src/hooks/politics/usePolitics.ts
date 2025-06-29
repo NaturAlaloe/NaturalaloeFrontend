@@ -11,7 +11,7 @@ export function usePolitics() {
     version: "",
     fecha_creacion: "",
     fecha_vigencia: "",
-    
+
   });
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [responsables, setResponsables] = useState<{ id_responsable: number; nombre_responsable: string }[]>([]);
@@ -68,7 +68,7 @@ export function usePolitics() {
     data.append("version", String(Number(formData.version)).trim());
     data.append("fecha_creacion", formData.fecha_creacion.trim());
     data.append("fecha_vigencia", formData.fecha_vigencia.trim());
-    data.append("documento", pdfFile); 
+    data.append("documento", pdfFile);
 
     try {
       await createPolitics(data);
@@ -82,7 +82,7 @@ export function usePolitics() {
         fecha_creacion: "",
         fecha_vigencia: "",
 
-        
+
       });
       setPdfFile(null);
     } catch (error: any) {

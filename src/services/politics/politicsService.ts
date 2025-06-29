@@ -19,6 +19,15 @@ export async function getPoliticsList() {
   return response.data.data; 
 }
 
+
+
+export async function getActivePolitics() {
+  const response = await api.get("/policeActive");
+  return response.data.data;
+}
+
+
+
 export const updatePolitics = async (
   formData: FormData
 ) => {
