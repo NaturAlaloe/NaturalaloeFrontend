@@ -224,7 +224,11 @@ export default function ListProcedures() {
 
                 <div className="md:col-span-2">
                   <PdfInput
-                    label="Documento PDF (Opcional - Solo para actualizar)"
+                    label={
+                      controller.editModal.data.es_nueva_version 
+                        ? "Documento PDF (Opcional - Nueva versión)"
+                        : "Documento PDF (Opcional - Solo para actualizar)"
+                    }
                     pdfFile={controller.editModal.data.pdf || null}
                     onChange={(e) => {
                       const file = e.target.files?.[0] || null;
@@ -234,6 +238,19 @@ export default function ListProcedures() {
                       controller.editModal.handlers.handleFileChange(null)
                     }
                   />
+                  
+                  {/* Aviso específico para nueva versión */}
+                  {controller.editModal.data.es_nueva_version && !controller.editModal.data.pdf && (
+                    <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                      <p className="text-sm text-yellow-700">
+                        💡 <strong>Información:</strong> Se creará la nueva versión sin documento PDF asociado.
+                      </p>
+                      <p className="text-xs text-yellow-600 mt-1">
+                        Puede agregar un PDF ahora o subirlo más tarde editando esta versión.
+                      </p>
+                    </div>
+                  )}
+                  
                   {controller.editModal.data?.path ? (
                     <div className="mt-2 p-2 bg-gray-50 rounded border">
                       <p className="text-sm text-gray-600">
@@ -254,7 +271,7 @@ export default function ListProcedures() {
                         Selecciona un nuevo archivo solo si deseas reemplazarlo
                       </p>
                     </div>
-                  ) : (
+                  ) : !controller.editModal.data.es_nueva_version && (
                     <div className="mt-2 p-2 bg-orange-50 border border-orange-200 rounded">
                       <p className="text-sm text-orange-700">
                         ⚠️ <strong>Sin documento PDF:</strong> Esta versión del procedimiento no tiene un documento PDF asociado.
