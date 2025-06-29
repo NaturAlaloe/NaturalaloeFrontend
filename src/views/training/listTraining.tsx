@@ -1,109 +1,165 @@
-import { Search, Person, Badge, Apartment, Work, EditNote, ChatBubble } from "@mui/icons-material";
-import { useState } from 'react';
-import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
-import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
-import GlobalModal from '../../components/globalComponents/GlobalModal';
-import { useCapacitationList } from '../../hooks/trainings/useTrainingList';
+import {
+  Search,
+  Person,
+  Badge,
+  Apartment,
+  Work,
+  EditNote,
+  ChatBubble,
+  ExpandMore,
+  ExpandLess,
+} from "@mui/icons-material";
+import { useState } from "react";
+import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
+import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
+import GlobalModal from "../../components/globalComponents/GlobalModal";
+import { useTrainingList } from "../../hooks/trainings/useTrainingList";
+import type { Training } from "../../hooks/trainings/useTrainingList";
 
-export default function ListCapacitations() {
+export default function ListTrainings() {
   const {
-    capacitations,
+    trainings: trainings,
     searchTerm,
     setSearchTerm,
-    poeFilter,
-    setPoeFilter,
-    estadoFilter,
-    setEstadoFilter,
-    tipoFilter,
-    setTipoFilter,
-    seguimientoFilter,
-    setSeguimientoFilter,
-    poes,
-    estados,
-    tipos,
-    seguimientos,
     showModal,
     setShowModal,
-    selectedCapacitation,
+    selectedTraining: selectedTraining,
     handleRowClick,
     navegarCapacitacionFinalizada,
     isLoading,
-  } = useCapacitationList();
+  } = useTrainingList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentToShow, setCommentToShow] = useState<string | null>(null);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+  const toggleExpanded = (id: string) => {
+    const newExpanded = new Set(expandedRows);
+    if (newExpanded.has(id)) {
+      newExpanded.delete(id);
+    } else {
+      newExpanded.add(id);
+    }
+    setExpandedRows(newExpanded);
+  };
 
   if (isLoading) return <FullScreenSpinner />;
 
   const columns = [
     {
-      name: 'POE',
+      name: "POE",
       selector: (row: any) => row.poe,
       sortable: true,
-      cell: (row: any) => <div className="text-sm font-medium text-gray-900">{row.poe}</div>,
+      cell: (row: any) => (
+        <div className="text-sm font-medium text-gray-900 py-2 min-h-[56px] flex items-center">
+          {row.isGrouped ? (
+            <div className="flex items-center">
+              <button
+                onClick={() => toggleExpanded(row.id)}
+                className="flex items-center text-[#2AAC67] hover:text-[#1e8449]"
+              >
+                {expandedRows.has(row.id) ? <ExpandLess /> : <ExpandMore />}
+                <span className="ml-1">{row.poe}</span>
+              </button>
+            </div>
+          ) : (
+            row.poe
+          )}
+        </div>
+      ),
       wrap: true,
     },
     {
-      name: 'TÍTULO',
+      name: "TÍTULO",
       selector: (row: any) => row.titulo,
       sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.titulo}</div>,
+      cell: (row: any) => (
+        <div className="text-sm text-gray-700 py-2 min-h-[56px] flex items-center">
+          {row.titulo}
+        </div>
+      ),
       wrap: true,
-    }, {
-      name: 'DURACIÓN (h)',
+    },
+    {
+      name: "DURACIÓN (h)",
       selector: (row: any) => row.duracion,
       sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.duracion}</div>,
+      cell: (row: any) => (
+        <div className="text-sm text-gray-700 py-2 min-h-[56px] flex items-center">
+          {row.duracion}
+        </div>
+      ),
       wrap: true,
     },
     {
-      name: 'FECHA FINAL',
+      name: "FECHA FINAL",
       selector: (row: any) => row.fechaFinal,
       sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.fechaFinal}</div>,
-
+      cell: (row: any) => (
+        <div className="text-sm text-gray-700 py-2 min-h-[56px] flex items-center">
+          {row.fechaFinal}
+        </div>
+      ),
     },
     {
-      name: 'ESTADO',
+      name: "ESTADO",
       selector: (row: any) => row.estado,
       sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.estado}</div>,
+      cell: (row: any) => (
+        <div className="text-sm text-gray-700 capitalize py-2min-h-[56px] flex items-center">
+          {row.estado}
+        </div>
+      ),
       wrap: true,
     },
     {
-      name: 'TIPO',
+      name: "TIPO",
       selector: (row: any) => row.tipo,
       sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.tipo}</div>,
+      cell: (row: any) => (
+        <div className="text-sm text-gray-700 capitalize py-2 min-h-[56px] flex items-center">
+          {row.tipo}
+        </div>
+      ),
       wrap: true,
     },
     {
-      name: 'SEGUIMIENTO',
+      name: "SEGUIMIENTO",
       selector: (row: any) => row.seguimiento,
       sortable: true,
-      cell: (row: any) => <div className="text-sm text-gray-700">{row.seguimiento}</div>,
+      cell: (row: any) => (
+        <div className="text-sm text-gray-700 capitalize py-2 min-h-[56px] flex items-center">
+          {row.seguimiento}
+        </div>
+      ),
       wrap: true,
     },
     {
-      name: 'ACCIONES',
+      name: "ACCIONES",
       cell: (row: any) => (
-        <div className="flex flex-col sm:flex-row gap-2 items-center justify-center">          <button
-          className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
-          onClick={() => navegarCapacitacionFinalizada(row.poe)}
-          title="Calificar examen"
-        >
-          <EditNote />
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2 items-center justify-center py-2 min-h-[56px]">
+          {/* Botón de calificar examen - disponible para todos los POEs */}
           <button
-            className="text-[#2AAC67] hover:text-[#1e8449] transition-colors"
-            onClick={() => {
-              setCommentToShow(row.comentario);
-              setShowCommentModal(true);
-            }}
-            title="Ver comentario"
+            className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
+            onClick={() => navegarCapacitacionFinalizada(row.poe)}
+            title="Calificar examen"
           >
-            <ChatBubble />
+            <EditNote />
           </button>
+          
+          {/* Botón de comentario - solo para POEs padre (no sub-filas) */}
+          {!row.isSubRow && (
+            <button
+              className="text-[#2AAC67] hover:text-[#1e8449] transition-colors"
+              onClick={() => {
+                setCommentToShow(row.comentario);
+                setShowCommentModal(true);
+              }}
+              title="Ver comentario"
+            >
+              <ChatBubble />
+            </button>
+          )}
         </div>
       ),
       ignoreRowClick: true,
@@ -111,143 +167,181 @@ export default function ListCapacitations() {
       button: true,
     },
   ];
+
+  // Crear datos expandidos que incluyan las sub-capacitaciones
+  const getExpandedData = () => {
+    const result: any[] = [];
+
+    trainings.forEach((cap) => {
+      result.push(cap);
+
+      if (cap.isGrouped && cap.subTrainings && expandedRows.has(cap.id)) {
+        cap.subTrainings.forEach((subCap) => {
+          result.push({
+            ...subCap,
+            isSubRow: true,
+            parentId: cap.id,
+          });
+        });
+      }
+    });
+
+    return result;
+  };
+
+  // Calcular el número de elementos por página considerando las expansiones
+  const hasExpandedRows = expandedRows.size > 0;
+  const expandedData = getExpandedData();
+  const baseItemsPerPage = 10;
+  const itemsPerPage = hasExpandedRows
+    ? Math.min(50, Math.max(baseItemsPerPage, expandedData.length))
+    : baseItemsPerPage;
+
+  const customRowStyles = {
+    headCells: {
+      style: {
+        background: "#F0FFF4",
+        color: "#2AAC67",
+        fontWeight: "bold",
+        fontSize: "13px",
+        textTransform: "uppercase",
+      },
+    },
+  };
+
   return (
-    <div className="p-4 bg-white rounded-lg ">
+    <div className="p-4 bg-white rounded-lg">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
         Capacitaciones de la Empresa
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="text-gray-400" />
-          </div>
-          <input
-            type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
-            placeholder="Buscar por POE, estado o seguimiento..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
+      <div className="relative mb-6">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search className="text-gray-400" />
         </div>
-        <select
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67]"
-          value={poeFilter}
-          onChange={e => setPoeFilter(e.target.value)}
-        >
-          <option value="">POE</option>
-          {poes.map((poe) => (
-            <option key={poe} value={poe}>{poe}</option>
-          ))}
-        </select>        <select
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67]"
-          value={estadoFilter}
-          onChange={e => setEstadoFilter(e.target.value)}
-        >
-          <option value="">Estados</option>
-          {estados.map((estado) => (
-            <option key={estado} value={estado}>{estado}</option>
-          ))}
-        </select>
-        <select
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67]"
-          value={tipoFilter}
-          onChange={e => setTipoFilter(e.target.value)}
-        >
-          <option value="">Tipos</option>
-          {tipos.map((tipo) => (
-            <option key={tipo} value={tipo}>{tipo}</option>
-          ))}
-        </select>
-        <select
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67]"
-          value={seguimientoFilter}
-          onChange={e => setSeguimientoFilter(e.target.value)}
-        >
-          <option value="">Seguimientos</option>
-          {seguimientos.map((seg) => (
-            <option key={seg} value={seg}>{seg}</option>
-          ))}
-        </select>      </div>
+        <input
+          type="text"
+          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
+          placeholder="Buscar por POE, título, estado, tipo o seguimiento..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
 
       <div className="border border-gray-200 rounded-lg overflow-x-auto">
         <GlobalDataTable
+          key={`training-table-${searchTerm}`}
           columns={columns}
-          data={capacitations}
+          data={expandedData}
           pagination={true}
-          rowsPerPage={10}
-          dense
+          paginationPerPage={itemsPerPage}
+          paginationRowsPerPageOptions={[10, 25, 50]}
           highlightOnHover
+          dense={false}
           noDataComponent={
             <div className="px-6 py-4 text-center text-sm text-gray-500">
-              {isLoading ? "Cargando capacitaciones..." : "No se encontraron capacitaciones"}
+              {isLoading
+                ? "Cargando capacitaciones..."
+                : "No se encontraron capacitaciones"}
             </div>
           }
-          customStyles={{
-            headCells: {
+          customStyles={customRowStyles}
+          onRowClicked={(row: Training) => {
+            if (row.isSubRow) {
+              // No hacer nada al hacer click en sub-filas
+              return;
+            } else if (row.isGrouped) {
+              // Mostrar modal con todos los colaboradores agrupados para capacitaciones grupales
+              handleRowClick(row);
+            } else if (!row.isGrouped) {
+              // Mostrar modal para capacitaciones individuales
+              handleRowClick(row);
+            }
+          }}
+          progressPending={isLoading}
+          conditionalRowStyles={[
+            {
+              when: (row: any) => row.isSubRow,
               style: {
-                background: "#F0FFF4",
-                color: "#2AAC67",
-                fontWeight: "bold",
-                fontSize: "13px",
-                textTransform: "uppercase",
+                backgroundColor: "#f8f9fa",
+                paddingLeft: "2rem",
+                borderLeft: "3px solid #2AAC67",
+                cursor: "default", // Cambiar cursor para indicar que no es clickeable
               },
             },
-          }}
-          onRowClicked={handleRowClick}
-          progressPending={isLoading}
-        />      </div>
-
+          ]}
+        />
+      </div>
       <GlobalModal
         open={showModal}
         onClose={() => setShowModal(false)}
         title="Detalles de Capacitación"
         maxWidth="md"
       >
-        {selectedCapacitation && (
+        {selectedTraining && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left">
                 Información de los Colaboradores
               </h3>
               <div className="space-y-3">
-                {selectedCapacitation.colaboradores.map((colaborador, index) => (
-                  <details key={index} className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
-                    <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
-                      <Person className="mr-2" />
-                      {colaborador.nombreCompleto}
-                      <span className="ml-auto text-[#2ecc71]">▼</span>
-                    </summary>
-                    <div className="px-3 pb-3 pt-2">
-                      <div className="mb-2 flex items-center">
-                        <Badge className="mr-2 text-[#2ecc71]" />
-                        <span className="font-semibold mr-1">Cédula:</span> {colaborador.cedula}
+                {selectedTraining.colaboradores.map(
+                  (colaborador, index) => (
+                    <details
+                      key={index}
+                      className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]"
+                    >
+                      <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
+                        <Person className="mr-2" />
+                        {colaborador.nombreCompleto}
+                        <span className="ml-auto text-[#2ecc71]">▼</span>
+                      </summary>
+                      <div className="px-3 pb-3 pt-2">
+                        <div className="mb-2 flex items-center">
+                          <Badge className="mr-2 text-[#2ecc71]" />
+                          <span className="font-semibold mr-1">
+                            Cédula:
+                          </span>{" "}
+                          {colaborador.cedula}
+                        </div>
+                        <div className="mb-2 flex items-center">
+                          <Apartment className="mr-2 text-[#2ecc71]" />
+                          <span className="font-semibold mr-1">
+                            Departamento:
+                          </span>{" "}
+                          {colaborador.departamento}
+                        </div>
+                        <div className="mb-2 flex items-center">
+                          <Work className="mr-2 text-[#2ecc71]" />
+                          <span className="font-semibold mr-1">
+                            Puesto:
+                          </span>{" "}
+                          {colaborador.puesto}
+                        </div>
                       </div>
-                      <div className="mb-2 flex items-center">
-                        <Apartment className="mr-2 text-[#2ecc71]" />
-                        <span className="font-semibold mr-1">Departamento:</span> {colaborador.departamento}
-                      </div>
-                      <div className="mb-2 flex items-center">
-                        <Work className="mr-2 text-[#2ecc71]" />
-                        <span className="font-semibold mr-1">Puesto:</span> {colaborador.puesto}
-                      </div>
-                    </div>
-                  </details>
-                ))}
+                    </details>
+                  )
+                )}
               </div>
             </div>
             <div>
-              <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left mt-8 md:mt-0">Información del Facilitador</h3>
+              <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left mt-8 md:mt-0">
+                Información del Facilitador
+              </h3>
               <div className="mb-4">
                 <details className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
                   <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
                     <Person className="mr-2" />
-                    {selectedCapacitation.profesor.nombre} {selectedCapacitation.profesor.apellido}
+                    {selectedTraining.profesor.nombre}{" "}
+                    {selectedTraining.profesor.apellido}
                     <span className="ml-auto">▼</span>
                   </summary>
                   <div className="px-3 pb-3 pt-2">
                     <div className="mb-2 flex items-center">
                       <Badge className="mr-2 text-[#2ecc71]" />
-                      <span className="font-semibold mr-1">Identificación:</span> {selectedCapacitation.profesor.identificacion}
+                      <span className="font-semibold mr-1">
+                        Identificación:
+                      </span>{" "}
+                      {selectedTraining.profesor.identificacion}
                     </div>
                   </div>
                 </details>
