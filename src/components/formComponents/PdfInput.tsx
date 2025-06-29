@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import InputField from "./InputField";
 
 interface PdfInputProps {
@@ -18,9 +18,20 @@ const PdfInput: React.FC<PdfInputProps> = ({
   onRemove,
   required = false,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleRemove = () => {
+    // Resetear el valor del input file para permitir seleccionar el mismo archivo nuevamente
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    onRemove();
+  };
+
   return (
     <div>
       <InputField
+        ref={fileInputRef}
         label={label}
         name={name}
         type="file"
@@ -36,7 +47,7 @@ const PdfInput: React.FC<PdfInputProps> = ({
           <button
             type="button"
             className="text-red-600 underline text-xs"
-            onClick={onRemove}
+            onClick={handleRemove}
           >
             Quitar
           </button>

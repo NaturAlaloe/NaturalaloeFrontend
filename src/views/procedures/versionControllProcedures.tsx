@@ -14,7 +14,7 @@ export default function VersionControlProcedures() {
   const filteredProcedures = procedures.filter((row) => {
     const text = filterText.toLowerCase();
     return (
-      row.codigo.toLowerCase().includes(text) ||
+      row.codigo_poe.toLowerCase().includes(text) ||
       row.titulo.toLowerCase().includes(text) ||
       row.departamento.toLowerCase().includes(text) ||
       row.versiones.some((v) => v.responsable.toLowerCase().includes(text))
@@ -24,10 +24,10 @@ export default function VersionControlProcedures() {
   const columns = [
     {
       name: "POE",
-      selector: (row: ProcedureRow) => row.codigo,
+      selector: (row: ProcedureRow) => row.codigo_poe,
       sortable: true,
       cell: (row: ProcedureRow) => (
-        <div className="text-sm font-medium text-gray-900">{row.codigo}</div>
+        <div className="text-sm font-medium text-gray-900">{row.codigo_poe}</div>
       ),
       width: "120px",
     },
@@ -50,25 +50,25 @@ export default function VersionControlProcedures() {
     },
     {
       name: "RESPONSABLE",
-      selector: (row: ProcedureRow) => row.versiones[selectedRevision[row.codigo] ?? row.versiones.length - 1]?.responsable || "",
+      selector: (row: ProcedureRow) => row.versiones[selectedRevision[row.codigo_poe] ?? row.versiones.length - 1]?.responsable || "",
       sortable: true,
       cell: (row: ProcedureRow) => (
-        <div className="text-sm text-gray-700">{row.versiones[selectedRevision[row.codigo] ?? row.versiones.length - 1]?.responsable || ""}</div>
+        <div className="text-sm text-gray-700">{row.versiones[selectedRevision[row.codigo_poe] ?? row.versiones.length - 1]?.responsable || ""}</div>
       ),
     },
     {
       name: "REVISIÓN",
       cell: (row: ProcedureRow) => {
-        const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
+        const idx = selectedRevision[row.codigo_poe] ?? row.versiones.length - 1;
         return (
           <select
             className="border border-gray-300 rounded px-2 py-1 text-sm text-[#2AAC67] bg-white"
             value={idx}
-            onChange={e => setSelectedRevision({ ...selectedRevision, [row.codigo]: Number(e.target.value) })}
+            onChange={e => setSelectedRevision({ ...selectedRevision, [row.codigo_poe]: Number(e.target.value) })}
             style={{ minWidth: 80 }}
           >
             {row.versiones.map((ver, i) => (
-              <option key={ver.codigo} value={i}>{ver.version}</option>
+              <option key={ver.id_documento} value={i}>{ver.revision}</option>
             ))}
           </select>
         );
@@ -79,7 +79,7 @@ export default function VersionControlProcedures() {
     {
       name: "FECHA VIGENCIA",
       cell: (row: ProcedureRow) => {
-        const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
+        const idx = selectedRevision[row.codigo_poe] ?? row.versiones.length - 1;
         return (
           <div className="text-sm text-gray-700" style={{ whiteSpace: "normal", wordBreak: "break-word", minWidth: 0 }}>
             {row.versiones[idx]?.fecha_vigencia || ""}
@@ -92,10 +92,10 @@ export default function VersionControlProcedures() {
     {
       name: "DOCUMENTO",
       cell: (row: ProcedureRow) => {
-        const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
+        const idx = selectedRevision[row.codigo_poe] ?? row.versiones.length - 1;
         return (
           <a
-            href={row.versiones[idx]?.pdf}
+            href={row.versiones[idx]?.ruta_documento || undefined}
             target="_blank"
             rel="noopener noreferrer"
             className="action-button text-[#2AAC67] hover:text-[#1e8449] flex items-center gap-1"

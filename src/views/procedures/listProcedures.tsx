@@ -1,292 +1,41 @@
-import {
-  useProceduresList,
-  type Procedure,
-} from "../../hooks/listProcedure/useProceduresList";
-import type { TableColumn } from "react-data-table-component";
-import {
-  Edit,
-  Delete,
-  Visibility,
-  Info,
-  Badge,
-  Apartment,
-  Person,
-  CalendarMonth,
-} from "@mui/icons-material";
-import React, { useState } from "react";
 import TableContainer from "../../components/TableContainer";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
-import GlobalModal from "../../components/globalComponents/GlobalModal";
 import SearchBar from "../../components/globalComponents/SearchBarTable";
-import InputField from "../../components/formComponents/InputField";
-import SubmitButton from "../../components/formComponents/SubmitButton";
-import SelectField from "../../components/formComponents/SelectField";
-import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
-import FormContainer from "../../components/formComponents/FormContainer";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import CustomToaster, {
   showCustomToast,
 } from "../../components/globalComponents/CustomToaster";
-import { useResponsibles } from "../../hooks/procedureFormHooks/useResponsibles";
+import GlobalModal from "../../components/globalComponents/GlobalModal";
+import FormContainer from "../../components/formComponents/FormContainer";
+import InputField from "../../components/formComponents/InputField";
+import SelectField from "../../components/formComponents/SelectField";
+import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
+import SubmitButton from "../../components/formComponents/SubmitButton";
 import PdfInput from "../../components/formComponents/PdfInput";
-import { deleteProcedure } from "../../services/procedures/procedureService";
 
-const formatDateToBackend = (dateString: string | Date | undefined): string => {
-  if (!dateString) return "";
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      if (
-        typeof dateString === "string" &&
-        /^\d{4}-\d{2}-\d{2}$/.test(dateString)
-      ) {
-        return dateString;
-      }
-      throw new Error("Fecha inválida");
-    }
-    return date.toISOString().split("T")[0];
-  } catch {
-    return "";
-  }
-};
+// Hooks
+import { useVersionedProceduresController } from "../../hooks/listProcedure/useVersionedProceduresController";
+import { useVersionedTableColumns } from "../../hooks/listProcedure/useVersionedTableColumns";
 
 export default function ListProcedures() {
-  const {
-    procedures,
-    loading,
-    error,
-    searchTerm,
-    setSearchTerm,
-    sortDirection,
-    handleSort,
-    departmentFilter,
-    setDepartmentFilter,
-    departments,
-    updateProcedure,
-    fetchProcedures,
-  } = useProceduresList();
+  const controller = useVersionedProceduresController();
 
-  const { responsibles, loading: loadingResponsibles } = useResponsibles() as {
-    responsibles: Array<{ id_responsable: string; nombre_responsable: string }>;
-    loading: boolean;
-  };
-
-  const [showModal, setShowModal] = useState(false);
-  const [selectedProcedure, setSelectedProcedure] = useState<Procedure | null>(
-    null
-  );
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editData, setEditData] = useState<any>(null);
-  const [saving, setSaving] = useState(false);
-  const [validationError, setValidationError] = useState<string | null>(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [procedureToDelete, setProcedureToDelete] = useState<Procedure | null>(
-    null
-  );
-
-  // Edit handler
-  const handleEdit = (row: Procedure) => {
-    const responsableObj = responsibles.find(
-      (r) => r.nombre_responsable === row.responsable
-    );
-    setEditData({
-      ...row,
-      descripcion: row.titulo,
-      id_responsable: responsableObj ? responsableObj.id_responsable : "",
-      path: row.path || row.pdf || "",
-      fecha_creacion: row.fecha_creacion?.split("T")[0] || "",
-      fecha_vigencia: row.fecha_vigencia?.split("T")[0] || "",
-      revision: row.revision || "",
-      codigo: row.codigo || "",
-      area: "No disponible", // Valor por defecto ya que no está en Procedure
-      departamento: row.departamento || "",
-      categoria: "No disponible", // Valor por defecto ya que no está en Procedure
-      pdf: null, // Para el nuevo archivo PDF
-      es_vigente: true, // Valor por defecto
-      es_nueva_version: false, // Valor por defecto para nueva versión
-    });
-    setEditModalOpen(true);
-  };
-
-  // Update handler
-  const handleUpdateProcedure = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editData) return;
-    setSaving(true);
-    try {
-      if (
-        !editData.descripcion ||
-        !editData.id_responsable ||
-        !editData.fecha_creacion ||
-        !editData.fecha_vigencia
-      ) {
-        showCustomToast("Todos los campos obligatorios", "", "error");
-        setSaving(false);
-        return;
-      }
-      setValidationError(null);
-      const result = await updateProcedure({
-        id_documento: editData.id_documento,
-        descripcion: editData.descripcion,
-        id_responsable: editData.id_responsable,
-        fecha_creacion: formatDateToBackend(editData.fecha_creacion),
-        fecha_vigencia: formatDateToBackend(editData.fecha_vigencia),
-        path: editData.path || "",
-      });
-      if (result.success) {
-        showCustomToast(
-          "Procedimiento actualizado correctamente",
-          "",
-          "success"
-        );
-        setEditModalOpen(false);
-        setEditData(null);
-        await fetchProcedures();
-      } else {
-        showCustomToast("Error al actualizar el procedimiento", "", "error");
-      }
-    } catch (err: any) {
-      showCustomToast("Error inesperado", err?.message || "", "error");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDeleteClick = (row: Procedure) => {
-    setProcedureToDelete(row);
-    setDeleteModalOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!procedureToDelete) return;
-    try {
-      const res = await deleteProcedure(procedureToDelete.id_documento);
-      showCustomToast(
-        "Éxito",
-        res.message || "Procedimiento eliminado lógicamente correctamente",
-        "success"
-      );
-      fetchProcedures();
-    } catch (err: any) {
-      showCustomToast(
-        "Error",
-        err.message || "No se pudo eliminar el procedimiento",
-        "error"
-      );
-    }
-    setDeleteModalOpen(false);
-    setProcedureToDelete(null);
-  };
-
-  const columns: TableColumn<Procedure>[] = [
-    {
-      name: "CÓDIGO",
-      selector: (row) => row.codigo || "No aplica",
-      sortable: true,
-      cell: (row) => (
-        <div className="text-sm font-medium text-gray-900">
-          {row.codigo || "No aplica"}
-        </div>
-      ),
-    },
-    {
-      name: "TÍTULO",
-      selector: (row) => row.titulo,
-      sortable: true,
-      cell: (row) => <div className="text-sm text-gray-700">{row.titulo}</div>,
-    },
-    {
-      name: "DEPARTAMENTO",
-      selector: (row) => row.departamento,
-      sortable: true,
-      cell: (row) => (
-        <div className="text-sm text-gray-700">{row.departamento}</div>
-      ),
-    },
-    {
-      name: "RESPONSABLE",
-      selector: (row) => row.responsable,
-      sortable: true,
-      cell: (row) => (
-        <div className="text-sm text-gray-700">{row.responsable}</div>
-      ),
-    },
-    {
-      name: "REVISION",
-      selector: (row) => row.revision,
-      sortable: true,
-    },
-    {
-      name: "FECHA VIGENCIA",
-      selector: (row) => row.fecha_vigencia,
-      sortable: true,
-      cell: (row) => {
-        // Si la fecha viene como "2025-06-29T00:00:00.000Z", toma solo la parte YYYY-MM-DD
-        const fecha = row.fecha_vigencia
-          ? row.fecha_vigencia.split("T")[0].split("-").reverse().join("/")
-          : "";
-        return <div className="text-sm text-gray-700">{fecha}</div>;
-      },
-    },
-    {
-      name: "ACCIONES",
-      cell: (row) => (
-        <div className="flex items-center space-x-2">
-          <button
-            className="action-button text-green-600 hover:text-green-800 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              setSelectedProcedure(row);
-              setShowModal(true);
-            }}
-            title="Ver detalles"
-          >
-            <Visibility fontSize="small" />
-          </button>
-          <button
-            className="action-button text-green-600 hover:text-green-800 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEdit(row);
-            }}
-            title="Editar"
-          >
-            <Edit fontSize="small" />
-          </button>
-          <button
-            className="action-button text-red-600 hover:text-red-800 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDeleteClick(row);
-            }}
-            title="Eliminar"
-          >
-            <Delete fontSize="small" />
-          </button>
-        </div>
-      ),
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
-    },
-  ];
-
-  // Antes de paginar, filtra:
-  const filteredProcedures = procedures.filter((proc) => {
-    const matchesSearch =
-      proc.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proc.revision.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesDepartment =
-      !departmentFilter || proc.departamento === departmentFilter;
-
-    return matchesSearch && matchesDepartment;
+  // Columnas con manejo de versiones
+  const columns = useVersionedTableColumns({
+    onEdit: controller.handleEdit,
+    onViewPdf: controller.handleViewPdf,
+    selectedRevision: controller.selectedRevision,
+    onVersionChange: controller.handleVersionChange,
+    getSelectedVersionData: controller.getSelectedVersionData,
   });
-  // Luego, pasa filteredProcedures a la tabla y la paginación.
 
-  if (loading) return <FullScreenSpinner />;
-  if (error) {
-    showCustomToast("Error al cargar procedimientos", error, "error");
+  if (controller.loading) return <FullScreenSpinner />;
+  if (controller.error) {
+    showCustomToast(
+      "Error de conexión", 
+      "No se pudieron cargar los procedimientos. Verifique su conexión e intente nuevamente", 
+      "error"
+    );
     return null;
   }
 
@@ -296,9 +45,9 @@ export default function ListProcedures() {
       <TableContainer title="Procedimientos de la Empresa">
         <div className="mb-4">
           <SearchBar
-            value={searchTerm}
-            onChange={setSearchTerm}
-            placeholder="Buscar procedimientos por título o revisión..."
+            value={controller.searchTerm}
+            onChange={controller.setSearchTerm}
+            placeholder="Buscar procedimientos por título o código..."
             className="w-full"
           />
         </div>
@@ -308,11 +57,11 @@ export default function ListProcedures() {
           </label>
           <select
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-[#2AAC67]"
-            value={departmentFilter}
-            onChange={(e) => setDepartmentFilter(e.target.value)}
+            value={controller.departmentFilter}
+            onChange={(e) => controller.setDepartmentFilter(e.target.value)}
           >
             <option value="">Todos los departamentos</option>
-            {departments.map((dept) => (
+            {controller.departments.map((dept: string) => (
               <option key={dept} value={dept}>
                 {dept}
               </option>
@@ -321,174 +70,74 @@ export default function ListProcedures() {
         </div>
         <GlobalDataTable
           columns={columns}
-          data={filteredProcedures}
+          data={controller.procedures}
           highlightOnHover
           pagination
           paginationPerPage={10}
           paginationRowsPerPageOptions={[10, 25, 50, 100]}
+          currentPage={controller.currentPage}
+          onChangePage={controller.setCurrentPage}
           noDataComponent={
             <div className="p-4 text-center text-gray-500">
               No se encontraron procedimientos
             </div>
           }
         />
-        {/* Modal de detalles */}
-        <GlobalModal
-          open={showModal && !!selectedProcedure}
-          onClose={() => setShowModal(false)}
-          title="Detalles de Procedimiento"
-          maxWidth="md"
-        >
-          {selectedProcedure && (
-            <div className="flex flex-col items-center py-2">
-              <div className="flex flex-col items-center mb-2">
-                <div className="bg-[#e8f8f2] rounded-full w-14 h-14 flex items-center justify-center mb-2">
-                  <Info className="text-[#2AAC67]" style={{ fontSize: 36 }} />
-                </div>
-                <h2 className="text-xl font-bold text-[#2AAC67] mb-1">
-                  Detalles de Procedimiento
-                </h2>
-              </div>
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Información del Procedimiento */}
-                <div>
-                  <h3 className="text-lg font-semibold text-[#2AAC67] mb-3">
-                    Información del Procedimiento
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center border border-[#2AAC67] rounded-lg px-3 py-2 bg-[#f6fff6]">
-                      <Badge className="text-[#2AAC67] mr-2" />
-                      <div>
-                        <div className="text-xs font-semibold text-[#2AAC67]">
-                          Código
-                        </div>
-                        <div className="text-sm">
-                          {selectedProcedure.codigo || "No aplica"}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center border border-[#2AAC67] rounded-lg px-3 py-2 bg-[#f6fff6]">
-                      <Info className="text-[#2AAC67] mr-2" />
-                      <div>
-                        <div className="text-xs font-semibold text-[#2AAC67]">
-                          Título
-                        </div>
-                        <div className="text-sm">
-                          {selectedProcedure.titulo}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center border border-[#2AAC67] rounded-lg px-3 py-2 bg-[#f6fff6]">
-                      <Edit className="text-[#2AAC67] mr-2" />
-                      <div>
-                        <div className="text-xs font-semibold text-[#2AAC67]">
-                          Versión
-                        </div>
-                        <div className="text-sm">
-                          {selectedProcedure.revision}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Información Adicional */}
-                <div>
-                  <h3 className="text-lg font-semibold text-[#2AAC67] mb-3">
-                    Información Adicional
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center border border-[#2AAC67] rounded-lg px-3 py-2 bg-[#f6fff6]">
-                      <Apartment className="text-[#2AAC67] mr-2" />
-                      <div>
-                        <div className="text-xs font-semibold text-[#2AAC67]">
-                          Departamento
-                        </div>
-                        <div className="text-sm">
-                          {selectedProcedure.departamento}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center border border-[#2AAC67] rounded-lg px-3 py-2 bg-[#f6fff6]">
-                      <Person className="text-[#2AAC67] mr-2" />
-                      <div>
-                        <div className="text-xs font-semibold text-[#2AAC67]">
-                          Responsable
-                        </div>
-                        <div className="text-sm">
-                          {selectedProcedure.responsable}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center border border-[#2AAC67] rounded-lg px-3 py-2 bg-[#f6fff6]">
-                      <CalendarMonth className="text-[#2AAC67] mr-2" />
-                      <div>
-                        <div className="text-xs font-semibold text-[#2AAC67]">
-                          Fecha Vigencia
-                        </div>
-                        <div className="text-sm">
-                          {selectedProcedure.fecha_vigencia
-                            ? selectedProcedure.fecha_vigencia
-                                .split("T")[0]
-                                .split("-")
-                                .reverse()
-                                .join("/")
-                            : ""}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {selectedProcedure.pdf && (
-                <div className="pt-6 w-full flex justify-center">
-                  <a
-                    href={selectedProcedure.pdf}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-green-600 hover:text-green-800 hover:underline flex items-center"
-                  >
-                    Ver documento PDF
-                  </a>
-                </div>
-              )}
-            </div>
-          )}
-        </GlobalModal>
 
-        {/* Modal de edición */}
+        {/* Modal de Edición */}
         <GlobalModal
-          open={editModalOpen}
-          onClose={() => !saving && setEditModalOpen(false)}
-          title="Editar Procedimiento"
+          open={controller.editModal.isOpen}
+          onClose={controller.editModal.onClose}
+          title={
+            controller.editModal.data?.es_nueva_version 
+              ? "Crear Nueva Versión del Procedimiento" 
+              : "Editar Procedimiento"
+          }
           maxWidth="lg"
         >
-          {editData && (
+          {controller.editModal.data && (
             <FormContainer
-              title="Editar Procedimiento"
-              onSubmit={handleUpdateProcedure}
+              title={
+                controller.editModal.data.es_nueva_version 
+                  ? "Crear Nueva Versión" 
+                  : "Editar Procedimiento"
+              }
+              onSubmit={controller.editModal.onSubmit}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Información cuando es nueva versión */}
+                {controller.editModal.data.es_nueva_version && (
+                  <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">📋 Creando Nueva Versión</h4>
+                    <p className="text-blue-700 text-sm">
+                      Se creará una nueva versión del procedimiento <strong>{controller.editModal.data.codigo}</strong>. 
+                      Si marca esta versión como vigente, todas las versiones anteriores se desactivarán automáticamente.
+                    </p>
+                  </div>
+                )}
+
                 {/* Checkbox para nueva versión */}
                 <StyledCheckbox
                   label="¿Es una nueva versión?"
-                  checked={editData.es_nueva_version || false}
+                  checked={controller.editModal.data.es_nueva_version || false}
                   onChange={(checked) =>
-                    setEditData({ ...editData, es_nueva_version: checked })
+                    controller.editModal.handlers.handleCheckboxChange('es_nueva_version', checked)
                   }
                 />
 
                 <StyledCheckbox
                   label="¿Es Vigente?"
-                  checked={editData.es_vigente || false}
+                  checked={controller.editModal.data.es_vigente || false}
                   onChange={(checked) =>
-                    setEditData({ ...editData, es_vigente: checked })
+                    controller.editModal.handlers.handleCheckboxChange('es_vigente', checked)
                   }
                 />
+                
                 {/* CAMPOS DE SOLO LECTURA */}
                 <InputField
                   label="Código POE"
                   name="codigo_poe"
-                  value={editData.codigo || "No aplica"}
+                  value={controller.editModal.data.codigo || "No aplica"}
                   readOnly
                   disabled
                 />
@@ -497,7 +146,7 @@ export default function ListProcedures() {
                   label="Fecha de Creación"
                   name="fecha_creacion"
                   type="date"
-                  value={editData.fecha_creacion}
+                  value={controller.editModal.data.fecha_creacion}
                   readOnly
                   disabled
                 />
@@ -505,7 +154,7 @@ export default function ListProcedures() {
                 <InputField
                   label="Departamento"
                   name="departamento"
-                  value={editData.departamento || "No especificado"}
+                  value={controller.editModal.data.departamento || "No especificado"}
                   readOnly
                   disabled
                 />
@@ -513,7 +162,7 @@ export default function ListProcedures() {
                 <InputField
                   label="Categoría"
                   name="categoria"
-                  value={editData.categoria || "No especificada"}
+                  value={controller.editModal.data.categoria || "No especificada"}
                   readOnly
                   disabled
                 />
@@ -522,26 +171,26 @@ export default function ListProcedures() {
                 <InputField
                   label="Título"
                   name="descripcion"
-                  value={editData.descripcion}
+                  value={controller.editModal.data.descripcion}
                   onChange={(e) =>
-                    setEditData({ ...editData, descripcion: e.target.value })
+                    controller.editModal.handlers.handleInputChange('descripcion', e.target.value)
                   }
                   placeholder="Ingrese título"
                   required
-                  disabled={saving}
+                  disabled={controller.editModal.saving}
                 />
 
                 <SelectField
                   label="Responsable"
                   name="responsable"
-                  value={editData.id_responsable || ""}
+                  value={controller.editModal.data.id_responsable || ""}
                   onChange={(e) =>
-                    setEditData({ ...editData, id_responsable: e.target.value })
+                    controller.editModal.handlers.handleInputChange('id_responsable', e.target.value)
                   }
-                  options={responsibles}
+                  options={controller.editModal.responsibles}
                   optionLabel="nombre_responsable"
                   optionValue="id_responsable"
-                  disabled={saving || loadingResponsibles}
+                  disabled={controller.editModal.saving || controller.editModal.loadingResponsibles}
                   required
                 />
 
@@ -551,75 +200,82 @@ export default function ListProcedures() {
                   type="number"
                   min="1"
                   step="1"
-                  value={editData.revision || ""}
+                  value={controller.editModal.data.revision || ""}
                   onChange={(e) =>
-                    setEditData({ ...editData, revision: e.target.value })
+                    controller.editModal.handlers.handleInputChange('revision', e.target.value)
                   }
                   placeholder="1"
                   required
-                  disabled={saving}
+                  disabled={controller.editModal.saving || !controller.editModal.data.es_nueva_version}
+                  readOnly={!controller.editModal.data.es_nueva_version}
                 />
 
                 <InputField
                   label="Fecha de Vigencia"
                   name="fecha_vigencia"
                   type="date"
-                  value={editData.fecha_vigencia}
+                  value={controller.editModal.data.fecha_vigencia}
                   onChange={(e) =>
-                    setEditData({ ...editData, fecha_vigencia: e.target.value })
+                    controller.editModal.handlers.handleInputChange('fecha_vigencia', e.target.value)
                   }
                   required
-                  disabled={saving}
+                  disabled={controller.editModal.saving}
                 />
 
                 <div className="md:col-span-2">
                   <PdfInput
                     label="Documento PDF (Opcional - Solo para actualizar)"
-                    pdfFile={editData.pdf || null}
+                    pdfFile={controller.editModal.data.pdf || null}
                     onChange={(e) => {
                       const file = e.target.files?.[0] || null;
-                      setEditData({ ...editData, pdf: file });
+                      controller.editModal.handlers.handleFileChange(file);
                     }}
-                    onRemove={() => setEditData({ ...editData, pdf: null })}
+                    onRemove={() => 
+                      controller.editModal.handlers.handleFileChange(null)
+                    }
                   />
+                  {controller.editModal.data?.path ? (
+                    <div className="mt-2 p-2 bg-gray-50 rounded border">
+                      <p className="text-sm text-gray-600">
+                        <strong>PDF actual:</strong> 
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            if (controller.editModal.data?.path) {
+                              window.open(controller.editModal.data.path, '_blank');
+                            }
+                          }}
+                          className="ml-2 text-[#2AAC67] hover:text-[#228B55] underline"
+                        >
+                          Ver PDF actual
+                        </button>
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Selecciona un nuevo archivo solo si deseas reemplazarlo
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mt-2 p-2 bg-orange-50 border border-orange-200 rounded">
+                      <p className="text-sm text-orange-700">
+                        ⚠️ <strong>Sin documento PDF:</strong> Esta versión del procedimiento no tiene un documento PDF asociado.
+                      </p>
+                      <p className="text-xs text-orange-600 mt-1">
+                        Puede subir un archivo PDF nuevo usando el selector de archivos arriba.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="text-center mt-8">
-                <SubmitButton width="w-40" disabled={saving}>
-                  {saving ? "Guardando..." : "Guardar Cambios"}
+                <SubmitButton width="w-40" disabled={controller.editModal.saving}>
+                  {controller.editModal.saving ? "Guardando..." : "Guardar Cambios"}
                 </SubmitButton>
               </div>
             </FormContainer>
           )}
         </GlobalModal>
 
-        {/* Modal de confirmación de eliminación */}
-        <GlobalModal
-          open={deleteModalOpen}
-          onClose={() => setDeleteModalOpen(false)}
-          title="Confirmar eliminación"
-        >
-          <div className="p-4 text-center">
-            <p className="text-sm text-gray-700 mb-4">
-              ¿Está seguro que desea eliminar este procedimiento?
-            </p>
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={() => setDeleteModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700"
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </GlobalModal>
       </TableContainer>
     </>
   );
