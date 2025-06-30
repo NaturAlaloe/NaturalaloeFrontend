@@ -26,17 +26,30 @@ const Evaluacion = () => {
   const { submitQualify, loading: saving } = useAddQualifyTraining();
 
   const handleChange = (
-    id: number,
-    idCap: number,
-    field: keyof Colaborador,
-    value: string
-  ) => {
-    setColaboradores((prev) =>
-      prev.map((c) =>
-        c.id === id && c.id_capacitacion === idCap ? { ...c, [field]: value } : c
-      )
-    );
-  };
+  id: number,
+  idCap: number,
+  field: keyof Colaborador,
+  value: string
+) => {
+  let newValue = value;
+  if (field === "seguimiento") {
+    if (["Reevaluación", "reevaluacion", "revaluacion"].includes(value.trim().toLowerCase())) {
+      newValue = "revaluacion";
+    }
+  }
+  setColaboradores((prev) =>
+    prev.map((c) =>
+      c.id === id && c.id_capacitacion === idCap ? { ...c, [field]: newValue } : c
+    )
+  );
+};
+
+  const normalizarSeguimiento = (valor: string): "satisfactorio" | "reprogramar" | "revaluacion" => {
+    const limpio = valor.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (limpio === "reprogramar") return "reprogramar";
+  if (["reevaluacion", "revaluacion"].includes(limpio)) return "revaluacion";
+  return "satisfactorio";
+};
 
   const handleGuardarTodos = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,7 +60,7 @@ const Evaluacion = () => {
         colab.nota === null ||
         isNaN(Number(colab.nota)) ||
         !colab.seguimiento ||
-        colab.seguimiento === "Seleccionar"
+        colab.seguimiento === ""
     );
 
     if (incompletos) {
@@ -61,14 +74,12 @@ const Evaluacion = () => {
 
     const payload = colaboradores.map((colab) => ({
       id_capacitacion: colab.id_capacitacion,
-      seguimiento: colab.seguimiento.toLowerCase() as
-        | "satisfactorio"
-        | "reprogramar"
-        | "revaluacion",
+      seguimiento: normalizarSeguimiento(colab.seguimiento ?? ""),
       nota: Number(colab.nota),
       comentario_final: colab.comentario?.trim() ?? "",
     }));
 
+    console.log("📦 Payload normalizado a enviar:", payload);
     submitQualify(payload);
   };
 
@@ -108,7 +119,12 @@ const Evaluacion = () => {
               e.target.value
             )
           }
-          options={["Seleccionar", "Satisfactorio", "Reprogramar", "Reevaluación"]}
+          options={[
+            { label: "Seleccionar", value: "" },
+            { label: "Satisfactorio", value: "satisfactorio" },
+            { label: "Reprogramar", value: "reprogramar" },
+            { label: "Reevaluación", value: "revaluacion" },
+          ]}
         />
       ),
     },
@@ -177,8 +193,7 @@ const Evaluacion = () => {
     },
   };
 
-  if (loading)
-    return <p className="text-center">Cargando colaboradores...</p>;
+  if (loading) return <p className="text-center">Cargando colaboradores...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (

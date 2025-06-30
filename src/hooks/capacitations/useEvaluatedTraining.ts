@@ -1,3 +1,4 @@
+// src/hooks/capacitations/useEvaluatedTraining.ts
 import { useEffect, useState } from "react";
 import {
   getEvaluatedTraining,
@@ -58,6 +59,7 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
   comentario: item.comentario ?? "",
   id_capacitacion: item.id_capacitacion,
 }));
+
 
         const first = allData[0];
         setTrainingInfo({
