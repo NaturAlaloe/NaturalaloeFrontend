@@ -94,6 +94,7 @@ export default function ListProcedures() {
               : "Editar Procedimiento"
           }
           maxWidth="lg"
+          backgroundColor="#DDF6E8"
         >
           {controller.editModal.data && (
             <FormContainer
@@ -107,9 +108,9 @@ export default function ListProcedures() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Información cuando es nueva versión */}
                 {controller.editModal.data.es_nueva_version && (
-                  <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h4 className="font-semibold text-blue-800 mb-2">📋 Creando Nueva Versión</h4>
-                    <p className="text-blue-700 text-sm">
+                  <div className="md:col-span-2 p-4 bg-blue-50 border border-gary-200 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">📋 Creando Nueva Versión</h4>
+                    <p className="text-gray-700 text-sm">
                       Se creará una nueva versión del procedimiento <strong>{controller.editModal.data.codigo}</strong>. 
                       Si marca esta versión como vigente, todas las versiones anteriores se desactivarán automáticamente.
                     </p>
