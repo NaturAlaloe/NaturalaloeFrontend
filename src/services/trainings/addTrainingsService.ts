@@ -9,7 +9,7 @@ export interface CreateCapacitacionRequest {
   fecha_fin: string;
   comentario?: string;
   is_evaluado: boolean;
-  metodo_empleado: string;
+  metodo_empleado?: string;
   duracion: number;
 }
 
@@ -84,8 +84,8 @@ export const validateCapacitacionData = (
     errors.push("La fecha de inicio no puede ser posterior a la fecha de fin");
   }
 
-  if (!data.metodo_empleado || data.metodo_empleado.trim() === "") {
-    errors.push("El método empleado es requerido");
+  if (data.is_evaluado && (!data.metodo_empleado || data.metodo_empleado.trim() === "" || data.metodo_empleado === "Seleccione...")) {
+    errors.push("El método empleado es requerido cuando la capacitación es evaluada");
   }
 
   if (!data.duracion || data.duracion <= 0) {

@@ -180,7 +180,7 @@ export default function CollaboratorRolesList({
                       >
                         <TableCell>{row.codigo}</TableCell>
                         <TableCell>{row.descripcion}</TableCell>
-                        <TableCell>{row.version}</TableCell>
+                        <TableCell>{Math.floor(Number(row.version))}</TableCell>
                         <TableCell>
                           {row.fecha_inicio
                             ? new Date(row.fecha_inicio).toLocaleDateString()

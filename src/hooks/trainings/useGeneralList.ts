@@ -15,7 +15,8 @@ export function useGenerales() {
   const [editing, setEditing] = useState<General | null>(null);
   const [selected, setSelected] = useState<General | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   useEffect(() => {
     const fetchGenerales = async () => {
       try {
@@ -31,6 +32,10 @@ export function useGenerales() {
 
     fetchGenerales();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const openAdd = () => {
     setEditing({ id: 0, codigo: "", titulo: "" });
@@ -67,7 +72,8 @@ export function useGenerales() {
         });
 
         const nuevo: General = {
-          id: response.data.data?.id_general || Math.floor(Math.random() * 10000),
+          id:
+            response.data.data?.id_general || Math.floor(Math.random() * 10000),
           codigo: general.codigo,
           titulo: general.titulo,
         };
@@ -115,8 +121,11 @@ export function useGenerales() {
     setEditing,
     openAdd,
     openEdit,
+    currentPage,
+    setCurrentPage,
     openDelete,
     closeModal,
+    setSearchTerm,
     closeDeleteModal,
     updateGeneral,
     deleteGeneral,

@@ -2,46 +2,35 @@ import {
   Search,
   Person,
   Badge,
-  Apartment,
-  Work,
+  Assignment,
   EditNote,
   ChatBubble,
-  ExpandMore,
-  ExpandLess,
+  Visibility,
 } from "@mui/icons-material";
 import { useState } from "react";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import { useTrainingList } from "../../hooks/trainings/useTrainingList";
-import type { Training } from "../../hooks/trainings/useTrainingList";
 
 export default function ListTrainings() {
   const {
-    trainings: trainings,
+    trainings,
     searchTerm,
     setSearchTerm,
     showModal,
     setShowModal,
-    selectedTraining: selectedTraining,
+    showPoeModal,
+    setShowPoeModal,
+    selectedTraining,
     handleRowClick,
+    handlePoeClick,
     navegarCapacitacionFinalizada,
     isLoading,
   } = useTrainingList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentToShow, setCommentToShow] = useState<string | null>(null);
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-
-  const toggleExpanded = (id: string) => {
-    const newExpanded = new Set(expandedRows);
-    if (newExpanded.has(id)) {
-      newExpanded.delete(id);
-    } else {
-      newExpanded.add(id);
-    }
-    setExpandedRows(newExpanded);
-  };
 
   if (isLoading) return <FullScreenSpinner />;
 
@@ -52,16 +41,13 @@ export default function ListTrainings() {
       sortable: true,
       cell: (row: any) => (
         <div className="text-sm font-medium text-gray-900 py-2 min-h-[56px] flex items-center">
-          {row.isGrouped ? (
-            <div className="flex items-center">
-              <button
-                onClick={() => toggleExpanded(row.id)}
-                className="flex items-center text-[#2AAC67] hover:text-[#1e8449]"
-              >
-                {expandedRows.has(row.id) ? <ExpandLess /> : <ExpandMore />}
-                <span className="ml-1">{row.poe}</span>
-              </button>
-            </div>
+          {row.isGrouped && row.subTrainings && row.subTrainings.length > 0 ? (
+            <button
+              onClick={() => handlePoeClick(row)}
+              className="text-[#2AAC67] hover:text-[#1e8449] cursor-pointer"
+            >
+              {row.poe}
+            </button>
           ) : (
             row.poe
           )}
@@ -138,28 +124,34 @@ export default function ListTrainings() {
       name: "ACCIONES",
       cell: (row: any) => (
         <div className="flex flex-col sm:flex-row gap-2 items-center justify-center py-2 min-h-[56px]">
-          {/* Botón de calificar examen - disponible para todos los POEs */}
           <button
-            className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
-            onClick={() => navegarCapacitacionFinalizada(row.poe)}
-            title="Calificar examen"
+            className="text-[#2AAC67] hover:text-[#1e8449] transition-colors"
+            onClick={() => handleRowClick(row)}
+            title="Ver detalles"
           >
-            <EditNote />
+            <Visibility />
           </button>
-          
-          {/* Botón de comentario - solo para POEs padre (no sub-filas) */}
-          {!row.isSubRow && (
+
+          {row.estado.toLowerCase() !== "finalizada" && (
             <button
-              className="text-[#2AAC67] hover:text-[#1e8449] transition-colors"
-              onClick={() => {
-                setCommentToShow(row.comentario);
-                setShowCommentModal(true);
-              }}
-              title="Ver comentario"
+              className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
+              onClick={() => navegarCapacitacionFinalizada(row.poe)}
+              title="Calificar examen"
             >
-              <ChatBubble />
+              <EditNote />
             </button>
           )}
+
+          <button
+            className="text-[#2AAC67] hover:text-[#1e8449] transition-colors"
+            onClick={() => {
+              setCommentToShow(row.comentario);
+              setShowCommentModal(true);
+            }}
+            title="Ver comentario"
+          >
+            <ChatBubble />
+          </button>
         </div>
       ),
       ignoreRowClick: true,
@@ -167,35 +159,6 @@ export default function ListTrainings() {
       button: true,
     },
   ];
-
-  // Crear datos expandidos que incluyan las sub-capacitaciones
-  const getExpandedData = () => {
-    const result: any[] = [];
-
-    trainings.forEach((cap) => {
-      result.push(cap);
-
-      if (cap.isGrouped && cap.subTrainings && expandedRows.has(cap.id)) {
-        cap.subTrainings.forEach((subCap) => {
-          result.push({
-            ...subCap,
-            isSubRow: true,
-            parentId: cap.id,
-          });
-        });
-      }
-    });
-
-    return result;
-  };
-
-  // Calcular el número de elementos por página considerando las expansiones
-  const hasExpandedRows = expandedRows.size > 0;
-  const expandedData = getExpandedData();
-  const baseItemsPerPage = 10;
-  const itemsPerPage = hasExpandedRows
-    ? Math.min(50, Math.max(baseItemsPerPage, expandedData.length))
-    : baseItemsPerPage;
 
   const customRowStyles = {
     headCells: {
@@ -231,9 +194,9 @@ export default function ListTrainings() {
         <GlobalDataTable
           key={`training-table-${searchTerm}`}
           columns={columns}
-          data={expandedData}
+          data={trainings}
           pagination={true}
-          paginationPerPage={itemsPerPage}
+          paginationPerPage={10}
           paginationRowsPerPageOptions={[10, 25, 50]}
           highlightOnHover
           dense={false}
@@ -245,32 +208,53 @@ export default function ListTrainings() {
             </div>
           }
           customStyles={customRowStyles}
-          onRowClicked={(row: Training) => {
-            if (row.isSubRow) {
-              // No hacer nada al hacer click en sub-filas
-              return;
-            } else if (row.isGrouped) {
-              // Mostrar modal con todos los colaboradores agrupados para capacitaciones grupales
-              handleRowClick(row);
-            } else if (!row.isGrouped) {
-              // Mostrar modal para capacitaciones individuales
-              handleRowClick(row);
-            }
-          }}
+          onRowClicked={() => {}}
           progressPending={isLoading}
-          conditionalRowStyles={[
-            {
-              when: (row: any) => row.isSubRow,
-              style: {
-                backgroundColor: "#f8f9fa",
-                paddingLeft: "2rem",
-                borderLeft: "3px solid #2AAC67",
-                cursor: "default", // Cambiar cursor para indicar que no es clickeable
-              },
-            },
-          ]}
         />
       </div>
+
+      {/* Modal para mostrar POEs internos */}
+      <GlobalModal
+        open={showPoeModal}
+        onClose={() => setShowPoeModal(false)}
+        title="POEs de la Capacitación Grupal"
+        maxWidth="md"
+      >
+        {selectedTraining && selectedTraining.subTrainings && (
+          <div className="space-y-3">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-[#2AAC67] mb-2">
+                {selectedTraining.titulo}
+              </h3>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-800">
+                POEs de la Capacitación:
+              </h4>
+              {/* POE Principal */}
+              <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
+                <span className="font-medium text-gray-900">
+                  {selectedTraining.poe}
+                </span>
+              </div>
+              {/* POEs Adicionales */}
+              {selectedTraining.subTrainings.map((subTraining, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50"
+                >
+                  <span className="font-medium text-gray-900">
+                    {subTraining.poe}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </GlobalModal>
+
+      {/* Modal de detalles de capacitación */}
       <GlobalModal
         open={showModal}
         onClose={() => setShowModal(false)}
@@ -284,43 +268,36 @@ export default function ListTrainings() {
                 Información de los Colaboradores
               </h3>
               <div className="space-y-3">
-                {selectedTraining.colaboradores.map(
-                  (colaborador, index) => (
-                    <details
-                      key={index}
-                      className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]"
-                    >
-                      <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
-                        <Person className="mr-2" />
-                        {colaborador.nombreCompleto}
-                        <span className="ml-auto text-[#2ecc71]">▼</span>
-                      </summary>
-                      <div className="px-3 pb-3 pt-2">
-                        <div className="mb-2 flex items-center">
-                          <Badge className="mr-2 text-[#2ecc71]" />
-                          <span className="font-semibold mr-1">
-                            Cédula:
-                          </span>{" "}
-                          {colaborador.cedula}
-                        </div>
-                        <div className="mb-2 flex items-center">
-                          <Apartment className="mr-2 text-[#2ecc71]" />
-                          <span className="font-semibold mr-1">
-                            Departamento:
-                          </span>{" "}
-                          {colaborador.departamento}
-                        </div>
-                        <div className="mb-2 flex items-center">
-                          <Work className="mr-2 text-[#2ecc71]" />
-                          <span className="font-semibold mr-1">
-                            Puesto:
-                          </span>{" "}
-                          {colaborador.puesto}
-                        </div>
+                {selectedTraining.colaboradores.map((colaborador, index) => (
+                  <details
+                    key={index}
+                    className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]"
+                  >
+                    <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-gray-900">
+                      <Person className="mr-2 text-[#2ecc71]" />
+                      {colaborador.nombreCompleto}
+                      <span className="ml-auto text-[#2ecc71]">▼</span>
+                    </summary>
+                    <div className="px-3 pb-3 pt-2">
+                      <div className="mb-2 flex items-center">
+                        <Badge className="mr-2 text-[#2ecc71]" />
+                        <span className="font-semibold mr-1">Cédula:</span>{" "}
+                        {colaborador.cedula}
                       </div>
-                    </details>
-                  )
-                )}
+                      {selectedTraining.estado.toLowerCase() === "finalizada" &&
+                        colaborador.nota !== null &&
+                        colaborador.nota !== undefined && (
+                          <div className="mb-2 flex items-center">
+                            <Assignment className="mr-2 text-[#2ecc71]" />
+                            <span className="font-semibold mr-1">
+                              Nota:
+                            </span>{" "}
+                            {colaborador.nota}
+                          </div>
+                        )}
+                    </div>
+                  </details>
+                ))}
               </div>
             </div>
             <div>
@@ -329,11 +306,11 @@ export default function ListTrainings() {
               </h3>
               <div className="mb-4">
                 <details className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
-                  <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
-                    <Person className="mr-2" />
+                  <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-gray-900">
+                    <Person className="mr-2 text-[#2ecc71]" />
                     {selectedTraining.profesor.nombre}{" "}
                     {selectedTraining.profesor.apellido}
-                    <span className="ml-auto">▼</span>
+                    <span className="ml-auto text-[#2ecc71]">▼</span>
                   </summary>
                   <div className="px-3 pb-3 pt-2">
                     <div className="mb-2 flex items-center">
@@ -351,6 +328,7 @@ export default function ListTrainings() {
         )}
       </GlobalModal>
 
+      {/* Modal de comentarios */}
       {showCommentModal && (
         <GlobalModal
           open={showCommentModal}

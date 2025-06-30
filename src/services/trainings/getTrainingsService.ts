@@ -39,6 +39,7 @@ export interface Procedimientos {
   id_documento: number;
   codigo: string;
   descripcion: string;
+  estado_capacitacion?: string;
 }
 export async function getProcedimientos(): Promise<Procedimientos[]> {
   try {
