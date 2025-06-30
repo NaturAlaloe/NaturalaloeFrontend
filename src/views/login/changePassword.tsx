@@ -16,6 +16,13 @@ export default function ChangePassword() {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.group("Validación de formulario");
+    console.log("Token obtenido de URL:", token);
+    console.log("Nueva contraseña:", newPassword);
+    console.log("Confirmación contraseña:", confirmPassword);
+    console.groupEnd();
+
     if (!newPassword || !confirmPassword) {
       showCustomToast("Error", "Por favor completa todos los campos", "error");
       return;
@@ -28,12 +35,30 @@ export default function ChangePassword() {
       showCustomToast("Error", "Token inválido o faltante", "error");
       return;
     }
+
     setIsSubmitting(true);
+    
     try {
-      const res = await api.post("/resetPassword", {
+      const payload = {
         token,
-        nuevaContrasena: newPassword,
-      });
+        nuevaContrasena: newPassword
+      };
+
+      console.group("Preparando solicitud a /resetPassword");
+      console.log("Endpoint completo:", api.defaults.baseURL + "/resetPassword");
+      console.log("Método: POST");
+      console.log("Payload a enviar:", payload);
+      console.log("Headers configurados:", api.defaults.headers);
+      console.groupEnd();
+
+      const res = await api.post("/resetPassword", payload);
+
+      console.group("Respuesta del servidor");
+      console.log("Status:", res.status);
+      console.log("Datos recibidos:", res.data);
+      console.log("Headers recibidos:", res.headers);
+      console.groupEnd();
+
       if (res.data.success) {
         showCustomToast("Éxito", "Contraseña restablecida correctamente", "success");
         setTimeout(() => navigate("/login"), 2000);
@@ -41,9 +66,26 @@ export default function ChangePassword() {
         showCustomToast("Error", res.data.message, "error");
       }
     } catch (err: any) {
-      showCustomToast("Error", "Error al restablecer la contraseña", "error");
+      console.group("Error en la solicitud");
+      console.error("Error completo:", err);
+      console.log("¿Tiene response?:", !!err.response);
+      if (err.response) {
+        console.log("Status code:", err.response.status);
+        console.log("Datos del error:", err.response.data);
+        console.log("Headers del error:", err.response.headers);
+      }
+      console.log("Mensaje:", err.message);
+      console.log("Configuración de la solicitud:", err.config);
+      console.groupEnd();
+
+      if (err.response?.data?.message) {
+        showCustomToast("Error", err.response.data.message, "error");
+      } else {
+        showCustomToast("Error", "Error al restablecer la contraseña", "error");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   if (!token) {
