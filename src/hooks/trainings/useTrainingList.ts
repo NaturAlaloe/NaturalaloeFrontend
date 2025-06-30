@@ -21,8 +21,8 @@ export interface Training {
   metodo: string;
   seguimiento: string;
   estado: string;
-  isGrouped?: boolean; // Para identificar capacitaciones agrupadas
-  subTrainings?: Training[]; // Para almacenar las capacitaciones por POE
+  isGrouped?: boolean;
+  subTrainings?: Training[];
   colaboradores: {
     nombreCompleto: string;
     cedula: string;
@@ -47,14 +47,15 @@ export function useTrainingList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
-  const [selectedTraining, setSelectedTraining] =
-    useState<Training | null>(null);
+  const [showPoeModal, setShowPoeModal] = useState(false);
+  const [selectedTraining, setSelectedTraining] = useState<Training | null>(
+    null
+  );
   const navigate = useNavigate();
 
-  // Función personalizada para manejar el cambio de término de búsqueda
   const handleSearchTermChange = (term: string) => {
     setSearchTerm(term);
-    setCurrentPage(1); // Resetear a la primera página cuando se busque
+    setCurrentPage(1);
   };
 
   const groupTrainingsByCollaborators = (
@@ -74,9 +75,13 @@ export function useTrainingList() {
         fechaInicio: new Date(item.fecha_inicio).toISOString().split("T")[0],
         fechaFinal: new Date(item.fecha_fin).toISOString().split("T")[0],
         comentario: item.comentario || "N/A",
-        tipo: item.tipo_capacitacion === "grupal" && item.capacitacion === "general" ? "general" : item.tipo_capacitacion,
+        tipo:
+          item.tipo_capacitacion === "grupal" && item.capacitacion === "general"
+            ? "general"
+            : item.tipo_capacitacion,
         capacitacion: item.capacitacion,
-        evaluado: item.is_evaluado === "1" || item.is_evaluado === 1 ? "Sí" : "No",
+        evaluado:
+          item.is_evaluado === "1" || item.is_evaluado === 1 ? "Sí" : "No",
         metodo: item.metodo_empleado || "N/A",
         seguimiento: item.seguimiento || "N/A",
         estado: item.estado || "N/A",
@@ -93,13 +98,13 @@ export function useTrainingList() {
         ],
         profesor: {
           nombre: item.nombre_facilitador?.split(" ")[0] || "N/A",
-          apellido: item.nombre_facilitador?.split(" ").slice(1).join(" ") || "",
+          apellido:
+            item.nombre_facilitador?.split(" ").slice(1).join(" ") || "",
           identificacion: item.id_facilitador.toString() || "N/A",
         },
-        isSubRow: undefined
+        isSubRow: undefined,
       };
 
-      // Si es grupal, agrupar por título y luego por POE
       if (item.tipo_capacitacion === "grupal") {
         const titleKey = item.titulo_capacitacion;
         const poeKey = item.codigo_documento;
@@ -109,60 +114,49 @@ export function useTrainingList() {
         }
 
         const poeMap = grupalByTitle.get(titleKey)!;
-        
+
         if (poeMap.has(poeKey)) {
-          // Si ya existe este POE, agregar el colaborador
           const existingCap = poeMap.get(poeKey)!;
           existingCap.colaboradores.push(newTraining.colaboradores[0]);
         } else {
-          // Si no existe este POE, agregarlo
           poeMap.set(poeKey, newTraining);
         }
       } else {
-        // Para individuales, usar la lógica original
         if (trainingMap.has(trainingId)) {
           const existingTraining = trainingMap.get(trainingId)!;
-          existingTraining.colaboradores.push(
-            newTraining.colaboradores[0]
-          );
+          existingTraining.colaboradores.push(newTraining.colaboradores[0]);
         } else {
           trainingMap.set(trainingId, newTraining);
         }
       }
     });
 
-    // Crear capacitaciones agrupadas para grupales
     const result: Training[] = Array.from(trainingMap.values());
 
     grupalByTitle.forEach((poeMap, title) => {
       const trainingsByPoe = Array.from(poeMap.values());
-      
+
       if (trainingsByPoe.length > 1) {
-        // Crear una capacitación agrupada
         const firstCap = trainingsByPoe[0];
-        
-        // Los POEs restantes se mostrarán como elementos internos del collapse
         const remainingCaps = trainingsByPoe.slice(1);
-        
-        // Agregar todos los colaboradores de todas las capacitaciones por POE
-        const allColaboradores = trainingsByPoe.flatMap(cap => cap.colaboradores);
-        
-        // Eliminar colaboradores duplicados basándose en la cédula
-        const uniqueColaboradores = allColaboradores.filter((colaborador, index, array) => 
-          array.findIndex(c => c.cedula === colaborador.cedula) === index
+        const allColaboradores = trainingsByPoe.flatMap(
+          (cap) => cap.colaboradores
         );
-        
+        const uniqueColaboradores = allColaboradores.filter(
+          (colaborador, index, array) =>
+            array.findIndex((c) => c.cedula === colaborador.cedula) === index
+        );
+
         const groupedTraining: Training = {
           ...firstCap,
           id: `grouped_${title}`,
           poe: `${firstCap.poe}`,
           isGrouped: true,
-          subTrainings: remainingCaps, // Todos los POEs restantes como elementos internos
-          colaboradores: uniqueColaboradores, // Colaboradores únicos
+          subTrainings: remainingCaps,
+          colaboradores: uniqueColaboradores,
         };
         result.push(groupedTraining);
       } else {
-        // Si solo hay un POE, agregar directamente
         result.push(trainingsByPoe[0]);
       }
     });
@@ -229,6 +223,13 @@ export function useTrainingList() {
     setShowModal(true);
   };
 
+  const handlePoeClick = (cap: Training) => {
+    if (cap.isGrouped && cap.subTrainings && cap.subTrainings.length > 0) {
+      setSelectedTraining(cap);
+      setShowPoeModal(true);
+    }
+  };
+
   return {
     trainings: filteredTrainings,
     searchTerm,
@@ -239,10 +240,13 @@ export function useTrainingList() {
     totalPages,
     showModal,
     setShowModal,
+    showPoeModal,
+    setShowPoeModal,
     navegarCapacitacionFinalizada,
     selectedTraining: selectedTraining,
     setSelectedTraining: setSelectedTraining,
     handleRowClick,
+    handlePoeClick,
     totalCount: filteredTrainings.length,
     isLoading,
     error,
