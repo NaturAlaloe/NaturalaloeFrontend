@@ -55,7 +55,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         <div className="flex flex-row items-center justify-between mb-8">
           <div className="flex flex-col items-start">
             <h2 className="text-4xl font-bold text-[#2AAC67] mb-1">¡Bienvenido!</h2>
-            <p className="text-gray-500 text-base">Por favor, inicia sesión para continuar</p>
+            <p className="text-gray-500 text-base">Por favor, inicia sesión para continuar prueba para ver</p>
           </div>
           <img
             src={LogoNaturaloe}
