@@ -14,7 +14,6 @@ interface TrainingModalProps {
   initialData?: any;
 }
 
-const tipoCapacitacionOptions = ["Interna", "Externa"];
 const metodoEvaluacionOptions = ["Teórico", "Práctico"];
 const seguimientoOptions = ["Satisfactorio", "Reprogramar", "Reevaluación"];
 
@@ -29,7 +28,6 @@ export default function TrainingModal({
   const [form, setForm] = useState({
     fechaInicio: initialData?.fechaInicio || "",
     fechaFin: initialData?.fechaFin || "",
-    tipo: initialData?.tipo || "",
     facilitador: initialData?.facilitador || "",
     metodoEvaluacion: initialData?.metodoEvaluacion || "",
     seguimiento: initialData?.seguimiento || "",
@@ -90,7 +88,9 @@ export default function TrainingModal({
           borderRadius: 3,
           boxShadow: 24,
           p: 3,
-          minWidth: 380,
+          minWidth: 500,
+          width: "90%",
+          maxWidth: 900,
         }}
       >
         <div className="flex flex-col items-center justify-center">
@@ -134,15 +134,6 @@ export default function TrainingModal({
                   onChange={handleChange}
                   required
                   className="bg-white"
-                />
-                <SelectField
-                  label="Tipo capacitación"
-                  name="tipo"
-                  value={form.tipo}
-                  onChange={handleChange}
-                  options={tipoCapacitacionOptions}
-                  required
-                  className="bg-white min-h-[50px]"
                 />
                 <InputField
                   label="Duración (Horas)"

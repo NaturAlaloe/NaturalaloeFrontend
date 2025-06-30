@@ -31,6 +31,7 @@ export interface Training {
     area: string;
     departamento: string;
     puesto: string;
+    nota?: number | null;
   }[];
   profesor: {
     nombre: string;
@@ -94,6 +95,7 @@ export function useTrainingList() {
             area: "N/A",
             departamento: "N/A",
             puesto: "N/A",
+            nota: item.nota,
           },
         ],
         profesor: {
@@ -179,6 +181,8 @@ export function useTrainingList() {
 
       const groupedData = groupTrainingsByCollaborators(apiData);
       console.log("Datos agrupados:", groupedData);
+
+      groupedData.sort((a, b) => a.titulo.localeCompare(b.titulo));
 
       setTrainings(groupedData);
 

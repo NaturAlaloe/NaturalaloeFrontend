@@ -2,17 +2,16 @@ import {
   Search,
   Person,
   Badge,
-  Apartment,
-  Work,
+  Assignment,
   EditNote,
   ChatBubble,
+  Visibility,
 } from "@mui/icons-material";
 import { useState } from "react";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import { useTrainingList } from "../../hooks/trainings/useTrainingList";
-import type { Training } from "../../hooks/trainings/useTrainingList";
 
 export default function ListTrainings() {
   const {
@@ -125,6 +124,14 @@ export default function ListTrainings() {
       name: "ACCIONES",
       cell: (row: any) => (
         <div className="flex flex-col sm:flex-row gap-2 items-center justify-center py-2 min-h-[56px]">
+          <button
+            className="text-[#2AAC67] hover:text-[#1e8449] transition-colors"
+            onClick={() => handleRowClick(row)}
+            title="Ver detalles"
+          >
+            <Visibility />
+          </button>
+
           {row.estado.toLowerCase() !== "finalizada" && (
             <button
               className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
@@ -201,9 +208,7 @@ export default function ListTrainings() {
             </div>
           }
           customStyles={customRowStyles}
-          onRowClicked={(row: Training) => {
-            handleRowClick(row);
-          }}
+          onRowClicked={() => {}}
           progressPending={isLoading}
         />
       </div>
@@ -224,7 +229,9 @@ export default function ListTrainings() {
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-medium text-gray-800">POEs de la Capacitación:</h4>
+              <h4 className="font-medium text-gray-800">
+                POEs de la Capacitación:
+              </h4>
               {/* POE Principal */}
               <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
                 <span className="font-medium text-gray-900">
@@ -266,8 +273,8 @@ export default function ListTrainings() {
                     key={index}
                     className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]"
                   >
-                    <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
-                      <Person className="mr-2" />
+                    <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-gray-900">
+                      <Person className="mr-2 text-[#2ecc71]" />
                       {colaborador.nombreCompleto}
                       <span className="ml-auto text-[#2ecc71]">▼</span>
                     </summary>
@@ -277,18 +284,17 @@ export default function ListTrainings() {
                         <span className="font-semibold mr-1">Cédula:</span>{" "}
                         {colaborador.cedula}
                       </div>
-                      <div className="mb-2 flex items-center">
-                        <Apartment className="mr-2 text-[#2ecc71]" />
-                        <span className="font-semibold mr-1">
-                          Departamento:
-                        </span>{" "}
-                        {colaborador.departamento}
-                      </div>
-                      <div className="mb-2 flex items-center">
-                        <Work className="mr-2 text-[#2ecc71]" />
-                        <span className="font-semibold mr-1">Puesto:</span>{" "}
-                        {colaborador.puesto}
-                      </div>
+                      {selectedTraining.estado.toLowerCase() === "finalizada" &&
+                        colaborador.nota !== null &&
+                        colaborador.nota !== undefined && (
+                          <div className="mb-2 flex items-center">
+                            <Assignment className="mr-2 text-[#2ecc71]" />
+                            <span className="font-semibold mr-1">
+                              Nota:
+                            </span>{" "}
+                            {colaborador.nota}
+                          </div>
+                        )}
                     </div>
                   </details>
                 ))}
@@ -300,11 +306,11 @@ export default function ListTrainings() {
               </h3>
               <div className="mb-4">
                 <details className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
-                  <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
-                    <Person className="mr-2" />
+                  <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-gray-900">
+                    <Person className="mr-2 text-[#2ecc71]" />
                     {selectedTraining.profesor.nombre}{" "}
                     {selectedTraining.profesor.apellido}
-                    <span className="ml-auto">▼</span>
+                    <span className="ml-auto text-[#2ecc71]">▼</span>
                   </summary>
                   <div className="px-3 pb-3 pt-2">
                     <div className="mb-2 flex items-center">
