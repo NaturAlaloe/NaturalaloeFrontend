@@ -219,6 +219,14 @@ export function useCapacitation() {
     setShowPoesTable(false);
   };
 
+  const eliminarColaborador = (colaboradorId: number) => {
+    setColaboradoresAsignados(prev => prev.filter(c => c.id !== colaboradorId));
+  };
+
+  const eliminarPoe = (poeId: number) => {
+    setPoesAsignados(prev => prev.filter(p => p.id !== poeId));
+  };
+
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -337,6 +345,7 @@ export function useCapacitation() {
     setShowColaboradoresTable,
     columnsColaboradores,
     agregarColaboradores,
+    eliminarColaborador,
     // Procedimientos (POEs)
     procedimientosDisponibles,
     loadingProcedimientos,
@@ -346,6 +355,7 @@ export function useCapacitation() {
     setShowPoesTable,
     columnsPoes,
     agregarPoes,
+    eliminarPoe,
     // Métodos de evaluación
     metodosEvaluacion,
   };

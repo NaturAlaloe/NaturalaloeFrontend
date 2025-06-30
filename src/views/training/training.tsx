@@ -7,6 +7,7 @@ import { useCapacitation } from '../../hooks/trainings/useTraining';
 import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
 import GlobalModal from '../../components/globalComponents/GlobalModal';
+import { Delete } from '@mui/icons-material';
 
 const Capacitacion = () => {
     const {
@@ -30,10 +31,74 @@ const Capacitacion = () => {
         poesAsignados,
         agregarColaboradores,
         agregarPoes,
+        eliminarColaborador,
+        eliminarPoe,
         isLoading,
         loadingFacilitadores,
         getFacilitadoresOptions,
-    } = useCapacitation(); return (<FormContainer
+    } = useCapacitation();
+
+    // Columnas para colaboradores asignados (con acciones)
+    const columnsColaboradoresAsignados = [
+        {
+            name: "Nombre",
+            selector: (row: any) => row?.nombreCompleto || "Sin nombre",
+            sortable: true,
+        },
+        {
+            name: "Puesto",
+            selector: (row: any) => row?.puesto || "Sin puesto",
+            sortable: true,
+        },
+        {
+            name: "Acciones",
+            cell: (row: any) => (
+                <button
+                    className="action-button text-red-600 hover:text-red-800 transition-colors"
+
+                    onClick={() => eliminarColaborador(row.id)}
+                    title="Eliminar POE"
+                ><Delete fontSize="small" />
+                </button>
+            ),
+            ignoreRowClick: true,
+            allowOverflow: true,
+            button: true,
+            width: "100px",
+        },
+    ];
+
+    // Columnas para POEs asignados (con acciones)
+    const columnsPoesAsignados = [
+        {
+            name: "Código",
+            selector: (row: any) => row?.codigo || "Sin código",
+            sortable: true,
+        },
+        {
+            name: "Título",
+            selector: (row: any) => row?.titulo || "Sin título",
+            sortable: true,
+        },
+        {
+            name: "Acciones",
+            cell: (row: any) => (
+                <button
+                    className="action-button text-red-600 hover:text-red-800 transition-colors"
+
+                    onClick={() => eliminarPoe(row.id)}
+                    title="Eliminar POE"
+                ><Delete fontSize="small" />
+                </button>
+            ),
+            ignoreRowClick: true,
+            allowOverflow: true,
+            button: true,
+            width: "100px",
+        },
+    ];
+
+    return (<FormContainer
         title="Registro de Capacitación"
         onSubmit={handleSubmit}
     >
@@ -151,7 +216,7 @@ const Capacitacion = () => {
                     </div>
                     <div className="overflow-x-auto rounded-lg border border-[#2AAC67] shadow">
                         <GlobalDataTable
-                            columns={columnsColaboradores}
+                            columns={columnsColaboradoresAsignados}
                             data={colaboradoresAsignados}
                             rowsPerPage={5}
                             dense
@@ -184,7 +249,7 @@ const Capacitacion = () => {
                     </div>
                     <div className="overflow-x-auto rounded-lg border border-[#2AAC67] shadow">
                         <GlobalDataTable
-                            columns={columnsPoes}
+                            columns={columnsPoesAsignados}
                             data={poesAsignados}
                             rowsPerPage={5}
                             dense
