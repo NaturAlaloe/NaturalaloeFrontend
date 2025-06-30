@@ -41,7 +41,7 @@ export default function ChangePassword() {
     try {
       const payload = {
         token,
-        nuevaContrasena: newPassword
+        newPassword: newPassword
       };
 
       console.group("Preparando solicitud a /resetPassword");
@@ -65,6 +65,7 @@ export default function ChangePassword() {
       } else {
         showCustomToast("Error", res.data.message, "error");
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.group("Error en la solicitud");
       console.error("Error completo:", err);
