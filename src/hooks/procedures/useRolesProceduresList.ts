@@ -1,252 +1,181 @@
-import { useState, useMemo, useEffect, useRef } from "react";
-
-import { useRolesProcedures } from "./useRolesProcedures";
+import { useState, useMemo, useEffect } from "react";
+import { useRolesProceduresContext } from "./RolesProceduresContext";
 import { getActiveProcedures } from "../../services/procedures/procedureService";
-import { getActivePolitics } from "../../services/politics/politicsService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
+// Este es el hook que maneja los roles y sus procedimientos  
+
 export function useRolesProceduresList() {
-  const { rolesProcedures, loading, saveProcedures, refreshData, removeProcedures } = useRolesProcedures();
+  const { 
+    rolesProcedures, 
+    loading, 
+    saveProcedures, 
+    removeProcedures
+  } = useRolesProceduresContext();
 
-  // Estados UI - Agregar loading para el modal
+  // Estados para búsqueda y paginación
   const [search, setSearch] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [rolActual, setRolActual] = useState<any | null>(null);
-  const [procedimientosSeleccionados, setProcedimientosSeleccionados] = useState<number[]>([]);
-  const [modalSearch, setModalSearch] = useState("");
-  const [procedimientosActivos, setProcedimientosActivos] = useState<any[]>([]);
-  const [politicasActivas, setPoliticasActivas] = useState<any[]>([]);
-  const [tipoAsignacion, setTipoAsignacion] = useState<'poe' | 'politica'>('poe');
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
-  const [modalLoading, setModalLoading] = useState(false); 
 
+  // Estados para modal POE
+  const [modalPOEOpen, setModalPOEOpen] = useState(false);
+  const [rolActualPOE, setRolActualPOE] = useState<any | null>(null);
+  const [procedimientosSeleccionados, setProcedimientosSeleccionados] = useState<number[]>([]);
+  const [modalSearchPOE, setModalSearchPOE] = useState("");
+  const [procedimientosActivos, setProcedimientosActivos] = useState<any[]>([]);
+  const [modalLoadingPOE, setModalLoadingPOE] = useState(false);
 
-  const prevSeleccionRef = useRef<number[]>([]);
-
-
+  // Effect para resetear paginación
   useEffect(() => {
     setResetPaginationToggle(prev => !prev);
   }, [search]);
 
-
+  // Effect para cargar procedimientos cuando se abre el modal
   useEffect(() => {
-    if (modalOpen) {
-      setModalLoading(true);
-
-      Promise.all([
-        getActiveProcedures().then((procedimientos) => {
-          setProcedimientosActivos(
-            procedimientos.map((p: any) => ({
-              id_documento: p.id_documento,
-              poe: p.id_documento?.toString(),
-              codigo: p.codigo,
-              titulo: p.titulo,
-            }))
-          );
-        }),
-
-        getActivePolitics().then((politicas) => {
-          setPoliticasActivas(
-            politicas.map((p: any) => ({
-              id_politica: p.id_documento,
-              numero_politica: p.codigo?.toString(),
-              codigo: p.codigo,
-              titulo: p.titulo || p.nombre,
-            }))
-          );
-        })
-      ]).finally(() => {
-        setModalLoading(false);
+    if (modalPOEOpen) {
+      setModalLoadingPOE(true);
+      
+      getActiveProcedures().then((procedimientos) => {
+        setProcedimientosActivos(
+          procedimientos.map((p: any) => ({
+            id_documento: p.id_documento,
+            poe: p.id_documento?.toString(),
+            codigo: p.codigo,
+            titulo: p.titulo,
+          }))
+        );
+        setModalLoadingPOE(false);
+      }).catch(() => {
+        setModalLoadingPOE(false);
       });
     }
-  }, [modalOpen]);
+  }, [modalPOEOpen]);
 
-  const rolesFiltrados = useMemo(
-    () => {
-      const filtered = rolesProcedures.filter((rol) => {
-        const nombreMatch = rol.nombre_rol.toLowerCase().includes(search.toLowerCase());
-        
-        const procedimientosMatch = rol.procedimientos?.some((p: any) => 
-          p.codigo?.toLowerCase().includes(search.toLowerCase())
-        );
-
-        const politicasMatch = rol.politicas?.some((p: any) => 
-          p.numero_politica?.toString().toLowerCase().includes(search.toLowerCase())
-        );
-        
-        return nombreMatch || procedimientosMatch || politicasMatch;
-      });
-
-      return filtered.sort((a, b) => {
-        const aHasItems = (a.procedimientos && a.procedimientos.length > 0) || 
-                         (a.politicas && a.politicas.length > 0);
-        const bHasItems = (b.procedimientos && b.procedimientos.length > 0) || 
-                         (b.politicas && b.politicas.length > 0);
-        
-        if (aHasItems && !bHasItems) return -1;
-        if (!aHasItems && bHasItems) return 1;
-        return 0;
-      });
-    },
-    [rolesProcedures, search]
-  );
-
-  // Abrir modal y cargar items asignados según el tipo 
-  const handleOpenModal = (rol: any) => {
-    setRolActual(rol);
-    
-    let itemsAsignados: number[] = [];
-    if (tipoAsignacion === 'poe') {
-      itemsAsignados = rol.procedimientos?.map((p: any) => p.id_documento) || [];
-    } else {
-      itemsAsignados = rol.politicas?.map((p: any) => p.id_politica) || [];
+  // Effect para cargar procedimientos asignados cuando se abre el modal
+  useEffect(() => {
+    if (rolActualPOE && modalPOEOpen) {
+      const itemsAsignados = rolActualPOE.procedimientos?.map((p: any) => p.id_documento) || [];
+      setProcedimientosSeleccionados(itemsAsignados);
     }
-    
-    setProcedimientosSeleccionados(itemsAsignados);
-    prevSeleccionRef.current = itemsAsignados;
-    
-    setModalSearch("");
-    setModalOpen(true);
+  }, [rolActualPOE, modalPOEOpen]);
+
+  // Filtrar roles
+  const rolesFiltrados = useMemo(() => {
+    const filtered = rolesProcedures.filter((rol) => {
+      const nombreMatch = rol.nombre_rol.toLowerCase().includes(search.toLowerCase());
+      const procedimientosMatch = rol.procedimientos?.some((p: any) => 
+        p.codigo?.toLowerCase().includes(search.toLowerCase())
+      );
+      const politicasMatch = rol.politicas?.some((p: any) => 
+        p.numero_politica?.toString().toLowerCase().includes(search.toLowerCase())
+      );
+      return nombreMatch || procedimientosMatch || politicasMatch;
+    });
+
+    return filtered.sort((a, b) => {
+      const aHasItems = (a.procedimientos && a.procedimientos.length > 0) || 
+                       (a.politicas && a.politicas.length > 0);
+      const bHasItems = (b.procedimientos && b.procedimientos.length > 0) || 
+                       (b.politicas && b.politicas.length > 0);
+      
+      if (aHasItems && !bHasItems) return -1;
+      if (!aHasItems && bHasItems) return 1;
+      return 0;
+    });
+  }, [rolesProcedures, search]);
+
+  // Filtrar procedimientos en el modal
+  const procedimientosFiltradosModal = useMemo(() => {
+    if (!modalSearchPOE.trim()) {
+      return procedimientosActivos;
+    }
+
+    const searchTerm = modalSearchPOE.toLowerCase();
+    return procedimientosActivos.filter((item: any) => 
+      item.id_documento?.toString().toLowerCase().includes(searchTerm) ||
+      item.poe?.toLowerCase().includes(searchTerm) ||
+      item.codigo?.toLowerCase().includes(searchTerm) ||
+      item.titulo?.toLowerCase().includes(searchTerm)
+    );
+  }, [procedimientosActivos, modalSearchPOE]);
+
+  // Handlers para modal POE
+  const handleOpenModalPOE = (rol: any) => {
+    setRolActualPOE(rol);
+    setModalSearchPOE("");
+    setModalPOEOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setRolActual(null);
+  const handleCloseModalPOE = () => {
+    setModalPOEOpen(false);
+    setRolActualPOE(null);
     setProcedimientosSeleccionados([]);
-    setModalSearch("");
+    setModalSearchPOE("");
   };
 
-  // Guardar asignación según el tipo - VERSIÓN COMPLETAMENTE CORREGIDA
   const handleSaveProcedimientos = async () => {
-    if (!rolActual) {
-      handleCloseModal();
+    if (!rolActualPOE) {
+      handleCloseModalPOE();
       return;
     }
 
     try {
-      // Obtener la selección original al abrir el modal
-      let seleccionOriginal: number[] = [];
-      if (tipoAsignacion === 'poe') {
-        seleccionOriginal = rolActual.procedimientos?.map((p: any) => p.id_documento) || [];
-      } else {
-        seleccionOriginal = rolActual.politicas?.map((p: any) => p.id_politica) || [];
-      }
-
-      // Calcular diferencias
+      const seleccionOriginal = rolActualPOE.procedimientos?.map((p: any) => p.id_documento) || [];
       const nuevosElementos = procedimientosSeleccionados.filter(id => !seleccionOriginal.includes(id));
-      const elementosEliminados = seleccionOriginal.filter(id => !procedimientosSeleccionados.includes(id));
+      const elementosEliminados = seleccionOriginal.filter((id: number) => !procedimientosSeleccionados.includes(id));
 
-      console.log('=== GUARDAR CAMBIOS ===');
-      console.log('Selección original:', seleccionOriginal);
-      console.log('Selección actual:', procedimientosSeleccionados);
-      console.log('Nuevos elementos:', nuevosElementos);
-      console.log('Elementos eliminados:', elementosEliminados);
+      console.log(' Enviando cambios POE:', {
+        rol: rolActualPOE.nombre_rol,
+        nuevos: nuevosElementos,
+        eliminados: elementosEliminados
+      });
 
-      // Procesar eliminaciones primero
       if (elementosEliminados.length > 0) {
-        console.log('🗑️ Eliminando elementos:', elementosEliminados);
-        if (tipoAsignacion === 'poe') {
-          await removeProcedures(rolActual.id_rol, elementosEliminados);
-        } else {
-          // await removePolitics(rolActual.id_rol, elementosEliminados);
-          console.log('Eliminación de políticas pendiente de implementar');
-        }
+        await removeProcedures(rolActualPOE.id_rol, elementosEliminados);
       }
 
-      // Procesar nuevas asignaciones
       if (nuevosElementos.length > 0) {
-        console.log('➕ Asignando nuevos elementos:', nuevosElementos);
-        if (tipoAsignacion === 'poe') {
-          await saveProcedures(rolActual.id_rol, nuevosElementos);
-        } else {
-          // await savePolitics(rolActual.id_rol, nuevosElementos);
-          console.log('Asignación de políticas pendiente de implementar');
-        }
+        await saveProcedures(rolActualPOE.id_rol, nuevosElementos);
       }
 
-      // Mostrar mensaje apropiado
       if (nuevosElementos.length === 0 && elementosEliminados.length === 0) {
         showCustomToast("Información", "No hay cambios para guardar", "info");
       } else {
-        const tipoTexto = tipoAsignacion === 'poe' ? 'procedimientos' : 'políticas';
-        let mensaje = '';
-        if (nuevosElementos.length > 0 && elementosEliminados.length > 0) {
-          mensaje = `${tipoTexto} actualizados correctamente`;
-        } else if (nuevosElementos.length > 0) {
-          mensaje = `${tipoTexto} asignados correctamente`;
-        } else {
-          mensaje = `${tipoTexto} desasignados correctamente`;
-        }
-        showCustomToast("Éxito", mensaje, "success");
+        showCustomToast("Éxito", "Procedimientos actualizados correctamente", "success");
       }
-      
-      // Refrescar datos después de cualquier operación
-      if (refreshData) {
-        await refreshData();
-      }
-      
     } catch (error: any) {
       console.error('Error en handleSaveProcedimientos:', error);
-      showCustomToast(
-        "Error",
-        error?.response?.data?.message || `No se pudieron guardar los cambios en ${tipoAsignacion === 'poe' ? 'procedimientos' : 'políticas'}`,
-        "error"
-      );
+      showCustomToast("Error", "No se pudieron guardar los cambios en procedimientos", "error");
     } finally {
-      // Siempre cerrar el modal al final
-      handleCloseModal();
+      handleCloseModalPOE();
     }
   };
 
-  // Items filtrados en el modal según el tipo seleccionado - MEJORADO CON BÚSQUEDA POR ID
-  const itemsFiltradosModal = useMemo(() => {
-    const items = tipoAsignacion === 'poe' ? procedimientosActivos : politicasActivas;
-
-    if (!modalSearch.trim()) {
-      return items;
-    }
-
-    const searchTerm = modalSearch.toLowerCase();
-
-    return items.filter((item: any) => {
-      if (tipoAsignacion === 'poe') {
-        // Para POE: buscar por ID documento, código y título
-        return (
-          item.id_documento?.toString().toLowerCase().includes(searchTerm) ||
-          item.poe?.toLowerCase().includes(searchTerm) ||
-          item.codigo?.toLowerCase().includes(searchTerm) ||
-          item.titulo?.toLowerCase().includes(searchTerm)
-        );
-      } else {
-        // Para políticas: buscar por ID, número de política, código y título
-        return (
-          item.id_politica?.toString().toLowerCase().includes(searchTerm) ||
-          item.numero_politica?.toLowerCase().includes(searchTerm) ||
-          item.codigo?.toLowerCase().includes(searchTerm) ||
-          item.titulo?.toLowerCase().includes(searchTerm)
-        );
-      }
-    });
-  }, [tipoAsignacion, procedimientosActivos, politicasActivas, modalSearch]);
+  const handleSeleccionChangePOE = (seleccion: string[]) => {
+    const numericSeleccion = seleccion.map(Number);
+    setProcedimientosSeleccionados(numericSeleccion);
+  };
 
   return {
+    // Estados compartidos
     loading,
     search,
     setSearch,
     rolesFiltrados,
-    modalOpen,
-    handleOpenModal,
-    handleCloseModal,
-    rolActual,
+    resetPaginationToggle,
+    
+    // Estados y handlers específicos de POE
+    modalPOEOpen,
+    handleOpenModalPOE,
+    handleCloseModalPOE,
+    rolActualPOE,
     procedimientosSeleccionados,
     setProcedimientosSeleccionados,
-    modalSearch,
-    setModalSearch,
-    procedimientosFiltradosModal: itemsFiltradosModal,
+    modalSearchPOE,
+    setModalSearchPOE,
+    procedimientosFiltradosModal,
     handleSaveProcedimientos,
-    resetPaginationToggle,
-    tipoAsignacion,
-    setTipoAsignacion,
-    modalLoading, // Agregar el nuevo estado
+    modalLoadingPOE,
+    handleSeleccionChangePOE,
   };
 }

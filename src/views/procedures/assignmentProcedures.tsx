@@ -1,4 +1,6 @@
 import { useRolesProceduresList } from "../../hooks/procedures/useRolesProceduresList";
+import { useRolesPoliticsList } from "../../hooks/procedures/useRolesPoliticsList";
+import { RolesProceduresProvider } from "../../hooks/procedures/RolesProceduresContext";
 import {
   Button,
   Box,
@@ -13,29 +15,42 @@ import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import type { TableColumn } from "react-data-table-component";
 import SearchBar from "../../components/globalComponents/SearchBarTable";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
-import SelectField from "../../components/formComponents/SelectField"; 
 
-export default function RolesProcedures() {
+function RolesProceduresContent() {
+  // Hook para procedimientos (POE)
   const {
     loading,
     search,
     setSearch,
     rolesFiltrados,
-    modalOpen,
-    handleOpenModal,
-    handleCloseModal,
-    rolActual,
+    resetPaginationToggle,
+    modalPOEOpen,
+    handleOpenModalPOE,
+    handleCloseModalPOE,
+    rolActualPOE,
     procedimientosSeleccionados,
-    setProcedimientosSeleccionados,
-    modalSearch,
-    setModalSearch,
+    modalSearchPOE,
+    setModalSearchPOE,
     procedimientosFiltradosModal,
     handleSaveProcedimientos,
-    resetPaginationToggle,
-    tipoAsignacion,
-    setTipoAsignacion,
-    modalLoading, // Agregar el nuevo estado
+    modalLoadingPOE,
+    handleSeleccionChangePOE,
   } = useRolesProceduresList();
+
+  // Hook para políticas
+  const {
+    modalPoliticsOpen,
+    handleOpenModalPolitics,
+    handleCloseModalPolitics,
+    rolActualPolitics,
+    politicasSeleccionadas,
+    modalSearchPolitics,
+    setModalSearchPolitics,
+    politicasFiltradosModal,
+    handleSavePolitics,
+    modalLoadingPolitics,
+    handleSeleccionChangePolitics,
+  } = useRolesPoliticsList();
 
   const columns: TableColumn<any>[] = [
     {
@@ -54,8 +69,17 @@ export default function RolesProcedures() {
                 key={p.id_documento}
                 label={p.codigo}
                 size="small"
-                color="success"
-                sx={{ borderRadius: 1 }}
+                sx={{ 
+                  backgroundColor: "#2AAC67",
+                  color: "#fff",
+                  borderRadius: 1,
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  border: "none",
+                  "&:hover": {
+                    backgroundColor: "#22965a"
+                  }
+                }}
               />
             ))}
           </Box>
@@ -71,10 +95,24 @@ export default function RolesProcedures() {
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
             {rol.politicas.map((p: any) => (
               <Chip
-                key={p.id_politica}
+                key={p.id_documento}
                 label={p.codigo}
                 size="small"
-                color="success"
+                variant="outlined"
+                sx={{ 
+                  borderColor: "#2AAC67",
+                  color: "#2AAC67",
+                  backgroundColor: "transparent",
+                  borderRadius: 1,
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  borderWidth: "1.5px",
+                  "&:hover": {
+                    borderColor: "#22965a",
+                    color: "#22965a",
+                    backgroundColor: "rgba(42, 172, 103, 0.04)"
+                  }
+                }}
               />
             ))}
           </Box>
@@ -84,52 +122,65 @@ export default function RolesProcedures() {
       grow: 2,
     },
     {
-      name: "",
+      name: "Asignar",
       cell: (rol) => (
-        <Tooltip title="Asignar procedimientos/políticas" arrow>
-          <Button
-            onClick={() => handleOpenModal(rol)}
-            variant="contained"
-            size="small"
-            style={{
-              backgroundColor: "#2AAC67",
-              color: "#fff",
-              textTransform: "none",
-              fontWeight: 500,
-              fontSize: "0.75rem",
-              minWidth: 0,
-              padding: "2px 12px",
-              borderRadius: "6px",
-              boxShadow: "none",
-            }}
-          >
-            Asignar
-          </Button>
-        </Tooltip>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Tooltip title="Asignar POE" arrow>
+            <Button
+              onClick={() => handleOpenModalPOE(rol)}
+              variant="contained"
+              size="small"
+              style={{
+                backgroundColor: "#2AAC67",
+                color: "#fff",
+                textTransform: "none",
+                fontWeight: 500,
+                fontSize: "0.7rem",
+                minWidth: 0,
+                padding: "4px 8px",
+                borderRadius: "4px",
+                boxShadow: "none",
+              }}
+            >
+              Procedimientos
+            </Button>
+          </Tooltip>
+          <Tooltip title="Asignar Políticas" arrow>
+            <Button
+              onClick={() => handleOpenModalPolitics(rol)}
+              variant="outlined"
+              size="small"
+              style={{
+                borderColor: "#2AAC67",
+                color: "#2AAC67",
+                backgroundColor: "transparent",
+                textTransform: "none",
+                fontWeight: 500,
+                fontSize: "0.7rem",
+                minWidth: 0,
+                padding: "4px 8px",
+                borderRadius: "4px",
+                boxShadow: "none",
+                borderWidth: "1.5px",
+              }}
+              sx={{
+                "&:hover": {
+                  borderColor: "#22965a",
+                  color: "#22965a",
+                  backgroundColor: "rgba(42, 172, 103, 0.04)"
+                }
+              }}
+            >
+              Políticas
+            </Button>
+          </Tooltip>
+        </Box>
       ),
-      width: "90px",
+      width: "180px",
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
     },
-  ];
-
-  const handleSeleccionChange = (seleccion: string[]) => {
-    const numericSeleccion = seleccion.map(Number);
-    console.log('🔄 Cambio de selección:', {
-      anterior: procedimientosSeleccionados,
-      nueva: numericSeleccion
-    });
-    setProcedimientosSeleccionados(numericSeleccion);
-  };
-
-  const handleTipoAsignacionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTipoAsignacion(e.target.value as "poe" | "politica");
-  };
-
-  const opcionesTipoAsignacion = [
-    { value: "poe", label: "Procedimientos (POE)" },
-    { value: "politica", label: "Políticas" }
   ];
 
   return (
@@ -158,64 +209,117 @@ export default function RolesProcedures() {
         />
       )}
 
+      {/* Modal para POE */}
       <GlobalModal
-        open={modalOpen}
-        onClose={handleCloseModal}
-        title={`Asignar ${tipoAsignacion === "poe" ? "procedimientos" : "políticas"} a ${
-          rolActual?.nombre_rol || ""
-        }`}
+        open={modalPOEOpen}
+        onClose={handleCloseModalPOE}
+        title={`Asignar procedimientos (POE) a ${rolActualPOE?.nombre_rol || ""}`}
         maxWidth="md"
         actions={
           <div className="flex justify-center items-center gap-2">
             <SubmitButton onClick={handleSaveProcedimientos}>
-              Guardar Cambios
+              Guardar Procedimientos
             </SubmitButton>
           </div>
         }
       >
-        <div className="mb-2">
-          <SelectField
-            label="Tipo de asignación"
-            name="tipoAsignacion"
-            value={tipoAsignacion}
-            onChange={handleTipoAsignacionChange}
-            options={opcionesTipoAsignacion}
-            optionLabel="label"
-            optionValue="value"
-          />
-        </div>
-
         <div className="relative mb-4">
           <SearchBar
-            value={modalSearch}
-            onChange={setModalSearch}
-            placeholder={`Buscar ${
-              tipoAsignacion === "poe" 
-                ? "procedimientos por ID, código POE" 
-                : "políticas por ID, número"
-            } o descripción...`}
+            value={modalSearchPOE}
+            onChange={setModalSearchPOE}
+            placeholder="Buscar procedimientos por ID, código POE o descripción..."
           />
         </div>
 
         <div style={{ maxHeight: 350, overflowY: "auto" }}>
-          {modalLoading ? (
+          {modalLoadingPOE ? (
             <div className="flex justify-center items-center py-8">
               <CircularProgress 
                 size={40} 
                 style={{ color: "#2AAC67" }}
               />
-             
+              <span className="ml-3 text-gray-600">Cargando procedimientos...</span>
             </div>
           ) : (
             <ProceduresTableModal
-              procedimientos={procedimientosFiltradosModal}
+              procedimientos={
+                [...procedimientosFiltradosModal].sort(
+                  (a, b) => {
+                    // Ordenar por número de POE (codigo), numérico si es posible
+                    const aNum = Number(a.codigo);
+                    const bNum = Number(b.codigo);
+                    if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+                    return (a.codigo || '').localeCompare(b.codigo || '');
+                  }
+                )
+              }
               procedimientosSeleccionados={procedimientosSeleccionados.map(String)}
-              onSeleccionChange={handleSeleccionChange}
-              tipo={tipoAsignacion}
+              onSeleccionChange={handleSeleccionChangePOE}
+              tipo="poe"
+            />
+          )}
+        </div>
+      </GlobalModal>
+
+      {/* Modal para Políticas */}
+      <GlobalModal
+        open={modalPoliticsOpen}
+        onClose={handleCloseModalPolitics}
+        title={`Asignar políticas a ${rolActualPolitics?.nombre_rol || ""}`}
+        maxWidth="md"
+        actions={
+          <div className="flex justify-center items-center gap-1">
+            <SubmitButton onClick={handleSavePolitics}>
+              Guardar Políticas
+            </SubmitButton>
+          </div>
+        }
+      >
+        <div className="relative mb-2">
+          <SearchBar
+            value={modalSearchPolitics}
+            onChange={setModalSearchPolitics}
+            placeholder="Buscar políticas por ID, número o descripción..."
+          />
+        </div>
+
+        <div style={{ maxHeight: 350, overflowY: "auto" }}>
+          {modalLoadingPolitics ? (
+            <div className="flex justify-center items-center py-8">
+              <CircularProgress 
+                size={40} 
+                style={{ color: "#2AAC67" }}
+              />
+              <span className="ml-3 text-gray-600">Cargando políticas...</span>
+            </div>
+          ) : (
+            <ProceduresTableModal
+              procedimientos={
+                [...politicasFiltradosModal].sort(
+                  (a, b) => {
+                    // Ordenar por número de política (numero_politica), numérico si es posible
+                    const aNum = Number(a.numero_politica ?? a.codigo);
+                    const bNum = Number(b.numero_politica ?? b.codigo);
+                    if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+                    return (a.numero_politica || a.codigo || '').localeCompare(b.numero_politica || b.codigo || '');
+                  }
+                )
+              }
+              procedimientosSeleccionados={politicasSeleccionadas.map(String)}
+              onSeleccionChange={handleSeleccionChangePolitics}
+              tipo="politica"
             />
           )}
         </div>
       </GlobalModal>
     </div>
+  );
+}
+
+export default function RolesProcedures() {
+  return (
+    <RolesProceduresProvider>
+      <RolesProceduresContent />
+    </RolesProceduresProvider>
   );
 }
