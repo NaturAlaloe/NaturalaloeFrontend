@@ -111,8 +111,21 @@ export function useCapacitation() {
     try {
       setLoadingProcedimientos(true);
       const data = await getProcedimientos();
+      
+      // Log para verificar la estructura de datos
+      console.log("Datos de procedimientos sin filtrar:", data);
+      
       const procedimientosTransformados = data
         .filter(Boolean)
+        // Filtrar procedimientos: solo null, reevaluacion o reprogramacion (no progreso)
+        .filter((proc) => {
+          const estado = proc.estado_capacitacion;
+          return estado === null || 
+                 estado === "reevaluacion" || 
+                 estado === "reprogramacion" ||
+                 estado === "" ||
+                 estado === undefined;
+        })
         .map((proc) => ({
           ...proc,
           id: proc.id_documento,
@@ -123,6 +136,7 @@ export function useCapacitation() {
         (proc, index, array) => array.findIndex((p) => p.id === proc.id) === index
       );
 
+      console.log("Procedimientos filtrados:", procedimientosUnicos);
       setProcedimientosDisponibles(procedimientosUnicos);
     } catch (error) {
       console.error("Error al cargar procedimientos:", error);
@@ -137,8 +151,24 @@ export function useCapacitation() {
     try {
       setLoadingColaboradores(true);
       const data = await getColaboradores();
+      
+      // Log para verificar la estructura de datos
+      console.log("Datos de colaboradores sin filtrar:", data);
+      
       const colaboradoresTransformados = data
         .filter(Boolean)
+        // Filtrar colaboradores: solo null, reevaluacion o reprogramacion (no progreso)
+        .filter((colab) => {
+          const estado = colab.estado_capacitacion;
+          const incluir = estado === null || 
+                         estado === "reevaluacion" || 
+                         estado === "reprogramacion" ||
+                         estado === "" ||
+                         estado === undefined;
+          
+          console.log(`Colaborador ${colab.nombre_completo}, estado: ${estado}, incluir: ${incluir}`);
+          return incluir;
+        })
         .map((colab) => ({
           ...colab,
           id: colab.id_colaborador,
@@ -150,6 +180,7 @@ export function useCapacitation() {
         (colab, index, array) => array.findIndex((c) => c.id === colab.id) === index
       );
 
+      console.log("Colaboradores filtrados:", colaboradoresUnicos);
       setColaboradoresDisponibles(colaboradoresUnicos);
     } catch (error) {
       console.error("Error al cargar colaboradores:", error);
