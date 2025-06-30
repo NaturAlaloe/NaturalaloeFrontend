@@ -24,10 +24,6 @@ export function useTrainingRegister({
       showCustomToast("Error", "La fecha de fin no puede ser anterior a la fecha de inicio.", "error");
       return;
     }
-    if (!form.tipo) {
-      showCustomToast("Error", "El tipo de capacitación es obligatorio.", "error");
-      return;
-    }
     if (
       !form.duracionHoras ||
       isNaN(Number(form.duracionHoras)) ||

@@ -1,5 +1,5 @@
 import { Edit, Delete, Search } from "@mui/icons-material";
-import { useFacilitadores } from "../../hooks/capacitations/useListFacilitators";
+import { useFacilitadores } from "../../hooks/trainings/useListFacilitators";
 import type { Facilitador } from "../../services/listFacilitatorService";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
@@ -12,6 +12,8 @@ export default function ListFacilitadores() {
     searchTerm,
     setSearchTerm,
     filtered,
+    currentPage,
+    setCurrentPage,
     showEditModal,
     facilitadorEditando,
     handleEditClick,
@@ -63,7 +65,15 @@ export default function ListFacilitadores() {
         />
       </div>
 
-      <GlobalDataTable columns={columns} data={filtered} pagination highlightOnHover dense />
+      <GlobalDataTable 
+        columns={columns} 
+        data={filtered} 
+        pagination 
+        highlightOnHover 
+        dense 
+        currentPage={currentPage}
+        onChangePage={setCurrentPage}
+      />
 
       {showEditModal && facilitadorEditando && (
         <GlobalModal open={showEditModal} onClose={handleCancelEdit} title="Editar Facilitador" maxWidth="sm">

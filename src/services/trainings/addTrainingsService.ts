@@ -44,27 +44,6 @@ export const createCapacitacion = async (
   }
 };
 
-export interface Capacitation_General {
-  id_capacitacion_general: number;
-  titulo: string;
-  fecha_capacitacion: Date;
-  id_colaborador: number;
-  nombre_completo: string;
-}
-
-export const createCapacitacionGeneral = async (data: {
-  titulo: string;
-  id_colaborador: number[];
-}): Promise<any> => {
-  try {
-    const response = await api.post("/training/general", data);
-    return response.data;
-  } catch (error) {
-    console.error("Error al crear capacitación general:", error);
-    throw error;
-  }
-};
-
 export const formatDateForAPI = (date: Date): string => {
   return date.toISOString().split("T")[0];
 };

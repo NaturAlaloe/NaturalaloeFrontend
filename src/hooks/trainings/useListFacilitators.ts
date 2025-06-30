@@ -11,6 +11,7 @@ export function useFacilitadores() {
   const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [facilitadorEditando, setFacilitadorEditando] = useState<Facilitador | null>(null);
@@ -25,6 +26,11 @@ export function useFacilitadores() {
       .catch(() => showCustomToast("Error", "No se pudieron cargar los facilitadores", "error"))
       .finally(() => setLoading(false));
   }, []);
+
+  // Resetear página cuando cambie el término de búsqueda
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const filtered = useMemo(() => {
     const term = searchTerm.toLowerCase();
@@ -122,6 +128,8 @@ export function useFacilitadores() {
     searchTerm,
     setSearchTerm,
     filtered,
+    currentPage,
+    setCurrentPage,
     showEditModal,
     facilitadorEditando,
     handleEditClick,

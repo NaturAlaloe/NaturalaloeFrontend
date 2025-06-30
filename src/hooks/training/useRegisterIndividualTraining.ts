@@ -12,11 +12,6 @@ export function useRegisterIndividualTraining() {
     setLoading(true);
     try {
       await registerIndividualTraining(payload);
-      showCustomToast(
-        "Éxito",
-        "Capacitación registrada correctamente",
-        "success"
-      );
       return true;
     } catch (error) {
       showCustomToast("Error", "No se pudo registrar la capacitación", "error");
