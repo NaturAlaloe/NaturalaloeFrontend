@@ -113,7 +113,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
   const [openCapacitaciones, setOpenCapacitaciones] = React.useState(false);
   const [openColaboradores, setOpenColaboradores] = React.useState(false);
 
-  const { user, loading, fullName } = useUserFromToken();
+  const {  loading, fullName } = useUserFromToken();
 
 
   const handleDrawerOpen = () => setOpen(true);
