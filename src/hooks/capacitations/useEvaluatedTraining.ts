@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { getTrainingByIdService, qualifyTrainingService } from "../../services/capacitations/getCapacitationEvaluatedService";
-import { saveEvaluationsService } from "../../services/capacitations/getCapacitationEvaluatedService";
-import type { SaveEvaluationData, QualifyTrainingData } from "../../services/capacitations/getCapacitationEvaluatedService";
+import { getTrainingByIdService, saveEvaluationsService, type SaveEvaluationData } from "../../services/capacitations/getEvaluatedCapacitationService";
 
 export interface Colaborador {
   id: number;
@@ -42,16 +40,10 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
       setLoading(true);
       setError(null);
       try {
-        const data = await getTrainingByIdService(codigoDocumento);        if (data && data.length > 0) {
+        const data = await getTrainingByIdService(codigoDocumento);
+
+        if (data && data.length > 0) {
           const firstRecord = data[0];
-          
-          // Validar si la capacitación ya está finalizada
-          if (firstRecord.estado === "Finalizada") {
-            setError("No se puede calificar una capacitación finalizada");
-            setLoading(false);
-            return;
-          }
-          
           setTrainingInfo({
             id_capacitacion: firstRecord.id_capacitacion,
             titulo_capacitacion: firstRecord.titulo_capacitacion,
@@ -65,10 +57,11 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
           const collaboratorsData = data.map((item, index) => ({
             id: index + 1,
             id_colaborador: item.id_colaborador,
-            id_capacitacion: item.id_capacitacion,            nombre:
+            id_capacitacion: item.id_capacitacion,
+            nombre:
               `${item.nombre} ${item.primer_apellido} ${item.segundo_apellido}`.trim(),
             nota: "",
-            seguimiento: "satisfactorio",
+            seguimiento: item.seguimiento || "en progreso",
             comentario: "",
           }));
 
@@ -86,7 +79,9 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
     };
 
     fetchTrainingData();
-  }, [codigoDocumento]);  const saveEvaluations = async (): Promise<boolean> => {
+  }, [codigoDocumento]);
+
+  const saveEvaluations = async (): Promise<boolean> => {
     if (colaboradores.length === 0) {
       throw new Error("No hay colaboradores para evaluar");
     }
@@ -101,20 +96,16 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
           seguimiento: colaborador.seguimiento,
           comentario: colaborador.comentario,
         })
-      );      // Primero guardar las evaluaciones individuales
+      );
+
       const success = await saveEvaluationsService(evaluationsData);
-      
-      // Si se guardan exitosamente, actualizar el estado a finalizada localmente
-      if (success && trainingInfo) {
-        setTrainingInfo(prev => prev ? { ...prev, estado: "Finalizada" } : null);
-      }
-      
       return success;
     } catch (error) {
       console.error("Error saving evaluations:", error);
       throw error;
     } finally {
-      setSaving(false);    }
+      setSaving(false);
+    }
   };
 
   return {

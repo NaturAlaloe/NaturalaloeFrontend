@@ -22,7 +22,7 @@ export async function getTrainingByIdService(
 ): Promise<TrainingCollaboratorData[]> {
   try {
     console.log("getTrainingByIdService: usando codigo_documento:", codigoDocumento);
-    const response = await api.get(`/api/training/pending/${codigoDocumento}`);
+    const response = await api.get(`/training/pending/${codigoDocumento}`);
     console.log("getTrainingByIdService: respuesta de la API:", response.data);
     
     if (response.data.success && response.data.data) {
@@ -49,37 +49,14 @@ export async function saveEvaluationsService(
 ): Promise<boolean> {
   try {
     console.log("saveEvaluationsService: enviando evaluaciones:", evaluations);
-    
-    // Intentar con el endpoint correcto para guardar evaluaciones
-    const response = await api.post('/api/training/qualify', evaluations);
+    const response = await api.post('/training/evaluations', {
+      evaluations
+    });
     
     console.log("saveEvaluationsService: respuesta de la API:", response.data);
     return response.data.success || false;
   } catch (error) {
     console.error("Error saving evaluations:", error);
-    throw error;
-  }
-}
-
-// Servicio para calificar la capacitación completa
-export interface QualifyTrainingData {
-  id_capacitacion: number;
-  seguimiento: "satisfactorio" | "reprogramar" | "reevaluacion";
-  nota: number;
-  comentario_final: string;
-}
-
-export async function qualifyTrainingService(
-  qualificationData: QualifyTrainingData | QualifyTrainingData[]
-): Promise<boolean> {
-  try {
-    console.log("qualifyTrainingService: enviando calificación:", qualificationData);
-    const response = await api.post('/api/training/qualify', qualificationData);
-    
-    console.log("qualifyTrainingService: respuesta de la API:", response.data);
-    return response.data.success || false;
-  } catch (error) {
-    console.error("Error qualifying training:", error);
     throw error;
   }
 }

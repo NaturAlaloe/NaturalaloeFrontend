@@ -166,7 +166,7 @@ export default function DepartmentsList() {
           </div>
         }
       >
-        <div>¿Estás seguro de que deseas eliminar este departamento?</div>
+          <div className="flex justify-center items-center text-center">¿Estás seguro de que deseas eliminar este departamento?</div>
       </GlobalModal>
     </TableContainer>
   );

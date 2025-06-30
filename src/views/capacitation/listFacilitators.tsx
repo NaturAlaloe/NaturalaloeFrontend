@@ -23,10 +23,10 @@ export default function ListFacilitadores() {
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
-    loading, // <-- usa loading
+    loading, 
   } = useFacilitadores();
 
-  if (loading) return <FullScreenSpinner />; // <-- muestra spinner
+  if (loading) return <FullScreenSpinner />;
 
   const columns = [
     { name: "NOMBRE", selector: (row: Facilitador) => row.nombre, sortable: true },

@@ -3,15 +3,16 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useParams } from "react-router-dom";
+import React from "react";
 import useCollaboratorDetail from "../../hooks/collaborator/useCollaboratorDetail";
 import CollaboratorRolesList from "../../components/CollaboratorRolesList";
 
 export default function CollaboratorDetail() {
   const { id } = useParams<{ id: string }>();
-  const { data, loading, error } = useCollaboratorDetail(id || "");
+  const [refreshKey, setRefreshKey] = React.useState(0);
+  const { data, loading, error } = useCollaboratorDetail(id || "", refreshKey);
 
-  if (loading)
-    return <Box sx={{ p: 5, textAlign: "center" }}>Cargando...</Box>;
+  if (loading) return <Box sx={{ p: 5, textAlign: "center" }}>Cargando...</Box>;
   if (error || !data)
     return (
       <Box sx={{ p: 5, textAlign: "center", color: "red" }}>
@@ -19,11 +20,8 @@ export default function CollaboratorDetail() {
       </Box>
     );
 
-  // Tomar info personal del primer rol (todas las propiedades personales son iguales)
   const personal = data.roles[0];
-  // Extraer apellidos (todo menos la primera palabra)
-  const nombreSplit = data.nombre_completo.trim().split(" ");
-  const apellidos = nombreSplit.length > 1 ? nombreSplit.slice(1).join(" ") : "";
+  const apellidos = [data.apellido1, data.apellido2].filter(Boolean).join(" ");
 
   return (
     <Box
@@ -88,7 +86,9 @@ export default function CollaboratorDetail() {
               borderRadius: 3,
               backgroundColor: "#fff",
               WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiInputBase-input": {
+                WebkitTextFillColor: "#222 !important",
+              },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "#2AAC67 !important" },
                 "&:hover fieldset": { borderColor: "black !important" },
@@ -99,7 +99,7 @@ export default function CollaboratorDetail() {
           />
           <TextField
             label="Nombre"
-            value={nombreSplit[0]}
+            value={data.nombre}
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"
@@ -110,7 +110,9 @@ export default function CollaboratorDetail() {
               borderRadius: 3,
               backgroundColor: "#fff",
               WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiInputBase-input": {
+                WebkitTextFillColor: "#222 !important",
+              },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "#2AAC67 !important" },
                 "&:hover fieldset": { borderColor: "black !important" },
@@ -132,7 +134,9 @@ export default function CollaboratorDetail() {
               borderRadius: 3,
               backgroundColor: "#fff",
               WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiInputBase-input": {
+                WebkitTextFillColor: "#222 !important",
+              },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "#2AAC67 !important" },
                 "&:hover fieldset": { borderColor: "black !important" },
@@ -154,7 +158,9 @@ export default function CollaboratorDetail() {
               borderRadius: 3,
               backgroundColor: "#fff",
               WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiInputBase-input": {
+                WebkitTextFillColor: "#222 !important",
+              },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "#2AAC67 !important" },
                 "&:hover fieldset": { borderColor: "black !important" },
@@ -176,7 +182,9 @@ export default function CollaboratorDetail() {
               borderRadius: 3,
               backgroundColor: "#fff",
               WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiInputBase-input": {
+                WebkitTextFillColor: "#222 !important",
+              },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "#2AAC67 !important" },
                 "&:hover fieldset": { borderColor: "black !important" },
@@ -198,7 +206,9 @@ export default function CollaboratorDetail() {
               borderRadius: 3,
               backgroundColor: "#fff",
               WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": { WebkitTextFillColor: "#222 !important" },
+              "& .MuiInputBase-input": {
+                WebkitTextFillColor: "#222 !important",
+              },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "#2AAC67 !important" },
                 "&:hover fieldset": { borderColor: "black !important" },
@@ -220,7 +230,10 @@ export default function CollaboratorDetail() {
           >
             Roles de Trabajo
           </Typography>
-          <CollaboratorRolesList roles={data.roles} />
+          <CollaboratorRolesList
+            roles={data.roles}
+            onRefresh={() => setRefreshKey((k) => k + 1)}
+          />
         </Box>
       </Paper>
     </Box>

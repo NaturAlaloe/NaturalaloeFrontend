@@ -57,11 +57,11 @@ export function useCapacitationList() {
         existingCapacitation.colaboradores.push({
           nombreCompleto: item.nombre_colaborador || "Sin nombre",
           cedula: item.id_colaborador || "N/A",
-          correo: "N/A", // No viene en la API
-          telefono: "N/A", // No viene en la API
-          area: "N/A", // No viene en la API
-          departamento: "N/A", // No viene en la API
-          puesto: "N/A", // No viene en la API
+          correo: "N/A", 
+          telefono: "N/A", 
+          area: "N/A", 
+          departamento: "N/A",
+          puesto: "N/A",
         });
       } else {
         capacitationMap.set(capacitationId, {
@@ -80,11 +80,11 @@ export function useCapacitationList() {
           colaboradores: [{
             nombreCompleto: item.nombre_colaborador || "Sin nombre",
             cedula: item.id_colaborador || "N/A",
-            correo: "N/A", // No viene en la API
-            telefono: "N/A", // No viene en la API
-            area: "N/A", // No viene en la API
-            departamento: "N/A", // No viene en la API
-            puesto: "N/A", // No viene en la API
+            correo: "N/A", 
+            telefono: "N/A", 
+            area: "N/A", 
+            departamento: "N/A", 
+            puesto: "N/A",
           }],
           profesor: {
             nombre: item.nombre_facilitador?.split(' ')[0] || "Sin nombre",
@@ -97,7 +97,7 @@ export function useCapacitationList() {
 
     return Array.from(capacitationMap.values());
   };
-  // Función para cargar capacitaciones desde la API
+ 
   const loadCapacitations = async () => {
     try {
       setIsLoading(true);

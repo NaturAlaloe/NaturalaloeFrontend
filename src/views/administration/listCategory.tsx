@@ -146,7 +146,7 @@ export default function CategoriesList() {
                     </div>
                 }
             >
-                <div>¿Estás seguro de que deseas eliminar esta categoría?</div>
+                  <div className="flex justify-center items-center text-center">¿Estás seguro de que deseas eliminar esta categoría?</div>
             </GlobalModal>
             
         </TableContainer>

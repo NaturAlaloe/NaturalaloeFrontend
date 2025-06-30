@@ -3,10 +3,10 @@ import InputField from '../../components/formComponents/InputField';
 import SelectField from '../../components/formComponents/SelectField';
 import AutocompleteField from '../../components/formComponents/AutocompleteField';
 import SubmitButton from '../../components/formComponents/SubmitButton';
-import SimpleModal from "../../components/globalComponents/SimpleModal";
 import { useCapacitation } from '../../hooks/capacitations/useCapacitation';
 import PaginatedTableModal from '../../components/globalComponents/PaginatedTableModal';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
+import GlobalModal from '../../components/globalComponents/GlobalModal';
 
 const Capacitacion = () => {
     const {
@@ -136,9 +136,7 @@ const Capacitacion = () => {
                 />
             </div>
         </div>        <div className="flex justify-center mt-6 gap-4">
-            <SubmitButton width="w-40" disabled={isLoading}>
-                {isLoading ? "Guardando..." : "Guardar"}
-            </SubmitButton>
+
             <SubmitButton
                 type="button"
                 onClick={() => setShowAsignacionesModal(true)}
@@ -155,12 +153,17 @@ const Capacitacion = () => {
                 className={isGeneralMode ? "bg-orange-500 hover:bg-orange-600" : ""}>
                 {isGeneralMode ? 'Normal' : 'General'}
             </SubmitButton>
+
+            <SubmitButton width="w-40" disabled={isLoading}>
+                {isLoading ? "Guardando..." : "Guardar"}
+            </SubmitButton>
         </div>
         {showAsignacionesModal && (
-            <SimpleModal
+            <GlobalModal
                 open={showAsignacionesModal}
                 title="Progreso"
                 onClose={() => setShowAsignacionesModal(false)}
+                maxWidth="md"
             >
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
@@ -246,7 +249,7 @@ const Capacitacion = () => {
                         onAdd={agregarPoes}
                     />
                 )}
-            </SimpleModal>
+            </GlobalModal>
         )}
     </FormContainer>
     );

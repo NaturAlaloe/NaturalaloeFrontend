@@ -9,11 +9,11 @@ import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinn
 import usePoliticsList from "../../hooks/politics/usePoliticsList";
 import SelectAutocomplete from "../../components/formComponents/SelectAutocomplete";
 import PdfInput from "../../components/formComponents/PdfInput";
-
+import FormContainer from "../../components/formComponents/FormContainer";
+import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
 
 export default function PoliticsList() {
   const ui = usePoliticsList();
-
 
   const columns = [
     {
@@ -24,7 +24,7 @@ export default function PoliticsList() {
     },
 
     {
-      name: "Descripción",
+      name: "Título",
       selector: (row: { descripcion: string }) => row.descripcion,
       sortable: true,
       grow: 2,
@@ -38,23 +38,63 @@ export default function PoliticsList() {
       wrap: true,
     },
     {
-      name: "Revisión",
-      selector: (row: { version: string }) => row.version,
+      name: "Fecha Creación",
+      selector: (row: { fecha_creacion: string }) => {
+        const date = new Date(row.fecha_creacion);
+        return date.toLocaleDateString();
+      },
       sortable: true,
-      width: "120px",
-      center: true,
+      grow: 1.5,
+      wrap: true,
     },
     {
       name: "Fecha Vigencia",
       selector: (row: { fecha_vigencia: string }) => {
         const date = new Date(row.fecha_vigencia);
-        date.setDate(date.getDate() + 1); // Suma un día
+        date.setDate(date.getDate() + 1);
         return date.toLocaleDateString();
       },
       sortable: true,
-      width: "130px",
-      center: true,
+      grow: 1.5,
+      wrap: true,
     },
+    {
+      name: "Revisión",
+      cell: (row: any) => {
+        const selectedVersionId = ui.selectedVersions[row.codigo_politica];
+        const selectedVersion = row.versiones?.find((v: any) => v.id_documento === selectedVersionId);
+        const isVigente = selectedVersion?.vigente === 1;
+
+        return (
+          <select
+            className={`border border-gray-300 rounded px-2 py-1 text-sm bg-white ${isVigente ? 'text-green-600 font-medium' : 'text-[#2AAC67]'
+              }`}
+            value={selectedVersionId || ""}
+            onChange={(e) => ui.handleVersionChange(row.codigo_politica, e.target.value)}
+            style={{ minWidth: 80 }}
+          >
+            <option value="">Seleccionar</option>
+            {row.versiones?.map((version: any) => (
+              <option
+                key={version.id_documento}
+                value={version.id_documento}
+                style={{
+                  color: version.vigente === 1 ? '#16a34a' : '#2AAC67',
+                  fontWeight: version.vigente === 1 ? 'bold' : 'normal'
+                }}
+              >
+                {version.revision} {version.vigente === 1 ? '(Vigente)' : ''}
+              </option>
+            ))}
+          </select>
+        );
+      },
+      width: "180px",
+      sortable: true,
+      grow: 1.5,
+      wrap: true,
+    },
+
     {
       name: "Acciones",
       cell: (row: any) => (
@@ -63,7 +103,7 @@ export default function PoliticsList() {
             href={row.ruta_documento}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#2AAC67]  hover:text-blue-700"
+            className="text-[#2AAC67] hover:text-green-700"
             title="Ver documento"
           >
             <Visibility fontSize="small" />
@@ -114,30 +154,113 @@ export default function PoliticsList() {
 
       <GlobalModal
         open={ui.modalOpen}
-        onClose={() => {
-          ui.setModalOpen(false);
-          ui.setEditPoliticsObj(null);
-        }}
-        title={ui.editPoliticsObj ? "Editar Política" : "Agregar Política"}
-        maxWidth="sm"
+        onClose={() => !ui.saving && ui.setModalOpen(false)}
+        title={
+          ""
+        }
+        maxWidth="lg"
+        backgroundColor="#DDF6E8"
       >
         {ui.editPoliticsObj && (
-          <form
+          <FormContainer
+            title={
+              ui.esNuevaVersion
+                ? "Crear Nueva Versión"
+                : "Editar Política"
+            }
             onSubmit={ui.handleSave}
-            className="grid grid-cols-1 gap-4 min-w-[250px]"
           >
-            {/* Descripción a lo largo */}
-            <InputField
-              label="Descripción"
-              name="descripcion"
-              value={ui.descripcionInput}
-              onChange={(e) => ui.setDescripcionInput(e.target.value)}
-              required
-              className="w-full"
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {ui.esNuevaVersion && (
+                <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">📋 Creando Nueva Versión</h4>
+                  <p className="text-gray-700 text-sm">
+                    Se creará una nueva versión de la política <strong>{ui.editPoliticsObj.codigo_politica}</strong>.
+                    Si marca esta versión como vigente, todas las versiones anteriores se desactivarán automáticamente.
+                  </p>
+                </div>
+              )}
 
-            {/* Fecha y Revisión en la misma fila */}
-            <div className="grid grid-cols-2 gap-4">
+              <StyledCheckbox
+                label="¿Es una nueva versión?"
+                checked={ui.esNuevaVersion || false}
+                onChange={(checked) => ui.setEsNuevaVersion(checked)}
+
+              />
+
+              <StyledCheckbox
+                label="¿Es Vigente?"
+                checked={ui.esVigente || false}
+                onChange={(checked) => ui.setEsVigente(checked)}
+
+              />
+
+
+              <InputField
+                label="Código"
+                name="codigo"
+                value={ui.editPoliticsObj.codigo || "No aplica"}
+                readOnly
+                disabled
+              />
+
+              <InputField
+                label="Fecha de Creación"
+                name="fecha_creacion"
+                type="date"
+                value={ui.fechaCreacionInput || ""}
+                readOnly
+                disabled
+              />
+
+
+              <InputField
+                label="Título"
+                name="titulo"
+                value={ui.descripcionInput}
+                onChange={(e) => ui.setDescripcionInput(e.target.value)}
+                placeholder="Ingrese título de la política"
+                required
+                className="w-full"
+                disabled={ui.saving}
+              />
+
+              <SelectAutocomplete
+                label="Responsable"
+                options={ui.responsables}
+                optionLabel="nombre_responsable"
+                optionValue="id_responsable"
+                value={
+                  ui.responsableInput
+                    ? ui.responsables.find(
+                      (r) => r.id_responsable === Number(ui.responsableInput)
+                    ) || null
+                    : null
+                }
+                onChange={(selected) => {
+                  ui.setResponsableInput(
+                    selected && !Array.isArray(selected) ? String(selected.id_responsable) : ""
+                  );
+                }}
+                placeholder="Selecciona un responsable"
+                disabled={ui.loadingResponsables || ui.saving}
+                fullWidth
+              />
+
+              <InputField
+                label="Revisión"
+                name="revision"
+                type="number"
+                min="1"
+                step="1"
+                value={ui.versionInput}
+                onChange={(e) => ui.setVersionInput(e.target.value)}
+                placeholder="1.0"
+                required
+                disabled={ui.saving || !ui.esNuevaVersion}
+                readOnly={!ui.esNuevaVersion}
+              />
+
               <InputField
                 label="Fecha de Vigencia"
                 name="fecha_vigencia"
@@ -145,50 +268,58 @@ export default function PoliticsList() {
                 value={ui.fechaVigenciaInput}
                 onChange={(e) => ui.setFechaVigenciaInput(e.target.value)}
                 required
+                disabled={ui.saving}
               />
-              <InputField
-                label="Versión"
-                name="version"
-                type="number"
-                value={ui.versionInput}
-                onChange={(e) => ui.setVersionInput(e.target.value)}
-                required
-              />
+
+              <div className="md:col-span-2">
+                <PdfInput
+                  label="Documento PDF (Opcional - Solo para actualizar)"
+                  pdfFile={ui.pdfFile}
+                  onChange={ui.handlePdfChange}
+                  onRemove={() => ui.setPdfFile(null)}
+                />
+                {ui.editPoliticsObj?.ruta_documento ? (
+                  <div className="mt-2 p-2 bg-gray-50 rounded border">
+                    <p className="text-sm text-gray-600">
+                      <strong>PDF actual:</strong>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (ui.editPoliticsObj?.ruta_documento) {
+                            window.open(ui.editPoliticsObj.ruta_documento, '_blank');
+                          }
+                        }}
+                        className="ml-2 text-[#2AAC67] hover:text-[#228B55] underline"
+                      >
+                        Ver PDF actual
+                      </button>
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Selecciona un nuevo archivo solo si deseas reemplazarlo
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-2 p-2 bg-orange-50 border border-orange-200 rounded">
+                    <p className="text-sm text-orange-700">
+                      ⚠️ <strong>Sin documento PDF:</strong> Esta versión de la política no tiene un documento PDF asociado.
+                    </p>
+                    <p className="text-xs text-orange-600 mt-1">
+                      Puede subir un archivo PDF nuevo usando el selector de archivos arriba.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-            <SelectAutocomplete
-              label="Responsable"
-              options={ui.responsables}
-              optionLabel="nombre_responsable"
-              optionValue="id_responsable"
-              value={
-                ui.responsables.find(
-                  (r) => r.id_responsable === Number(ui.responsableInput)
-                ) || null
-              }
-              onChange={(selected) => {
-                ui.setResponsableInput(
-                  selected && !Array.isArray(selected) ? String(selected.id_responsable) : ""
-                );
-              }}
-              placeholder="Selecciona un responsable"
-              disabled={ui.loadingResponsables}
-              fullWidth
-            />
 
-            {/* Archivo PDF a lo largo */}
-            <PdfInput
-              pdfFile={ui.pdfFile}
-              onChange={ui.handlePdfChange}
-              onRemove={() => ui.setPdfFile(null)}
-              required={false}
-            />
-
-            <div className="flex justify-center">
-              <SubmitButton>
-                Guardar Cambios
+            <div className="text-center mt-8">
+              <SubmitButton width="w-40" disabled={ui.saving} >
+                {ui.saving
+                  ? (ui.esNuevaVersion ? "Creando Versión..." : "Actualizando...")
+                  : (ui.esNuevaVersion ? "Crear Nueva Versión" : "Guardar Cambios")
+                }
               </SubmitButton>
             </div>
-          </form>
+          </FormContainer>
         )}
       </GlobalModal>
 

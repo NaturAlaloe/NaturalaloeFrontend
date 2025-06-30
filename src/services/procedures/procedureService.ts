@@ -46,3 +46,36 @@ export const getActiveProcedures = async (): Promise<Procedure[]> => {
     throw new Error("No se pudieron cargar los procedimientos activos");
   }
 };
+
+export const updateProcedure = async (data: any) => {
+  const formData = new FormData();
+  formData.append("id_documento", data.id_documento);
+  formData.append("descripcion", data.descripcion);
+  formData.append("id_responsable", data.id_responsable);
+  formData.append("fecha_creacion", data.fecha_creacion);
+  formData.append("fecha_vigencia", data.fecha_vigencia);
+  if (data.pdf instanceof File) {
+    formData.append("pdf", data.pdf);
+  }
+  // ...otros campos
+
+  const response = await api.post("/ruta-actualizar", formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+  return response.data;
+};
+
+export const deleteProcedure = async (id_documento: number) => {
+  try {
+    const response = await api.delete("/procedure", {
+      data: {
+        id_documento,
+        vigencia: 0
+      },
+      headers: { "Content-Type": "application/json" }
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || { success: false, message: "Error al eliminar el procedimiento" };
+  }
+};

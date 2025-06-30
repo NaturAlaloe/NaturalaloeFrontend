@@ -127,7 +127,7 @@ const StatsCards = () => {
               return (
                 <div
                   key={statIndex}
-                  className="bg-white rounded-2xl shadow-md p-8 w-full md:w-1/3 max-w-xs border border-green-100 flex flex-col justify-between"
+                  className="bg-white rounded-2xl shadow-md p-8 w-full md:w-1/3 max-w-xs  flex flex-col justify-between transition-transform duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400"
                 >
                   <h4 className="text-xl font-bold text-green-800 mb-4">{stat.area}</h4>
                   <div className="mb-2 flex justify-between">

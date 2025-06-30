@@ -1,8 +1,9 @@
-import { Search, Person, Badge, Apartment, Work, Close, Info, EditNote, ChatBubble } from "@mui/icons-material";
+import { Search, Person, Badge, Apartment, Work, EditNote, ChatBubble } from "@mui/icons-material";
 import { useState } from 'react';
 import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
+import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
+import GlobalModal from '../../components/globalComponents/GlobalModal';
 import { useCapacitationList } from '../../hooks/capacitations/useCapacitationList';
-import SimpleModal from "../../components/globalComponents/SimpleModal";
 
 export default function ListCapacitations() {
   const {
@@ -27,11 +28,12 @@ export default function ListCapacitations() {
     handleRowClick,
     navegarCapacitacionFinalizada,
     isLoading,
-   
   } = useCapacitationList();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentToShow, setCommentToShow] = useState<string | null>(null);
+
+  if (isLoading) return <FullScreenSpinner />;
 
   const columns = [
     {
@@ -86,12 +88,12 @@ export default function ListCapacitations() {
       name: 'ACCIONES',
       cell: (row: any) => (
         <div className="flex flex-col sm:flex-row gap-2 items-center justify-center">          <button
-            className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
-            onClick={() => navegarCapacitacionFinalizada(row.poe)}
-            title="Calificar examen"
-          >
-            <EditNote />
-          </button>
+          className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
+          onClick={() => navegarCapacitacionFinalizada(row.poe)}
+          title="Calificar examen"
+        >
+          <EditNote />
+        </button>
           <button
             className="text-[#2AAC67] hover:text-[#1e8449] transition-colors"
             onClick={() => {
@@ -166,7 +168,7 @@ export default function ListCapacitations() {
             <option key={seg} value={seg}>{seg}</option>
           ))}
         </select>      </div>
-   
+
       <div className="border border-gray-200 rounded-lg overflow-x-auto">
         <GlobalDataTable
           columns={columns}
@@ -193,89 +195,79 @@ export default function ListCapacitations() {
           }}
           onRowClicked={handleRowClick}
           progressPending={isLoading}
-        />
-      </div>
-      {showModal && selectedCapacitation && (
-        <div
-          className="fixed mt-15 inset-0 flex items-center justify-center z-50"
-          style={{
-            backdropFilter: "blur(4px)",
-            backgroundColor: "rgba(0,0,0,0.3)",
-          }}
-        >
-          <div className="bg-white rounded-2xl px-8 py-8 w-full max-w-3xl shadow-2xl relative  overflow-y-auto max-h-[95vh]">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
-            >
-              <Close />
-            </button>
-            <div className="flex flex-col items-center mb-8">
-              <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#2ecc71]/10 mb-2">
-                <Info className="text-[#2ecc71]" style={{ fontSize: 36 }} />
-              </div>
-              <h2 className="text-[#2ecc71] font-bold text-2xl text-center">Detalles de Capacitación</h2>
-            </div>            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left">
-                  Información de los Colaboradores
-                </h3>
-                <div className="space-y-3">
-                  {selectedCapacitation.colaboradores.map((colaborador, index) => (
-                    <details key={index} className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
-                      <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
-                        <Person className="mr-2" />
-                        {colaborador.nombreCompleto}
-                        <span className="ml-auto text-[#2ecc71]">▼</span>
-                      </summary>
-                      <div className="px-3 pb-3 pt-2">
-                        <div className="mb-2 flex items-center">
-                          <Badge className="mr-2 text-[#2ecc71]" />
-                          <span className="font-semibold mr-1">Cédula:</span> {colaborador.cedula}
-                        </div>
-                        <div className="mb-2 flex items-center">
-                          <Apartment className="mr-2 text-[#2ecc71]" />
-                          <span className="font-semibold mr-1">Departamento:</span> {colaborador.departamento}
-                        </div>
-                        <div className="mb-2 flex items-center">
-                          <Work className="mr-2 text-[#2ecc71]" />
-                          <span className="font-semibold mr-1">Puesto:</span> {colaborador.puesto}
-                        </div>
-                      </div>
-                    </details>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left mt-8 md:mt-0">Información del Profesor</h3>
-                <div className="mb-4">
-                  <details className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
+        />      </div>
+
+      <GlobalModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        title="Detalles de Capacitación"
+        maxWidth="md"
+      >
+        {selectedCapacitation && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left">
+                Información de los Colaboradores
+              </h3>
+              <div className="space-y-3">
+                {selectedCapacitation.colaboradores.map((colaborador, index) => (
+                  <details key={index} className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
                     <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
                       <Person className="mr-2" />
-                      {selectedCapacitation.profesor.nombre} {selectedCapacitation.profesor.apellido}
-                      <span className="ml-auto">▼</span>
+                      {colaborador.nombreCompleto}
+                      <span className="ml-auto text-[#2ecc71]">▼</span>
                     </summary>
                     <div className="px-3 pb-3 pt-2">
-                      <div className="mb-2 flex items-center"><Badge className="mr-2 text-[#2ecc71]" /> <span className="font-semibold mr-1">Identificación:</span> {selectedCapacitation.profesor.identificacion}</div>
+                      <div className="mb-2 flex items-center">
+                        <Badge className="mr-2 text-[#2ecc71]" />
+                        <span className="font-semibold mr-1">Cédula:</span> {colaborador.cedula}
+                      </div>
+                      <div className="mb-2 flex items-center">
+                        <Apartment className="mr-2 text-[#2ecc71]" />
+                        <span className="font-semibold mr-1">Departamento:</span> {colaborador.departamento}
+                      </div>
+                      <div className="mb-2 flex items-center">
+                        <Work className="mr-2 text-[#2ecc71]" />
+                        <span className="font-semibold mr-1">Puesto:</span> {colaborador.puesto}
+                      </div>
                     </div>
                   </details>
-                </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-[#2ecc71] font-bold text-lg mb-4 text-center md:text-left mt-8 md:mt-0">Información del Profesor</h3>
+              <div className="mb-4">
+                <details className="rounded-lg border border-[#2ecc71] bg-[#f6fff6]">
+                  <summary className="flex items-center px-3 py-2 cursor-pointer select-none font-semibold text-[#2ecc71]">
+                    <Person className="mr-2" />
+                    {selectedCapacitation.profesor.nombre} {selectedCapacitation.profesor.apellido}
+                    <span className="ml-auto">▼</span>
+                  </summary>
+                  <div className="px-3 pb-3 pt-2">
+                    <div className="mb-2 flex items-center">
+                      <Badge className="mr-2 text-[#2ecc71]" />
+                      <span className="font-semibold mr-1">Identificación:</span> {selectedCapacitation.profesor.identificacion}
+                    </div>
+                  </div>
+                </details>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </GlobalModal>
+
       {showCommentModal && (
-        <SimpleModal
+        <GlobalModal
           open={showCommentModal}
           onClose={() => setShowCommentModal(false)}
           title="Comentario"
-          widthClass="max-w-md w-full"
+          maxWidth="sm"
         >
           <div className="text-gray-800 text-sm whitespace-pre-line break-words">
             {commentToShow}
           </div>
-        </SimpleModal>
+        </GlobalModal>
       )}
     </div>
   );

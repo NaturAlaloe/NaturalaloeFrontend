@@ -19,6 +19,9 @@ export default function ViewCollaborators() {
     const [collaboratorToDelete, setCollaboratorToDelete] = useState<Collaborator | null>(null);
 
     const [editableData, setEditableData] = useState({
+        nombre: "",
+        apellido1: "",
+        apellido2: "",
         correo: "",
         numero: ""
     });
@@ -28,6 +31,9 @@ export default function ViewCollaborators() {
     useEffect(() => {
         if (selectedCollaborator) {
             setEditableData({
+                nombre: selectedCollaborator.nombre,
+                apellido1: selectedCollaborator.apellido1,
+                apellido2: selectedCollaborator.apellido2,
                 correo: selectedCollaborator.correo,
                 numero: selectedCollaborator.numero
             });
@@ -41,14 +47,20 @@ export default function ViewCollaborators() {
 
     const handleSaveChanges = async () => {
         if (!selectedCollaborator) return;
-        const result = await handleEditCollaborator({
+        const dataToUpdate = {
             id_colaborador: selectedCollaborator.id_colaborador,
+            nombre: editableData.nombre,
+            apellido1: editableData.apellido1,
+            apellido2: editableData.apellido2,
             correo: editableData.correo,
             numero: editableData.numero,
-        });
+        };
+        console.log("Datos a actualizar:", dataToUpdate); // <-- Aquí el console.log
+        const result = await handleEditCollaborator(dataToUpdate);
         if (result) {
             showCustomToast("Éxito", "Colaborador actualizado correctamente.", "success");
             setModalOpen(false);
+            console.log("Colaborador actualizado:", result);
             setSelectedCollaborator(null);
             fetchCollaborators();
         }
@@ -203,6 +215,43 @@ export default function ViewCollaborators() {
                                         />
                                     </div>
                                 </div>
+
+                                <div className="grid grid-cols-2 gap-4 mt-5">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                                        <InputField
+                                            name="nombre"
+                                            type="text"
+                                            value={editableData.nombre}
+                                            onChange={handleInputChange}
+                                            className="mt-1 block w-full p-2 border rounded-md focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Apellido1</label>
+                                        <InputField
+                                            name="apellido1"
+                                            type="text"
+                                            value={editableData.apellido1}
+                                            onChange={handleInputChange}
+                                            className="mt-1 block w-full p-2 border rounded-md focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 mt-5">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Apellido2</label>
+                                        <InputField
+                                            name="apellido2"
+                                            type="text"
+                                            value={editableData.apellido2}
+                                            onChange={handleInputChange}
+                                            className="mt-1 block w-full p-2 border rounded-md focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
+                                        />
+                                    </div>
+                                </div>
+
                             </div>
                         </GlobalModal>
                     )}

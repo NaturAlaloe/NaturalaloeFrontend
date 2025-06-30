@@ -21,7 +21,7 @@ export default function FormContainer({
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-11/12 md:w-[80%] p-10 space-y-10 bg-white border border-[#2AAC67] rounded-2xl shadow-2xl"
+        className="w-11/12 md:w-[100%] p-10 space-y-10 bg-white border border-[#2AAC67] rounded-2xl shadow-2xl"
       >
         {/* Encabezado */}
         <div className="flex items-center justify-center gap-4">
