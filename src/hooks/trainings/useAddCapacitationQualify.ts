@@ -1,32 +1,33 @@
 import { useState } from "react";
-import {
-  addQualifyTraining,
-  type QualifyPayload,
-} from "../../services/trainings/addTrainingQualifyService";
+import { addQualifyTraining } from "../../services/trainings/addTrainingQualifyService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+
+interface PayloadItem {
+  id_capacitacion: number;
+  seguimiento: "satisfactorio" | "reprogramar" | "revaluacion";
+  nota: number;
+  comentario_final: string;
+}
 
 export const useAddQualifyTraining = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const submitQualify = async (data: QualifyPayload[]) => {
+  const submitQualify = async (payload: PayloadItem[]) => {
     setLoading(true);
-    setError(null);
-
     try {
-      await addQualifyTraining(data);
-      showCustomToast(
-        "Calificación enviada",
-        "Se guardaron correctamente las calificaciones.",
-        "success"
-      );
-    } catch (err) {
-      setError("No se pudo enviar la calificación.");
-      showCustomToast("Error", "No se pudo enviar la calificación", "error");
+      console.log("🟡 [Hook] Payload recibido desde vista:", payload);
+      await addQualifyTraining(payload);
+      showCustomToast("Calificación guardada con éxito", undefined, "success");
+    } catch (error) {
+      console.error("🔴 [Hook] Error al guardar calificaciones:", error);
+      showCustomToast("Error al guardar", "Intente nuevamente", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  return { submitQualify, loading, error };
+  return {
+    submitQualify,
+    loading,
+  };
 };

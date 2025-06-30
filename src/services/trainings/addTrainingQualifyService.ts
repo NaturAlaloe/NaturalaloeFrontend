@@ -1,4 +1,3 @@
-// src/services/capacitations/addCapacitationQualifyService.ts
 import api from "../../apiConfig/api";
 
 export interface QualifyPayload {
@@ -12,9 +11,11 @@ export const addQualifyTraining = async (
   data: QualifyPayload[]
 ): Promise<void> => {
   try {
-    await api.post("/training/qualify", data);
+    console.log("🔵 [Service] Payload recibido para enviar:", data);
+    const response = await api.post("/training/qualify", data);
+    console.log("🟢 [Service] Respuesta del backend:", response.data);
   } catch (error) {
-    console.error("Error al calificar la capacitación:", error);
+    console.error("🔴 [Service] Error al calificar la capacitación:", error);
     throw error;
   }
 };
