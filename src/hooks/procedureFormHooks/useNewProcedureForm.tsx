@@ -10,6 +10,7 @@ import { useCreateProcedureSubmit } from "./useCreateProcedures";
 import { useProcedureCode } from "./useProcedureCode";
 import { useProcedureFormState } from "./useProcedureFormState";
 import { useProcedureFormHandlers } from "./useProcedureFormHandlers";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { useEffect } from "react";
 
 interface FormData {
@@ -75,7 +76,8 @@ export function useNewProcedureForm() {
   // Buscar consecutivo cuando cambian depto/cat
   useEffect(() => {
     if (departamentoSeleccionado && categoriaSeleccionada) {
-      fetchLastConsecutive();
+      const prefix = `${departamentoSeleccionado.codigo_departamento}-${categoriaSeleccionada.numero_categoria}`;
+      fetchLastConsecutive(prefix);
     }
   }, [departamentoSeleccionado, categoriaSeleccionada, fetchLastConsecutive]);
 
@@ -87,7 +89,7 @@ export function useNewProcedureForm() {
   );
 
   // PDF
-  const { pdfFile, setPdfFile, handlePdfChange, removePdf } = usePdfInput();
+  const { pdfFile, setPdfFile, handlePdfChange } = usePdfInput();
 
   // Reset
   const limpiarFormulario = useFormReset(initialState, setFormData, setPdfFile);
@@ -97,8 +99,49 @@ export function useNewProcedureForm() {
     useCreateProcedureSubmit();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!pdfFile) return;
-    if (!formData.area) return;
+    
+    // Validación completa de campos requeridos
+    if (!pdfFile) {
+      showCustomToast("Campo requerido", "Por favor, carga un archivo PDF", "error");
+      return;
+    }
+    if (!formData.titulo.trim()) {
+      showCustomToast("Campo requerido", "Por favor, ingresa el título del procedimiento", "error");
+      return;
+    }
+    if (!formData.area || !areaSeleccionada) {
+      showCustomToast("Campo requerido", "Por favor, selecciona un área", "error");
+      return;
+    }
+    if (!formData.departamento || !departamentoSeleccionado) {
+      showCustomToast("Campo requerido", "Por favor, selecciona un departamento", "error");
+      return;
+    }
+    if (!formData.categoria || !categoriaSeleccionada) {
+      showCustomToast("Campo requerido", "Por favor, selecciona una categoría", "error");
+      return;
+    }
+    if (!formData.responsable || !responsableSeleccionado) {
+      showCustomToast("Campo requerido", "Por favor, selecciona un responsable", "error");
+      return;
+    }
+    if (!formData.revision || Number(formData.revision) < 1) {
+      showCustomToast("Campo requerido", "Por favor, ingresa un número de revisión válido (mayor a 0)", "error");
+      return;
+    }
+    if (!formData.fechaCreacion) {
+      showCustomToast("Campo requerido", "Por favor, selecciona la fecha de creación", "error");
+      return;
+    }
+    if (!formData.fechaVigencia) {
+      showCustomToast("Campo requerido", "Por favor, selecciona la fecha de vigencia", "error");
+      return;
+    }
+    if (!codeApi) {
+      showCustomToast("Código no generado", "Espera a que se genere el código del procedimiento automáticamente", "error");
+      return;
+    }
+    
     try {
       await submitProcedure({
         descripcion: formData.titulo,
@@ -124,15 +167,12 @@ export function useNewProcedureForm() {
     handlePdfChange,
     pdfFile,
     setPdfFile,
-    removePdf,
-    setFormData,
     departments,
     loadingDepartments,
     areas,
     loadingAreas,
     categorias,
     loadingCategorias,
-    submitProcedure,
     loadingSubmit,
     responsibles,
     loadingResponsibles,
@@ -144,6 +184,5 @@ export function useNewProcedureForm() {
     handleSubmit,
     procedureCode: codeVisual,
     loadingConsecutivo,
-    limpiarFormulario,
   };
 }

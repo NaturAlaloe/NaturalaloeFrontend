@@ -15,14 +15,34 @@ export async function getPoliticsConsecutive() {
 }
 
 export async function getPoliticsList() {
-  const response = await api.get("/police");
+  const response = await api.get("/police/versions");
   return response.data.data; 
 }
+
+
+
+export async function getActivePolitics() {
+  const response = await api.get("/policeActive");
+  return response.data.data;
+}
+
+
 
 export const updatePolitics = async (
   formData: FormData
 ) => {
   const response = await api.put(`/police`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    };
+
+export const createNewPoliticsVersion = async (
+  formData: FormData
+) => {
+  const response = await api.put(`/police/increase`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

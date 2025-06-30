@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import InputField from "../../components/formComponents/InputField";
-import { useNavigate } from "react-router-dom";
+import api from "../../apiConfig/api";
 
 export default function RecoverPassword() {
   const [correo, setCorreo] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const [mensaje, setMensaje] = useState("");
 
   // Animación para el formulario
   const formVariants = {
@@ -15,14 +15,17 @@ export default function RecoverPassword() {
     exit: { opacity: 0, y: -40 },
   };
 
-  // Simulación de envío de correo
-  const handleSendEmail = (e: React.FormEvent) => {
+  const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate("/login/changePassword");
-    }, 1200);
+    setMensaje("");
+    try {
+      const res = await api.post("/requestPasswordReset", { email: correo });
+      setMensaje(res.data.message || "Si el correo existe, se ha enviado un enlace para restablecer la contraseña.");
+    } catch (err: any) {
+      setMensaje("Error al enviar el correo. Intenta de nuevo.");
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -63,6 +66,9 @@ export default function RecoverPassword() {
             {isLoading ? "Enviando..." : "Enviar enlace de recuperación"}
           </button>
         </motion.form>
+        {mensaje && (
+          <div className="mt-4 text-center text-green-600 font-semibold">{mensaje}</div>
+        )}
       </motion.div>
     </div>
   );
