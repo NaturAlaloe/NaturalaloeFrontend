@@ -87,6 +87,13 @@ export function useCapacitation() {
     loadInitialData();
   }, []);
 
+  // Limpiar método de evaluación cuando isEvaluado cambie a false
+  useEffect(() => {
+    if (!isEvaluado) {
+      setFormData(prev => ({ ...prev, metodoEvaluacion: "" }));
+    }
+  }, [isEvaluado]);
+
   const loadFacilitadores = async () => {
     try {
       setLoadingFacilitadores(true);
@@ -226,9 +233,14 @@ export function useCapacitation() {
         fecha_fin: formData.fechaFin,
         comentario: formData.comentario || undefined,
         is_evaluado: isEvaluado,
-        metodo_empleado: formData.metodoEvaluacion,
+        metodo_empleado: isEvaluado && formData.metodoEvaluacion && formData.metodoEvaluacion !== "" && formData.metodoEvaluacion !== "Seleccione..." ? formData.metodoEvaluacion : undefined,
         duracion: parseFloat(formData.duracion),
       };
+
+      console.log("Datos a enviar:", capacitacionData);
+      console.log("isEvaluado:", isEvaluado);
+      console.log("metodoEvaluacion:", formData.metodoEvaluacion);
+      console.log("metodo_empleado final:", capacitacionData.metodo_empleado);
 
       const validationErrors = validateCapacitacionData(capacitacionData);
       if (validationErrors.length > 0) {
