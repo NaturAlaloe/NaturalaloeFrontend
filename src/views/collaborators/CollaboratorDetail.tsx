@@ -52,6 +52,8 @@ export default function CollaboratorDetail() {
           sx={{
             minWidth: 300,
             maxWidth: 340,
+            height: "fit-content",
+            alignSelf: "flex-start",
             mr: 5,
             bgcolor: "#F6FBF7",
             borderRadius: 4,

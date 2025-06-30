@@ -68,6 +68,8 @@ export default function AreasList() {
         data={ui.filteredAreas}
         rowsPerPage={5}
         progressPending={ui.loading}
+        currentPage={ui.currentPage}
+        onChangePage={ui.setCurrentPage}
       />
 
       <GlobalModal
@@ -121,11 +123,9 @@ export default function AreasList() {
           </div>
         }
       >
-        <div>¿Estás seguro de que deseas eliminar esta área?</div>
+        <div className="flex justify-center items-center text-center">¿Estás seguro de que deseas eliminar esta área?</div>
       </GlobalModal>
-      {ui.error && (
-        <div className="text-red-500 mt-2 text-center">{ui.error}</div>
-      )}
+    
     </TableContainer>
   );
 }

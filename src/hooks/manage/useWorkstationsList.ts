@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useWorkstations } from "./useWorkstations";
 import { addWorkstation, updateWorkstation, deleteWorkstation as deleteWorkstationApi } from "../../services/manage/workstationService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
@@ -19,6 +19,11 @@ export function useWorkstationsList() {
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
   const [editWorkstation, setEditWorkstation] = useState<any | null>(null);
   const [deleteWorkstation, setDeleteWorkstation] = useState<any | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   // Form states
   const [workstationInput, setWorkstationInput] = useState("");
@@ -76,7 +81,7 @@ export function useWorkstationsList() {
       showCustomToast("Error al guardar", "Intenta de nuevo", "error");
     }
   };
-
+  
   const handleDelete = async () => {
     try {
       if (deleteWorkstation) {
@@ -85,8 +90,15 @@ export function useWorkstationsList() {
       }
       setDeleteWorkstation(null);
       refetch();
-    } catch (err) {
-      showCustomToast("Error al eliminar", "Intenta de nuevo", "error");
+    } catch (err: any) {
+      // Intenta extraer el mensaje del backend
+      let message = "Intenta de nuevo";
+      if (err?.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err?.message) {
+        message = err.message;
+      }
+      showCustomToast("Atención", message, "info");  
     }
   };
 
@@ -115,5 +127,7 @@ export function useWorkstationsList() {
     handleOpenEdit,
     handleSave,
     handleDelete,
+    currentPage,
+    setCurrentPage,
   };
 }

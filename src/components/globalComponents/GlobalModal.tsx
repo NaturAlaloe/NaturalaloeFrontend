@@ -10,6 +10,7 @@ interface CenteredTitleModalProps {
   actions?: React.ReactNode;
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
   fullWidth?: boolean;
+  backgroundColor?: string; // <-- Nueva prop
 }
 
 export default function GlobalModal({
@@ -20,6 +21,7 @@ export default function GlobalModal({
   actions,
   maxWidth = "md",
   fullWidth = true,
+  backgroundColor = "#fff", // <-- Valor por defecto
 }: CenteredTitleModalProps) {
   return (
     <Dialog
@@ -27,13 +29,13 @@ export default function GlobalModal({
       onClose={onClose}
       maxWidth={maxWidth}
       fullWidth={fullWidth}
-        PaperProps={{
-            sx: {
-            borderRadius: "10px",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-            backgroundColor: "#fff",
-            },
-        }}
+      PaperProps={{
+        sx: {
+          borderRadius: "10px",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+          backgroundColor: backgroundColor, // <-- Usa la prop aquí
+        },
+      }}
       BackdropProps={{
         style: {
           backdropFilter: "blur(4px)",
@@ -45,7 +47,7 @@ export default function GlobalModal({
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "center", 
+          justifyContent: "center",
           background: "#2AAC67",
           px: 2,
           pt: 2,
@@ -76,7 +78,7 @@ export default function GlobalModal({
         <DialogActions
           sx={{
             display: "flex",
-            justifyContent: "center", 
+            justifyContent: "center",
             alignItems: "center",
           }}
         >

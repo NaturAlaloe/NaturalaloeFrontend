@@ -3,7 +3,7 @@ import InputField from "../../components/formComponents/InputField";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import LogoNaturaloe from "../../assets/img/Logo_Naturaloe.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import SubmitButton from "../../components/formComponents/SubmitButton";
@@ -23,7 +23,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
   const { login, error, success, loading } = useLogin();
 
-  // Llama a onLoginSuccess cuando el login sea exitoso
   useEffect(() => {
     if (success) {
       onLoginSuccess();

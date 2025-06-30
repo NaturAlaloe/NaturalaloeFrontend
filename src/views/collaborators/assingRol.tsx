@@ -63,6 +63,7 @@ export default function AssignRol() {
     }
   };
 
+
   // Manejar asignación y desasignación de roles
   const manejarAsignarRoles = async () => {
     if (!colaboradorSeleccionado) {
@@ -91,6 +92,7 @@ export default function AssignRol() {
       showCustomToast('Fallo al actualizar', undefined, 'error');
       console.error('Error al procesar roles:', error);
     }
+
   };
 
   // Roles a mostrar en la página actual

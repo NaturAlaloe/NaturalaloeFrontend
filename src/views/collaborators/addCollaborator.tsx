@@ -11,7 +11,8 @@ import { useAddCollaborator } from "../../hooks/collaborators/useAddCollaborator
 function addCollaborator() {
   const [formData, setFormData] = useState({
     nombreCompleto: "",
-    apellidos: "",
+    apellido1: "",
+    apellido2: "",
     cedula: "",
     correo: "",
     numero: "",
@@ -74,7 +75,8 @@ function addCollaborator() {
       id_colaborador: Number(formData.cedula), 
       id_puesto: Number(formData.puesto),
       nombre: formData.nombreCompleto,
-      apellido: formData.apellidos,
+      apellido1: formData.apellido1,
+      apellido2: formData.apellido2,
       fecha_nacimiento: formData.fechaNacimiento,
       numero: formData.numero,
       correo: formData.correo,
@@ -97,16 +99,25 @@ function addCollaborator() {
             pattern={undefined}
           />
 
+         
           <InputField
-            label="Apellidos"
-            name="apellidos"
-            value={formData.apellidos}
+            label="Primer Apellido"
+            name="apellido1"
+            value={formData.apellido1}
             onChange={handleChange}
-            placeholder="Ingrese los apellidos"
+            placeholder="Ingrese el primer apellido"
             required
             pattern={undefined}
           />
-
+          <InputField
+            label="Segundo Apellido"
+            name="apellido2"
+            value={formData.apellido2}
+            onChange={handleChange}
+            placeholder="Ingrese el segundo apellido"
+            required
+            pattern={undefined}
+          />
           <InputField
             label="Cédula"
             name="cedula"

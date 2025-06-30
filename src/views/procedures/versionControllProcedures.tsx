@@ -1,66 +1,74 @@
-import { Download } from "@mui/icons-material";
-import { useVersionControlProcedures } from "../../hooks/procedures/useVersionControlProcedures";
-import type { PoeRow } from "../../hooks/procedures/useVersionControlProcedures";
+import React from "react";
+import { Visibility } from "@mui/icons-material";
+import { useProceduresVersions, type ProcedureRow } from "../../hooks/proceduresVersionControll/useProceduresVersions";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import SearchBar from "../../components/globalComponents/SearchBarTable";
+import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner"; // <-- Importa el spinner
 
 export default function VersionControlProcedures() {
-  const {
-    poes,
-    filterText,
-    setFilterText,
-    selectedRevision,
-    setSelectedRevision,
-  } = useVersionControlProcedures();
+  const { procedures, loading } = useProceduresVersions();
+  // Filtro local (puedes mejorarlo con useMemo si la tabla es grande)
+  const [filterText, setFilterText] = React.useState("");
+  const [selectedRevision, setSelectedRevision] = React.useState<Record<string, number>>({});
+
+  const filteredProcedures = procedures.filter((row) => {
+    const text = filterText.toLowerCase();
+    return (
+      row.codigo_poe.toLowerCase().includes(text) ||
+      row.titulo.toLowerCase().includes(text) ||
+      row.departamento.toLowerCase().includes(text) ||
+      row.versiones.some((v) => v.responsable.toLowerCase().includes(text))
+    );
+  });
 
   const columns = [
     {
       name: "POE",
-      selector: (row: PoeRow) => row.codigo,
+      selector: (row: ProcedureRow) => row.codigo_poe,
       sortable: true,
-      cell: (row: PoeRow) => (
-        <div className="text-sm font-medium text-gray-900">{row.codigo}</div>
+      cell: (row: ProcedureRow) => (
+        <div className="text-sm font-medium text-gray-900">{row.codigo_poe}</div>
       ),
       width: "120px",
     },
     {
       name: "TÍTULO",
-      selector: (row: PoeRow) => row.titulo,
+      selector: (row: ProcedureRow) => row.titulo,
       sortable: true,
-      cell: (row: PoeRow) => (
+      cell: (row: ProcedureRow) => (
         <div className="text-sm text-gray-700">{row.titulo}</div>
       ),
       grow: 2,
     },
     {
       name: "DEPARTAMENTO",
-      selector: (row: PoeRow) => row.departamento,
+      selector: (row: ProcedureRow) => row.departamento,
       sortable: true,
-      cell: (row: PoeRow) => (
+      cell: (row: ProcedureRow) => (
         <div className="text-sm text-gray-700">{row.departamento}</div>
       ),
     },
     {
       name: "RESPONSABLE",
-      selector: (row: PoeRow) => row.responsable,
+      selector: (row: ProcedureRow) => row.versiones[selectedRevision[row.codigo_poe] ?? row.versiones.length - 1]?.responsable || "",
       sortable: true,
-      cell: (row: PoeRow) => (
-        <div className="text-sm text-gray-700">{row.responsable}</div>
+      cell: (row: ProcedureRow) => (
+        <div className="text-sm text-gray-700">{row.versiones[selectedRevision[row.codigo_poe] ?? row.versiones.length - 1]?.responsable || ""}</div>
       ),
     },
     {
       name: "REVISIÓN",
-      cell: (row: PoeRow) => {
-        const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
+      cell: (row: ProcedureRow) => {
+        const idx = selectedRevision[row.codigo_poe] ?? row.versiones.length - 1;
         return (
           <select
             className="border border-gray-300 rounded px-2 py-1 text-sm text-[#2AAC67] bg-white"
             value={idx}
-            onChange={e => setSelectedRevision({ ...selectedRevision, [row.codigo]: Number(e.target.value) })}
+            onChange={e => setSelectedRevision({ ...selectedRevision, [row.codigo_poe]: Number(e.target.value) })}
             style={{ minWidth: 80 }}
           >
             {row.versiones.map((ver, i) => (
-              <option key={ver.revision} value={i}>{ver.revision}</option>
+              <option key={ver.id_documento} value={i}>{ver.revision}</option>
             ))}
           </select>
         );
@@ -70,11 +78,11 @@ export default function VersionControlProcedures() {
     },
     {
       name: "FECHA VIGENCIA",
-      cell: (row: PoeRow) => {
-        const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
+      cell: (row: ProcedureRow) => {
+        const idx = selectedRevision[row.codigo_poe] ?? row.versiones.length - 1;
         return (
           <div className="text-sm text-gray-700" style={{ whiteSpace: "normal", wordBreak: "break-word", minWidth: 0 }}>
-            {row.versiones[idx].fechaVigencia}
+            {row.versiones[idx]?.fecha_vigencia || ""}
           </div>
         );
       },
@@ -83,20 +91,19 @@ export default function VersionControlProcedures() {
     },
     {
       name: "DOCUMENTO",
-      cell: (row: PoeRow) => {
-        const idx = selectedRevision[row.codigo] ?? row.versiones.length - 1;
+      cell: (row: ProcedureRow) => {
+        const idx = selectedRevision[row.codigo_poe] ?? row.versiones.length - 1;
         return (
           <a
-            href={row.versiones[idx].pdfUrl}
+            href={row.versiones[idx]?.ruta_documento || undefined}
             target="_blank"
             rel="noopener noreferrer"
             className="action-button text-[#2AAC67] hover:text-[#1e8449] flex items-center gap-1"
-            download
-            title="Descargar PDF"
+            title="Visualizar PDF"
             onClick={e => e.stopPropagation()}
           >
-            <Download fontSize="small" />
-            <span className="underline">PDF</span>
+            <Visibility fontSize="small" />
+            <span className="underline">Ver</span>
           </a>
         );
       },
@@ -106,6 +113,11 @@ export default function VersionControlProcedures() {
       width: "120px",
     },
   ];
+
+  // Muestra el spinner a pantalla completa mientras loading sea true
+  if (loading) {
+    return <FullScreenSpinner />;
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
@@ -123,8 +135,9 @@ export default function VersionControlProcedures() {
       {/* DataTable */}
       <GlobalDataTable
         columns={columns}
-        data={poes}
+        data={filteredProcedures}
         pagination={true}
+        progressPending={loading}
         noDataComponent={
           <div className="px-6 py-4 text-center text-sm text-gray-500">
             No se encontraron versiones de POEs

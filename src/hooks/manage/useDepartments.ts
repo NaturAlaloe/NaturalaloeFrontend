@@ -42,7 +42,7 @@ export function useDepartments() {
         err?.response?.data?.error ||
         "Error al agregar departamento";
       setError(backendMsg);
-      showCustomToast("Error", backendMsg, "info");
+      showCustomToast("Atención", backendMsg, "info");
       return false;
     } finally {
       setLoading(false);
@@ -67,7 +67,7 @@ export function useDepartments() {
         err?.response?.data?.error ||
         "Error al actualizar departamento";
       setError(backendMsg);
-      showCustomToast("Error", backendMsg, "info");
+      showCustomToast("Atención", backendMsg, "info");
       return false;
     } finally {
       setLoading(false);
@@ -78,7 +78,7 @@ export function useDepartments() {
     setLoading(true);
     setError(null);
     try {
-      const response = await deleteDepartment(id);
+      await deleteDepartment(id);
       await fetchDepartments();
       showCustomToast("Éxito", "Departamento eliminado correctamente", "success");
       return true;
@@ -89,7 +89,7 @@ export function useDepartments() {
         err?.response?.data?.error ||
         "Error al eliminar departamento";
       setError(backendMsg);
-      showCustomToast("Error", backendMsg, "info");
+      showCustomToast("Atención", backendMsg, "info");
       return false;
     } finally {
       setLoading(false);

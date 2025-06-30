@@ -17,6 +17,7 @@ export const useCategoriesList = () => {
   const [deleteCategoryObj, setDeleteCategoryObj] = useState<Category | null>(null);
   const [categoryInput, setCategoryInput] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch categories on mount y para refetch
   const fetchCategories = async () => {
@@ -34,6 +35,10 @@ export const useCategoriesList = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const refetch = fetchCategories;
 
@@ -112,7 +117,7 @@ export const useCategoriesList = () => {
     } catch (err: any) {
       if (err?.response?.data?.message) {
         setError(err.response.data.message);
-        showCustomToast("Error", err.response.data.message, "error");
+        showCustomToast("Atención", err.response.data.message, "info");
       } else {
         setError('Error al eliminar la categoría');
         showCustomToast("Error", "No se pudo eliminar la categoría", "error");
@@ -142,5 +147,7 @@ export const useCategoriesList = () => {
     handleDelete,
     error,
     refetch,
+    currentPage,
+    setCurrentPage,
   };
 };

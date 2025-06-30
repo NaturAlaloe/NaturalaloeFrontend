@@ -13,7 +13,6 @@ import { useDepartments } from "../../hooks/manage/useDepartments";
 export default function ListWorkstations() {
   const {
     loading,
-    error,
     search,
     setSearch,
     modalOpen,
@@ -31,6 +30,8 @@ export default function ListWorkstations() {
     handleOpenEdit,
     handleSave,
     handleDelete,
+    currentPage,
+    setCurrentPage,
   } = useWorkstationsList();
 
   const {
@@ -93,6 +94,8 @@ export default function ListWorkstations() {
         data={filteredWorkstations}
         rowsPerPage={5}
         progressPending={loading}
+        currentPage={currentPage}
+        onChangePage={setCurrentPage}
       />
 
       <GlobalModal
@@ -157,7 +160,7 @@ export default function ListWorkstations() {
           </div>
         }
       >
-        <div>¿Estás seguro de que deseas eliminar este puesto?</div>
+         <div className="flex justify-center items-center text-center">¿Estás seguro de que deseas eliminar este puesto?</div>
       </GlobalModal>
     </TableContainer>
   );

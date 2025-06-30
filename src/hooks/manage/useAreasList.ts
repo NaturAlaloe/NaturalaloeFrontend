@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAreas } from "./useAreas";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
@@ -14,6 +14,11 @@ export function useAreasList() {
   const [areaPadreInput, setAreaPadreInput] = useState<number | undefined>(undefined);
   const [deleteAreaObj, setDeleteAreaObj] = useState<any | null>(null);
   const [editAreaObj, setEditAreaObj] = useState<any | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const filteredAreas = Array.isArray(areas)
     ? areas.filter((a) => a.titulo.toLowerCase().includes(search.toLowerCase()))
@@ -53,8 +58,13 @@ export function useAreasList() {
         setEditAreaObj(null);
         setAreaInput("");
         setAreaPadreInput(undefined);
-      } catch (err) {
-        showCustomToast("Error", "Error al actualizar área", "error");
+      } catch (err: any) {
+        // Extrae el mensaje del backend si existe
+        const backendMsg =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          "Error al actualizar área";
+        showCustomToast("Atención", backendMsg, "info");
       }
     } else {
       try {
@@ -66,8 +76,13 @@ export function useAreasList() {
         setModalOpen(false);
         setAreaInput("");
         setAreaPadreInput(undefined);
-      } catch (err) {
-        showCustomToast("Error", "Error al agregar área", "error");
+      } catch (err: any) {
+        // Extrae el mensaje del backend si existe
+        const backendMsg =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          "Error al agregar área";
+        showCustomToast("Atención", backendMsg, "info");
       }
     }
   };
@@ -77,8 +92,13 @@ export function useAreasList() {
       try {
         await removeArea(deleteAreaObj.id_area);
         showCustomToast("Éxito", "Área eliminada correctamente", "success");
-      } catch (err) {
-        showCustomToast("Error", "Error al eliminar área", "error");
+      } catch (err: any) {
+        // Extrae el mensaje del backend si existe
+        const backendMsg =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          "Error al eliminar área";
+        showCustomToast("Atención", backendMsg, "info");
       }
       setDeleteAreaObj(null);
     }
@@ -108,5 +128,7 @@ export function useAreasList() {
     handleOpenDelete,
     handleSave,
     handleDelete,
+    currentPage,
+    setCurrentPage,
   };
 }
