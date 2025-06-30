@@ -6,7 +6,7 @@ import Login from './views/login/login';
 import ChangePassword from './views/login/changePassword';
 import RecoverPassword from './views/login/recoverPassword';
 import api from './apiConfig/api';
-import HomeScreen from './views/home/HomeScreen';
+
 import AllStatsCards from './views/estadisticas/AllStatsCards';
 
 function App() {
@@ -63,9 +63,6 @@ function App() {
         ) : (
           <Drawer onLogout={handleLogout} />
         )}
-        <Routes>
-          <Route path="/estadisticas" element={<AllStatsCards />} />
-        </Routes>
       </BrowserRouter>
     </>
   );

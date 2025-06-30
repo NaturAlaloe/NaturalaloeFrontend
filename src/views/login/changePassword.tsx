@@ -1,49 +1,72 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import InputField from "../../components/formComponents/InputField";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+import api from "../../apiConfig/api";
 
 export default function ChangePassword() {
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const params = new URLSearchParams(location.search);
+  const token = params.get("token");
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      alert("Por favor completa todos los campos");
+    if (!newPassword || !confirmPassword) {
+      showCustomToast("Error", "Por favor completa todos los campos", "error");
       return;
     }
     if (newPassword !== confirmPassword) {
-      alert("Las contraseñas nuevas no coinciden");
+      showCustomToast("Error", "Las contraseñas nuevas no coinciden", "error");
+      return;
+    }
+    if (!token) {
+      showCustomToast("Error", "Token inválido o faltante", "error");
       return;
     }
     setIsSubmitting(true);
-    // Aquí va tu lógica real de cambio de contraseña (API call)
-    setTimeout(() => {
-      setIsSubmitting(false);
-      showCustomToast("Éxito", "Contraseña actualizada correctamente");
-        // Redirigir a ñlogin 
-        setTimeout(() => {
-        window.location.replace("/login");
-        }, 2000);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    }, 1500);
+    try {
+      const res = await api.post("/resetPassword", {
+        token,
+        nuevaContrasena: newPassword,
+      });
+      if (res.data.success) {
+        showCustomToast("Éxito", "Contraseña restablecida correctamente", "success");
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        showCustomToast("Error", res.data.message, "error");
+      }
+    } catch (err: any) {
+      showCustomToast("Error", "Error al restablecer la contraseña", "error");
+    }
+    setIsSubmitting(false);
   };
+
+  if (!token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#eafbf2]">
+        <div className="bg-white p-8 rounded shadow text-center">
+          <h2 className="text-xl font-bold mb-4 text-[#2AAC67]">Enlace inválido</h2>
+          <p>
+            El enlace para restablecer la contraseña no es válido o ha expirado.<br />
+            Solicita uno nuevo desde la página de recuperación.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#eafbf2] to-[#d6f5e3] flex items-center justify-center p-6 font-[Poppins]">
       <div className="bg-white rounded-[2rem] p-8 shadow-[0_20px_40px_rgba(0,0,0,0.1)] w-full max-w-md relative z-10  flex flex-col items-center">
         <h1 className="text-2xl font-bold text-[#2AAC67] mb-2 uppercase tracking-wide text-center drop-shadow">
-          Módulo de Seguridad
+          Restablecer Contraseña
         </h1>
-        <h2 className="text-lg text-[#023047] font-semibold mb-6 text-center relative pb-2 after:content-[''] after:block after:mx-auto after:w-16 after:h-1 after:bg-[#2AAC67] after:rounded after:mt-2 after:animate-slidein">
-          Cambia tu contraseña
-        </h2>
         <form className="w-full flex flex-col gap-4" onSubmit={handleChangePassword}>
-         
           <InputField
             label="Nueva Contraseña"
             name="newPassword"
@@ -71,17 +94,6 @@ export default function ChangePassword() {
           </button>
         </form>
       </div>
-      <style>
-        {`
-          @keyframes slidein {
-            from { transform: scaleX(0); }
-            to { transform: scaleX(1); }
-          }
-          .after\\:animate-slidein::after {
-            animation: slidein 0.3s ease forwards;
-          }
-        `}
-      </style>
     </div>
   );
 }
