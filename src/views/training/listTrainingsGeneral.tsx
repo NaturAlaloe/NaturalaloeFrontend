@@ -17,6 +17,8 @@ export default function ListCapacitationGeneral() {
     loading,
     setEditing,
     openAdd,
+    setCurrentPage,
+    currentPage,
     openEdit,
     openDelete,
     closeModal,
@@ -27,7 +29,7 @@ export default function ListCapacitationGeneral() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Filtrar toda la lista según búsqueda (sin paginar aquí)
+  
   const filtered = generales.filter((item) => {
     const codigo = (item.codigo ?? "").toLowerCase().trim();
     const titulo = (item.titulo ?? "").toLowerCase().trim();
@@ -92,10 +94,12 @@ export default function ListCapacitationGeneral() {
 
       <GlobalDataTable
         columns={columns}
-        data={filtered} // PASAMOS toda la lista filtrada completa
-        pagination // paginación nativa del componente
+        data={filtered}
+        pagination 
         highlightOnHover
         dense
+        currentPage={currentPage}
+        onChangePage={setCurrentPage}
       />
 
       {/* Modal Agregar/Editar */}
