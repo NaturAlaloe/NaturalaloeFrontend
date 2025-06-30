@@ -117,7 +117,7 @@ export const useCategoriesList = () => {
     } catch (err: any) {
       if (err?.response?.data?.message) {
         setError(err.response.data.message);
-        showCustomToast("Error", err.response.data.message, "error");
+        showCustomToast("Atención", err.response.data.message, "info");
       } else {
         setError('Error al eliminar la categoría');
         showCustomToast("Error", "No se pudo eliminar la categoría", "error");
