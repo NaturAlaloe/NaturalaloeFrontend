@@ -36,23 +36,34 @@ const TableRol: React.FC<TableRolProps> = ({
   const [pagina, setPagina] = useState(0);
 
   // Filtrar roles por búsqueda
-  const filteredRoles = useMemo(
-    () =>
-      roles.filter((rol) =>
-        rol.toLowerCase().includes(search.trim().toLowerCase())
-      ),
-    [roles, search]
-  );
+const filteredRoles = useMemo(
+  () =>
+    roles.filter((rol) =>
+      rol.toLowerCase().includes(search.trim().toLowerCase())
+    ),
+  [roles, search]
+);
 
-  // Roles a mostrar en la página actual
-  const paginatedRoles = useMemo(
-    () =>
-      filteredRoles.slice(
-        pagina * rolesPorPagina,
-        pagina * rolesPorPagina + rolesPorPagina
-      ),
-    [filteredRoles, pagina]
-  );
+// Ordenar: asignados primero
+const orderedRoles = useMemo(
+  () =>
+    filteredRoles.slice().sort((a, b) => {
+      const aAssigned = rolesSeleccionados.includes(a) ? -1 : 1;
+      const bAssigned = rolesSeleccionados.includes(b) ? -1 : 1;
+      return aAssigned - bAssigned;
+    }),
+  [filteredRoles, rolesSeleccionados]
+);
+
+// Roles a mostrar en la página actual
+const paginatedRoles = useMemo(
+  () =>
+    orderedRoles.slice(
+      pagina * rolesPorPagina,
+      pagina * rolesPorPagina + rolesPorPagina
+    ),
+  [orderedRoles, pagina]
+);
 
   // Si cambias el filtro, vuelve a la página 0
   React.useEffect(() => {
