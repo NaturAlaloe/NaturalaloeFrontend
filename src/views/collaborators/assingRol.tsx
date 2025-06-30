@@ -192,14 +192,13 @@ export default function AssignRol() {
                         colab.id_colaborador,
                         colab.nombre,
                         colab.apellido1,
-                        colab.apellido2,
-                        colab.puesto
+                        colab.apellido2,                      
                       )
                     }
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      py: 1, // Menos alto
+                      py: 1, 
                       px: 2,
                       mb: 1,
                       borderRadius: 2,
@@ -220,12 +219,7 @@ export default function AssignRol() {
                     </Box>
                     <Box sx={{ color: '#333', fontWeight: 500 }}>
                       {[colab.nombre, colab.apellido1, colab.apellido2].filter(Boolean).join(' ').trim() || 'Sin nombre'}
-                    </Box>
-                    {colab.puesto && (
-                      <Box sx={{ ml: 'auto', color: '#1F8A50', fontSize: 13, fontWeight: 500, px: 1.5, py: 0.5, borderRadius: 1, background: '#E6F3EA' }}>
-                        {colab.puesto}
-                      </Box>
-                    )}
+                    </Box>                  
                   </Box>
                 ))
             )}
