@@ -6,6 +6,10 @@ import {
   getColaboradores,
   type Colaboradores,
 } from "../../services/trainings/getTrainingsService";
+import {
+  getGeneral,
+  type Genaral,
+} from "../../services/trainings/getTrainigGeneralService";
 
 interface FormData {
   titulo: string;
@@ -37,6 +41,12 @@ export function useGeneralTraining() {
   const [showColaboradoresTable, setShowColaboradoresTable] = useState(false);
   const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>([]);
 
+  // Estados para generales
+  const [generalesDisponibles, setGeneralesDisponibles] = useState<Genaral[]>([]);
+  const [loadingGenerales, setLoadingGenerales] = useState(false);
+  const [showGeneralesTable, setShowGeneralesTable] = useState(false);
+  const [generalesAsignadas, setGeneralesAsignadas] = useState<any[]>([]);
+
   const columnsColaboradores = [
     {
       name: "Nombre",
@@ -50,13 +60,27 @@ export function useGeneralTraining() {
     },
   ];
 
+  const columnsGenerales = [
+    {
+      name: "Código",
+      selector: (row: any) => row?.codigo || "Sin código",
+      sortable: true,
+    },
+    {
+      name: "Descripción",
+      selector: (row: any) => row?.descripcion || "Sin descripción",
+      sortable: true,
+    },
+  ];
+
   useEffect(() => {
     const loadInitialData = async () => {
       setLoadingInitialData(true);
       try {
         await Promise.all([
           loadFacilitadores(),
-          loadColaboradores()
+          loadColaboradores(),
+          loadGenerales()
         ]);
       } finally {
         setLoadingInitialData(false);
@@ -105,6 +129,27 @@ export function useGeneralTraining() {
     }
   };
 
+  const loadGenerales = async () => {
+    try {
+      setLoadingGenerales(true);
+      const data = await getGeneral();
+      const generalesTransformadas = data
+        .filter(Boolean)
+        .map((general) => ({
+          ...general,
+          id: general.id_general,
+        }));
+
+      setGeneralesDisponibles(generalesTransformadas);
+    } catch (error) {
+      console.error("Error al cargar generales:", error);
+      showCustomToast("Error", "No se pudieron cargar las generales", "error");
+      setGeneralesDisponibles([]);
+    } finally {
+      setLoadingGenerales(false);
+    }
+  };
+
   const getNombreCompletoFacilitador = (facilitador: Facilitador): string => {
     return `${facilitador.nombre} ${facilitador.apellido1} ${facilitador.apellido2}`.trim();
   };
@@ -123,6 +168,14 @@ export function useGeneralTraining() {
       ...seleccionados.filter(c => !prev.some(asig => asig.id === c.id))
     ]);
     setShowColaboradoresTable(false);
+  };
+
+  const agregarGenerales = (seleccionadas: any[]) => {
+    setGeneralesAsignadas(prev => [
+      ...prev,
+      ...seleccionadas.filter(g => !prev.some(asig => asig.id === g.id))
+    ]);
+    setShowGeneralesTable(false);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -198,7 +251,7 @@ export function useGeneralTraining() {
       comentario: "",
     });
     setColaboradoresAsignados([]);
-    
+    setGeneralesAsignadas([]);
   };
 
   return {
@@ -230,5 +283,15 @@ export function useGeneralTraining() {
     setShowColaboradoresTable,
     columnsColaboradores,
     agregarColaboradores,
+
+    // Generales
+    generalesDisponibles,
+    loadingGenerales,
+    generalesAsignadas,
+    setGeneralesAsignadas,
+    showGeneralesTable,
+    setShowGeneralesTable,
+    columnsGenerales,
+    agregarGenerales,
   };
 }

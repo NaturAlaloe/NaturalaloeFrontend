@@ -24,9 +24,15 @@ const GeneralTraining = () => {
         isLoading,
         loadingFacilitadores,
         getFacilitadoresOptions,
+        
+        // Elementos para generales
+        generalesDisponibles,
+        columnsGenerales,
+        showGeneralesTable,
+        setShowGeneralesTable,
+        generalesAsignadas,
+        agregarGenerales,
     } = useGeneralTraining();
-
-    
 
     return (
         <FormContainer
@@ -167,6 +173,48 @@ const GeneralTraining = () => {
                         </div>
                     </div>
 
+                    {/* Sección de Generales */}
+                    <div className="mb-8">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                            <h4 className="font-semibold text-[#15803D] text-lg">
+                                Generales asignadas
+                            </h4>
+                            <button
+                                className="bg-[#2AAC67] text-white px-4 py-1 rounded hover:bg-[#24965c] text-sm shadow w-full md:w-auto"
+                                onClick={() => setShowGeneralesTable(true)}
+                                type="button"
+                            >
+                                + Agregar
+                            </button>
+                        </div>
+                        <div className="overflow-x-auto rounded-lg border border-[#2AAC67] shadow">
+                            <GlobalDataTable
+                                columns={columnsGenerales}
+                                data={generalesAsignadas}
+                                rowsPerPage={5}
+                                dense
+                                highlightOnHover
+                                noDataComponent={
+                                    <div className="px-6 py-4 text-center text-sm text-gray-500">
+                                        No hay generales asignadas
+                                    </div>
+                                }
+                                customStyles={{
+                                    headCells: {
+                                        style: {
+                                            background: "#F0FFF4",
+                                            color: "#2AAC67",
+                                            fontWeight: "bold",
+                                            fontSize: "13px",
+                                            textTransform: "uppercase",
+                                        },
+                                    },
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Modales para selección */}
                     <PaginatedTableModal
                         open={showColaboradoresTable}
                         onClose={() => setShowColaboradoresTable(false)}
@@ -174,6 +222,15 @@ const GeneralTraining = () => {
                         columns={columnsColaboradores}
                         data={colaboradoresDisponibles}
                         onAdd={agregarColaboradores}
+                    />
+
+                    <PaginatedTableModal
+                        open={showGeneralesTable}
+                        onClose={() => setShowGeneralesTable(false)}
+                        title="Selecciona generales para agregar"
+                        columns={columnsGenerales}
+                        data={generalesDisponibles}
+                        onAdd={agregarGenerales}
                     />
                 </GlobalModal>
             )}

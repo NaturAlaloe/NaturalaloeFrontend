@@ -2,7 +2,7 @@ import React from "react";
 import {
   useEvaluatedTraining,
   type Colaborador,
-} from "../../hooks/capacitations/useEvaluatedTraining";
+} from "../../hooks/trainings/useEvaluatedTraining";
 import FormContainer from "../../components/formComponents/FormContainer";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import InputField from "../../components/formComponents/InputField";

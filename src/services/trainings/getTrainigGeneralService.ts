@@ -25,3 +25,22 @@ export async function getCapacitationGeneralList(): Promise<
     return [];
   }
 }
+
+export interface Genaral {
+  id_general: number;
+  codigo: string;
+  descripcion: string;
+}
+
+export async function getGeneral(): Promise<Genaral[]> {
+  try {
+    const response = await api.get(`/training/generals/`);
+    if (!response.data || !response.data.data) {
+      return [];
+    }
+    return response.data.data || null;
+  } catch (error) {
+    console.error(`Error al obtener la general`, error);
+    return [];
+  }
+}
