@@ -51,7 +51,6 @@ export default function ProceduresTableModal({
   procedimientosSeleccionados,
   onSeleccionChange,
   tipo = 'poe',
-  isSaving = false, // <-- Añade aquí también
 }: ProceduresTableModalProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 4;
