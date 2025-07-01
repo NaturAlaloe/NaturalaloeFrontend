@@ -47,7 +47,9 @@ import Evaluacion from "./views/training/evaluatedTraining";
 import Estadistica from "./views/estadisticas/AllStatsCards";
 import ListaColaboradores from "./views/collaborators/viewCollaborators";
 import AddTrainingGeneral from "./views/training/generalTraining";
-import AssignRol from "./views/collaborators/assingRol"
+import AssignRol from "./views/collaborators/assingRol";
+import { useUserFromToken } from "./hooks/useUserFromToken";
+
 
 const drawerWidth = 270;
 
@@ -107,13 +109,14 @@ interface DrawerProps {
 
 export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
   const [open, setOpen] = React.useState(false);
-
-
   const [openLogin, setOpenLogin] = React.useState(false);
   const [openProcedimientos, setOpenProcedimientos] = React.useState(false);
   const [openPoliticas, setOpenPoliticas] = React.useState(false);
   const [openCapacitaciones, setOpenCapacitaciones] = React.useState(false);
   const [openColaboradores, setOpenColaboradores] = React.useState(false);
+
+  const {  loading, fullName } = useUserFromToken();
+
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -200,7 +203,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             sx={{ fontSize: 48, color: "#ddebd7", mb: 1, mt: 1 }}
           />
           <Box sx={{ fontWeight: "bold", color: "#fff", fontSize: 18, mt: 1 }}>
-            Emerson Duarte
+          {loading ? "Cargando..." : fullName || "Usuario"}
           </Box>
         </Box>
         <Divider sx={{ borderColor: "#fff", opacity: 0.7, my: 2, mx: 0 }} />

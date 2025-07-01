@@ -83,8 +83,8 @@ export function useNewProcedureForm() {
 
   // Código POE modularizado
   const { codeApi, codeVisual } = useProcedureCode(
-    departamentoSeleccionado,
-    categoriaSeleccionada,
+    departamentoSeleccionado ? departamentoSeleccionado.id_departamento : null,
+    categoriaSeleccionada ? categoriaSeleccionada.id_categoria : null,
     lastConsecutive
   );
 
