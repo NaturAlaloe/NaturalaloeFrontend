@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormContainer from "../../components/formComponents/FormContainer";
 import InputField from "../../components/formComponents/InputField";
 import SelectField from "../../components/formComponents/SelectField";
@@ -7,6 +7,7 @@ import { useDepartments } from "../../hooks/manage/useDepartments";
 import { useWorkstations } from "../../hooks/manage/useWorkstations";
 import { useAreas } from "../../hooks/manage/useAreas";
 import { useAddCollaborator } from "../../hooks/collaborators/useAddCollaborator";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 function addCollaborator() {
   const [formData, setFormData] = useState({
@@ -33,14 +34,14 @@ function addCollaborator() {
   // Filtrar departamentos según área seleccionada
   const filteredDepartments = formData.area
     ? departments.filter(
-        (d: any) => String(d.id_area) === String(formData.area)
-      )
+      (d: any) => String(d.id_area) === String(formData.area)
+    )
     : [];
   // Filtrar puestos según departamento seleccionado
   const filteredWorkstations = formData.departamento
     ? workstations.filter(
-        (w: any) => String(w.id_departamento) === String(formData.departamento)
-      )
+      (w: any) => String(w.id_departamento) === String(formData.departamento)
+    )
     : [];
 
   const handleChange = (
@@ -72,7 +73,7 @@ function addCollaborator() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const collaboratorData = {
-      id_colaborador: Number(formData.cedula), 
+      id_colaborador: Number(formData.cedula),
       id_puesto: Number(formData.puesto),
       nombre: formData.nombreCompleto,
       apellido1: formData.apellido1,
@@ -84,6 +85,29 @@ function addCollaborator() {
     console.log("Datos enviados al backend:", collaboratorData);
     await handleAddCollaborator(collaboratorData);
   };
+
+  useEffect(() => {
+    if (success) {
+      setFormData({
+        nombreCompleto: "",
+        apellido1: "",
+        apellido2: "",
+        cedula: "",
+        correo: "",
+        numero: "",
+        fechaNacimiento: "",
+        area: "",
+        departamento: "",
+        puesto: "",
+        rol: "",
+      });
+      showCustomToast("¡Éxito!", "¡Usuario registrado con éxito!", "success"); 
+    }
+    if (error) {
+      showCustomToast("Error al registrar usuario", error, "error");
+    }
+  }, [success, error]);
+
 
   return (
     <div>
@@ -99,7 +123,7 @@ function addCollaborator() {
             pattern={undefined}
           />
 
-         
+
           <InputField
             label="Primer Apellido"
             name="apellido1"
@@ -195,12 +219,6 @@ function addCollaborator() {
           <SubmitButton width="" disabled={loading}>
             {loading ? "Guardando..." : "Guardar"}
           </SubmitButton>
-          {error && <div className="text-red-500 mt-2">{error}</div>}
-          {success && (
-            <div className="text-green-600 mt-2">
-              Colaborador agregado correctamente
-            </div>
-          )}
         </div>
       </FormContainer>
     </div>
