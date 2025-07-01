@@ -186,7 +186,11 @@ export default function ViewCollaborators() {
                                     {editLoading ? "Guardando..." : "Guardar Cambios"}
                                 </button>}>
                             <div>
-                                <div className="mb-5 text-center text-2xl font-semibold text-gray-600">
+                                <div className="mb-5 text-center text-xl">
+                                    Nombre: {selectedCollaborator.nombre} {selectedCollaborator.apellido1} {selectedCollaborator.apellido2}
+                                </div>
+
+                                <div className="mb-5 text-center text-xl">
                                     Cédula: {selectedCollaborator.id_colaborador}
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
@@ -213,7 +217,6 @@ export default function ViewCollaborators() {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4 mt-5">
-                                    
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Nombre</label>
                                         <InputField
