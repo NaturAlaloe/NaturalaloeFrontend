@@ -2,37 +2,42 @@ import { useState } from "react";
 import type { Collaborator } from "../../services/collaborators/addCollaboratorService";
 import { addCollaborator } from "../../services/collaborators/addCollaboratorService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+import axios from "axios";
 
 export function useAddCollaborator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Recibe los datos del colaborador y los envía al servicio
   const handleAddCollaborator = async (collaboratorData: Collaborator) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
     try {
-      const result = await addCollaborator(collaboratorData);
-      setSuccess(!!result);
-      showCustomToast("Éxito", "Colaborador agregado correctamente.", "success");
-      return result;
+      await addCollaborator(collaboratorData);
+      setSuccess(true);
     } catch (err: any) {
-      const msg = err?.response?.data?.message || "";
-      if (msg.includes('cedula')) {
-        showCustomToast("Error", "Ya existe un colaborador con esa cédula.", "error");
-      } else if (msg.includes('telefono')) {
-        showCustomToast("Error", "Ya existe un colaborador con ese teléfono.", "error");
-      } else if (msg.includes('correo')) {
-        showCustomToast("Error", "Ya existe un colaborador con ese correo.", "error");
-      } else if (msg.includes('repetido')) {
-        showCustomToast("Error", "Hay campos repetidos.", "error");
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        const errorMessage = err.response?.data?.message?.toLowerCase() || '';
+        
+        if (status === 409) {
+          if (errorMessage.includes('cédula') || errorMessage.includes('cedula')) {
+            showCustomToast("Información", 'La cédula ya está en uso.', "info");
+          } else if (errorMessage.includes('correo') || errorMessage.includes('email')) {
+            showCustomToast("Información", 'El correo electrónico ya está en uso.', "info");
+          } else {
+            showCustomToast("Información", 'Datos duplicados. La cédula o correo ya están en uso.', "info");
+          }
+        } else if (status === 500) {
+          showCustomToast("Error", "Error al insertar colaborador desde el servidor", "error");
+        } else {
+          showCustomToast("Error", "Error desconocido al agregar colaborador", "error");
+        }
       } else {
-        showCustomToast("Error", "Error al agregar colaborador.", "error");
+        showCustomToast("Error", err.message || "Error al agregar colaborador", "error");
       }
-      
-      return null;
+      setSuccess(false);
     } finally {
       setLoading(false);
     }

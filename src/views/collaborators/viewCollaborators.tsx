@@ -55,12 +55,10 @@ export default function ViewCollaborators() {
             correo: editableData.correo,
             numero: editableData.numero,
         };
-        console.log("Datos a actualizar:", dataToUpdate); // <-- Aquí el console.log
         const result = await handleEditCollaborator(dataToUpdate);
         if (result) {
             showCustomToast("Éxito", "Colaborador actualizado correctamente.", "success");
             setModalOpen(false);
-            console.log("Colaborador actualizado:", result);
             setSelectedCollaborator(null);
             fetchCollaborators();
         }
@@ -68,10 +66,14 @@ export default function ViewCollaborators() {
 
     const handleConfirmDelete = async () => {
         if (!collaboratorToDelete) return;
-        await deleteCollaborator({ id_colaborador: collaboratorToDelete.id_colaborador });
+        try {
+            await deleteCollaborator({ id_colaborador: collaboratorToDelete.id_colaborador });
+            showCustomToast("Éxito", "Colaborador eliminado correctamente.", "success");
+        } catch (error) {
+            showCustomToast("Error", "No se pudo eliminar el colaborador.", "error");
+        }
         setDeleteModalOpen(false);
         setCollaboratorToDelete(null);
-        showCustomToast("Éxito", "Colaborador eliminado correctamente.", "success");
         fetchCollaborators();
     };
 
@@ -109,16 +111,18 @@ export default function ViewCollaborators() {
                             setSelectedCollaborator(row);
                             setModalOpen(true);
                         }}
+                        className="text-green-600 hover:text-green-800"
                     >
-                        <Edit fontSize="small" className="text-green-600" />
+                        <Edit fontSize="small" />
                     </button>
                     <button
                         onClick={() => {
                             setCollaboratorToDelete(row);
                             setDeleteModalOpen(true);
                         }}
+                        className="text-red-600 hover:text-red-800"
                     >
-                        <Delete fontSize="small" className="text-red-600" />
+                        <Delete fontSize="small" />
                     </button>
                 </div>
             ),
@@ -165,8 +169,11 @@ export default function ViewCollaborators() {
                         paginationComponentOptions={{
                             rowsPerPageText: "Filas por página",
                             rangeSeparatorText: "de",
-                            noRowsContent: "No hay colaboradores.",
+                            noRowsPerPage: false,
+                            selectAllRowsItem: false,
+                            selectAllRowsItemText: "Todos",
                         }}
+                        noDataComponent="No hay colaboradores registrados"
                     />
 
                     {selectedCollaborator && (
@@ -178,77 +185,66 @@ export default function ViewCollaborators() {
                             }}
                             title="Editar Colaborador"
                             actions={
-                                <button
-                                    onClick={handleSaveChanges}
-                                    className="bg-[#2AAC67] text-white px-4 py-2 rounded"
-                                    disabled={editLoading}
-                                >
-                                    {editLoading ? "Guardando..." : "Guardar Cambios"}
-                                </button>}>
-                            <div>
-                                <div className="mb-5 text-center text-2xl font-semibold text-gray-600">
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        onClick={() => setModalOpen(false)}
+                                        className="px-4 py-2 text-gray-600 rounded hover:bg-gray-100"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleSaveChanges}
+                                        className="bg-[#2AAC67] text-white px-4 py-2 rounded hover:bg-[#218c54]"
+                                        disabled={editLoading}
+                                    >
+                                        {editLoading ? "Guardando..." : "Guardar Cambios"}
+                                    </button>
+                                </div>
+                            }
+                        >
+                            <div className="space-y-4">
+                                <div className="text-center text-2xl font-bold text-gray-600">
                                     Cédula: {selectedCollaborator.id_colaborador}
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Correo</label>
-                                        <InputField
-                                            name="correo"
-                                            type="email"
-                                            value={editableData.correo}
-                                            onChange={handleInputChange}
-                                            className="mt-1 block w-full p-2 border rounded-md focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Teléfono</label>
-                                        <InputField
-                                            name="numero"
-                                            type="text"
-                                            value={editableData.numero}
-                                            onChange={handleInputChange}
-                                            className="mt-1 block w-full p-2 border rounded-md focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
-                                        />
-                                    </div>
-                                </div>
 
-                                <div className="grid grid-cols-2 gap-4 mt-5">
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                                        <InputField
-                                            name="nombre"
-                                            type="text"
-                                            value={editableData.nombre}
-                                            onChange={handleInputChange}
-                                            className="mt-1 block w-full p-2 border rounded-md focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Apellido1</label>
-                                        <InputField
-                                            name="apellido1"
-                                            type="text"
-                                            value={editableData.apellido1}
-                                            onChange={handleInputChange}
-                                            className="mt-1 block w-full p-2 border rounded-md focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
-                                        />
-                                    </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <InputField
+                                        label="Nombre"
+                                        name="nombre"
+                                        value={editableData.nombre}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <InputField
+                                        label="Primer Apellido"
+                                        name="apellido1"
+                                        value={editableData.apellido1}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <InputField
+                                        label="Segundo Apellido"
+                                        name="apellido2"
+                                        value={editableData.apellido2}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <InputField
+                                        label="Correo Electrónico"
+                                        name="correo"
+                                        type="email"
+                                        value={editableData.correo}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <InputField
+                                        label="Teléfono"
+                                        name="numero"
+                                        value={editableData.numero}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
                                 </div>
-
-                                <div className="grid grid-cols-2 gap-4 mt-5">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Apellido2</label>
-                                        <InputField
-                                            name="apellido2"
-                                            type="text"
-                                            value={editableData.apellido2}
-                                            onChange={handleInputChange}
-                                            className="mt-1 block w-full p-2 border rounded-md focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
-                                        />
-                                    </div>
-                                </div>
-
                             </div>
                         </GlobalModal>
                     )}
@@ -260,26 +256,34 @@ export default function ViewCollaborators() {
                                 setDeleteModalOpen(false);
                                 setCollaboratorToDelete(null);
                             }}
-                            title="Eliminar Colaborador"
+                            title="Confirmar Eliminación"
                             actions={
-                                <div className="flex gap-2">
-                                    <button onClick={handleConfirmDelete} className="bg-red-600 text-white px-4 py-2 rounded">
-                                        Confirmar
-                                    </button>
+                                <div className="flex justify-end gap-2">
                                     <button
-                                        onClick={() => {
-                                            setDeleteModalOpen(false);
-                                            setCollaboratorToDelete(null);
-                                        }}
-                                        className="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+                                        onClick={() => setDeleteModalOpen(false)}
+                                        className="px-4 py-2 text-gray-600 rounded hover:bg-gray-100"
                                     >
                                         Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleConfirmDelete}
+                                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                    >
+                                        Eliminar
                                     </button>
                                 </div>
                             }
                         >
-                            <div className="text-center text-lg">
-                                ¿Está seguro que desea eliminar el usuario <span className="font-bold">{collaboratorToDelete.nombre} {collaboratorToDelete.apellido1} {collaboratorToDelete.apellido2}</span> con la cédula <span className="font-bold">{collaboratorToDelete.id_colaborador}</span>?
+                            <div className="text-center">
+                                <p className="text-gray-700 mb-4">
+                                    ¿Está seguro que desea eliminar permanentemente al colaborador?
+                                </p>
+                                <p className="font-semibold">
+                                    {collaboratorToDelete.nombre} {collaboratorToDelete.apellido1} {collaboratorToDelete.apellido2}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                    Cédula: {collaboratorToDelete.id_colaborador}
+                                </p>
                             </div>
                         </GlobalModal>
                     )}
