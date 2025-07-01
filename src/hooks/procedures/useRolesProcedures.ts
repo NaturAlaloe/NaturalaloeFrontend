@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import {
   getRolesWithProcedures,
+  getRolesWithPolitics,
   getAllRoles,
   assignProceduresToRole,
-  unassignProceduresFromRole, // <-- Importa la función
+  unassignProceduresFromRole,
+  assignPoliticsToRole,
+  unassignPoliticsFromRole,
 } from "../../services/procedures/procedureRolesService";
 
-// Este hook maneja la lógica de roles y procedimientos
-// y proporciona una interfaz para interactuar con los roles y sus procedimientos asignados.
-
+// Este es el hook que maneja los roles y sus procedimientos/políticas
 
 export interface Procedure {
   id_documento: number;
@@ -17,19 +18,19 @@ export interface Procedure {
 }
 
 export interface Politica {
-  id_politica: number;
+  id_documento: number;
   codigo: string;
   numero_politica: string;
   titulo: string;
   nombre: string;
+  descripcion?: string;
 }
 
-// Actualizar la interfaz para incluir políticas
 export interface RoleProcedures {
   id_rol: number;
   nombre_rol: string;
   procedimientos: Procedure[];
-  politicas: Politica[]; // Agregar esta línea
+  politicas: Politica[];
 }
 
 export function useRolesProcedures() {
@@ -39,13 +40,10 @@ export function useRolesProcedures() {
   const fetchRolesProcedures = async () => {
     setLoading(true);
     try {
-      // Obtener todos los roles
       const allRoles = await getAllRoles();
-      
-      // Obtener roles con procedimientos asignados
       const rolesWithProcedures = await getRolesWithProcedures();
+      const rolesWithPolitics = await getRolesWithPolitics();
       
-      // Crear un mapa de procedimientos por rol
       const proceduresByRole: { [id_rol: number]: Procedure[] } = {};
       rolesWithProcedures.forEach((item: any) => {
         if (!proceduresByRole[item.id_rol]) {
@@ -57,17 +55,32 @@ export function useRolesProcedures() {
           descripcion: item.descripcion,
         });
       });
+
+      const politicsByRole: { [id_rol: number]: Politica[] } = {};
+      rolesWithPolitics.forEach((item: any) => {
+        if (!politicsByRole[item.id_rol]) {
+          politicsByRole[item.id_rol] = [];
+        }
+        politicsByRole[item.id_rol].push({
+          id_documento: item.id_documento,
+          codigo: item.codigo,
+          numero_politica: item.codigo,
+          titulo: item.descripcion || item.codigo,
+          nombre: item.descripcion || item.codigo,
+          descripcion: item.descripcion,
+        });
+      });
       
-      // Combinar todos los roles con sus procedimientos (o array vacío si no tienen)
       const rolesProceduresComplete = allRoles.map((role: any) => ({
         id_rol: role.id_rol,
         nombre_rol: role.nombre_rol,
         procedimientos: proceduresByRole[role.id_rol] || [],
+        politicas: politicsByRole[role.id_rol] || [],
       }));
       
       setRolesProcedures(rolesProceduresComplete);
     } catch (error) {
-      console.error('Error al obtener roles y procedimientos:', error);
+      console.error('Error al obtener roles, procedimientos y políticas:', error);
       setRolesProcedures([]);
     } finally {
       setLoading(false);
@@ -76,26 +89,36 @@ export function useRolesProcedures() {
 
   const saveProcedures = async (id_rol: number, procedimientos: number[]) => {
     await assignProceduresToRole(id_rol, procedimientos);
-    await fetchRolesProcedures(); // Agregar await aquí
+    await fetchRolesProcedures();
   };
 
-  // Nueva función para desasignar procedimientos
   const removeProcedures = async (id_rol: number, procedimientos: number[]) => {
     await unassignProceduresFromRole(id_rol, procedimientos);
-    await fetchRolesProcedures(); // Agregar await aquí
+    await fetchRolesProcedures();
+  };
+
+  const savePolitics = async (id_rol: number, politicas: number[]) => {
+    await assignPoliticsToRole(id_rol, politicas);
+    await fetchRolesProcedures();
+  };
+
+  const removePolitics = async (id_rol: number, politicas: number[]) => {
+    await unassignPoliticsFromRole(id_rol, politicas);
+    await fetchRolesProcedures();
   };
 
   useEffect(() => {
     fetchRolesProcedures();
   }, []);
 
-  // Exporta la nueva función
   return { 
     rolesProcedures, 
     loading, 
     fetchRolesProcedures, 
     saveProcedures, 
     removeProcedures,
-    refreshData: fetchRolesProcedures // Agregar esta línea
+    savePolitics,
+    removePolitics,
+    refreshData: fetchRolesProcedures
   };
 }
