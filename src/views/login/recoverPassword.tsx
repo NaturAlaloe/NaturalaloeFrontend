@@ -22,6 +22,7 @@ export default function RecoverPassword() {
     try {
       const res = await api.post("/requestPasswordReset", { email: correo });
       setMensaje(res.data.message || "Si el correo existe, se ha enviado un enlace para restablecer la contraseña.");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     } catch (err: any) {
       setMensaje("Error al enviar el correo. Intenta de nuevo.");
     }
