@@ -31,9 +31,29 @@ const Evaluacion = () => {
     field: keyof Colaborador,
     value: string
   ) => {
+    let processedValue = value;
+    
+    // Si es el campo seguimiento, convertir el valor del select al formato de la BD
+    if (field === "seguimiento") {
+      switch (value) {
+        case "Satisfactorio":
+          processedValue = "satisfactorio";
+          break;
+        case "Reprogramar":
+          processedValue = "reprogramar";
+          break;
+        case "Reevaluación":
+          processedValue = "revaluacion";
+          break;
+        default:
+          processedValue = "";
+      }
+      console.log(`🔄 [handleChange] Convertido "${value}" a "${processedValue}"`);
+    }
+    
     setColaboradores((prev) =>
       prev.map((c) =>
-        c.id === id && c.id_capacitacion === idCap ? { ...c, [field]: value } : c
+        c.id === id && c.id_capacitacion === idCap ? { ...c, [field]: processedValue } : c
       )
     );
   };
@@ -59,16 +79,32 @@ const Evaluacion = () => {
       return;
     }
 
-    const payload = colaboradores.map((colab) => ({
-      id_capacitacion: colab.id_capacitacion,
-      seguimiento: colab.seguimiento.toLowerCase() as
-        | "satisfactorio"
-        | "reprogramar"
-        | "revaluacion",
-      nota: Number(colab.nota),
-      comentario_final: colab.comentario?.trim() ?? "",
-    }));
+    const payload = colaboradores.map((colab) => {
+      console.log(`🔍 [DEBUG] Colaborador: ${colab.nombre}, Seguimiento: "${colab.seguimiento}", Nota: ${colab.nota}`);
+      
+      // Validar que el seguimiento es válido
+      const validSeguimientos = ["satisfactorio", "reprogramar", "revaluacion"];
+      if (!validSeguimientos.includes(colab.seguimiento)) {
+        console.error(`❌ [DEBUG] Seguimiento inválido para ${colab.nombre}: "${colab.seguimiento}"`);
+        throw new Error(`Seguimiento inválido para ${colab.nombre}: "${colab.seguimiento}"`);
+      }
 
+      const item = {
+        id_capacitacion: colab.id_capacitacion,
+        seguimiento: colab.seguimiento as "satisfactorio" | "reprogramar" | "revaluacion",
+        nota: Number(colab.nota),
+        comentario_final: colab.comentario?.trim() ?? "",
+      };
+      
+      console.log(`✅ [DEBUG] Item procesado:`, item);
+      return item;
+    });
+
+    console.log(`🚀 [DEBUG] Payload completo a enviar:`, payload);
+    
+    // Agregar este log adicional para verificar la estructura exacta
+    console.log(`📝 [DEBUG] Payload JSON:`, JSON.stringify(payload, null, 2));
+    
     submitQualify(payload);
   };
 
@@ -96,21 +132,43 @@ const Evaluacion = () => {
     },
     {
       name: "Seguimiento",
-      cell: (row: Colaborador) => (
-        <SelectField
-          name={`seguimiento-${row.id}`}
-          value={row.seguimiento}
-          onChange={(e) =>
-            handleChange(
-              row.id,
-              row.id_capacitacion,
-              "seguimiento",
-              e.target.value
-            )
-          }
-          options={["Seleccionar", "Satisfactorio", "Reprogramar", "Reevaluación"]}
-        />
-      ),
+      cell: (row: Colaborador) => {
+        // Mapear el valor de la base de datos al valor del select
+        let selectValue = "Seleccionar";
+        
+        switch (row.seguimiento.toLowerCase()) {
+          case "satisfactorio":
+            selectValue = "Satisfactorio";
+            break;
+          case "reprogramar":
+            selectValue = "Reprogramar";
+            break;
+          case "revaluacion":
+          case "reevaluación":
+            selectValue = "Reevaluación";
+            break;
+          default:
+            selectValue = "Seleccionar";
+        }
+        
+        console.log(`🔍 [SelectField] Colaborador: ${row.nombre}, valor BD: "${row.seguimiento}", valor select: "${selectValue}"`);
+        
+        return (
+          <SelectField
+            name={`seguimiento-${row.id}`}
+            value={selectValue}
+            onChange={(e) =>
+              handleChange(
+                row.id,
+                row.id_capacitacion,
+                "seguimiento",
+                e.target.value
+              )
+            }
+            options={["Seleccionar", "Satisfactorio", "Reprogramar", "Reevaluación"]}
+          />
+        );
+      }
     },
     {
       name: "Comentario",
