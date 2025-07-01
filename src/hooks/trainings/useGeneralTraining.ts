@@ -10,6 +10,11 @@ import {
   getGeneral,
   type Genaral,
 } from "../../services/trainings/getTrainigGeneralService";
+import {
+  createCapacitacion,
+  type CreateCapacitacionRequest,
+  validateCapacitacionData,
+} from "../../services/trainings/addTrainingGeneralService";
 
 interface FormData {
   titulo: string;
@@ -197,6 +202,11 @@ export function useGeneralTraining() {
       return false;
     }
 
+    if (generalesAsignadas.length === 0) {
+      showCustomToast("Error", "Debe asignar al menos una capacitación general", "error");
+      return false;
+    }
+
     return true;
   };
 
@@ -208,30 +218,65 @@ export function useGeneralTraining() {
     setIsLoading(true);
 
     try {
-      // TODO: Implementar la lógica de guardado para capacitaciones generales
-      // const facilitadorId = getFacilitadorIdByNombre(formData.facilitador);
-      // const generalTrainingData = {
-      //   id_colaborador: colaboradoresAsignados.map(c => c.id),
-      //   id_facilitador: facilitadorId,
-      //   titulo_capacitacion: formData.titulo,
-      //   fecha_inicio: formData.fecha,
-      //   fecha_fin: formData.fechaFin,
-      //   comentario: formData.comentario || undefined,
-      //   is_evaluado: isEvaluado,
-      //   duracion: parseFloat(formData.duracion),
-      // };
+      const facilitadorId = getFacilitadorIdByNombre(formData.facilitador);
+      
+      if (!facilitadorId) {
+        showCustomToast("Error", "No se pudo encontrar el facilitador seleccionado", "error");
+        return;
+      }
 
-      // const result = await createGeneralTraining(generalTrainingData);
-      // if (result.success) {
-      //   showCustomToast("Éxito", "La capacitación general fue registrada correctamente", "success");
-      //   resetForm();
-      // } else {
-      //   showCustomToast("Error", result.message, "error");
-      // }
+      let successCount = 0;
+      let errorCount = 0;
+      const errors: string[] = [];
 
-      // Placeholder hasta que implementes el servicio
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      showCustomToast("Info", "Funcionalidad pendiente de implementar", "info");
+      // Crear una capacitación por cada combinación de colaborador y general
+      for (const colaborador of colaboradoresAsignados) {
+        for (const general of generalesAsignadas) {
+          const capacitacionData: CreateCapacitacionRequest = {
+            titulo_capacitacion: formData.titulo,
+            id_general: general.id,
+            id_colaborador: colaborador.id,
+            fecha_inicio: formData.fecha,
+            fecha_fin: formData.fechaFin,
+            id_facilitador: facilitadorId,
+            duracion: parseFloat(formData.duracion),
+            comentario: formData.comentario || "",
+          };
+
+          // Validar los datos antes de enviar
+          const validationErrors = validateCapacitacionData(capacitacionData);
+          if (validationErrors.length > 0) {
+            errors.push(`Colaborador ${colaborador.nombreCompleto} - General ${general.descripcion}: ${validationErrors.join(", ")}`);
+            errorCount++;
+            continue;
+          }
+
+          try {
+            const result = await createCapacitacion(capacitacionData);
+            if (result.success) {
+              successCount++;
+            } else {
+              errors.push(`Colaborador ${colaborador.nombreCompleto} - General ${general.descripcion}: ${result.message}`);
+              errorCount++;
+            }
+          } catch (error) {
+            errors.push(`Colaborador ${colaborador.nombreCompleto} - General ${general.descripcion}: Error inesperado`);
+            errorCount++;
+          }
+        }
+      }
+
+      // Mostrar resultados
+      if (successCount > 0 && errorCount === 0) {
+        showCustomToast("Éxito", `Se registraron ${successCount} capacitaciones generales correctamente`, "success");
+        resetForm();
+      } else if (successCount > 0 && errorCount > 0) {
+        showCustomToast("Información", `Se registraron ${successCount} capacitaciones. ${errorCount} fallaron`, "info");
+        console.error("Errores:", errors);
+      } else {
+        showCustomToast("Error", `No se pudo registrar ninguna capacitación. ${errors[0] || "Error desconocido"}`, "error");
+        console.error("Todos los errores:", errors);
+      }
       
     } catch (error) {
       console.error("Error al enviar capacitación general:", error);
