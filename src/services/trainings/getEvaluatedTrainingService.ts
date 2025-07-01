@@ -27,7 +27,7 @@ export const getEvaluatedTraining = async (
     }
     throw new Error("Error en la respuesta de la API");
   } catch (error) {
-    console.error("Error al obtener datos de capacitación:", error);
+    
     throw error;
   }
 };

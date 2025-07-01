@@ -1,4 +1,6 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import React from "react";
+import { Delete } from '@mui/icons-material';
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import {
   getFacilitadores,
@@ -65,6 +67,33 @@ export function useGeneralTraining() {
     },
   ];
 
+  const columnsColaboradoresAsignados = [
+    {
+      name: "Nombre",
+      selector: (row: any) => row?.nombreCompleto || "Sin nombre",
+      sortable: true,
+    },
+    {
+      name: "Puesto",
+      selector: (row: any) => row?.puesto || "Sin puesto",
+      sortable: true,
+    },
+    {
+      name: "Acciones",
+      cell: (row: any) => (
+        React.createElement('button', {
+          className: "action-button text-red-600 hover:text-red-800 transition-colors",
+          onClick: () => eliminarColaborador(row.id),
+          title: "Eliminar colaborador"
+        }, React.createElement(Delete, { fontSize: "small" }))
+      ),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+      width: "100px",
+    },
+  ];
+
   const columnsGenerales = [
     {
       name: "Código",
@@ -75,6 +104,33 @@ export function useGeneralTraining() {
       name: "Descripción",
       selector: (row: any) => row?.descripcion || "Sin descripción",
       sortable: true,
+    },
+  ];
+
+  const columnsGeneralesAsignadas = [
+    {
+      name: "Código",
+      selector: (row: any) => row?.codigo || "Sin código",
+      sortable: true,
+    },
+    {
+      name: "Descripción",
+      selector: (row: any) => row?.descripcion || "Sin descripción",
+      sortable: true,
+    },
+    {
+      name: "Acciones",
+      cell: (row: any) => (
+        React.createElement('button', {
+          className: "action-button text-red-600 hover:text-red-800 transition-colors",
+          onClick: () => eliminarGeneral(row.id),
+          title: "Eliminar general"
+        }, React.createElement(Delete, { fontSize: "small" }))
+      ),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+      width: "100px",
     },
   ];
 
@@ -181,6 +237,14 @@ export function useGeneralTraining() {
       ...seleccionadas.filter(g => !prev.some(asig => asig.id === g.id))
     ]);
     setShowGeneralesTable(false);
+  };
+
+  const eliminarColaborador = (colaboradorId: number) => {
+    setColaboradoresAsignados(prev => prev.filter(c => c.id !== colaboradorId));
+  };
+
+  const eliminarGeneral = (generalId: number) => {
+    setGeneralesAsignadas(prev => prev.filter(g => g.id !== generalId));
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -327,7 +391,9 @@ export function useGeneralTraining() {
     showColaboradoresTable,
     setShowColaboradoresTable,
     columnsColaboradores,
+    columnsColaboradoresAsignados,
     agregarColaboradores,
+    eliminarColaborador,
 
     // Generales
     generalesDisponibles,
@@ -337,6 +403,8 @@ export function useGeneralTraining() {
     showGeneralesTable,
     setShowGeneralesTable,
     columnsGenerales,
+    columnsGeneralesAsignadas,
     agregarGenerales,
+    eliminarGeneral,
   };
 }

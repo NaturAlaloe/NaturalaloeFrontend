@@ -1,7 +1,18 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
-import {createCapacitacion,validateCapacitacionData,type CreateCapacitacionRequest,} from "../../services/trainings/addTrainingsService";
-import {getFacilitadores,type Facilitador,getColaboradores,type Colaboradores,getProcedimientos,type Procedimientos,} from "../../services/trainings/getTrainingsService";
+import {
+  createCapacitacion,
+  validateCapacitacionData,
+  type CreateCapacitacionRequest,
+} from "../../services/trainings/addTrainingsService";
+import {
+  getFacilitadores,
+  type Facilitador,
+  getColaboradores,
+  type Colaboradores,
+  getProcedimientos,
+  type Procedimientos,
+} from "../../services/trainings/getTrainingsService";
 
 const metodosEvaluacion = [
   { value: "", label: "Seleccione...", disabled: true },
@@ -25,9 +36,13 @@ export function useCapacitation() {
   const [isLoading, setIsLoading] = useState(false);
   const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);
   const [loadingFacilitadores, setLoadingFacilitadores] = useState(false);
-  const [colaboradoresDisponibles, setColaboradoresDisponibles] = useState<Colaboradores[]>([]);
+  const [colaboradoresDisponibles, setColaboradoresDisponibles] = useState<
+    Colaboradores[]
+  >([]);
   const [loadingColaboradores, setLoadingColaboradores] = useState(false);
-  const [procedimientosDisponibles, setProcedimientosDisponibles] = useState<Procedimientos[]>([]);
+  const [procedimientosDisponibles, setProcedimientosDisponibles] = useState<
+    Procedimientos[]
+  >([]);
   const [loadingProcedimientos, setLoadingProcedimientos] = useState(false);
   const [loadingInitialData, setLoadingInitialData] = useState(true);
   const [formData, setFormData] = useState<FormData>({
@@ -42,7 +57,9 @@ export function useCapacitation() {
 
   const [showColaboradoresTable, setShowColaboradoresTable] = useState(false);
   const [showPoesTable, setShowPoesTable] = useState(false);
-  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>([]);
+  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>(
+    []
+  );
   const [poesAsignados, setPoesAsignados] = useState<any[]>([]);
 
   const columnsColaboradores = [
@@ -78,7 +95,7 @@ export function useCapacitation() {
         await Promise.all([
           loadFacilitadores(),
           loadColaboradores(),
-          loadProcedimientos()
+          loadProcedimientos(),
         ]);
       } finally {
         setLoadingInitialData(false);
@@ -90,7 +107,7 @@ export function useCapacitation() {
   // Limpiar método de evaluación cuando isEvaluado cambie a false
   useEffect(() => {
     if (!isEvaluado) {
-      setFormData(prev => ({ ...prev, metodoEvaluacion: "" }));
+      setFormData((prev) => ({ ...prev, metodoEvaluacion: "" }));
     }
   }, [isEvaluado]);
 
@@ -101,7 +118,11 @@ export function useCapacitation() {
       setFacilitadores(data);
     } catch (error) {
       console.error("Error al cargar facilitadores:", error);
-      showCustomToast("Error", "No se pudieron cargar los facilitadores", "error");
+      showCustomToast(
+        "Error",
+        "No se pudieron cargar los facilitadores",
+        "error"
+      );
     } finally {
       setLoadingFacilitadores(false);
     }
@@ -111,20 +132,18 @@ export function useCapacitation() {
     try {
       setLoadingProcedimientos(true);
       const data = await getProcedimientos();
-      
-      // Log para verificar la estructura de datos
-      console.log("Datos de procedimientos sin filtrar:", data);
-      
+
       const procedimientosTransformados = data
         .filter(Boolean)
-        // Filtrar procedimientos: solo null, reevaluacion o reprogramacion (no progreso)
         .filter((proc) => {
           const estado = proc.estado_capacitacion;
-          return estado === null || 
-                 estado === "reevaluacion" || 
-                 estado === "reprogramacion" ||
-                 estado === "" ||
-                 estado === undefined;
+          return (
+            estado === null ||
+            estado === "reevaluacion" ||
+            estado === "reprogramacion" ||
+            estado === "" ||
+            estado === undefined
+          );
         })
         .map((proc) => ({
           ...proc,
@@ -133,14 +152,17 @@ export function useCapacitation() {
         }));
 
       const procedimientosUnicos = procedimientosTransformados.filter(
-        (proc, index, array) => array.findIndex((p) => p.id === proc.id) === index
+        (proc, index, array) =>
+          array.findIndex((p) => p.id === proc.id) === index
       );
 
-      console.log("Procedimientos filtrados:", procedimientosUnicos);
       setProcedimientosDisponibles(procedimientosUnicos);
     } catch (error) {
-      console.error("Error al cargar procedimientos:", error);
-      showCustomToast("Error", "No se pudieron cargar los procedimientos", "error");
+      showCustomToast(
+        "Error",
+        "No se pudieron cargar los procedimientos",
+        "error"
+      );
       setProcedimientosDisponibles([]);
     } finally {
       setLoadingProcedimientos(false);
@@ -151,22 +173,21 @@ export function useCapacitation() {
     try {
       setLoadingColaboradores(true);
       const data = await getColaboradores();
-      
-      // Log para verificar la estructura de datos
-      console.log("Datos de colaboradores sin filtrar:", data);
-      
+
       const colaboradoresTransformados = data
         .filter(Boolean)
-        // Filtrar colaboradores: solo null, reevaluacion o reprogramacion (no progreso)
         .filter((colab) => {
           const estado = colab.estado_capacitacion;
-          const incluir = estado === null || 
-                         estado === "reevaluacion" || 
-                         estado === "reprogramacion" ||
-                         estado === "" ||
-                         estado === undefined;
-          
-          console.log(`Colaborador ${colab.nombre_completo}, estado: ${estado}, incluir: ${incluir}`);
+          const incluir =
+            estado === null ||
+            estado === "reevaluacion" ||
+            estado === "reprogramacion" ||
+            estado === "" ||
+            estado === undefined;
+
+          console.log(
+            `Colaborador ${colab.nombre_completo}, estado: ${estado}, incluir: ${incluir}`
+          );
           return incluir;
         })
         .map((colab) => ({
@@ -177,14 +198,17 @@ export function useCapacitation() {
         }));
 
       const colaboradoresUnicos = colaboradoresTransformados.filter(
-        (colab, index, array) => array.findIndex((c) => c.id === colab.id) === index
+        (colab, index, array) =>
+          array.findIndex((c) => c.id === colab.id) === index
       );
 
-      console.log("Colaboradores filtrados:", colaboradoresUnicos);
       setColaboradoresDisponibles(colaboradoresUnicos);
     } catch (error) {
-      console.error("Error al cargar colaboradores:", error);
-      showCustomToast("Error", "No se pudieron cargar los colaboradores", "error");
+      showCustomToast(
+        "Error",
+        "No se pudieron cargar los colaboradores",
+        "error"
+      );
       setColaboradoresDisponibles([]);
     } finally {
       setLoadingColaboradores(false);
@@ -195,47 +219,63 @@ export function useCapacitation() {
     return `${facilitador.nombre} ${facilitador.apellido1} ${facilitador.apellido2}`.trim();
   };
 
-  const getFacilitadorIdByNombre = (nombreCompleto: string): number | undefined => {
-    return facilitadores.find(f => getNombreCompletoFacilitador(f) === nombreCompleto)?.id_facilitador;
+  const getFacilitadorIdByNombre = (
+    nombreCompleto: string
+  ): number | undefined => {
+    return facilitadores.find(
+      (f) => getNombreCompletoFacilitador(f) === nombreCompleto
+    )?.id_facilitador;
   };
 
   const getFacilitadoresOptions = (): string[] => {
-    return facilitadores.map(f => getNombreCompletoFacilitador(f));
+    return facilitadores.map((f) => getNombreCompletoFacilitador(f));
   };
 
   const agregarColaboradores = (seleccionados: any[]) => {
-    setColaboradoresAsignados(prev => [
+    setColaboradoresAsignados((prev) => [
       ...prev,
-      ...seleccionados.filter(c => !prev.some(asig => asig.id === c.id))
+      ...seleccionados.filter((c) => !prev.some((asig) => asig.id === c.id)),
     ]);
     setShowColaboradoresTable(false);
   };
 
   const agregarPoes = (seleccionados: any[]) => {
-    setPoesAsignados(prev => [
+    setPoesAsignados((prev) => [
       ...prev,
-      ...seleccionados.filter(p => !prev.some(asig => asig.id === p.id))
+      ...seleccionados.filter((p) => !prev.some((asig) => asig.id === p.id)),
     ]);
     setShowPoesTable(false);
   };
 
   const eliminarColaborador = (colaboradorId: number) => {
-    setColaboradoresAsignados(prev => prev.filter(c => c.id !== colaboradorId));
+    setColaboradoresAsignados((prev) =>
+      prev.filter((c) => c.id !== colaboradorId)
+    );
   };
 
   const eliminarPoe = (poeId: number) => {
-    setPoesAsignados(prev => prev.filter(p => p.id !== poeId));
+    setPoesAsignados((prev) => prev.filter((p) => p.id !== poeId));
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = (): boolean => {
-    const requiredFields = ['titulo', 'facilitador', 'fecha', 'fechaFin', 'duracion'];
-    const missingFields = requiredFields.filter(field => !formData[field as keyof FormData]);
-    
+    const requiredFields = [
+      "titulo",
+      "facilitador",
+      "fecha",
+      "fechaFin",
+      "duracion",
+    ];
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field as keyof FormData]
+    );
+
     if (missingFields.length > 0) {
       showCustomToast("Error", "Todos los campos son obligatorios", "error");
       return false;
@@ -247,7 +287,11 @@ export function useCapacitation() {
     }
 
     if (poesAsignados.length === 0) {
-      showCustomToast("Error", "Debe asignar al menos un documento normativo (POE)", "error");
+      showCustomToast(
+        "Error",
+        "Debe asignar al menos un documento normativo (POE)",
+        "error"
+      );
       return false;
     }
 
@@ -256,7 +300,7 @@ export function useCapacitation() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -264,22 +308,23 @@ export function useCapacitation() {
     try {
       const facilitadorId = getFacilitadorIdByNombre(formData.facilitador);
       const capacitacionData: CreateCapacitacionRequest = {
-        id_colaborador: colaboradoresAsignados.map(c => c.id),
+        id_colaborador: colaboradoresAsignados.map((c) => c.id),
         id_facilitador: facilitadorId,
-        id_documento_normativo: poesAsignados.map(p => p.id),
+        id_documento_normativo: poesAsignados.map((p) => p.id),
         titulo_capacitacion: formData.titulo,
         fecha_inicio: formData.fecha,
         fecha_fin: formData.fechaFin,
         comentario: formData.comentario || undefined,
         is_evaluado: isEvaluado,
-        metodo_empleado: isEvaluado && formData.metodoEvaluacion && formData.metodoEvaluacion !== "" && formData.metodoEvaluacion !== "Seleccione..." ? formData.metodoEvaluacion : undefined,
+        metodo_empleado:
+          isEvaluado &&
+          formData.metodoEvaluacion &&
+          formData.metodoEvaluacion !== "" &&
+          formData.metodoEvaluacion !== "Seleccione..."
+            ? formData.metodoEvaluacion
+            : undefined,
         duracion: parseFloat(formData.duracion),
       };
-
-      console.log("Datos a enviar:", capacitacionData);
-      console.log("isEvaluado:", isEvaluado);
-      console.log("metodoEvaluacion:", formData.metodoEvaluacion);
-      console.log("metodo_empleado final:", capacitacionData.metodo_empleado);
 
       const validationErrors = validateCapacitacionData(capacitacionData);
       if (validationErrors.length > 0) {
@@ -289,14 +334,21 @@ export function useCapacitation() {
 
       const result = await createCapacitacion(capacitacionData);
       if (result.success) {
-        showCustomToast("Éxito", "La capacitación fue registrada correctamente", "success");
+        showCustomToast(
+          "Éxito",
+          "La capacitación fue registrada correctamente",
+          "success"
+        );
         resetForm();
       } else {
         showCustomToast("Error", result.message, "error");
       }
     } catch (error) {
-      console.error("Error al enviar capacitación:", error);
-      showCustomToast("Error", "Error inesperado al registrar la capacitación", "error");
+      showCustomToast(
+        "Error",
+        "Error inesperado al registrar la capacitación",
+        "error"
+      );
     } finally {
       setIsLoading(false);
     }

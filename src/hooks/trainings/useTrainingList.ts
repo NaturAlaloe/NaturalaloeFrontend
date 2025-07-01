@@ -173,14 +173,12 @@ export function useTrainingList() {
       console.log("Cargando capacitaciones desde la API...");
 
       const apiData = await getTrainingList();
-      console.log("Datos recibidos de la API:", apiData);
 
       if (!Array.isArray(apiData)) {
         throw new Error("Los datos recibidos no son un array válido");
       }
 
       const groupedData = groupTrainingsByCollaborators(apiData);
-      console.log("Datos agrupados:", groupedData);
 
       groupedData.sort((a, b) => a.titulo.localeCompare(b.titulo));
 
@@ -190,7 +188,6 @@ export function useTrainingList() {
         showCustomToast("Info", "No se encontraron capacitaciones", "info");
       }
     } catch (error) {
-      console.error("Error al cargar capacitaciones:", error);
       setError("No se pudieron cargar las capacitaciones");
       showCustomToast(
         "Error",

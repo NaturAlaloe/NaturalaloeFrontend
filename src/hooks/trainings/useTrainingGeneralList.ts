@@ -72,17 +72,14 @@ export function useCapacitationGeneralList() {
     try {
       setIsLoading(true);
       setError(null);
-      console.log("Cargando capacitaciones generales desde la API...");
 
       const apiData = await getCapacitationGeneralList();
-      console.log("Datos recibidos de la API:", apiData);
 
       if (!Array.isArray(apiData)) {
         throw new Error("Los datos recibidos no son un array válido");
       }
 
       const transformedData = transformApiDataToCapacitationGeneral(apiData);
-      console.log("Datos transformados:", transformedData);
 
       setCapacitations(transformedData);
 
@@ -94,7 +91,6 @@ export function useCapacitationGeneralList() {
         );
       }
     } catch (error) {
-      console.error("Error al cargar capacitaciones generales:", error);
       setError("No se pudieron cargar las capacitaciones generales");
       showCustomToast(
         "Error",

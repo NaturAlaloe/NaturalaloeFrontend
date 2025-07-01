@@ -11,7 +11,6 @@ export async function getFacilitadores(): Promise<Facilitador[]> {
     const response = await api.get("/facilitators");
     return response.data.data;
   } catch (error) {
-    console.error("Error al obtener facilitadores:", error);
     return [];
   }
 }
@@ -31,7 +30,6 @@ export async function getColaboradores(): Promise<Colaboradores[]> {
     }
     return response.data.data || [];
   } catch (error) {
-    console.error("Error al obtener colaboradores:", error);
     return [];
   }
 }
@@ -49,7 +47,6 @@ export async function getProcedimientos(): Promise<Procedimientos[]> {
     }
     return response.data.data || [];
   } catch (error) {
-    console.error("Error al obtener procedimientos:", error);
     return [];
   }
 }

@@ -17,6 +17,7 @@ const GeneralTraining = () => {
         handleChange,
         colaboradoresDisponibles,
         columnsColaboradores,
+        columnsColaboradoresAsignados,
         showColaboradoresTable,
         setShowColaboradoresTable,
         colaboradoresAsignados,
@@ -28,6 +29,7 @@ const GeneralTraining = () => {
         // Elementos para generales
         generalesDisponibles,
         columnsGenerales,
+        columnsGeneralesAsignadas,
         showGeneralesTable,
         setShowGeneralesTable,
         generalesAsignadas,
@@ -148,7 +150,7 @@ const GeneralTraining = () => {
                         </div>
                         <div className="overflow-x-auto rounded-lg border border-[#2AAC67] shadow">
                             <GlobalDataTable
-                                columns={columnsColaboradores}
+                                columns={columnsColaboradoresAsignados}
                                 data={colaboradoresAsignados}
                                 rowsPerPage={5}
                                 dense
@@ -189,7 +191,7 @@ const GeneralTraining = () => {
                         </div>
                         <div className="overflow-x-auto rounded-lg border border-[#2AAC67] shadow">
                             <GlobalDataTable
-                                columns={columnsGenerales}
+                                columns={columnsGeneralesAsignadas}
                                 data={generalesAsignadas}
                                 rowsPerPage={5}
                                 dense

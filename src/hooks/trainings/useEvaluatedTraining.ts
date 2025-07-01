@@ -41,8 +41,9 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const allData: TrainingItem[] = await getEvaluatedTraining(codigoDocumento);
-        console.log("📥 [useEvaluatedTraining] Datos recibidos de la API:", allData);
+        const allData: TrainingItem[] = await getEvaluatedTraining(
+          codigoDocumento
+        );
 
         if (allData.length === 0) {
           setError("No se encontraron datos de la capacitación");
@@ -53,14 +54,6 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
         }
 
         const colaboradoresFormateados: Colaborador[] = allData.map((item) => {
-          console.log(`🔍 [useEvaluatedTraining] Procesando colaborador:`, {
-            id_colaborador: item.id_colaborador,
-            nombre: item.nombre,
-            seguimiento_original: item.seguimiento,
-            nota: item.nota,
-            id_capacitacion: item.id_capacitacion
-          });
-          
           return {
             id: item.id_colaborador,
             nombre: `${item.nombre} ${item.primer_apellido} ${item.segundo_apellido}`,
@@ -70,9 +63,6 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
             id_capacitacion: item.id_capacitacion,
           };
         });
-
-        console.log("✅ [useEvaluatedTraining] Colaboradores formateados:", colaboradoresFormateados);
-
 
         const first = allData[0];
         setTrainingInfo({

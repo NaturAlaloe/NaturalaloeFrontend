@@ -52,7 +52,6 @@ export function useGenerales() {
     setEditing(null);
   };
 
-  // *** Nuevo para eliminar ***
   const openDelete = (general: General) => {
     setSelected(general);
     setDeleteModalOpen(true);
@@ -106,7 +105,6 @@ export function useGenerales() {
       showCustomToast("Exito", "General eliminado correctamente");
       closeDeleteModal();
     } catch (error) {
-      console.error("Error al eliminar general", error);
       showCustomToast("Error", "No se pudo eliminar el general");
     }
   };

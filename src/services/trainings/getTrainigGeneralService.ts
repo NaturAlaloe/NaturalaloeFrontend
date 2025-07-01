@@ -18,10 +18,6 @@ export async function getCapacitationGeneralList(): Promise<
     }
     return response.data.data || [];
   } catch (error) {
-    console.error(
-      "Error al obtener la lista de capacitaciones generales:",
-      error
-    );
     return [];
   }
 }
@@ -40,7 +36,6 @@ export async function getGeneral(): Promise<Genaral[]> {
     }
     return response.data.data || null;
   } catch (error) {
-    console.error(`Error al obtener la general`, error);
     return [];
   }
 }
