@@ -7,8 +7,6 @@ import ChangePassword from './views/login/changePassword';
 import RecoverPassword from './views/login/recoverPassword';
 import api from './apiConfig/api';
 
-import AllStatsCards from './views/estadisticas/AllStatsCards';
-
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);

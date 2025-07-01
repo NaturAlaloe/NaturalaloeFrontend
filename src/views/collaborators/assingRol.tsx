@@ -33,7 +33,7 @@ export default function AssignRol() {
   };
 
   // Función para cambiar de página
-  const manejarCambioPagina = (event: unknown, newPage: number) => {
+  const manejarCambioPagina = (_event: unknown, newPage: number) => {
     setPagina(newPage);
   };
 
@@ -43,7 +43,6 @@ export default function AssignRol() {
     nombre?: string,
     apellido1?: string,
     apellido2?: string,
-    puesto?: string
   ) => {
     const nombreCompleto = [nombre, apellido1, apellido2].filter(Boolean).join(' ').trim() || 'Sin nombre';
     setColaboradorSeleccionado(`${id} - ${nombreCompleto}`);
@@ -195,7 +194,6 @@ export default function AssignRol() {
                         colab.nombre,
                         colab.apellido1,
                         colab.apellido2,
-                        colab.puesto
                       )
                     }
                   >

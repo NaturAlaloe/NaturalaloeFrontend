@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { Bar, Pie, Doughnut, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -177,10 +177,10 @@ const kpiData = {
 
 const ChartSelector = ({ initialKpi = 'certification' }: { initialKpi?: keyof typeof kpiData }) => {
   const [chartType, setChartType] = useState<'bar' | 'pie' | 'doughnut' | 'line'>('bar');
-  const [selectedArea, setSelectedArea] = useState('todas');
+  const [selectedArea, setSelectedArea] = useState<'todas' | 'operaciones' | 'logistica' | 'calidad'>('todas');
   const [selectedKpi, setSelectedKpi] = useState<keyof typeof kpiData>(initialKpi);
 
-  const selectedData = kpiData[selectedKpi][selectedArea] || kpiData[selectedKpi]['todas'];
+  const selectedData = (kpiData[selectedKpi] as typeof kpiData['certification'])[selectedArea] || (kpiData[selectedKpi] as typeof kpiData['certification'])['todas'];
 
   const commonOptions = {
     responsive: true,
