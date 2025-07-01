@@ -24,12 +24,12 @@ import HomeScreen from "./views/home/HomeScreen";
 import Procedimientos from "./views/procedures/procedures";
 import AsignacionProcedimientos from "./views/procedures/assignmentProcedures";
 import ListaProcedimientos from "./views/procedures/listProcedures";
-import Capacitaciones from "./views/capacitation/capacitacion";
-import ListaFacilitadores from "./views/capacitation/listFacilitators";
-import ListaCapacitaciones from "./views/capacitation/listCapacitation";
+import Capacitaciones from "./views/training/training";
+import ListaFacilitadores from "./views/training/listFacilitators";
+import ListaCapacitaciones from "./views/training/listTraining";
 import Colaboradores from "./views/collaborators/collaborators";
 import CollaboratorDetail from "./views/collaborators/CollaboratorDetail";
-import RegistroFacilitadores from "./views/capacitation/facilitatorTraining";
+import RegistroFacilitadores from "./views/training/facilitatorTraining";
 import AddCollaborator from "./views/collaborators/addCollaborator";
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Register from "./views/administration/register";
@@ -42,11 +42,11 @@ import SchoolIcon from "@mui/icons-material/School";
 import Politicies from "./views/politics/politicsForm";
 import PoliticiesLista from "./views/politics/politicsList";
 import VersionControlProcedures from "./views/procedures/versionControllProcedures";
-import CapacitacionesGenerales from "./views/capacitation/listCapacitationsGeneral";
-import Evaluacion from "./views/capacitation/evaluatedTraining";
+import CapacitacionesGenerales from "./views/training/listTrainingsGeneral";
+import Evaluacion from "./views/training/evaluatedTraining";
 import Estadistica from "./views/estadisticas/AllStatsCards";
 import ListaColaboradores from "./views/collaborators/viewCollaborators";
-
+import AddTrainingGeneral from "./views/training/generalTraining";
 import AssignRol from "./views/collaborators/assingRol"
 
 const drawerWidth = 270;
@@ -439,7 +439,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             <List component="div" disablePadding>
               <ListItemButton
                 component={Link}
-                to="/capacitation"
+                to="/training"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -451,9 +451,23 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Agregar Capacitaciones" />
               </ListItemButton>
+                            <ListItemButton
+                component={Link}
+                to="/training/generalTraining"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Agregar Capacitaciones Generales" />
+              </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/facilitatorTraining"
+                to="/training/facilitatorTraining"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -467,7 +481,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/listCapacitation"
+                to="/training/listTraining"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -481,7 +495,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/listFacilitators"
+                to="/training/listFacilitators"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -495,7 +509,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/capacitation/listCapacitationsGeneral"
+                to="/training/listTrainingsGeneral"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -642,21 +656,22 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/procedures" element={<Procedimientos />} />
           <Route path="/procedures/listProcedures"element={<ListaProcedimientos />}/>
           <Route path="/procedures/assignmentProcedures"element={<AsignacionProcedimientos />}/>
-          <Route path="/capacitation/" element={<Capacitaciones />} />
-          <Route path="/capacitation/listCapacitation"element={<ListaCapacitaciones />} />
+          <Route path="/training/" element={<Capacitaciones />} />
+          <Route path="/training/listTraining"element={<ListaCapacitaciones />} />
           <Route path="/collaborators/collaborators" element={<Colaboradores />} />
           <Route path="/collaborators/detail/:id" element={<CollaboratorDetail />} />
-          <Route path="/capacitation/facilitatorTraining" element={<RegistroFacilitadores />} />
-          <Route path="/capacitation/listFacilitators" element={<ListaFacilitadores />} />
+          <Route path="/training/facilitatorTraining" element={<RegistroFacilitadores />} />
+          <Route path="/training/listFacilitators" element={<ListaFacilitadores />} />
           <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
           <Route path="/politics/politicsForm" element={<Politicies />} />
           <Route path="/politics/politicsList" element={<PoliticiesLista />} />
           <Route path="/procedures/versionControlProcedures" element={<VersionControlProcedures />} />
           <Route path="/collaborators/assingRol" element={<AssignRol/>} />
           <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores/>} />
-          <Route path="/capacitation/listCapacitationsGeneral" element={<CapacitacionesGenerales/>} />
-          <Route path="/capacitation/evaluatedTraining/:codigo_documento" element={<Evaluacion/>} />
+          <Route path="/training/listTrainingsGeneral" element={<CapacitacionesGenerales/>} />
+          <Route path="/training/evaluatedTraining/:codigo_documento" element={<Evaluacion/>} />
           <Route path="/estadisticas" element={<Estadistica/>} />
+          <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
           
         </Routes>
       </Main>

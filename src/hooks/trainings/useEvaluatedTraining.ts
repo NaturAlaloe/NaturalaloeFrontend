@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getTrainingByIdService, saveEvaluationsService, type SaveEvaluationData } from "../../services/capacitations/getEvaluatedCapacitationService";
+import { getTrainingByIdService, saveEvaluationsService, type SaveEvaluationData } from "../../services/trainings/getEvaluatedTrainingService";
 
 export interface Colaborador {
   id: number;
