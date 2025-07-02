@@ -193,7 +193,6 @@ export default function AssignRol() {
                         colab.id_colaborador,
                         colab.nombre,
                         colab.apellido1,
-
                         colab.apellido2,
 
                                          
