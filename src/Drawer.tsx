@@ -41,7 +41,6 @@ import ListaPuestos from "./views/administration/listWorkstations";
 import SchoolIcon from "@mui/icons-material/School";
 import Politicies from "./views/politics/politicsForm";
 import PoliticiesLista from "./views/politics/politicsList";
-import VersionControlProcedures from "./views/procedures/versionControllProcedures";
 import CapacitacionesGenerales from "./views/training/listTrainingsGeneral";
 import Evaluacion from "./views/training/evaluatedTraining";
 import Estadistica from "./views/estadisticas/AllStatsCards";
@@ -348,20 +347,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Asignar Procedimientos" />
               </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to="/procedures/versionControlProcedures"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
-              >
-                <ListItemText primary="Control de Versiones" />
-              </ListItemButton>
+             
             </List>
           </Collapse>
 
@@ -668,7 +654,6 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
           <Route path="/politics/politicsForm" element={<Politicies />} />
           <Route path="/politics/politicsList" element={<PoliticiesLista />} />
-          <Route path="/procedures/versionControlProcedures" element={<VersionControlProcedures />} />
           <Route path="/collaborators/assingRol" element={<AssignRol/>} />
           <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores/>} />
           <Route path="/training/listTrainingsGeneral" element={<CapacitacionesGenerales/>} />
