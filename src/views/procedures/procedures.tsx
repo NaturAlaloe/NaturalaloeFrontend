@@ -54,7 +54,7 @@ export default function Procedures() {
             optionValue="id_area"
             value={areaSeleccionada}
             onChange={(newValue) =>
-              handleAutocompleteChange("area", newValue, "id_area")
+              handleAutocompleteChange("area", newValue, "codigo")
             }
             placeholder="Buscar o seleccionar área..."
             disabled={loadingAreas}

@@ -83,10 +83,24 @@ export function useNewProcedureForm() {
 
   // Código POE modularizado
   const { codeApi, codeVisual } = useProcedureCode(
-    departamentoSeleccionado ? departamentoSeleccionado.id_departamento : null,
-    categoriaSeleccionada ? categoriaSeleccionada.id_categoria : null,
+    departamentoSeleccionado,
+    categoriaSeleccionada,
     lastConsecutive
   );
+
+  // Debug logs para ver qué está pasando
+  useEffect(() => {
+    console.log("🔍 Debug - Estados actuales:");
+    console.log("- formData.area:", formData.area);
+    console.log("- formData.departamento:", formData.departamento);
+    console.log("- formData.categoria:", formData.categoria);
+    console.log("- areaSeleccionada:", areaSeleccionada);
+    console.log("- departamentoSeleccionado:", departamentoSeleccionado);
+    console.log("- categoriaSeleccionada:", categoriaSeleccionada);
+    console.log("- lastConsecutive:", lastConsecutive);
+    console.log("- codeVisual:", codeVisual);
+    console.log("- codeApi:", codeApi);
+  }, [formData, areaSeleccionada, departamentoSeleccionado, categoriaSeleccionada, lastConsecutive, codeVisual, codeApi]);
 
   // PDF
   const { pdfFile, setPdfFile, handlePdfChange } = usePdfInput();
