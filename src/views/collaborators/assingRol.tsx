@@ -47,6 +47,7 @@ export default function AssignRol() {
     const nombreCompleto = [nombre, apellido1, apellido2].filter(Boolean).join(' ').trim() || 'Sin nombre';
     setColaboradorSeleccionado(`${id} - ${nombreCompleto}`);
     setPagina(0);
+    setSearchTerm(''); 
   };
 
   // Manejar selección de roles
@@ -152,7 +153,7 @@ export default function AssignRol() {
           variant="h5"
           sx={{ color: '#2AAC67', fontWeight: 'bold', mb: 3, letterSpacing: '1px', textAlign: 'center' }}
         >
-          Asignar Procedimientos a Roles
+          Asignar Roles a Colaborador
         </Typography>
 
         {/* Buscador de colaboradores con resultados en tiempo real */}
@@ -172,7 +173,7 @@ export default function AssignRol() {
           </Alert>
         )}
         {searchTerm && !colaboradorSeleccionado && (
-          <Box sx={{ mb: 3, maxHeight: 150, overflowY: 'auto', bgcolor: '#F6FBF7', borderRadius: 4, p: 2 }}>
+          <Box sx={{ mb: 3, maxHeight: 300, overflowY: 'auto', bgcolor: '#fff', borderRadius: 4, p: 2 }}>
             {loading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <CircularProgress />
@@ -185,23 +186,46 @@ export default function AssignRol() {
               collaborators
                 .filter(colab => colab && typeof colab.id_colaborador === 'string')
                 .map(colab => (
-                  <Typography
+                  <Box
                     key={colab.id_colaborador}
-                    sx={{ color: '#2AAC67', mb: 1, cursor: 'pointer', '&:hover': { color: '#1F8A50' } }}
                     onClick={() =>
                       manejarSeleccionColaborador(
                         colab.id_colaborador,
                         colab.nombre,
                         colab.apellido1,
+
                         colab.apellido2,
+
+                                         
+
                       )
                     }
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      py: 1, 
+                      px: 2,
+                      mb: 1,
+                      borderRadius: 2,
+                      border: '1px solid #2AAC67',
+                      background: '#fff',
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 4px rgba(42,172,103,0.07)',
+                      transition: 'background 0.2s, box-shadow 0.2s, border 0.2s',
+                      '&:hover': {
+                        background: '#E6F3EA',
+                        borderColor: '#13bd62',
+                        boxShadow: '0 2px 8px rgba(42,172,103,0.15)',
+                      },
+                    }}
                   >
-                    {colab.id_colaborador} - {[colab.nombre, colab.apellido1, colab.apellido2]
-                      .filter(Boolean)
-                      .join(' ')
-                      .trim() || 'Sin nombre'}
-                  </Typography>
+                    <Box sx={{ fontWeight: 700, color: '#2AAC67', mr: 2 }}>
+                      {colab.id_colaborador}
+                    </Box>
+                    <Box sx={{ color: '#333', fontWeight: 500 }}>
+                      {[colab.nombre, colab.apellido1, colab.apellido2].filter(Boolean).join(' ').trim() || 'Sin nombre'}
+                    </Box>                  
+                  </Box>
                 ))
             )}
           </Box>
@@ -227,16 +251,12 @@ export default function AssignRol() {
 
         {colaboradorSeleccionado && (
           <TableRol
-            roles={rolesPaginados}
+            roles={roles.map(r => r.nombre_rol)}
             rolesSeleccionados={rolesSeleccionados}
             loadingRoles={loadingRoles}
             errorRoles={errorRoles}
             puestoSeleccionado={puestoSeleccionado}
             onSeleccionRol={manejarSeleccionRol}
-            pagina={pagina}
-            rolesPorPagina={rolesPorPagina}
-            totalRoles={roles.length}
-            onPageChange={manejarCambioPagina}
           />
         )}
 
