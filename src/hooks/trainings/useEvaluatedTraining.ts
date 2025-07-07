@@ -18,6 +18,7 @@ export interface Colaborador {
   comentario: string;
   id_capacitacion: number;
   id_documento_normativo?: number;
+  is_evaluado: string;
 }
 
 export interface POESection {
@@ -68,15 +69,13 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
           return;
         }
 
-        // Agrupar colaboradores por POE usando id_documento_normativo
         const poesMap = new Map<number, POESection>();
 
         allData.forEach((item) => {
-          // Usar id_documento_normativo como identificador del POE
           const poeId = item.id_documento_normativo || 0;
           const poeCode = item.codigo_documento || "Sin Código";
           const poeTitle = `POE: ${poeCode}`;
-          
+
           if (!poesMap.has(poeId)) {
             poesMap.set(poeId, {
               id_poe: poeId,
@@ -94,6 +93,7 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
             comentario: item.comentario ?? "",
             id_capacitacion: item.id_capacitacion,
             id_documento_normativo: poeId,
+            is_evaluado: String(item.is_evaluado ?? "reprobado"),
           };
 
           poesMap.get(poeId)?.colaboradores.push(colaborador);
@@ -102,7 +102,6 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
         const poesSectionsArray = Array.from(poesMap.values());
         setPoesSections(poesSectionsArray);
 
-        // Información de la capacitación (se toma del primer item)
         const first = allData[0];
         setTrainingInfo({
           titulo_capacitacion: first.titulo_capacitacion,
@@ -155,7 +154,9 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
       prev.map((poeSection) => ({
         ...poeSection,
         colaboradores: poeSection.colaboradores.map((c) =>
-          c.id === id && c.id_capacitacion === idCap && c.id_documento_normativo === idPoe
+          c.id === id &&
+          c.id_capacitacion === idCap &&
+          c.id_documento_normativo === idPoe
             ? { ...c, [field]: processedValue }
             : c
         ),
@@ -166,49 +167,52 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
   const handleGuardarTodos = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Obtener todos los colaboradores de todas las secciones de POE
-    const todosColaboradores = poesSections.flatMap(poe => poe.colaboradores);
+    const todosColaboradores = poesSections.flatMap((poe) => poe.colaboradores);
 
     if (todosColaboradores.length === 0) {
-      showCustomToast(
-        "Error",
-        "No hay colaboradores para evaluar.",
-        "error"
-      );
+      showCustomToast("Error", "No hay colaboradores para evaluar.", "error");
       return;
     }
 
-    // Validación más estricta de campos
     const errores: string[] = [];
 
     todosColaboradores.forEach((colab) => {
-      const colaboradorInfo = `Colaborador ${colab.nombre}`;
-
-      // Validar anot
       if (!colab.nota || colab.nota.trim() === "") {
-        errores.push(`${colaboradorInfo}: La nota es obligatoria.`);
+        errores.push("Notas incompletas");
       } else {
         const notaNum = Number(colab.nota);
         if (isNaN(notaNum)) {
-          errores.push(`${colaboradorInfo}: La nota debe ser un número válido.`);
+          errores.push("Notas inválidas");
         } else if (notaNum < 0 || notaNum > 100) {
-          errores.push(`${colaboradorInfo}: La nota debe estar entre 0 y 100.`);
+          errores.push("Notas fuera de rango");
         }
       }
 
-      // Validar seguimiento
-      if (!colab.seguimiento || colab.seguimiento === "" || colab.seguimiento === "Seleccionar") {
-        errores.push(`${colaboradorInfo}: Debe seleccionar un seguimiento válido.`);
+      if (
+        !colab.seguimiento ||
+        colab.seguimiento === "" ||
+        colab.seguimiento === "Seleccionar"
+      ) {
+        errores.push("Seguimiento incompleto");
       }
 
-      // Validar que el seguimiento sea válido
       const validSeguimientos = ["satisfactorio", "reprogramar", "revaluacion"];
       if (colab.seguimiento && !validSeguimientos.includes(colab.seguimiento)) {
-        errores.push(`${colaboradorInfo}: El seguimiento "${colab.seguimiento}" no es válido.`);
+        errores.push("Seguimiento inválido");
       }
     });
 
-    
+    // Remove duplicates
+    const erroresUnicos = [...new Set(errores)];
+
+    if (erroresUnicos.length > 0) {
+      const mensajeError = erroresUnicos.length === 1 
+        ? erroresUnicos[0] 
+        : `• ${erroresUnicos.join("\n• ")}`;
+
+      showCustomToast("Campos Incompletos", mensajeError, "error");
+      return;
+    }
 
     const payload = todosColaboradores.map((colab) => {
       const item = {
@@ -221,6 +225,7 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
           | "revaluacion",
         nota: Number(colab.nota),
         comentario_final: colab.comentario?.trim() ?? "",
+        is_evaluado: colab.is_evaluado,
       };
 
       return item;
@@ -228,9 +233,7 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
 
     try {
       await submitQualify(payload);
-    } catch (error) {
-      // El error ya se maneja en submitQualify
-    }
+    } catch (error) {}
   };
 
   const createColumnsForPOE = (poeId: number) => [
@@ -247,7 +250,13 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
           name: `nota-${row.id}-${poeId}`,
           value: row.nota,
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-            handleChange(row.id, row.id_capacitacion, poeId, "nota", e.target.value),
+            handleChange(
+              row.id,
+              row.id_capacitacion,
+              poeId,
+              "nota",
+              e.target.value
+            ),
           className: "w-20 text-sm",
           min: 0,
           max: 100,
@@ -273,6 +282,9 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
             selectValue = "Seleccionar";
         }
 
+        const nota = Number(row.nota);
+        const isNotaValid = !isNaN(nota) && nota >= 80;
+
         return React.createElement(SelectField, {
           name: `seguimiento-${row.id}-${poeId}`,
           value: selectValue,
@@ -286,9 +298,39 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
             ),
           options: [
             "Seleccionar",
-            "Satisfactorio",
+            ...(isNotaValid ? ["Satisfactorio"] : []),
             "Reprogramar",
             "Reevaluación",
+          ],
+        });
+      },
+    },
+    {
+      name: "Estado",
+      cell: (row: Colaborador) => {
+        let selectValue = "Reprobado";
+
+        if (row.is_evaluado === "aprobado" || row.is_evaluado === "1") {
+          selectValue = "Aprobado";
+        }
+
+        const nota = Number(row.nota);
+        const isNotaValid = !isNaN(nota) && nota >= 80;
+
+        return React.createElement(SelectField, {
+          name: `is_evaluado-${row.id}-${poeId}`,
+          value: selectValue,
+          onChange: (e: React.ChangeEvent<HTMLSelectElement>) =>
+            handleChange(
+              row.id,
+              row.id_capacitacion,
+              poeId,
+              "is_evaluado",
+              e.target.value === "Aprobado" ? "aprobado" : "reprobado"
+            ),
+          options: [
+            "Reprobado",
+            ...(isNotaValid ? ["Aprobado"] : []),
           ],
         });
       },
