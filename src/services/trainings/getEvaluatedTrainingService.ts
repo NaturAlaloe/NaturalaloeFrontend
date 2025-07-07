@@ -1,4 +1,4 @@
-import api from '../../apiConfig/api';
+import api from "../../apiConfig/api";
 
 export interface TrainingItem {
   id_capacitacion: number;
@@ -15,20 +15,22 @@ export interface TrainingItem {
   segundo_apellido: string;
   nota?: string | null;
   comentario?: string | null;
+  id_documento_normativo?: number;
+  is_evaluado?: number;
 }
 
 export const getEvaluatedTraining = async (
-  codigoDocumento: string
+  id_capacitacion: string
 ): Promise<TrainingItem[]> => {
   try {
-    const response = await api.get(`/training/pending/${codigoDocumento}`);
+    const response = await api.get(`/training/pending/${id_capacitacion}`);
+    
     if (response.data.success) {
       return response.data.data;
     }
-    throw new Error("Error en la respuesta de la API");
-  } catch (error) {
     
+    throw new Error(`Error en la respuesta de la API: ${response.data.message || 'Sin mensaje'}`);
+  } catch (error: any) {
     throw error;
   }
 };
-

@@ -2,6 +2,8 @@ import api from "../../apiConfig/api";
 
 export interface QualifyPayload {
   id_capacitacion: number;
+  id_colaborador: number;
+  id_documento_normativo?: number;
   seguimiento: "satisfactorio" | "reprogramar" | "revaluacion";
   nota: number;
   comentario_final: string;
@@ -14,12 +16,6 @@ export const addQualifyTraining = async (
     const response = await api.post("/training/qualify", data);
 
     if (response.data && response.data.success === false) {
-      if (response.data.errors && Array.isArray(response.data.errors)) {
-        response.data.errors.forEach((error: any, index: number) => {
-          console.error(`  ${index + 1}. Error:`, error);
-        });
-      }
-
       const errorMessage =
         response.data.message || "Error desconocido del backend";
       const errorDetails = response.data.errors

@@ -63,7 +63,7 @@ export function useTrainingList() {
     apiData: TrainingList[]
   ): Training[] => {
     const trainingMap = new Map<string, Training>();
-    const grupalByTitle = new Map<string, Map<string, Training>>();
+    const grupalByCapacitacionId = new Map<string, Map<string, Training>>();
 
     apiData.forEach((item) => {
       const trainingId = item.id_capacitacion.toString();
@@ -108,14 +108,15 @@ export function useTrainingList() {
       };
 
       if (item.tipo_capacitacion === "grupal") {
-        const titleKey = item.titulo_capacitacion;
+        // Agrupar por id_capacitacion en lugar de por título
+        const capacitacionId = item.id_capacitacion.toString();
         const poeKey = item.codigo_documento;
 
-        if (!grupalByTitle.has(titleKey)) {
-          grupalByTitle.set(titleKey, new Map<string, Training>());
+        if (!grupalByCapacitacionId.has(capacitacionId)) {
+          grupalByCapacitacionId.set(capacitacionId, new Map<string, Training>());
         }
 
-        const poeMap = grupalByTitle.get(titleKey)!;
+        const poeMap = grupalByCapacitacionId.get(capacitacionId)!;
 
         if (poeMap.has(poeKey)) {
           const existingCap = poeMap.get(poeKey)!;
@@ -135,7 +136,7 @@ export function useTrainingList() {
 
     const result: Training[] = Array.from(trainingMap.values());
 
-    grupalByTitle.forEach((poeMap, title) => {
+    grupalByCapacitacionId.forEach((poeMap) => {
       const trainingsByPoe = Array.from(poeMap.values());
 
       if (trainingsByPoe.length > 1) {
@@ -151,7 +152,7 @@ export function useTrainingList() {
 
         const groupedTraining: Training = {
           ...firstCap,
-          id: `grouped_${title}`,
+          id: firstCap.id, // Mantener el id_capacitacion original
           poe: `${firstCap.poe}`,
           isGrouped: true,
           subTrainings: remainingCaps,
@@ -170,7 +171,6 @@ export function useTrainingList() {
     try {
       setIsLoading(true);
       setError(null);
-      console.log("Cargando capacitaciones desde la API...");
 
       const apiData = await getTrainingList();
 
@@ -213,8 +213,8 @@ export function useTrainingList() {
     return matchesSearch;
   });
 
-  const navegarCapacitacionFinalizada = (codigoDocumento: string) => {
-    navigate(`/training/evaluatedTraining/${codigoDocumento}`);
+  const navegarCapacitacionFinalizada = (id_capacitacion: string) => {
+    navigate(`/training/evaluatedTraining/${id_capacitacion}`);
   };
 
   const totalPages = Math.ceil(filteredTrainings.length / rowsPerPage);

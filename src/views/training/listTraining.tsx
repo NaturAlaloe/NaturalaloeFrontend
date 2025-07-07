@@ -135,7 +135,7 @@ export default function ListTrainings() {
           {row.estado.toLowerCase() !== "finalizada" && (
             <button
               className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
-              onClick={() => navegarCapacitacionFinalizada(row.poe)}
+              onClick={() => navegarCapacitacionFinalizada(row.id)}
               title="Calificar examen"
             >
               <EditNote />
