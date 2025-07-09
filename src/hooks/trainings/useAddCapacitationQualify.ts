@@ -3,21 +3,25 @@ import { addQualifyTraining } from "../../services/trainings/addTrainingQualifyS
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 interface PayloadItem {
-  id_capacitacion: number;
   id_colaborador: number;
   id_documento_normativo?: number;
   seguimiento: "satisfactorio" | "reprogramar" | "revaluacion";
-  nota: number;
+  nota: number | null;
   comentario_final: string;
+  is_aprobado?: string | null;
 }
 
 export const useAddQualifyTraining = () => {
   const [loading, setLoading] = useState(false);
 
-  const submitQualify = async (payload: PayloadItem[]) => {
+  const submitQualify = async (
+    id_capacitacion: number, 
+    calificaciones: PayloadItem[], 
+    metodoEvaluacion?: string | null
+  ) => {
     setLoading(true);
     try {
-      if (!payload || payload.length === 0) {
+      if (!calificaciones || calificaciones.length === 0) {
         showCustomToast(
           "Información",
           "No hay colaboradores para evaluar.",
@@ -27,25 +31,38 @@ export const useAddQualifyTraining = () => {
       }
 
       const errores: string[] = [];
+      
+      // Determinar el método de evaluación
+      const metodo = metodoEvaluacion?.toLowerCase() || "";
+      const esPractico = metodo === "práctico" || metodo === "practico";
+      const esTeorico = metodo === "teórico" || metodo === "teorico";
 
-      payload.forEach((item, index) => {
+      calificaciones.forEach((item, index) => {
         const colaboradorInfo = `Colaborador ${index + 1}`;
-
-        if (!item.id_capacitacion || item.id_capacitacion <= 0) {
-          errores.push(`${colaboradorInfo}: Falta el ID de capacitación`);
-        }
 
         if (!item.id_colaborador || item.id_colaborador <= 0) {
           errores.push(`${colaboradorInfo}: Falta el ID del colaborador`);
         }
 
-        if (item.nota === null || item.nota === undefined || isNaN(item.nota)) {
-          errores.push(
-            `${colaboradorInfo}: La nota es obligatoria y debe ser un número`
-          );
-        } else if (item.nota < 0 || item.nota > 100) {
-          errores.push(`${colaboradorInfo}: La nota debe estar entre 0 y 100`);
+        // Validar según el método de evaluación
+        if (esTeorico) {
+          // Para método teórico: validar nota
+          if (item.nota === null || item.nota === undefined || isNaN(item.nota)) {
+            errores.push(
+              `${colaboradorInfo}: La nota es obligatoria para evaluación teórica`
+            );
+          } else if (item.nota < 0 || item.nota > 100) {
+            errores.push(`${colaboradorInfo}: La nota debe estar entre 0 y 100`);
+          }
+        } else if (esPractico) {
+          // Para método práctico: validar is_aprobado
+          if (!item.is_aprobado || (item.is_aprobado !== "aprobado" && item.is_aprobado !== "reprobado")) {
+            errores.push(
+              `${colaboradorInfo}: Debe especificar si está aprobado o reprobado para evaluación práctica`
+            );
+          }
         }
+        // Para sin método: no validar nota ni is_aprobado, solo seguimiento
 
         const validSeguimientos = [
           "satisfactorio",
@@ -72,7 +89,16 @@ export const useAddQualifyTraining = () => {
         }
       });
 
-     
+      if (errores.length > 0) {
+        const mensajeError = errores.join("\n");
+        showCustomToast("Errores de validación", mensajeError, "error");
+        return;
+      }
+
+      const payload = {
+        id_capacitacion,
+        calificaciones
+      };
 
       await addQualifyTraining(payload);
 

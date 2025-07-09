@@ -26,6 +26,34 @@ const Evaluacion = () => {
   return (
     <>
       <FormContainer title="Calificación de Colaboradores" onSubmit={handleGuardarTodos}>
+        {/* Información del método de evaluación */}
+        {trainingInfo && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-lg font-semibold text-blue-800">
+                {trainingInfo.titulo_capacitacion}
+              </h3>
+            </div>
+            <div className="text-sm text-blue-700">
+              <span className="font-medium">Método de evaluación: </span>
+              <span className="capitalize font-semibold">
+                {trainingInfo.metodo_empleado || "No especificado"}
+              </span>
+            </div>
+            {trainingInfo.metodo_empleado && (
+              <div className="mt-2 text-xs text-blue-600">
+                {trainingInfo.metodo_empleado.toLowerCase() === "teórico" || trainingInfo.metodo_empleado.toLowerCase() === "teorico" ? (
+                  "📝 Evaluación teórica: Ingrese la nota numérica (0-100). Se requiere nota ≥80 para aprobar."
+                ) : trainingInfo.metodo_empleado.toLowerCase() === "práctico" || trainingInfo.metodo_empleado.toLowerCase() === "practico" ? (
+                  "✅ Evaluación práctica: Seleccione Aprobado o Reprobado según el desempeño."
+                ) : (
+                  "ℹ️ Método de evaluación no reconocido. Se mostrarán ambas opciones."
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Secciones por POE */}
         <div className="space-y-6">
           {poesSections.map((poeSection) => (

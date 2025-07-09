@@ -17,6 +17,7 @@ export interface TrainingItem {
   comentario?: string | null;
   id_documento_normativo?: number;
   is_evaluado?: number;
+  metodo_empleado?: string | null;
 }
 
 export const getEvaluatedTraining = async (

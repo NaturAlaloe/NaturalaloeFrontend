@@ -35,6 +35,7 @@ export interface TrainingInfo {
   fecha_inicio: string;
   fecha_fin: string;
   estado: string;
+  metodo_empleado?: string | null;
 }
 
 export const useEvaluatedTraining = (id_capacitacion: string) => {
@@ -85,15 +86,21 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
             });
           }
 
+          // Determinar valores por defecto basados en el método de evaluación
+          const metodoEvaluacion = item.metodo_empleado?.toLowerCase() || "";
+          const esPractico = metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
+          
           const colaborador: Colaborador = {
             id: item.id_colaborador,
             nombre: `${item.nombre} ${item.primer_apellido} ${item.segundo_apellido}`,
-            nota: item.nota ?? "",
+            nota: esPractico ? "0" : (item.nota ?? ""),
             seguimiento: item.seguimiento ? item.seguimiento.toLowerCase() : "",
             comentario: item.comentario ?? "",
             id_capacitacion: item.id_capacitacion,
             id_documento_normativo: poeId,
-            is_evaluado: String(item.is_evaluado ?? "reprobado"),
+            is_evaluado: esPractico ? 
+              (item.is_evaluado === 1 || String(item.is_evaluado) === "aprobado" ? "aprobado" : "reprobado") :
+              String(item.is_evaluado ?? "reprobado"),
           };
 
           poesMap.get(poeId)?.colaboradores.push(colaborador);
@@ -110,6 +117,7 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
           fecha_inicio: first.fecha_inicio,
           fecha_fin: first.fecha_fin,
           estado: first.estado,
+          metodo_empleado: first.metodo_empleado,
         });
 
         setError(null);
@@ -174,20 +182,35 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
       return;
     }
 
+    const metodoEvaluacion = trainingInfo?.metodo_empleado?.toLowerCase() || "";
+    const esPractico = metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
+    const esTeorico = metodoEvaluacion === "teórico" || metodoEvaluacion === "teorico";
+
     const errores: string[] = [];
 
     todosColaboradores.forEach((colab) => {
-      if (!colab.nota || colab.nota.trim() === "") {
-        errores.push("Notas incompletas");
-      } else {
-        const notaNum = Number(colab.nota);
-        if (isNaN(notaNum)) {
-          errores.push("Notas inválidas");
-        } else if (notaNum < 0 || notaNum > 100) {
-          errores.push("Notas fuera de rango");
+      // Para método teórico, validar nota
+      if (esTeorico) {
+        if (!colab.nota || colab.nota.trim() === "") {
+          errores.push("Notas incompletas");
+        } else {
+          const notaNum = Number(colab.nota);
+          if (isNaN(notaNum)) {
+            errores.push("Notas inválidas");
+          } else if (notaNum < 0 || notaNum > 100) {
+            errores.push("Notas fuera de rango");
+          }
         }
       }
 
+      // Para método práctico, validar estado de evaluación
+      if (esPractico) {
+        if (!colab.is_evaluado || (colab.is_evaluado !== "aprobado" && colab.is_evaluado !== "reprobado")) {
+          errores.push("Estado de evaluación incompleto");
+        }
+      }
+
+      // Validar seguimiento
       if (
         !colab.seguimiento ||
         colab.seguimiento === "" ||
@@ -214,55 +237,98 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
       return;
     }
 
-    const payload = todosColaboradores.map((colab) => {
+    const calificaciones = todosColaboradores.map((colab) => {
       const item = {
-        id_capacitacion: colab.id_capacitacion,
         id_colaborador: colab.id,
         id_documento_normativo: colab.id_documento_normativo,
         seguimiento: colab.seguimiento as
           | "satisfactorio"
           | "reprogramar"
           | "revaluacion",
-        nota: Number(colab.nota),
+        // Para método teórico enviar la nota y estado null
+        // Para método práctico enviar nota null y el estado
+        nota: esTeorico ? Number(colab.nota) : null,
         comentario_final: colab.comentario?.trim() ?? "",
-        is_evaluado: colab.is_evaluado,
+        is_aprobado: esPractico ? colab.is_evaluado : null,
       };
 
       return item;
     });
 
     try {
-      await submitQualify(payload);
+      // Obtener id_capacitacion del primer colaborador (todos tienen el mismo)
+      const id_capacitacion = todosColaboradores[0].id_capacitacion;
+      await submitQualify(id_capacitacion, calificaciones);
     } catch (error) {}
   };
 
-  const createColumnsForPOE = (poeId: number) => [
-    {
-      name: "Nombre",
-      selector: (row: Colaborador) => row.nombre,
-      sortable: true,
-    },
-    {
-      name: "Nota",
-      cell: (row: Colaborador) =>
-        React.createElement(InputField, {
-          type: "number",
-          name: `nota-${row.id}-${poeId}`,
-          value: row.nota,
-          onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-            handleChange(
-              row.id,
-              row.id_capacitacion,
-              poeId,
-              "nota",
-              e.target.value
-            ),
-          className: "w-20 text-sm",
-          min: 0,
-          max: 100,
-        }),
-    },
-    {
+  const createColumnsForPOE = (poeId: number) => {
+    const metodoEvaluacion = trainingInfo?.metodo_empleado?.toLowerCase() || "";
+    const esPractico = metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
+    const esTeorico = metodoEvaluacion === "teórico" || metodoEvaluacion === "teorico";
+
+    const baseColumns: any[] = [
+      {
+        name: "Nombre",
+        selector: (row: Colaborador) => row.nombre,
+        sortable: true,
+      },
+    ];
+
+    // Si es teórico, mostrar columna de Nota
+    if (esTeorico) {
+      baseColumns.push({
+        name: "Nota",
+        cell: (row: Colaborador) =>
+          React.createElement(InputField, {
+            type: "number",
+            name: `nota-${row.id}-${poeId}`,
+            value: row.nota,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange(
+                row.id,
+                row.id_capacitacion,
+                poeId,
+                "nota",
+                e.target.value
+              ),
+            className: "w-20 text-sm",
+            min: 0,
+            max: 100,
+          }),
+      });
+    }
+
+    // Si es práctico, mostrar columna de Estado (Aprobado/Reprobado)
+    if (esPractico) {
+      baseColumns.push({
+        name: "Estado",
+        cell: (row: Colaborador) => {
+          let selectValue = "Reprobado";
+
+          if (row.is_evaluado === "aprobado" || row.is_evaluado === "1") {
+            selectValue = "Aprobado";
+          }
+
+          return React.createElement(SelectField, {
+            name: `is_evaluado-${row.id}-${poeId}`,
+            value: selectValue,
+            onChange: (e: React.ChangeEvent<HTMLSelectElement>) =>
+              handleChange(
+                row.id,
+                row.id_capacitacion,
+                poeId,
+                "is_evaluado",
+                e.target.value === "Aprobado" ? "aprobado" : "reprobado"
+              ),
+            options: ["Reprobado", "Aprobado"],
+          });
+        },
+      });
+    }
+
+    // Añadir columna de Seguimiento
+    baseColumns.push({
       name: "Seguimiento",
       cell: (row: Colaborador) => {
         let selectValue = "Seleccionar";
@@ -282,8 +348,25 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
             selectValue = "Seleccionar";
         }
 
-        const nota = Number(row.nota);
-        const isNotaValid = !isNaN(nota) && nota >= 80;
+        // Para método teórico, solo permitir "Satisfactorio" si la nota es >= 80
+        let opciones = ["Seleccionar", "Reprogramar", "Reevaluación"];
+        
+        if (esTeorico) {
+          const nota = Number(row.nota);
+          const isNotaValid = !isNaN(nota) && nota >= 80;
+          if (isNotaValid) {
+            opciones = ["Seleccionar", "Satisfactorio", "Reprogramar", "Reevaluación"];
+          }
+        } else if (esPractico) {
+          // Para método práctico, solo permitir "Satisfactorio" si está "Aprobado"
+          const isAprobado = row.is_evaluado === "aprobado" || row.is_evaluado === "1";
+          if (isAprobado) {
+            opciones = ["Seleccionar", "Satisfactorio", "Reprogramar", "Reevaluación"];
+          }
+        } else {
+          // Si no hay método definido, mostrar todas las opciones
+          opciones = ["Seleccionar", "Satisfactorio", "Reprogramar", "Reevaluación"];
+        }
 
         return React.createElement(SelectField, {
           name: `seguimiento-${row.id}-${poeId}`,
@@ -296,46 +379,13 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
               "seguimiento",
               e.target.value
             ),
-          options: [
-            "Seleccionar",
-            ...(isNotaValid ? ["Satisfactorio"] : []),
-            "Reprogramar",
-            "Reevaluación",
-          ],
+          options: opciones,
         });
       },
-    },
-    {
-      name: "Estado",
-      cell: (row: Colaborador) => {
-        let selectValue = "Reprobado";
+    });
 
-        if (row.is_evaluado === "aprobado" || row.is_evaluado === "1") {
-          selectValue = "Aprobado";
-        }
-
-        const nota = Number(row.nota);
-        const isNotaValid = !isNaN(nota) && nota >= 80;
-
-        return React.createElement(SelectField, {
-          name: `is_evaluado-${row.id}-${poeId}`,
-          value: selectValue,
-          onChange: (e: React.ChangeEvent<HTMLSelectElement>) =>
-            handleChange(
-              row.id,
-              row.id_capacitacion,
-              poeId,
-              "is_evaluado",
-              e.target.value === "Aprobado" ? "aprobado" : "reprobado"
-            ),
-          options: [
-            "Reprobado",
-            ...(isNotaValid ? ["Aprobado"] : []),
-          ],
-        });
-      },
-    },
-    {
+    // Añadir columna de Comentario
+    baseColumns.push({
       name: "Comentario",
       cell: (row: Colaborador) =>
         React.createElement("textarea", {
@@ -353,8 +403,10 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
           className:
             "w-full border border-[#2AAC67] rounded-lg px-2 py-1 text-sm text-[#2AAC67] resize-none",
         }),
-    },
-  ];
+    });
+
+    return baseColumns;
+  };
 
   const customStyles = {
     table: {

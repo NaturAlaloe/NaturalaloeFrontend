@@ -2,15 +2,18 @@ import api from "../../apiConfig/api";
 
 export interface QualifyPayload {
   id_capacitacion: number;
-  id_colaborador: number;
-  id_documento_normativo?: number;
-  seguimiento: "satisfactorio" | "reprogramar" | "revaluacion";
-  nota: number;
-  comentario_final: string;
+  calificaciones: {
+    id_colaborador: number;
+    id_documento_normativo?: number;
+    seguimiento: "satisfactorio" | "reprogramar" | "revaluacion";
+    nota: number | null;
+    comentario_final: string;
+    is_aprobado?: string | null;
+  }[];
 }
 
 export const addQualifyTraining = async (
-  data: QualifyPayload[]
+  data: QualifyPayload
 ): Promise<void> => {
   try {
     const response = await api.post("/training/qualify", data);
