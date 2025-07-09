@@ -208,7 +208,7 @@ export default function ListTrainings() {
             </div>
           }
           customStyles={customRowStyles}
-          onRowClicked={() => {}}
+          onRowClicked={() => { }}
           progressPending={isLoading}
         />
       </div>
@@ -284,17 +284,49 @@ export default function ListTrainings() {
                         <span className="font-semibold mr-1">Cédula:</span>{" "}
                         {colaborador.cedula}
                       </div>
-                      {selectedTraining.estado.toLowerCase() === "finalizada" &&
-                        colaborador.nota !== null &&
-                        colaborador.nota !== undefined && (
-                          <div className="mb-2 flex items-center">
-                            <Assignment className="mr-2 text-[#2ecc71]" />
-                            <span className="font-semibold mr-1">
-                              Nota:
-                            </span>{" "}
-                            {colaborador.nota}
-                          </div>
-                        )}
+                      {selectedTraining.estado.toLowerCase() === "finalizada" && (
+                        <>
+                          {/* Para método teórico: mostrar nota */}
+                          {selectedTraining.metodo?.toLowerCase() === "teórico" &&
+                            colaborador.nota !== null &&
+                            colaborador.nota !== undefined && (
+                              <div className="mb-2 flex items-center">
+                                <Assignment className="mr-2 text-[#2ecc71]" />
+                                <span className="font-semibold mr-1">Nota:</span>
+                                <span>{colaborador.nota}</span>
+                              </div>
+                            )}
+
+                          {/* Para método práctico: mostrar estado de aprobación */}
+                          {selectedTraining.metodo?.toLowerCase() === "práctico" &&
+                            colaborador.is_aprobado !== null &&
+                            colaborador.is_aprobado !== undefined && (
+                              <div className="mb-2 flex items-center">
+                                <Assignment className="mr-2 text-[#2ecc71]" />
+                                <span className="font-semibold mr-1">Estado:</span>
+                                <span className={`font-medium ${colaborador.is_aprobado === "aprobado"
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                  }`}>
+                                  {colaborador.is_aprobado === "aprobado" ? "Aprobado" : "Reprobado"}
+                                </span>
+                              </div>
+                            )}
+
+                          {/* Para métodos no especificados o diferentes: mostrar nota si existe */}
+                          {(!selectedTraining.metodo ||
+                            (selectedTraining.metodo.toLowerCase() !== "teórico" &&
+                              selectedTraining.metodo.toLowerCase() !== "práctico")) &&
+                            colaborador.nota !== null &&
+                            colaborador.nota !== undefined && (
+                              <div className="mb-2 flex items-center">
+                                <Assignment className="mr-2 text-[#2ecc71]" />
+                                <span className="font-semibold mr-1">Nota:</span>
+                                <span>{colaborador.nota}</span>
+                              </div>
+                            )}
+                        </>
+                      )}
                     </div>
                   </details>
                 ))}

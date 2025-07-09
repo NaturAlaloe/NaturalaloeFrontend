@@ -5,11 +5,12 @@ import FormContainer from "../../components/formComponents/FormContainer";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 import CustomToaster from "../../components/globalComponents/CustomToaster";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
 
 const Evaluacion = () => {
   const { id_capacitacion } = useParams();
+  const navigate = useNavigate();
 
   const {
     poesSections,
@@ -19,7 +20,7 @@ const Evaluacion = () => {
     handleGuardarTodos,
     createColumnsForPOE,
     customStyles,
-  } = useEvaluatedTraining(id_capacitacion || "");
+  } = useEvaluatedTraining(id_capacitacion || "", navigate);
 
   if (loading) return <FullScreenSpinner />;
 
@@ -97,20 +98,6 @@ const Evaluacion = () => {
           <div className="text-center py-8">
             <div className="text-gray-500 mb-4">
               No hay POEs ni colaboradores para evaluar en esta capacitación.
-            </div>
-            <div className="text-xs text-gray-400 space-y-1">
-              <div>Debug Info:</div>
-              <div>ID Capacitación: {id_capacitacion}</div>
-              <div>POEs encontrados: {poesSections.length}</div>
-              <div>Estado de carga: {loading.toString()}</div>
-            </div>
-            {trainingInfo && (
-              <div className="text-xs text-blue-500 mt-2">
-                Capacitación encontrada: {trainingInfo.titulo_capacitacion}
-              </div>
-            )}
-            <div className="text-xs text-orange-500 mt-2">
-              💡 Revisa la consola del navegador para más detalles
             </div>
           </div>
         )}

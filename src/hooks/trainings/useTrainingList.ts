@@ -32,6 +32,7 @@ export interface Training {
     departamento: string;
     puesto: string;
     nota?: number | null;
+    is_aprobado?: string | null;
   }[];
   profesor: {
     nombre: string;
@@ -96,6 +97,7 @@ export function useTrainingList() {
             departamento: "N/A",
             puesto: "N/A",
             nota: item.nota,
+            is_aprobado: item.is_aprobado,
           },
         ],
         profesor: {

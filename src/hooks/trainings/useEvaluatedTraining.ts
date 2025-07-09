@@ -38,7 +38,7 @@ export interface TrainingInfo {
   metodo_empleado?: string | null;
 }
 
-export const useEvaluatedTraining = (id_capacitacion: string) => {
+export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: string) => void) => {
   const [poesSections, setPoesSections] = useState<POESection[]>([]);
   const [trainingInfo, setTrainingInfo] = useState<TrainingInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -259,6 +259,11 @@ export const useEvaluatedTraining = (id_capacitacion: string) => {
       // Obtener id_capacitacion del primer colaborador (todos tienen el mismo)
       const id_capacitacion = todosColaboradores[0].id_capacitacion;
       await submitQualify(id_capacitacion, calificaciones);
+      
+      // Redirigir a la lista de capacitaciones después del éxito
+      if (navigate) {
+        navigate('/training/listTraining');
+      }
     } catch (error) {}
   };
 
