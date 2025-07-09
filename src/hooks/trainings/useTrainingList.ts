@@ -110,12 +110,14 @@ export function useTrainingList() {
       };
 
       if (item.tipo_capacitacion === "grupal") {
-        // Agrupar por id_capacitacion en lugar de por título
         const capacitacionId = item.id_capacitacion.toString();
         const poeKey = item.codigo_documento;
 
         if (!grupalByCapacitacionId.has(capacitacionId)) {
-          grupalByCapacitacionId.set(capacitacionId, new Map<string, Training>());
+          grupalByCapacitacionId.set(
+            capacitacionId,
+            new Map<string, Training>()
+          );
         }
 
         const poeMap = grupalByCapacitacionId.get(capacitacionId)!;
@@ -154,7 +156,7 @@ export function useTrainingList() {
 
         const groupedTraining: Training = {
           ...firstCap,
-          id: firstCap.id, // Mantener el id_capacitacion original
+          id: firstCap.id,
           poe: `${firstCap.poe}`,
           isGrouped: true,
           subTrainings: remainingCaps,

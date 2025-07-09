@@ -9,7 +9,7 @@ import GlobalModal from '../../components/globalComponents/GlobalModal';
 
 const GeneralTraining = () => {
     const {
-        
+
         showAsignacionesModal,
         setShowAsignacionesModal,
         handleSubmit,
@@ -25,8 +25,6 @@ const GeneralTraining = () => {
         isLoading,
         loadingFacilitadores,
         getFacilitadoresOptions,
-        
-        // Elementos para generales
         generalesDisponibles,
         columnsGenerales,
         columnsGeneralesAsignadas,
@@ -51,7 +49,7 @@ const GeneralTraining = () => {
                     onChange={handleChange}
                     required
                 />
-                
+
                 <AutocompleteField
                     name="facilitador"
                     label="Facilitador:"
@@ -65,7 +63,7 @@ const GeneralTraining = () => {
                     required
                     disabled={loadingFacilitadores}
                 />
-                
+
                 <InputField
                     name="fecha"
                     label="Fecha Inicio:"
@@ -75,7 +73,7 @@ const GeneralTraining = () => {
                     onChange={handleChange}
                     required
                 />
-                
+
                 <InputField
                     name="fechaFin"
                     label="Fecha Fin:"
@@ -85,7 +83,7 @@ const GeneralTraining = () => {
                     onChange={handleChange}
                     required
                 />
-                
+
                 <InputField
                     name="duracion"
                     label="Duración (horas):"
@@ -175,7 +173,7 @@ const GeneralTraining = () => {
                         </div>
                     </div>
 
-                    {/* Sección de Generales */}
+
                     <div className="mb-8">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
                             <h4 className="font-semibold text-[#15803D] text-lg">
@@ -216,7 +214,7 @@ const GeneralTraining = () => {
                         </div>
                     </div>
 
-                    {/* Modales para selección */}
+
                     <PaginatedTableModal
                         open={showColaboradoresTable}
                         onClose={() => setShowColaboradoresTable(false)}

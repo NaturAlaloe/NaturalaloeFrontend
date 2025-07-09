@@ -15,8 +15,8 @@ export const useAddQualifyTraining = () => {
   const [loading, setLoading] = useState(false);
 
   const submitQualify = async (
-    id_capacitacion: number, 
-    calificaciones: PayloadItem[], 
+    id_capacitacion: number,
+    calificaciones: PayloadItem[],
     metodoEvaluacion?: string | null
   ) => {
     setLoading(true);
@@ -31,8 +31,6 @@ export const useAddQualifyTraining = () => {
       }
 
       const errores: string[] = [];
-      
-      // Determinar el método de evaluación
       const metodo = metodoEvaluacion?.toLowerCase() || "";
       const esPractico = metodo === "práctico" || metodo === "practico";
       const esTeorico = metodo === "teórico" || metodo === "teorico";
@@ -43,26 +41,31 @@ export const useAddQualifyTraining = () => {
         if (!item.id_colaborador || item.id_colaborador <= 0) {
           errores.push(`${colaboradorInfo}: Falta el ID del colaborador`);
         }
-
-        // Validar según el método de evaluación
         if (esTeorico) {
-          // Para método teórico: validar nota
-          if (item.nota === null || item.nota === undefined || isNaN(item.nota)) {
+          if (
+            item.nota === null ||
+            item.nota === undefined ||
+            isNaN(item.nota)
+          ) {
             errores.push(
               `${colaboradorInfo}: La nota es obligatoria para evaluación teórica`
             );
           } else if (item.nota < 0 || item.nota > 100) {
-            errores.push(`${colaboradorInfo}: La nota debe estar entre 0 y 100`);
+            errores.push(
+              `${colaboradorInfo}: La nota debe estar entre 0 y 100`
+            );
           }
         } else if (esPractico) {
-          // Para método práctico: validar is_aprobado
-          if (!item.is_aprobado || (item.is_aprobado !== "aprobado" && item.is_aprobado !== "reprobado")) {
+          if (
+            !item.is_aprobado ||
+            (item.is_aprobado !== "aprobado" &&
+              item.is_aprobado !== "reprobado")
+          ) {
             errores.push(
               `${colaboradorInfo}: Debe especificar si está aprobado o reprobado para evaluación práctica`
             );
           }
         }
-        // Para sin método: no validar nota ni is_aprobado, solo seguimiento
 
         const validSeguimientos = [
           "satisfactorio",
@@ -97,7 +100,7 @@ export const useAddQualifyTraining = () => {
 
       const payload = {
         id_capacitacion,
-        calificaciones
+        calificaciones,
       };
 
       await addQualifyTraining(payload);

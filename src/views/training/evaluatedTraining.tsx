@@ -27,7 +27,6 @@ const Evaluacion = () => {
   return (
     <>
       <FormContainer title="Calificación de Colaboradores" onSubmit={handleGuardarTodos}>
-        {/* Información del método de evaluación */}
         {trainingInfo && (
           <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
@@ -55,11 +54,10 @@ const Evaluacion = () => {
           </div>
         )}
 
-        {/* Secciones por POE */}
         <div className="space-y-6">
           {poesSections.map((poeSection) => (
             <div key={poeSection.id_poe} className="border border-[#2AAC67] rounded-lg overflow-hidden">
-              {/* Header del POE */}
+
               <div className="bg-[#2AAC67] text-white p-4">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                   <h3 className="text-lg font-semibold">
@@ -74,7 +72,7 @@ const Evaluacion = () => {
                 </div>
               </div>
 
-              {/* Tabla de colaboradores */}
+
               <div className="bg-white">
                 <GlobalDataTable
                   columns={createColumnsForPOE(poeSection.id_poe)}
@@ -93,7 +91,7 @@ const Evaluacion = () => {
           ))}
         </div>
 
-        {/* Mensaje si no hay POEs */}
+
         {poesSections.length === 0 && !loading && (
           <div className="text-center py-8">
             <div className="text-gray-500 mb-4">
@@ -102,7 +100,7 @@ const Evaluacion = () => {
           </div>
         )}
 
-        {/* Botón de guardar */}
+
         {poesSections.length > 0 && (
           <div className="flex justify-center mt-6">
             <SubmitButton disabled={saving} type="submit">

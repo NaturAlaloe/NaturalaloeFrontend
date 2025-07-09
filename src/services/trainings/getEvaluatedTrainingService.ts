@@ -25,12 +25,16 @@ export const getEvaluatedTraining = async (
 ): Promise<TrainingItem[]> => {
   try {
     const response = await api.get(`/training/pending/${id_capacitacion}`);
-    
+
     if (response.data.success) {
       return response.data.data;
     }
-    
-    throw new Error(`Error en la respuesta de la API: ${response.data.message || 'Sin mensaje'}`);
+
+    throw new Error(
+      `Error en la respuesta de la API: ${
+        response.data.message || "Sin mensaje"
+      }`
+    );
   } catch (error: any) {
     throw error;
   }

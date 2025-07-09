@@ -31,7 +31,6 @@ export const createCapacitacion = async (
       data: response.data,
     };
   } catch (error: any) {
-   
     const errorMessage =
       error.response?.data?.message || "Error al agendar la capacitación";
 
@@ -83,8 +82,15 @@ export const validateCapacitacionData = (
     errors.push("La fecha de inicio no puede ser posterior a la fecha de fin");
   }
 
-  if (data.is_evaluado && (!data.metodo_empleado || data.metodo_empleado.trim() === "" || data.metodo_empleado === "Seleccione...")) {
-    errors.push("El método empleado es requerido cuando la capacitación es evaluada");
+  if (
+    data.is_evaluado &&
+    (!data.metodo_empleado ||
+      data.metodo_empleado.trim() === "" ||
+      data.metodo_empleado === "Seleccione...")
+  ) {
+    errors.push(
+      "El método empleado es requerido cuando la capacitación es evaluada"
+    );
   }
 
   if (!data.duracion || data.duracion <= 0) {

@@ -213,7 +213,7 @@ export default function ListTrainings() {
         />
       </div>
 
-      {/* Modal para mostrar POEs internos */}
+
       <GlobalModal
         open={showPoeModal}
         onClose={() => setShowPoeModal(false)}
@@ -232,13 +232,13 @@ export default function ListTrainings() {
               <h4 className="font-medium text-gray-800">
                 POEs de la Capacitación:
               </h4>
-              {/* POE Principal */}
+
               <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
                 <span className="font-medium text-gray-900">
                   {selectedTraining.poe}
                 </span>
               </div>
-              {/* POEs Adicionales */}
+
               {selectedTraining.subTrainings.map((subTraining, index) => (
                 <div
                   key={index}
@@ -254,7 +254,7 @@ export default function ListTrainings() {
         )}
       </GlobalModal>
 
-      {/* Modal de detalles de capacitación */}
+
       <GlobalModal
         open={showModal}
         onClose={() => setShowModal(false)}
@@ -286,7 +286,7 @@ export default function ListTrainings() {
                       </div>
                       {selectedTraining.estado.toLowerCase() === "finalizada" && (
                         <>
-                          {/* Para método teórico: mostrar nota */}
+
                           {selectedTraining.metodo?.toLowerCase() === "teórico" &&
                             colaborador.nota !== null &&
                             colaborador.nota !== undefined && (
@@ -297,7 +297,7 @@ export default function ListTrainings() {
                               </div>
                             )}
 
-                          {/* Para método práctico: mostrar estado de aprobación */}
+
                           {selectedTraining.metodo?.toLowerCase() === "práctico" &&
                             colaborador.is_aprobado !== null &&
                             colaborador.is_aprobado !== undefined && (
@@ -305,15 +305,15 @@ export default function ListTrainings() {
                                 <Assignment className="mr-2 text-[#2ecc71]" />
                                 <span className="font-semibold mr-1">Estado:</span>
                                 <span className={`font-medium ${colaborador.is_aprobado === "aprobado"
-                                    ? "text-green-600"
-                                    : "text-red-600"
+                                  ? "text-green-600"
+                                  : "text-red-600"
                                   }`}>
                                   {colaborador.is_aprobado === "aprobado" ? "Aprobado" : "Reprobado"}
                                 </span>
                               </div>
                             )}
 
-                          {/* Para métodos no especificados o diferentes: mostrar nota si existe */}
+
                           {(!selectedTraining.metodo ||
                             (selectedTraining.metodo.toLowerCase() !== "teórico" &&
                               selectedTraining.metodo.toLowerCase() !== "práctico")) &&
@@ -360,7 +360,6 @@ export default function ListTrainings() {
         )}
       </GlobalModal>
 
-      {/* Modal de comentarios */}
       {showCommentModal && (
         <GlobalModal
           open={showCommentModal}

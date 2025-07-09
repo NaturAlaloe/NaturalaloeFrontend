@@ -11,7 +11,6 @@ export function useTrainingRegister({
   const { register, loading } = useRegisterIndividualTraining();
 
   const handleRegister = async (isEvaluado: boolean, form: any) => {
-
     if (!form.fechaInicio) {
       showCustomToast("Error", "La fecha de inicio es obligatoria.", "error");
       return;
@@ -21,7 +20,11 @@ export function useTrainingRegister({
       return;
     }
     if (new Date(form.fechaFin) < new Date(form.fechaInicio)) {
-      showCustomToast("Error", "La fecha de fin no puede ser anterior a la fecha de inicio.", "error");
+      showCustomToast(
+        "Error",
+        "La fecha de fin no puede ser anterior a la fecha de inicio.",
+        "error"
+      );
       return;
     }
     if (
@@ -29,7 +32,11 @@ export function useTrainingRegister({
       isNaN(Number(form.duracionHoras)) ||
       Number(form.duracionHoras) <= 0
     ) {
-      showCustomToast("Error", "La duración debe ser un número mayor a 0.", "error");
+      showCustomToast(
+        "Error",
+        "La duración debe ser un número mayor a 0.",
+        "error"
+      );
       return;
     }
     if (!form.facilitador) {
@@ -51,21 +58,37 @@ export function useTrainingRegister({
     const id_documento_normativo = initialData?.id_documento_normativo;
 
     if (!id_colaborador) {
-      showCustomToast("Error", "No se encontró el colaborador. Intente de nuevo.", "error");
+      showCustomToast(
+        "Error",
+        "No se encontró el colaborador. Intente de nuevo.",
+        "error"
+      );
       return;
     }
     if (!id_documento_normativo) {
-      showCustomToast("Error", "No se encontró el documento normativo. Intente de nuevo.", "error");
+      showCustomToast(
+        "Error",
+        "No se encontró el documento normativo. Intente de nuevo.",
+        "error"
+      );
       return;
     }
     if (!id_facilitador) {
-      showCustomToast("Error", "El facilitador seleccionado no es válido.", "error");
+      showCustomToast(
+        "Error",
+        "El facilitador seleccionado no es válido.",
+        "error"
+      );
       return;
     }
 
     if (isEvaluado) {
       if (!form.metodoEvaluacion) {
-        showCustomToast("Error", "Debe seleccionar un método de evaluación.", "error");
+        showCustomToast(
+          "Error",
+          "Debe seleccionar un método de evaluación.",
+          "error"
+        );
         return;
       }
       if (
@@ -74,7 +97,11 @@ export function useTrainingRegister({
         Number(form.nota) < 0 ||
         Number(form.nota) > 100
       ) {
-        showCustomToast("Error", "La nota debe ser un número entre 0 y 100.", "error");
+        showCustomToast(
+          "Error",
+          "La nota debe ser un número entre 0 y 100.",
+          "error"
+        );
         return;
       }
     }
@@ -98,7 +125,11 @@ export function useTrainingRegister({
     console.log("Datos enviados a /training/individual:", payload);
     const ok = await register(payload);
     if (ok) {
-      showCustomToast("Éxito", "Capacitación registrada correctamente", "success");
+      showCustomToast(
+        "Éxito",
+        "Capacitación registrada correctamente",
+        "success"
+      );
       if (typeof onClose === "function") onClose();
     }
   };

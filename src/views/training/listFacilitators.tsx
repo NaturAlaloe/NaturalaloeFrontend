@@ -25,7 +25,7 @@ export default function ListFacilitadores() {
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
-    loading, 
+    loading,
   } = useFacilitadores();
 
   if (loading) return <FullScreenSpinner />;
@@ -65,12 +65,12 @@ export default function ListFacilitadores() {
         />
       </div>
 
-      <GlobalDataTable 
-        columns={columns} 
-        data={filtered} 
-        pagination 
-        highlightOnHover 
-        dense 
+      <GlobalDataTable
+        columns={columns}
+        data={filtered}
+        pagination
+        highlightOnHover
+        dense
         currentPage={currentPage}
         onChangePage={setCurrentPage}
       />

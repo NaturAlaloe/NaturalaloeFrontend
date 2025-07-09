@@ -29,7 +29,7 @@ export default function ListCapacitationGeneral() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  
+
   const filtered = generales.filter((item) => {
     const codigo = (item.codigo ?? "").toLowerCase().trim();
     const titulo = (item.titulo ?? "").toLowerCase().trim();
@@ -95,14 +95,13 @@ export default function ListCapacitationGeneral() {
       <GlobalDataTable
         columns={columns}
         data={filtered}
-        pagination 
+        pagination
         highlightOnHover
         dense
         currentPage={currentPage}
         onChangePage={setCurrentPage}
       />
 
-      {/* Modal Agregar/Editar */}
       {modalOpen && editing && (
         <GlobalModal
           open={modalOpen}
@@ -151,7 +150,6 @@ export default function ListCapacitationGeneral() {
         </GlobalModal>
       )}
 
-      {/* Modal Eliminar */}
       {deleteModalOpen && selected && (
         <GlobalModal
           open={deleteModalOpen}

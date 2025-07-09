@@ -38,7 +38,10 @@ export interface TrainingInfo {
   metodo_empleado?: string | null;
 }
 
-export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: string) => void) => {
+export const useEvaluatedTraining = (
+  id_capacitacion: string,
+  navigate?: (path: string) => void
+) => {
   const [poesSections, setPoesSections] = useState<POESection[]>([]);
   const [trainingInfo, setTrainingInfo] = useState<TrainingInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,21 +89,24 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
             });
           }
 
-          // Determinar valores por defecto basados en el método de evaluación
           const metodoEvaluacion = item.metodo_empleado?.toLowerCase() || "";
-          const esPractico = metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
-          
+          const esPractico =
+            metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
+
           const colaborador: Colaborador = {
             id: item.id_colaborador,
             nombre: `${item.nombre} ${item.primer_apellido} ${item.segundo_apellido}`,
-            nota: esPractico ? "0" : (item.nota ?? ""),
+            nota: esPractico ? "0" : item.nota ?? "",
             seguimiento: item.seguimiento ? item.seguimiento.toLowerCase() : "",
             comentario: item.comentario ?? "",
             id_capacitacion: item.id_capacitacion,
             id_documento_normativo: poeId,
-            is_evaluado: esPractico ? 
-              (item.is_evaluado === 1 || String(item.is_evaluado) === "aprobado" ? "aprobado" : "reprobado") :
-              String(item.is_evaluado ?? "reprobado"),
+            is_evaluado: esPractico
+              ? item.is_evaluado === 1 ||
+                String(item.is_evaluado) === "aprobado"
+                ? "aprobado"
+                : "reprobado"
+              : String(item.is_evaluado ?? "reprobado"),
           };
 
           poesMap.get(poeId)?.colaboradores.push(colaborador);
@@ -183,13 +189,14 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
     }
 
     const metodoEvaluacion = trainingInfo?.metodo_empleado?.toLowerCase() || "";
-    const esPractico = metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
-    const esTeorico = metodoEvaluacion === "teórico" || metodoEvaluacion === "teorico";
+    const esPractico =
+      metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
+    const esTeorico =
+      metodoEvaluacion === "teórico" || metodoEvaluacion === "teorico";
 
     const errores: string[] = [];
 
     todosColaboradores.forEach((colab) => {
-      // Para método teórico, validar nota
       if (esTeorico) {
         if (!colab.nota || colab.nota.trim() === "") {
           errores.push("Notas incompletas");
@@ -203,14 +210,16 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
         }
       }
 
-      // Para método práctico, validar estado de evaluación
       if (esPractico) {
-        if (!colab.is_evaluado || (colab.is_evaluado !== "aprobado" && colab.is_evaluado !== "reprobado")) {
+        if (
+          !colab.is_evaluado ||
+          (colab.is_evaluado !== "aprobado" &&
+            colab.is_evaluado !== "reprobado")
+        ) {
           errores.push("Estado de evaluación incompleto");
         }
       }
 
-      // Validar seguimiento
       if (
         !colab.seguimiento ||
         colab.seguimiento === "" ||
@@ -225,13 +234,13 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
       }
     });
 
-    // Remove duplicates
     const erroresUnicos = [...new Set(errores)];
 
     if (erroresUnicos.length > 0) {
-      const mensajeError = erroresUnicos.length === 1 
-        ? erroresUnicos[0] 
-        : `• ${erroresUnicos.join("\n• ")}`;
+      const mensajeError =
+        erroresUnicos.length === 1
+          ? erroresUnicos[0]
+          : `• ${erroresUnicos.join("\n• ")}`;
 
       showCustomToast("Campos Incompletos", mensajeError, "error");
       return;
@@ -245,8 +254,6 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
           | "satisfactorio"
           | "reprogramar"
           | "revaluacion",
-        // Para método teórico enviar la nota y estado null
-        // Para método práctico enviar nota null y el estado
         nota: esTeorico ? Number(colab.nota) : null,
         comentario_final: colab.comentario?.trim() ?? "",
         is_aprobado: esPractico ? colab.is_evaluado : null,
@@ -256,21 +263,21 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
     });
 
     try {
-      // Obtener id_capacitacion del primer colaborador (todos tienen el mismo)
       const id_capacitacion = todosColaboradores[0].id_capacitacion;
       await submitQualify(id_capacitacion, calificaciones);
-      
-      // Redirigir a la lista de capacitaciones después del éxito
+
       if (navigate) {
-        navigate('/training/listTraining');
+        navigate("/training/listTraining");
       }
     } catch (error) {}
   };
 
   const createColumnsForPOE = (poeId: number) => {
     const metodoEvaluacion = trainingInfo?.metodo_empleado?.toLowerCase() || "";
-    const esPractico = metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
-    const esTeorico = metodoEvaluacion === "teórico" || metodoEvaluacion === "teorico";
+    const esPractico =
+      metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
+    const esTeorico =
+      metodoEvaluacion === "teórico" || metodoEvaluacion === "teorico";
 
     const baseColumns: any[] = [
       {
@@ -280,7 +287,6 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
       },
     ];
 
-    // Si es teórico, mostrar columna de Nota
     if (esTeorico) {
       baseColumns.push({
         name: "Nota",
@@ -304,7 +310,6 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
       });
     }
 
-    // Si es práctico, mostrar columna de Estado (Aprobado/Reprobado)
     if (esPractico) {
       baseColumns.push({
         name: "Estado",
@@ -332,7 +337,6 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
       });
     }
 
-    // Añadir columna de Seguimiento
     baseColumns.push({
       name: "Seguimiento",
       cell: (row: Colaborador) => {
@@ -353,26 +357,6 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
             selectValue = "Seleccionar";
         }
 
-        // Para método teórico, solo permitir "Satisfactorio" si la nota es >= 80
-        let opciones = ["Seleccionar", "Reprogramar", "Reevaluación"];
-        
-        if (esTeorico) {
-          const nota = Number(row.nota);
-          const isNotaValid = !isNaN(nota) && nota >= 80;
-          if (isNotaValid) {
-            opciones = ["Seleccionar", "Satisfactorio", "Reprogramar", "Reevaluación"];
-          }
-        } else if (esPractico) {
-          // Para método práctico, solo permitir "Satisfactorio" si está "Aprobado"
-          const isAprobado = row.is_evaluado === "aprobado" || row.is_evaluado === "1";
-          if (isAprobado) {
-            opciones = ["Seleccionar", "Satisfactorio", "Reprogramar", "Reevaluación"];
-          }
-        } else {
-          // Si no hay método definido, mostrar todas las opciones
-          opciones = ["Seleccionar", "Satisfactorio", "Reprogramar", "Reevaluación"];
-        }
-
         return React.createElement(SelectField, {
           name: `seguimiento-${row.id}-${poeId}`,
           value: selectValue,
@@ -384,12 +368,10 @@ export const useEvaluatedTraining = (id_capacitacion: string, navigate?: (path: 
               "seguimiento",
               e.target.value
             ),
-          options: opciones,
         });
       },
     });
 
-    // Añadir columna de Comentario
     baseColumns.push({
       name: "Comentario",
       cell: (row: Colaborador) =>
