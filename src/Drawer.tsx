@@ -46,6 +46,8 @@ import Evaluacion from "./views/training/evaluatedTraining";
 import Estadistica from "./views/estadisticas/AllStatsCards";
 import ListaColaboradores from "./views/collaborators/viewCollaborators";
 import AddTrainingGeneral from "./views/training/generalTraining";
+import TrainingRegisters from "./views/training/trainingRegisters";
+import TrainingLists from "./views/training/trainingLists";
 import AssignRol from "./views/collaborators/assingRol";
 import { useUserFromToken } from "./hooks/useUserFromToken";
 
@@ -428,7 +430,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             <List component="div" disablePadding>
               <ListItemButton
                 component={Link}
-                to="/training"
+                to="/training/registers"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -438,25 +440,11 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Agregar Capacitaciones" />
-              </ListItemButton>
-                            <ListItemButton
-                component={Link}
-                to="/training/generalTraining"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
-              >
-                <ListItemText primary="Agregar Capacitaciones Generales" />
+                <ListItemText primary="Registros" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
-                to="/training/facilitatorTraining"
+                to="/training/lists"
                 sx={{
                   pl: 6,
                   color: "#f4fcec",
@@ -466,49 +454,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Agregar Facilitadores" />
-              </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to="/training/listTraining"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
-              >
-                <ListItemText primary="Lista de Capacitaciones" />
-              </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to="/training/listFacilitators"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
-              >
-                <ListItemText primary="Lista de Facilitadores" />
-              </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to="/training/listTrainingsGeneral"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
-              >
-                <ListItemText primary="Lista de Generales" />
+                <ListItemText primary="Listas" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -660,6 +606,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/training/evaluatedTraining/:id_capacitacion" element={<Evaluacion/>} />
           <Route path="/estadisticas" element={<Estadistica/>} />
           <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
+          <Route path="/training/registers" element={<TrainingRegisters />} />
+          <Route path="/training/lists" element={<TrainingLists />} />
           
         </Routes>
       </Main>
