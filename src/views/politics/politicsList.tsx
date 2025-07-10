@@ -223,6 +223,7 @@ export default function PoliticsList() {
                 required
                 className="w-full"
                 disabled={ui.saving}
+                
               />
 
               <SelectAutocomplete
@@ -255,7 +256,7 @@ export default function PoliticsList() {
                 step="1"
                 value={ui.versionInput}
                 onChange={(e) => ui.setVersionInput(e.target.value)}
-                placeholder="1.0"
+                placeholder="0"
                 required
                 disabled={ui.saving || !ui.esNuevaVersion}
                 readOnly={!ui.esNuevaVersion}

@@ -19,7 +19,7 @@ export function useRolesPoliticsList() {
   const [modalSearchPolitics, setModalSearchPolitics] = useState("");
   const [politicasActivas, setPoliticasActivas] = useState<any[]>([]);
   const [modalLoadingPolitics, setModalLoadingPolitics] = useState(false);
-
+  const [savingPoliticas, setSavingPoliticas] = useState(false);
   // Effect para cargar políticas cuando se abre el modal
   useEffect(() => {
     if (modalPoliticsOpen) {
@@ -127,6 +127,14 @@ export function useRolesPoliticsList() {
     setPoliticasSeleccionadas(numericSeleccion);
   };
 
+    const handleSavePoliticsWithLoading = async () => {
+      setSavingPoliticas(true);
+      try {
+        await handleSavePolitics();
+      } finally {
+        setSavingPoliticas(false);
+      }
+    };
   return {
     // Estados y handlers específicos de Políticas
     modalPoliticsOpen,
@@ -140,6 +148,8 @@ export function useRolesPoliticsList() {
     politicasFiltradosModal,
     handleSavePolitics,
     modalLoadingPolitics,
+    handleSavePoliticsWithLoading,
     handleSeleccionChangePolitics,
+    savingPoliticas,
   };
 }

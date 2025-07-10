@@ -16,8 +16,8 @@ export const getAllRoles = async () => {
 };
 
 export const assignProceduresToRole = async (id_rol: number, id_documento: number[]) => {
-  console.log("POST /assignProcedures", { id_rol, id_documento });
-  return api.post("/assignProcedures", {
+  console.log("POST /assign", { id_rol, id_documento });
+  return api.post("/procedures/assign", {
     id_rol,
     id_documento,
   });

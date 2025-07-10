@@ -24,6 +24,8 @@ export function useRolesProceduresList() {
   const [modalSearchPOE, setModalSearchPOE] = useState("");
   const [procedimientosActivos, setProcedimientosActivos] = useState<any[]>([]);
   const [modalLoadingPOE, setModalLoadingPOE] = useState(false);
+  const [savingProcedimientos, setSavingProcedimientos] = useState(false);
+  
 
   // Effect para resetear paginación
   useEffect(() => {
@@ -156,6 +158,15 @@ export function useRolesProceduresList() {
     setProcedimientosSeleccionados(numericSeleccion);
   };
 
+  const handleSaveProcedimientosWithLoading = async () => {
+    setSavingProcedimientos(true);
+    try {
+      await handleSaveProcedimientos();
+    } finally {
+      setSavingProcedimientos(false);
+    }
+  };
+
   return {
     // Estados compartidos
     loading,
@@ -175,7 +186,9 @@ export function useRolesProceduresList() {
     setModalSearchPOE,
     procedimientosFiltradosModal,
     handleSaveProcedimientos,
+    handleSaveProcedimientosWithLoading,
     modalLoadingPOE,
     handleSeleccionChangePOE,
+    savingProcedimientos,
   };
 }

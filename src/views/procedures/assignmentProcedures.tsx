@@ -1,6 +1,7 @@
 import { useRolesProceduresList } from "../../hooks/procedures/useRolesProceduresList";
 import { useRolesPoliticsList } from "../../hooks/procedures/useRolesPoliticsList";
 import { RolesProceduresProvider } from "../../hooks/procedures/RolesProceduresContext";
+import React, { useState } from "react";
 import {
   Button,
   Box,
@@ -32,9 +33,10 @@ function RolesProceduresContent() {
     modalSearchPOE,
     setModalSearchPOE,
     procedimientosFiltradosModal,
-    handleSaveProcedimientos,
     modalLoadingPOE,
     handleSeleccionChangePOE,
+    handleSaveProcedimientosWithLoading,
+    savingProcedimientos,
   } = useRolesProceduresList();
 
   // Hook para políticas
@@ -47,10 +49,14 @@ function RolesProceduresContent() {
     modalSearchPolitics,
     setModalSearchPolitics,
     politicasFiltradosModal,
-    handleSavePolitics,
     modalLoadingPolitics,
     handleSeleccionChangePolitics,
+    handleSavePoliticsWithLoading,
+    savingPoliticas,
   } = useRolesPoliticsList();
+
+
+
 
   const columns: TableColumn<any>[] = [
     {
@@ -217,7 +223,7 @@ function RolesProceduresContent() {
         maxWidth="md"
         actions={
           <div className="flex justify-center items-center gap-2">
-            <SubmitButton onClick={handleSaveProcedimientos}>
+            <SubmitButton onClick={handleSaveProcedimientosWithLoading} loading={savingProcedimientos}>
               Guardar Procedimientos
             </SubmitButton>
           </div>
@@ -269,7 +275,7 @@ function RolesProceduresContent() {
         maxWidth="md"
         actions={
           <div className="flex justify-center items-center gap-1">
-            <SubmitButton onClick={handleSavePolitics}>
+            <SubmitButton onClick={handleSavePoliticsWithLoading} loading={savingPoliticas}>
               Guardar Políticas
             </SubmitButton>
           </div>

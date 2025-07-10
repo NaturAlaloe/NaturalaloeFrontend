@@ -26,6 +26,7 @@ export default function PoliticsForm() {
           value={formData.codigo}
           onChange={() => { }}
           disabled
+  
         />
         <InputField
           label="Descripción"
@@ -33,6 +34,7 @@ export default function PoliticsForm() {
           value={formData.descripcion}
           onChange={handleChange}
           placeholder="Ingrese la descripción"
+          required
         />
 
         <SelectAutocomplete
@@ -40,6 +42,7 @@ export default function PoliticsForm() {
           options={responsables}
           optionLabel="nombre_responsable"
           optionValue="id_responsable"
+          
           value={
             responsables.find(r => r.id_responsable === Number(formData.id_responsable)) || null
           }
@@ -55,6 +58,7 @@ export default function PoliticsForm() {
           placeholder="Selecciona un responsable"
           disabled={loadingResponsables}
           fullWidth
+          
         />
         <InputField
           label="Versión"
@@ -62,7 +66,7 @@ export default function PoliticsForm() {
           type="number"
           value={formData.version}
           onChange={handleChange}
-          placeholder="1.0"
+          placeholder="0"
           required
         />
         <InputField
@@ -81,12 +85,16 @@ export default function PoliticsForm() {
           type="date"
           required
         />
-        <PdfInput
+     
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <PdfInput
           pdfFile={pdfFile}
           onChange={handlePdfChange}
           onRemove={() => setPdfFile(null)}
           required={!pdfFile}
         />
+    
       </div>
       <div className="text-center mt-8">
         <SubmitButton width="">
