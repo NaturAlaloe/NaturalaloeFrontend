@@ -135,7 +135,7 @@ export default function ListTrainings() {
           {row.estado.toLowerCase() !== "finalizada" && (
             <button
               className="action-button text-[#2AAC67] hover:text-[#1e8449] transition-colors font-semibold"
-              onClick={() => navegarCapacitacionFinalizada(row.poe)}
+              onClick={() => navegarCapacitacionFinalizada(row.id)}
               title="Calificar examen"
             >
               <EditNote />
@@ -208,12 +208,12 @@ export default function ListTrainings() {
             </div>
           }
           customStyles={customRowStyles}
-          onRowClicked={() => {}}
+          onRowClicked={() => { }}
           progressPending={isLoading}
         />
       </div>
 
-      {/* Modal para mostrar POEs internos */}
+
       <GlobalModal
         open={showPoeModal}
         onClose={() => setShowPoeModal(false)}
@@ -232,13 +232,13 @@ export default function ListTrainings() {
               <h4 className="font-medium text-gray-800">
                 POEs de la Capacitación:
               </h4>
-              {/* POE Principal */}
+
               <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
                 <span className="font-medium text-gray-900">
                   {selectedTraining.poe}
                 </span>
               </div>
-              {/* POEs Adicionales */}
+
               {selectedTraining.subTrainings.map((subTraining, index) => (
                 <div
                   key={index}
@@ -254,7 +254,7 @@ export default function ListTrainings() {
         )}
       </GlobalModal>
 
-      {/* Modal de detalles de capacitación */}
+
       <GlobalModal
         open={showModal}
         onClose={() => setShowModal(false)}
@@ -284,17 +284,49 @@ export default function ListTrainings() {
                         <span className="font-semibold mr-1">Cédula:</span>{" "}
                         {colaborador.cedula}
                       </div>
-                      {selectedTraining.estado.toLowerCase() === "finalizada" &&
-                        colaborador.nota !== null &&
-                        colaborador.nota !== undefined && (
-                          <div className="mb-2 flex items-center">
-                            <Assignment className="mr-2 text-[#2ecc71]" />
-                            <span className="font-semibold mr-1">
-                              Nota:
-                            </span>{" "}
-                            {colaborador.nota}
-                          </div>
-                        )}
+                      {selectedTraining.estado.toLowerCase() === "finalizada" && (
+                        <>
+
+                          {selectedTraining.metodo?.toLowerCase() === "teórico" &&
+                            colaborador.nota !== null &&
+                            colaborador.nota !== undefined && (
+                              <div className="mb-2 flex items-center">
+                                <Assignment className="mr-2 text-[#2ecc71]" />
+                                <span className="font-semibold mr-1">Nota:</span>
+                                <span>{colaborador.nota}</span>
+                              </div>
+                            )}
+
+
+                          {selectedTraining.metodo?.toLowerCase() === "práctico" &&
+                            colaborador.is_aprobado !== null &&
+                            colaborador.is_aprobado !== undefined && (
+                              <div className="mb-2 flex items-center">
+                                <Assignment className="mr-2 text-[#2ecc71]" />
+                                <span className="font-semibold mr-1">Estado:</span>
+                                <span className={`font-medium ${colaborador.is_aprobado === "aprobado"
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                                  }`}>
+                                  {colaborador.is_aprobado === "aprobado" ? "Aprobado" : "Reprobado"}
+                                </span>
+                              </div>
+                            )}
+
+
+                          {(!selectedTraining.metodo ||
+                            (selectedTraining.metodo.toLowerCase() !== "teórico" &&
+                              selectedTraining.metodo.toLowerCase() !== "práctico")) &&
+                            colaborador.nota !== null &&
+                            colaborador.nota !== undefined && (
+                              <div className="mb-2 flex items-center">
+                                <Assignment className="mr-2 text-[#2ecc71]" />
+                                <span className="font-semibold mr-1">Nota:</span>
+                                <span>{colaborador.nota}</span>
+                              </div>
+                            )}
+                        </>
+                      )}
                     </div>
                   </details>
                 ))}
@@ -328,7 +360,6 @@ export default function ListTrainings() {
         )}
       </GlobalModal>
 
-      {/* Modal de comentarios */}
       {showCommentModal && (
         <GlobalModal
           open={showCommentModal}

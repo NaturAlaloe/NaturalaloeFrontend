@@ -6,7 +6,7 @@ import InputField from "./formComponents/InputField";
 import SelectField from "./formComponents/SelectField";
 import AutocompleteField from "./formComponents/AutocompleteField";
 import useCollaboratorFacilitator from "../hooks/collaborator/useCollaboratorFacilitator";
-import { useTrainingRegister } from "../hooks/training/useTrainingRegister";
+import { useTrainingRegister } from "../hooks/trainings/useTrainingRegister";
 
 interface TrainingModalProps {
   open: boolean;

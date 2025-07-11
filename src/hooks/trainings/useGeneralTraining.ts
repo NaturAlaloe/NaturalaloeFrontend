@@ -1,6 +1,6 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import React from "react";
-import { Delete } from '@mui/icons-material';
+import { Delete } from "@mui/icons-material";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import {
   getFacilitadores,
@@ -28,12 +28,13 @@ interface FormData {
 }
 
 export function useGeneralTraining() {
-  
   const [showAsignacionesModal, setShowAsignacionesModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);
   const [loadingFacilitadores, setLoadingFacilitadores] = useState(false);
-  const [colaboradoresDisponibles, setColaboradoresDisponibles] = useState<Colaboradores[]>([]);
+  const [colaboradoresDisponibles, setColaboradoresDisponibles] = useState<
+    Colaboradores[]
+  >([]);
   const [loadingColaboradores, setLoadingColaboradores] = useState(false);
   const [loadingInitialData, setLoadingInitialData] = useState(true);
   const [formData, setFormData] = useState<FormData>({
@@ -46,10 +47,13 @@ export function useGeneralTraining() {
   });
 
   const [showColaboradoresTable, setShowColaboradoresTable] = useState(false);
-  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>([]);
+  const [colaboradoresAsignados, setColaboradoresAsignados] = useState<any[]>(
+    []
+  );
 
-  // Estados para generales
-  const [generalesDisponibles, setGeneralesDisponibles] = useState<Genaral[]>([]);
+  const [generalesDisponibles, setGeneralesDisponibles] = useState<Genaral[]>(
+    []
+  );
   const [loadingGenerales, setLoadingGenerales] = useState(false);
   const [showGeneralesTable, setShowGeneralesTable] = useState(false);
   const [generalesAsignadas, setGeneralesAsignadas] = useState<any[]>([]);
@@ -80,13 +84,17 @@ export function useGeneralTraining() {
     },
     {
       name: "Acciones",
-      cell: (row: any) => (
-        React.createElement('button', {
-          className: "action-button text-red-600 hover:text-red-800 transition-colors",
-          onClick: () => eliminarColaborador(row.id),
-          title: "Eliminar colaborador"
-        }, React.createElement(Delete, { fontSize: "small" }))
-      ),
+      cell: (row: any) =>
+        React.createElement(
+          "button",
+          {
+            className:
+              "action-button text-red-600 hover:text-red-800 transition-colors",
+            onClick: () => eliminarColaborador(row.id),
+            title: "Eliminar colaborador",
+          },
+          React.createElement(Delete, { fontSize: "small" })
+        ),
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
@@ -120,13 +128,17 @@ export function useGeneralTraining() {
     },
     {
       name: "Acciones",
-      cell: (row: any) => (
-        React.createElement('button', {
-          className: "action-button text-red-600 hover:text-red-800 transition-colors",
-          onClick: () => eliminarGeneral(row.id),
-          title: "Eliminar general"
-        }, React.createElement(Delete, { fontSize: "small" }))
-      ),
+      cell: (row: any) =>
+        React.createElement(
+          "button",
+          {
+            className:
+              "action-button text-red-600 hover:text-red-800 transition-colors",
+            onClick: () => eliminarGeneral(row.id),
+            title: "Eliminar general",
+          },
+          React.createElement(Delete, { fontSize: "small" })
+        ),
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
@@ -141,7 +153,7 @@ export function useGeneralTraining() {
         await Promise.all([
           loadFacilitadores(),
           loadColaboradores(),
-          loadGenerales()
+          loadGenerales(),
         ]);
       } finally {
         setLoadingInitialData(false);
@@ -157,7 +169,11 @@ export function useGeneralTraining() {
       setFacilitadores(data);
     } catch (error) {
       console.error("Error al cargar facilitadores:", error);
-      showCustomToast("Error", "No se pudieron cargar los facilitadores", "error");
+      showCustomToast(
+        "Error",
+        "No se pudieron cargar los facilitadores",
+        "error"
+      );
     } finally {
       setLoadingFacilitadores(false);
     }
@@ -167,23 +183,26 @@ export function useGeneralTraining() {
     try {
       setLoadingColaboradores(true);
       const data = await getColaboradores();
-      const colaboradoresTransformados = data
-        .filter(Boolean)
-        .map((colab) => ({
-          ...colab,
-          id: colab.id_colaborador,
-          nombreCompleto: colab.nombre_completo.trim(),
-          nombre: colab.nombre_completo,
-        }));
+      const colaboradoresTransformados = data.filter(Boolean).map((colab) => ({
+        ...colab,
+        id: colab.id_colaborador,
+        nombreCompleto: colab.nombre_completo.trim(),
+        nombre: colab.nombre_completo,
+      }));
 
       const colaboradoresUnicos = colaboradoresTransformados.filter(
-        (colab, index, array) => array.findIndex((c) => c.id === colab.id) === index
+        (colab, index, array) =>
+          array.findIndex((c) => c.id === colab.id) === index
       );
 
       setColaboradoresDisponibles(colaboradoresUnicos);
     } catch (error) {
       console.error("Error al cargar colaboradores:", error);
-      showCustomToast("Error", "No se pudieron cargar los colaboradores", "error");
+      showCustomToast(
+        "Error",
+        "No se pudieron cargar los colaboradores",
+        "error"
+      );
       setColaboradoresDisponibles([]);
     } finally {
       setLoadingColaboradores(false);
@@ -194,12 +213,10 @@ export function useGeneralTraining() {
     try {
       setLoadingGenerales(true);
       const data = await getGeneral();
-      const generalesTransformadas = data
-        .filter(Boolean)
-        .map((general) => ({
-          ...general,
-          id: general.id_general,
-        }));
+      const generalesTransformadas = data.filter(Boolean).map((general) => ({
+        ...general,
+        id: general.id_general,
+      }));
 
       setGeneralesDisponibles(generalesTransformadas);
     } catch (error) {
@@ -215,47 +232,63 @@ export function useGeneralTraining() {
     return `${facilitador.nombre} ${facilitador.apellido1} ${facilitador.apellido2}`.trim();
   };
 
-  const getFacilitadorIdByNombre = (nombreCompleto: string): number | undefined => {
-    return facilitadores.find(f => getNombreCompletoFacilitador(f) === nombreCompleto)?.id_facilitador;
+  const getFacilitadorIdByNombre = (
+    nombreCompleto: string
+  ): number | undefined => {
+    return facilitadores.find(
+      (f) => getNombreCompletoFacilitador(f) === nombreCompleto
+    )?.id_facilitador;
   };
 
   const getFacilitadoresOptions = (): string[] => {
-    return facilitadores.map(f => getNombreCompletoFacilitador(f));
+    return facilitadores.map((f) => getNombreCompletoFacilitador(f));
   };
 
   const agregarColaboradores = (seleccionados: any[]) => {
-    setColaboradoresAsignados(prev => [
+    setColaboradoresAsignados((prev) => [
       ...prev,
-      ...seleccionados.filter(c => !prev.some(asig => asig.id === c.id))
+      ...seleccionados.filter((c) => !prev.some((asig) => asig.id === c.id)),
     ]);
     setShowColaboradoresTable(false);
   };
 
   const agregarGenerales = (seleccionadas: any[]) => {
-    setGeneralesAsignadas(prev => [
+    setGeneralesAsignadas((prev) => [
       ...prev,
-      ...seleccionadas.filter(g => !prev.some(asig => asig.id === g.id))
+      ...seleccionadas.filter((g) => !prev.some((asig) => asig.id === g.id)),
     ]);
     setShowGeneralesTable(false);
   };
 
   const eliminarColaborador = (colaboradorId: number) => {
-    setColaboradoresAsignados(prev => prev.filter(c => c.id !== colaboradorId));
+    setColaboradoresAsignados((prev) =>
+      prev.filter((c) => c.id !== colaboradorId)
+    );
   };
 
   const eliminarGeneral = (generalId: number) => {
-    setGeneralesAsignadas(prev => prev.filter(g => g.id !== generalId));
+    setGeneralesAsignadas((prev) => prev.filter((g) => g.id !== generalId));
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = (): boolean => {
-    const requiredFields = ['titulo', 'facilitador', 'fecha', 'fechaFin', 'duracion'];
-    const missingFields = requiredFields.filter(field => !formData[field as keyof FormData]);
-    
+    const requiredFields = [
+      "titulo",
+      "facilitador",
+      "fecha",
+      "fechaFin",
+      "duracion",
+    ];
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field as keyof FormData]
+    );
+
     if (missingFields.length > 0) {
       showCustomToast("Error", "Todos los campos son obligatorios", "error");
       return false;
@@ -267,7 +300,11 @@ export function useGeneralTraining() {
     }
 
     if (generalesAsignadas.length === 0) {
-      showCustomToast("Error", "Debe asignar al menos una capacitación general", "error");
+      showCustomToast(
+        "Error",
+        "Debe asignar al menos una capacitación general",
+        "error"
+      );
       return false;
     }
 
@@ -276,16 +313,20 @@ export function useGeneralTraining() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
 
     try {
       const facilitadorId = getFacilitadorIdByNombre(formData.facilitador);
-      
+
       if (!facilitadorId) {
-        showCustomToast("Error", "No se pudo encontrar el facilitador seleccionado", "error");
+        showCustomToast(
+          "Error",
+          "No se pudo encontrar el facilitador seleccionado",
+          "error"
+        );
         return;
       }
 
@@ -293,7 +334,6 @@ export function useGeneralTraining() {
       let errorCount = 0;
       const errors: string[] = [];
 
-      // Crear una capacitación por cada combinación de colaborador y general
       for (const colaborador of colaboradoresAsignados) {
         for (const general of generalesAsignadas) {
           const capacitacionData: CreateCapacitacionRequest = {
@@ -307,10 +347,13 @@ export function useGeneralTraining() {
             comentario: formData.comentario || "",
           };
 
-          // Validar los datos antes de enviar
           const validationErrors = validateCapacitacionData(capacitacionData);
           if (validationErrors.length > 0) {
-            errors.push(`Colaborador ${colaborador.nombreCompleto} - General ${general.descripcion}: ${validationErrors.join(", ")}`);
+            errors.push(
+              `Colaborador ${colaborador.nombreCompleto} - General ${
+                general.descripcion
+              }: ${validationErrors.join(", ")}`
+            );
             errorCount++;
             continue;
           }
@@ -320,31 +363,51 @@ export function useGeneralTraining() {
             if (result.success) {
               successCount++;
             } else {
-              errors.push(`Colaborador ${colaborador.nombreCompleto} - General ${general.descripcion}: ${result.message}`);
+              errors.push(
+                `Colaborador ${colaborador.nombreCompleto} - General ${general.descripcion}: ${result.message}`
+              );
               errorCount++;
             }
           } catch (error) {
-            errors.push(`Colaborador ${colaborador.nombreCompleto} - General ${general.descripcion}: Error inesperado`);
+            errors.push(
+              `Colaborador ${colaborador.nombreCompleto} - General ${general.descripcion}: Error inesperado`
+            );
             errorCount++;
           }
         }
       }
 
-      // Mostrar resultados
       if (successCount > 0 && errorCount === 0) {
-        showCustomToast("Éxito", `Se registraron ${successCount} capacitaciones generales correctamente`, "success");
+        showCustomToast(
+          "Éxito",
+          `Se registraron ${successCount} capacitaciones generales correctamente`,
+          "success"
+        );
         resetForm();
       } else if (successCount > 0 && errorCount > 0) {
-        showCustomToast("Información", `Se registraron ${successCount} capacitaciones. ${errorCount} fallaron`, "info");
+        showCustomToast(
+          "Información",
+          `Se registraron ${successCount} capacitaciones. ${errorCount} fallaron`,
+          "info"
+        );
         console.error("Errores:", errors);
       } else {
-        showCustomToast("Error", `No se pudo registrar ninguna capacitación. ${errors[0] || "Error desconocido"}`, "error");
+        showCustomToast(
+          "Error",
+          `No se pudo registrar ninguna capacitación. ${
+            errors[0] || "Error desconocido"
+          }`,
+          "error"
+        );
         console.error("Todos los errores:", errors);
       }
-      
     } catch (error) {
       console.error("Error al enviar capacitación general:", error);
-      showCustomToast("Error", "Error inesperado al registrar la capacitación general", "error");
+      showCustomToast(
+        "Error",
+        "Error inesperado al registrar la capacitación general",
+        "error"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -364,26 +427,19 @@ export function useGeneralTraining() {
   };
 
   return {
-    // Estados principales
     showAsignacionesModal,
     setShowAsignacionesModal,
     isLoading,
     loadingInitialData,
-    
-    // Datos del formulario
     formData,
     handleChange,
     handleSubmit,
     resetForm,
-    
-    // Facilitadores
     facilitadores,
     loadingFacilitadores,
     getNombreCompletoFacilitador,
     getFacilitadoresOptions,
     getFacilitadorIdByNombre,
-    
-    // Colaboradores
     colaboradoresDisponibles,
     loadingColaboradores,
     colaboradoresAsignados,
@@ -394,8 +450,6 @@ export function useGeneralTraining() {
     columnsColaboradoresAsignados,
     agregarColaboradores,
     eliminarColaborador,
-
-    // Generales
     generalesDisponibles,
     loadingGenerales,
     generalesAsignadas,

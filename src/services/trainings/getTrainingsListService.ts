@@ -23,6 +23,7 @@ export interface TrainingList {
   tipo_facilitador: string;
   nombre_facilitador: string;
   nota: number | null;
+  is_aprobado: string | null;
 }
 
 export async function getTrainingList(): Promise<TrainingList[]> {

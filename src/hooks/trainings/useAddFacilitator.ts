@@ -13,7 +13,9 @@ export const useFacilitatorForm = () => {
   const [apellido1, setApellido1] = useState("");
   const [apellido2, setApellido2] = useState("");
   const [identificacion, setIdentificacion] = useState("");
-  const [facilitadoresInternos, setFacilitadoresInternos] = useState<Facilitador[]>([]);
+  const [facilitadoresInternos, setFacilitadoresInternos] = useState<
+    Facilitador[]
+  >([]);
 
   useEffect(() => {
     if (tipo === "Interno") {
@@ -53,7 +55,13 @@ export const useFacilitatorForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!tipo || !nombre || !apellido1 || !apellido2 || (tipo === "Interno" && !identificacion)) {
+    if (
+      !tipo ||
+      !nombre ||
+      !apellido1 ||
+      !apellido2 ||
+      (tipo === "Interno" && !identificacion)
+    ) {
       alert("Por favor complete todos los campos.");
       return;
     }

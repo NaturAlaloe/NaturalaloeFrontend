@@ -17,6 +17,15 @@ export interface Colaborador {
   seguimiento: string;
   comentario: string;
   id_capacitacion: number;
+  id_documento_normativo?: number;
+  is_evaluado: string;
+}
+
+export interface POESection {
+  id_poe: number;
+  codigo_poe: string;
+  titulo_poe: string;
+  colaboradores: Colaborador[];
 }
 
 export interface TrainingInfo {
@@ -26,10 +35,14 @@ export interface TrainingInfo {
   fecha_inicio: string;
   fecha_fin: string;
   estado: string;
+  metodo_empleado?: string | null;
 }
 
-export const useEvaluatedTraining = (codigoDocumento: string) => {
-  const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
+export const useEvaluatedTraining = (
+  id_capacitacion: string,
+  navigate?: (path: string) => void
+) => {
+  const [poesSections, setPoesSections] = useState<POESection[]>([]);
   const [trainingInfo, setTrainingInfo] = useState<TrainingInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,8 +50,8 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
   const { submitQualify, loading: saving } = useAddQualifyTraining();
 
   useEffect(() => {
-    if (!codigoDocumento) {
-      setColaboradores([]);
+    if (!id_capacitacion) {
+      setPoesSections([]);
       setTrainingInfo(null);
       setError(null);
       setLoading(false);
@@ -49,27 +62,58 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
       setLoading(true);
       try {
         const allData: TrainingItem[] = await getEvaluatedTraining(
-          codigoDocumento
+          id_capacitacion
         );
 
         if (allData.length === 0) {
           setError("No se encontraron datos de la capacitación");
-          setColaboradores([]);
+          setPoesSections([]);
           setTrainingInfo(null);
           setLoading(false);
           return;
         }
 
-        const colaboradoresFormateados: Colaborador[] = allData.map((item) => {
-          return {
+        const poesMap = new Map<number, POESection>();
+
+        allData.forEach((item) => {
+          const poeId = item.id_documento_normativo || 0;
+          const poeCode = item.codigo_documento || "Sin Código";
+          const poeTitle = `POE: ${poeCode}`;
+
+          if (!poesMap.has(poeId)) {
+            poesMap.set(poeId, {
+              id_poe: poeId,
+              codigo_poe: poeCode,
+              titulo_poe: poeTitle,
+              colaboradores: [],
+            });
+          }
+
+          const metodoEvaluacion = item.metodo_empleado?.toLowerCase() || "";
+          const esPractico =
+            metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
+
+          const colaborador: Colaborador = {
             id: item.id_colaborador,
             nombre: `${item.nombre} ${item.primer_apellido} ${item.segundo_apellido}`,
-            nota: item.nota ?? "",
+            nota: esPractico ? "0" : item.nota ?? "",
             seguimiento: item.seguimiento ? item.seguimiento.toLowerCase() : "",
             comentario: item.comentario ?? "",
             id_capacitacion: item.id_capacitacion,
+            id_documento_normativo: poeId,
+            is_evaluado: esPractico
+              ? item.is_evaluado === 1 ||
+                String(item.is_evaluado) === "aprobado"
+                ? "aprobado"
+                : "reprobado"
+              : String(item.is_evaluado ?? "reprobado"),
           };
+
+          poesMap.get(poeId)?.colaboradores.push(colaborador);
         });
+
+        const poesSectionsArray = Array.from(poesMap.values());
+        setPoesSections(poesSectionsArray);
 
         const first = allData[0];
         setTrainingInfo({
@@ -79,13 +123,13 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
           fecha_inicio: first.fecha_inicio,
           fecha_fin: first.fecha_fin,
           estado: first.estado,
+          metodo_empleado: first.metodo_empleado,
         });
 
-        setColaboradores(colaboradoresFormateados);
         setError(null);
       } catch (err) {
         setError("No se pudieron cargar los datos de la capacitación");
-        setColaboradores([]);
+        setPoesSections([]);
         setTrainingInfo(null);
       } finally {
         setLoading(false);
@@ -93,11 +137,12 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
     };
 
     fetchData();
-  }, [codigoDocumento]);
+  }, [id_capacitacion]);
 
   const handleChange = (
     id: number,
     idCap: number,
+    idPoe: number,
     field: keyof Colaborador,
     value: string
   ) => {
@@ -117,86 +162,182 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
         default:
           processedValue = "";
       }
-      console.log(
-        `🔄 [handleChange] Convertido "${value}" a "${processedValue}"`
-      );
     }
 
-    setColaboradores((prev) =>
-      prev.map((c) =>
-        c.id === id && c.id_capacitacion === idCap
-          ? { ...c, [field]: processedValue }
-          : c
-      )
+    setPoesSections((prev) =>
+      prev.map((poeSection) => ({
+        ...poeSection,
+        colaboradores: poeSection.colaboradores.map((c) =>
+          c.id === id &&
+          c.id_capacitacion === idCap &&
+          c.id_documento_normativo === idPoe
+            ? { ...c, [field]: processedValue }
+            : c
+        ),
+      }))
     );
   };
 
-  const handleGuardarTodos = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleGuardarTodos = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const incompletos = colaboradores.some(
-      (colab) =>
-        colab.nota === "" ||
-        colab.nota === null ||
-        isNaN(Number(colab.nota)) ||
-        !colab.seguimiento ||
-        colab.seguimiento === "Seleccionar"
-    );
+    const todosColaboradores = poesSections.flatMap((poe) => poe.colaboradores);
 
-    if (incompletos) {
-      showCustomToast(
-        "Error",
-        "Debe completar la nota y seleccionar un seguimiento válido para todos los colaboradores.",
-        "error"
-      );
+    if (todosColaboradores.length === 0) {
+      showCustomToast("Error", "No hay colaboradores para evaluar.", "error");
       return;
     }
 
-    const payload = colaboradores.map((colab) => {
-      const validSeguimientos = ["satisfactorio", "reprogramar", "revaluacion"];
-      if (!validSeguimientos.includes(colab.seguimiento)) {
-        throw new Error(
-          `Seguimiento inválido para ${colab.nombre}: "${colab.seguimiento}"`
-        );
+    const metodoEvaluacion = trainingInfo?.metodo_empleado?.toLowerCase() || "";
+    const esPractico =
+      metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
+    const esTeorico =
+      metodoEvaluacion === "teórico" || metodoEvaluacion === "teorico";
+
+    const errores: string[] = [];
+
+    todosColaboradores.forEach((colab) => {
+      if (esTeorico) {
+        if (!colab.nota || colab.nota.trim() === "") {
+          errores.push("Notas incompletas");
+        } else {
+          const notaNum = Number(colab.nota);
+          if (isNaN(notaNum)) {
+            errores.push("Notas inválidas");
+          } else if (notaNum < 0 || notaNum > 100) {
+            errores.push("Notas fuera de rango");
+          }
+        }
       }
 
+      if (esPractico) {
+        if (
+          !colab.is_evaluado ||
+          (colab.is_evaluado !== "aprobado" &&
+            colab.is_evaluado !== "reprobado")
+        ) {
+          errores.push("Estado de evaluación incompleto");
+        }
+      }
+
+      if (
+        !colab.seguimiento ||
+        colab.seguimiento === "" ||
+        colab.seguimiento === "Seleccionar"
+      ) {
+        errores.push("Seguimiento incompleto");
+      }
+
+      const validSeguimientos = ["satisfactorio", "reprogramar", "revaluacion"];
+      if (colab.seguimiento && !validSeguimientos.includes(colab.seguimiento)) {
+        errores.push("Seguimiento inválido");
+      }
+    });
+
+    const erroresUnicos = [...new Set(errores)];
+
+    if (erroresUnicos.length > 0) {
+      const mensajeError =
+        erroresUnicos.length === 1
+          ? erroresUnicos[0]
+          : `• ${erroresUnicos.join("\n• ")}`;
+
+      showCustomToast("Campos Incompletos", mensajeError, "error");
+      return;
+    }
+
+    const calificaciones = todosColaboradores.map((colab) => {
       const item = {
-        id_capacitacion: colab.id_capacitacion,
+        id_colaborador: colab.id,
+        id_documento_normativo: colab.id_documento_normativo,
         seguimiento: colab.seguimiento as
           | "satisfactorio"
           | "reprogramar"
           | "revaluacion",
-        nota: Number(colab.nota),
+        nota: esTeorico ? Number(colab.nota) : null,
         comentario_final: colab.comentario?.trim() ?? "",
+        is_aprobado: esPractico ? colab.is_evaluado : null,
       };
 
       return item;
     });
 
-    submitQualify(payload);
+    try {
+      const id_capacitacion = todosColaboradores[0].id_capacitacion;
+      await submitQualify(id_capacitacion, calificaciones);
+
+      if (navigate) {
+        navigate("/training/listTraining");
+      }
+    } catch (error) {}
   };
 
-  const columns = [
-    {
-      name: "Nombre",
-      selector: (row: Colaborador) => row.nombre,
-      sortable: true,
-    },
-    {
-      name: "Nota",
-      cell: (row: Colaborador) =>
-        React.createElement(InputField, {
-          type: "number",
-          name: `nota-${row.id}`,
-          value: row.nota,
-          onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-            handleChange(row.id, row.id_capacitacion, "nota", e.target.value),
-          className: "w-20 text-sm",
-          min: 0,
-          max: 100,
-        }),
-    },
-    {
+  const createColumnsForPOE = (poeId: number) => {
+    const metodoEvaluacion = trainingInfo?.metodo_empleado?.toLowerCase() || "";
+    const esPractico =
+      metodoEvaluacion === "práctico" || metodoEvaluacion === "practico";
+    const esTeorico =
+      metodoEvaluacion === "teórico" || metodoEvaluacion === "teorico";
+
+    const baseColumns: any[] = [
+      {
+        name: "Nombre",
+        selector: (row: Colaborador) => row.nombre,
+        sortable: true,
+      },
+    ];
+
+    if (esTeorico) {
+      baseColumns.push({
+        name: "Nota",
+        cell: (row: Colaborador) =>
+          React.createElement(InputField, {
+            type: "number",
+            name: `nota-${row.id}-${poeId}`,
+            value: row.nota,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange(
+                row.id,
+                row.id_capacitacion,
+                poeId,
+                "nota",
+                e.target.value
+              ),
+            className: "w-20 text-sm",
+            min: 0,
+            max: 100,
+          }),
+      });
+    }
+
+    if (esPractico) {
+      baseColumns.push({
+        name: "Estado",
+        cell: (row: Colaborador) => {
+          let selectValue = "Reprobado";
+
+          if (row.is_evaluado === "aprobado" || row.is_evaluado === "1") {
+            selectValue = "Aprobado";
+          }
+
+          return React.createElement(SelectField, {
+            name: `is_evaluado-${row.id}-${poeId}`,
+            value: selectValue,
+            onChange: (e: React.ChangeEvent<HTMLSelectElement>) =>
+              handleChange(
+                row.id,
+                row.id_capacitacion,
+                poeId,
+                "is_evaluado",
+                e.target.value === "Aprobado" ? "aprobado" : "reprobado"
+              ),
+            options: ["Reprobado", "Aprobado"],
+          });
+        },
+      });
+    }
+
+    baseColumns.push({
       name: "Seguimiento",
       cell: (row: Colaborador) => {
         let selectValue = "Seleccionar";
@@ -217,34 +358,31 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
         }
 
         return React.createElement(SelectField, {
-          name: `seguimiento-${row.id}`,
+          name: `seguimiento-${row.id}-${poeId}`,
           value: selectValue,
           onChange: (e: React.ChangeEvent<HTMLSelectElement>) =>
             handleChange(
               row.id,
               row.id_capacitacion,
+              poeId,
               "seguimiento",
               e.target.value
             ),
-          options: [
-            "Seleccionar",
-            "Satisfactorio",
-            "Reprogramar",
-            "Reevaluación",
-          ],
         });
       },
-    },
-    {
+    });
+
+    baseColumns.push({
       name: "Comentario",
       cell: (row: Colaborador) =>
         React.createElement("textarea", {
-          name: `comentario-${row.id}`,
+          name: `comentario-${row.id}-${poeId}`,
           value: row.comentario,
           onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
             handleChange(
               row.id,
               row.id_capacitacion,
+              poeId,
               "comentario",
               e.target.value
             ),
@@ -252,8 +390,10 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
           className:
             "w-full border border-[#2AAC67] rounded-lg px-2 py-1 text-sm text-[#2AAC67] resize-none",
         }),
-    },
-  ];
+    });
+
+    return baseColumns;
+  };
 
   const customStyles = {
     table: {
@@ -300,15 +440,15 @@ export const useEvaluatedTraining = (codigoDocumento: string) => {
   };
 
   return {
-    colaboradores,
+    poesSections,
     trainingInfo,
     loading,
     error,
     saving,
-    setColaboradores,
+    setPoesSections,
     handleChange,
     handleGuardarTodos,
-    columns,
+    createColumnsForPOE,
     customStyles,
   };
 };

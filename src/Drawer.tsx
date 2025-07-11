@@ -657,7 +657,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/collaborators/assingRol" element={<AssignRol/>} />
           <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores/>} />
           <Route path="/training/listTrainingsGeneral" element={<CapacitacionesGenerales/>} />
-          <Route path="/training/evaluatedTraining/:codigo_documento" element={<Evaluacion/>} />
+          <Route path="/training/evaluatedTraining/:id_capacitacion" element={<Evaluacion/>} />
           <Route path="/estadisticas" element={<Estadistica/>} />
           <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
           
