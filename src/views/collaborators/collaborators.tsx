@@ -1,117 +1,106 @@
-import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Box, 
-  TextField, 
-  Alert, 
-  Typography,
-  InputAdornment
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import useCollaborators from '../../hooks/collaborator/useCollaborators';
+import React from 'react';
 import CollaboratorCard from '../../components/globalComponents/CollaboratorCard';
-import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner'; // <-- Importa el spinner
-
-
+import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
+import useCollaboratorsPagination from '../../hooks/collaborator/useCollaboratorsPagination';
 
 const Collaborators: React.FC = () => {
-  const navigate = useNavigate();
-  const { collaborators, loading, error, searchTerm, setSearchTerm } = useCollaborators();
-  const firstLoad = useRef(true);
+  const {
+    collaborators,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+    page,
+    setPage,
+    totalPages,
+    getPagination,
+    firstLoad,
+    handleCardClick,
+    allCollaboratorsLength,
+  } = useCollaboratorsPagination();
 
-  // Cuando loading pasa de true a false, ya no es la primera carga
-  React.useEffect(() => {
-    if (!loading) {
-      firstLoad.current = false;
-    }
-  }, [loading]);
-
-  const handleCardClick = (id: string) => {
-    navigate(`/collaborators/detail/${id}`);
-  };
-
-  // Solo muestra el spinner a pantalla completa en la primera carga
-  if (loading) {
+  if (loading && firstLoad.current) {
     return <FullScreenSpinner />;
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1200, margin: '0 auto' }}>
-      <Typography variant="h4" gutterBottom sx={{ 
-        fontWeight: 'bold', 
-        mb: 4,
-        color: '#2AAC67',
-        textAlign: 'center'
-      }}>
+    <div className="p-2 sm:p-6 max-w-[1300px] mx-auto bg-white rounded-3xl shadow-2xl min-h-[90vh]">
+      <h1 className="text-3xl font-bold text-[#2AAC67] text-center mb-6">
         Colaboradores
-      </Typography>
+      </h1>
 
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <TextField
-          fullWidth
-          variant="outlined"
+      <div className="mb-8 flex justify-center">
+        <input
+          type="text"
+          className="w-full max-w-xl rounded-xl border border-[#2AAC67] shadow-md px-4 py-2 focus:outline-none focus:border-green-600 text-base"
           placeholder="Buscar por nombre o código"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ 
-            maxWidth: 600,
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                borderColor: '#2AAC67',
-              },
-              '&:hover fieldset': {
-                borderColor: '#13bd62',
-              },
-              '&.Mui-focused fieldset': {
-                borderColor: '#13bd62',
-              },
-            },
-            '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-              color: '#2AAC67',
-            }
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            endAdornment: null
-          }}
         />
-      </Box>
+      </div>
 
       {error && (
-        <Alert severity="error" color="success" sx={{ mb: 3 }}>
+        <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
           {error}
-        </Alert>
+        </div>
       )}
 
-      {collaborators.length === 0 ? (
-        <Alert severity="info" color="success" sx={{ mt: 2 }}>
-          {searchTerm ? 
-            `No se encontraron colaboradores con "${searchTerm}"` : 
-            'No hay colaboradores disponibles'}
-        </Alert>
+      {allCollaboratorsLength === 0 ? (
+        <div className="mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-center">
+          {searchTerm
+            ? `No se encontraron colaboradores con "${searchTerm}"`
+            : 'No hay colaboradores disponibles'}
+        </div>
       ) : (
-        <Box sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: 3,
-          mt: 2
-        }}>
-          {collaborators.slice(0, 3).map((colab) => (
-            <CollaboratorCard
-              key={colab.id_colaborador}
-              id={colab.id_colaborador}
-              nombre={`${colab.nombre} ${colab.apellido1} ${colab.apellido2}`}
-              puesto={colab.puesto}
-              onClick={handleCardClick}
-            />
-          ))}
-        </Box>
+        <>
+          <div
+            className="
+              grid
+              gap-6
+              mt-4
+              pb-8
+              grid-cols-1
+              sm:grid-cols-2
+              md:grid-cols-3
+              lg:grid-cols-4
+            "
+          >
+            {collaborators.map((colab) => (
+              <CollaboratorCard
+                key={colab.id_colaborador}
+                id={colab.id_colaborador}
+                nombre={`${colab.nombre} ${colab.apellido1} ${colab.apellido2}`}
+                puesto={colab.puesto}
+                onClick={handleCardClick}
+              />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4">
+              <nav className="inline-flex space-x-2">
+                {getPagination(totalPages, page).map((p, idx) =>
+                  p === '...' ? (
+                    <span key={`ellipsis-${idx}`} className="px-3 py-1 text-gray-400 select-none">...</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setPage(Number(p))}
+                      className={`px-3 py-1 rounded-lg border ${
+                        page === p
+                          ? 'bg-green-600 text-white border-green-600'
+                          : 'bg-white text-green-700 border-green-200 hover:bg-green-50'
+                      } transition`}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+              </nav>
+            </div>
+          )}
+        </>
       )}
-    </Box>
+    </div>
   );
 };
 

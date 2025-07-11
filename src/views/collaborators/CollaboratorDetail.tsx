@@ -6,13 +6,14 @@ import { useParams } from "react-router-dom";
 import React from "react";
 import useCollaboratorDetail from "../../hooks/collaborator/useCollaboratorDetail";
 import CollaboratorRolesList from "../../components/CollaboratorRolesList";
+import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 
 export default function CollaboratorDetail() {
   const { id } = useParams<{ id: string }>();
   const [refreshKey, setRefreshKey] = React.useState(0);
   const { data, loading, error } = useCollaboratorDetail(id || "", refreshKey);
 
-  if (loading) return <Box sx={{ p: 5, textAlign: "center" }}>Cargando...</Box>;
+  if (loading) return  <FullScreenSpinner />;
   if (error || !data)
     return (
       <Box sx={{ p: 5, textAlign: "center", color: "red" }}>
