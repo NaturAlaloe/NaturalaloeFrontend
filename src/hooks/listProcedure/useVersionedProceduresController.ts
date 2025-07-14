@@ -5,6 +5,7 @@ import { useProcedureEdit } from "./useProcedureEdit";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { updateProcedure } from "../../services/procedures/updateProcedureService";
 import { increaseVersion } from "../../services/procedures/increaseVersionService";
+import { obsoleteProcedure } from "../../services/procedures/procedureService";
 
 export function useVersionedProceduresController() {
   // Hook principal de datos con versiones
@@ -25,6 +26,12 @@ export function useVersionedProceduresController() {
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Estado para obsoletar
+  const [obsoleteModal, setObsoleteModal] = useState<{ open: boolean, id?: number }>({ open: false, id: undefined });
+  const [reasonModal, setReasonModal] = useState(false);
+  const [deleteReason, setDeleteReason] = useState("");
+  const [obsoleteLoading, setObsoleteLoading] = useState(false);
 
   // Resetear página cuando cambien los filtros
   useEffect(() => {
@@ -171,6 +178,25 @@ export function useVersionedProceduresController() {
     }
   }, [selectedRevision]);
 
+  // Handler para marcar como obsoleto
+  const handleAskObsolete = (id_documento: number) => setObsoleteModal({ open: true, id: id_documento });
+  const handleConfirmObsolete = async () => {
+    if (!obsoleteModal.id || !deleteReason.trim()) return;
+    setObsoleteLoading(true);
+    try {
+      await obsoleteProcedure(obsoleteModal.id, deleteReason);
+      showCustomToast("Procedimiento obsoleto", "El procedimiento fue marcado como obsoleto.", "success");
+      setReasonModal(false);
+      setObsoleteModal({ open: false, id: undefined });
+      setDeleteReason("");
+      refetchProcedures();
+    } catch (e) {
+      showCustomToast("Error", "No se pudo marcar como obsoleto.", "error");
+    } finally {
+      setObsoleteLoading(false);
+    }
+  };
+
   return {
     // Datos
     procedures: filteredProcedures,
@@ -310,5 +336,16 @@ export function useVersionedProceduresController() {
       responsibles,
       loadingResponsibles: false,
     },
+
+    // Props para modal de obsoletar
+    obsoleteModal,
+    setObsoleteModal,
+    reasonModal,
+    setReasonModal,
+    deleteReason,
+    setDeleteReason,
+    obsoleteLoading,
+    handleAskObsolete,
+    handleConfirmObsolete,
   };
 }

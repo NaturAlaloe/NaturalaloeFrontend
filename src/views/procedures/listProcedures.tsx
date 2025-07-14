@@ -13,6 +13,7 @@ import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 import PdfInput from "../../components/formComponents/PdfInput";
 
+
 // Hooks
 import { useVersionedProceduresController } from "../../hooks/listProcedure/useVersionedProceduresController";
 import { useVersionedTableColumns } from "../../hooks/listProcedure/useVersionedTableColumns";
@@ -27,13 +28,15 @@ export default function ListProcedures() {
     selectedRevision: controller.selectedRevision,
     onVersionChange: controller.handleVersionChange,
     getSelectedVersionData: controller.getSelectedVersionData,
+    handleAskObsolete: controller.handleAskObsolete, // <-- aquí
   });
+ 
 
   if (controller.loading) return <FullScreenSpinner />;
   if (controller.error) {
     showCustomToast(
-      "Error de conexión", 
-      "No se pudieron cargar los procedimientos. Verifique su conexión e intente nuevamente", 
+      "Error de conexión",
+      "No se pudieron cargar los procedimientos. Verifique su conexión e intente nuevamente",
       "error"
     );
     return null;
@@ -89,8 +92,8 @@ export default function ListProcedures() {
           open={controller.editModal.isOpen}
           onClose={controller.editModal.onClose}
           title={
-            controller.editModal.data?.es_nueva_version 
-              ? "Crear Nueva Versión del Procedimiento" 
+            controller.editModal.data?.es_nueva_version
+              ? "Crear Nueva Versión del Procedimiento"
               : "Editar Procedimiento"
           }
           maxWidth="lg"
@@ -99,8 +102,8 @@ export default function ListProcedures() {
           {controller.editModal.data && (
             <FormContainer
               title={
-                controller.editModal.data.es_nueva_version 
-                  ? "Crear Nueva Versión" 
+                controller.editModal.data.es_nueva_version
+                  ? "Crear Nueva Versión"
                   : "Editar Procedimiento"
               }
               onSubmit={controller.editModal.onSubmit}
@@ -109,10 +112,14 @@ export default function ListProcedures() {
                 {/* Información cuando es nueva versión */}
                 {controller.editModal.data.es_nueva_version && (
                   <div className="md:col-span-2 p-4 bg-blue-50 border border-gary-200 rounded-lg">
-                    <h4 className="font-semibold text-gray-800 mb-2">📋 Creando Nueva Versión</h4>
+                    <h4 className="font-semibold text-gray-800 mb-2">
+                      📋 Creando Nueva Versión
+                    </h4>
                     <p className="text-gray-700 text-sm">
-                      Se creará una nueva versión del procedimiento <strong>{controller.editModal.data.codigo}</strong>. 
-                      Si marca esta versión como vigente, todas las versiones anteriores se desactivarán automáticamente.
+                      Se creará una nueva versión del procedimiento{" "}
+                      <strong>{controller.editModal.data.codigo}</strong>. Si
+                      marca esta versión como vigente, todas las versiones
+                      anteriores se desactivarán automáticamente.
                     </p>
                   </div>
                 )}
@@ -122,7 +129,10 @@ export default function ListProcedures() {
                   label="¿Es una nueva versión?"
                   checked={controller.editModal.data.es_nueva_version || false}
                   onChange={(checked) =>
-                    controller.editModal.handlers.handleCheckboxChange('es_nueva_version', checked)
+                    controller.editModal.handlers.handleCheckboxChange(
+                      "es_nueva_version",
+                      checked
+                    )
                   }
                 />
 
@@ -130,10 +140,13 @@ export default function ListProcedures() {
                   label="¿Es Vigente?"
                   checked={controller.editModal.data.es_vigente || false}
                   onChange={(checked) =>
-                    controller.editModal.handlers.handleCheckboxChange('es_vigente', checked)
+                    controller.editModal.handlers.handleCheckboxChange(
+                      "es_vigente",
+                      checked
+                    )
                   }
                 />
-                
+
                 {/* CAMPOS DE SOLO LECTURA */}
                 <InputField
                   label="Código POE"
@@ -155,7 +168,9 @@ export default function ListProcedures() {
                 <InputField
                   label="Departamento"
                   name="departamento"
-                  value={controller.editModal.data.departamento || "No especificado"}
+                  value={
+                    controller.editModal.data.departamento || "No especificado"
+                  }
                   readOnly
                   disabled
                 />
@@ -163,7 +178,9 @@ export default function ListProcedures() {
                 <InputField
                   label="Categoría"
                   name="categoria"
-                  value={controller.editModal.data.categoria || "No especificada"}
+                  value={
+                    controller.editModal.data.categoria || "No especificada"
+                  }
                   readOnly
                   disabled
                 />
@@ -174,7 +191,10 @@ export default function ListProcedures() {
                   name="descripcion"
                   value={controller.editModal.data.descripcion}
                   onChange={(e) =>
-                    controller.editModal.handlers.handleInputChange('descripcion', e.target.value)
+                    controller.editModal.handlers.handleInputChange(
+                      "descripcion",
+                      e.target.value
+                    )
                   }
                   placeholder="Ingrese título"
                   required
@@ -186,12 +206,18 @@ export default function ListProcedures() {
                   name="responsable"
                   value={controller.editModal.data.id_responsable || ""}
                   onChange={(e) =>
-                    controller.editModal.handlers.handleInputChange('id_responsable', e.target.value)
+                    controller.editModal.handlers.handleInputChange(
+                      "id_responsable",
+                      e.target.value
+                    )
                   }
                   options={controller.editModal.responsibles}
                   optionLabel="nombre_responsable"
                   optionValue="id_responsable"
-                  disabled={controller.editModal.saving || controller.editModal.loadingResponsibles}
+                  disabled={
+                    controller.editModal.saving ||
+                    controller.editModal.loadingResponsibles
+                  }
                   required
                 />
 
@@ -203,11 +229,17 @@ export default function ListProcedures() {
                   step="1"
                   value={controller.editModal.data.revision || ""}
                   onChange={(e) =>
-                    controller.editModal.handlers.handleInputChange('revision', e.target.value)
+                    controller.editModal.handlers.handleInputChange(
+                      "revision",
+                      e.target.value
+                    )
                   }
                   placeholder="1"
                   required
-                  disabled={controller.editModal.saving || !controller.editModal.data.es_nueva_version}
+                  disabled={
+                    controller.editModal.saving ||
+                    !controller.editModal.data.es_nueva_version
+                  }
                   readOnly={!controller.editModal.data.es_nueva_version}
                 />
 
@@ -217,7 +249,10 @@ export default function ListProcedures() {
                   type="date"
                   value={controller.editModal.data.fecha_vigencia}
                   onChange={(e) =>
-                    controller.editModal.handlers.handleInputChange('fecha_vigencia', e.target.value)
+                    controller.editModal.handlers.handleInputChange(
+                      "fecha_vigencia",
+                      e.target.value
+                    )
                   }
                   required
                   disabled={controller.editModal.saving}
@@ -226,7 +261,7 @@ export default function ListProcedures() {
                 <div className="md:col-span-2">
                   <PdfInput
                     label={
-                      controller.editModal.data.es_nueva_version 
+                      controller.editModal.data.es_nueva_version
                         ? "Documento PDF (Opcional - Nueva versión)"
                         : "Documento PDF (Opcional - Solo para actualizar)"
                     }
@@ -235,32 +270,38 @@ export default function ListProcedures() {
                       const file = e.target.files?.[0] || null;
                       controller.editModal.handlers.handleFileChange(file);
                     }}
-                    onRemove={() => 
+                    onRemove={() =>
                       controller.editModal.handlers.handleFileChange(null)
                     }
                   />
-                  
+
                   {/* Aviso específico para nueva versión */}
-                  {controller.editModal.data.es_nueva_version && !controller.editModal.data.pdf && (
-                    <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                      <p className="text-sm text-yellow-700">
-                        💡 <strong>Información:</strong> Se creará la nueva versión sin documento PDF asociado.
-                      </p>
-                      <p className="text-xs text-yellow-600 mt-1">
-                        Puede agregar un PDF ahora o subirlo más tarde editando esta versión.
-                      </p>
-                    </div>
-                  )}
-                  
+                  {controller.editModal.data.es_nueva_version &&
+                    !controller.editModal.data.pdf && (
+                      <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                        <p className="text-sm text-yellow-700">
+                          💡 <strong>Información:</strong> Se creará la nueva
+                          versión sin documento PDF asociado.
+                        </p>
+                        <p className="text-xs text-yellow-600 mt-1">
+                          Puede agregar un PDF ahora o subirlo más tarde
+                          editando esta versión.
+                        </p>
+                      </div>
+                    )}
+
                   {controller.editModal.data?.path ? (
                     <div className="mt-2 p-2 bg-gray-50 rounded border">
                       <p className="text-sm text-gray-600">
-                        <strong>PDF actual:</strong> 
-                        <button 
+                        <strong>PDF actual:</strong>
+                        <button
                           type="button"
                           onClick={() => {
                             if (controller.editModal.data?.path) {
-                              window.open(controller.editModal.data.path, '_blank');
+                              window.open(
+                                controller.editModal.data.path,
+                                "_blank"
+                              );
                             }
                           }}
                           className="ml-2 text-[#2AAC67] hover:text-[#228B55] underline"
@@ -275,10 +316,12 @@ export default function ListProcedures() {
                   ) : !controller.editModal.data.es_nueva_version && (
                     <div className="mt-2 p-2 bg-orange-50 border border-orange-200 rounded">
                       <p className="text-sm text-orange-700">
-                        ⚠️ <strong>Sin documento PDF:</strong> Esta versión del procedimiento no tiene un documento PDF asociado.
+                        ⚠️ <strong>Sin documento PDF:</strong> Esta versión del
+                        procedimiento no tiene un documento PDF asociado.
                       </p>
                       <p className="text-xs text-orange-600 mt-1">
-                        Puede subir un archivo PDF nuevo usando el selector de archivos arriba.
+                        Puede subir un archivo PDF nuevo usando el selector de
+                        archivos arriba.
                       </p>
                     </div>
                   )}
@@ -286,14 +329,104 @@ export default function ListProcedures() {
               </div>
 
               <div className="text-center mt-8">
-                <SubmitButton width="w-40" disabled={controller.editModal.saving}>
-                  {controller.editModal.saving ? "Guardando..." : "Guardar Cambios"}
+                <SubmitButton
+                  width="w-40"
+                  loading={controller.editModal.saving}
+                  disabled={controller.editModal.saving}
+                >
+                  Guardar Cambios
                 </SubmitButton>
               </div>
             </FormContainer>
           )}
         </GlobalModal>
 
+        {/* Modal de confirmación */}
+        <GlobalModal
+          open={controller.obsoleteModal.open}
+          onClose={() =>
+            controller.setObsoleteModal({ open: false, id: undefined })
+          }
+          title="Marcar como obsoleto"
+          maxWidth="sm"
+          actions={
+            <div className="flex gap-2">
+              <SubmitButton
+                className="bg-gray-400 hover:bg-gray-500"
+                type="button"
+                onClick={() =>
+                  controller.setObsoleteModal({ open: false, id: undefined })
+                }
+              >
+                Cancelar
+              </SubmitButton>
+              <SubmitButton
+                className="bg-red-500 hover:bg-red-600"
+                type="button"
+                onClick={() => {
+                  controller.setObsoleteModal({
+                    ...controller.obsoleteModal,
+                    open: false,
+                  });
+                  controller.setReasonModal(true);
+                }}
+              >
+                Eliminar
+              </SubmitButton>
+            </div>
+          }
+        >
+          <div>
+            ¿Estás seguro de que deseas marcar este procedimiento como obsoleto?
+          </div>
+        </GlobalModal>
+
+        {/* Modal para razón */}
+        <GlobalModal
+          open={controller.reasonModal}
+          onClose={() => controller.setReasonModal(false)}
+          title="Razón de obsolescencia"
+          maxWidth="sm"
+          actions={
+            <div className="flex gap-2">
+              <SubmitButton
+                className="bg-gray-400 hover:bg-gray-500"
+                type="button"
+                onClick={() => controller.setReasonModal(false)}
+                disabled={controller.obsoleteLoading}
+              >
+                Cancelar
+              </SubmitButton>
+              <SubmitButton
+                className="bg-red-500 hover:bg-red-600"
+                type="button"
+                onClick={controller.handleConfirmObsolete}
+                disabled={
+                  !controller.deleteReason.trim() || controller.obsoleteLoading
+                }
+                loading={controller.obsoleteLoading}
+              >
+                Confirmar
+              </SubmitButton>
+            </div>
+          }
+        >
+          <div>
+            <label className="block mb-2 font-medium text-gray-700">
+              Escribe la razón por la que este procedimiento será marcado como
+              obsoleto:
+            </label>
+            <textarea
+              className="w-full border border-gray-300 rounded p-2"
+              rows={3}
+              value={controller.deleteReason}
+              onChange={(e) => controller.setDeleteReason(e.target.value)}
+              placeholder="Motivo de obsolescencia"
+              autoFocus
+              disabled={controller.obsoleteLoading}
+            />
+          </div>
+        </GlobalModal>
       </TableContainer>
     </>
   );

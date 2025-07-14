@@ -65,17 +65,15 @@ export const updateProcedure = async (data: any) => {
   return response.data;
 };
 
-export const deleteProcedure = async (id_documento: number) => {
+export const obsoleteProcedure = async (id_documento: number, razon_cambio: string) => {
   try {
-    const response = await api.delete("/procedure", {
-      data: {
-        id_documento,
-        vigencia: 0
-      },
-      headers: { "Content-Type": "application/json" }
+    const response = await api.put("/procedure/obsolete", {
+      id_documento,
+      razon_cambio,
     });
+    console.log("Response from obsoleteProcedure:", response.data);
     return response.data;
   } catch (error: any) {
-    throw error.response?.data || { success: false, message: "Error al eliminar el procedimiento" };
+    throw error.response?.data || { success: false, message: "Error al marcar como obsoleto" };
   }
 };

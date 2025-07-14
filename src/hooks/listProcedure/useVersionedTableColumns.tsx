@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { type TableColumn } from "react-data-table-component";
-import { Edit, Visibility } from "@mui/icons-material";
+import { Edit, Visibility, Delete } from "@mui/icons-material";
 import { type ProcedureRow } from "../proceduresVersionControll/useProceduresVersions";
 
 interface UseVersionedTableColumnsProps {
@@ -9,6 +9,7 @@ interface UseVersionedTableColumnsProps {
   selectedRevision: Record<string, number>;
   onVersionChange: (codigo: string, versionIndex: number) => void;
   getSelectedVersionData: (row: any, field: string) => string | null;
+  handleAskObsolete: (id_documento: number) => void; // <-- Añade esto como prop
 }
 
 export function useVersionedTableColumns({
@@ -17,6 +18,7 @@ export function useVersionedTableColumns({
   selectedRevision,
   onVersionChange,
   getSelectedVersionData,
+  handleAskObsolete,
 }: UseVersionedTableColumnsProps) {
   // Renderer para la celda de revisión con select
   const renderRevisionCell = useCallback(
@@ -117,9 +119,23 @@ export function useVersionedTableColumns({
         >
           <Edit fontSize="small" />
         </button>
+        <button
+          className="action-button text-red-500 hover:text-red-700 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAskObsolete(
+              row.versiones[
+                selectedRevision[row.codigo_poe] ?? row.versiones.length - 1
+              ].id_documento
+            );
+          }}
+          title="Marcar como obsoleto"
+        >
+          <Delete fontSize="small" />
+        </button>
       </div>
     ),
-    [onEdit, onViewPdf]
+    [onEdit, onViewPdf, handleAskObsolete, selectedRevision]
   );
 
   const columns: TableColumn<ProcedureRow>[] = useMemo(
