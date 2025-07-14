@@ -53,7 +53,7 @@ const kpiData = {
       labels: ['Certificados', 'No certificados'],
       datasets: [{
         label: 'Personal',
-        data: [120, 15],
+        data: [120, 100],
         backgroundColor: ['#4ade80', '#f87171'],
         borderWidth: 1,
       }]
@@ -189,8 +189,8 @@ const ChartSelector = ({ initialKpi = 'certification' }: { initialKpi?: keyof ty
       legend: {
         position: 'right' as const,
         labels: {
-          boxWidth: 20,
-          padding: 15,
+          boxWidth: 18,
+          padding: 10,
         },
       },
       tooltip: {
@@ -205,9 +205,7 @@ const ChartSelector = ({ initialKpi = 'certification' }: { initialKpi?: keyof ty
         }
       },
       title: {
-        display: true,
-        text: kpiOptions.find(k => k.value === selectedKpi)?.label || 'Indicador',
-        font: { size: 18 },
+        display: false,
       },
     },
   };
@@ -228,13 +226,13 @@ const ChartSelector = ({ initialKpi = 'certification' }: { initialKpi?: keyof ty
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md w-full">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
-        <h2 className="text-xl font-semibold text-gray-800">
-          {kpiOptions.find(k => k.value === selectedKpi)?.label || 'Indicador'}
-        </h2>
-        <div className="flex gap-4 flex-wrap">
-          <FormControl sx={{ minWidth: 180 }}>
+    <div className="bg-white p-0 rounded-lg shadow-none w-full">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-2 gap-2">
+        <span className="text-2xl font-semibold text-green-800">
+          {kpiOptions.find(k => k.value === selectedKpi)?.label}
+        </span>
+        <div className="flex gap-2 flex-wrap">
+          <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel id="kpi-select-label">Indicador</InputLabel>
             <Select
               labelId="kpi-select-label"
@@ -249,7 +247,7 @@ const ChartSelector = ({ initialKpi = 'certification' }: { initialKpi?: keyof ty
           </FormControl>
 
           {selectedKpi !== 'update' && (
-            <FormControl sx={{ minWidth: 180 }}>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
               <InputLabel id="area-select-label">Área</InputLabel>
               <Select
                 labelId="area-select-label"
@@ -264,12 +262,12 @@ const ChartSelector = ({ initialKpi = 'certification' }: { initialKpi?: keyof ty
             </FormControl>
           )}
 
-          <FormControl sx={{ minWidth: 180 }}>
-            <InputLabel id="chart-select-label">Tipo de Gráfico</InputLabel>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel id="chart-select-label">Gráfico</InputLabel>
             <Select
               labelId="chart-select-label"
               value={chartType}
-              label="Tipo de Gráfico"
+              label="Gráfico"
               onChange={(e) => setChartType(e.target.value as any)}
             >
               {chartOptions.map((option) => (
@@ -280,16 +278,12 @@ const ChartSelector = ({ initialKpi = 'certification' }: { initialKpi?: keyof ty
         </div>
       </div>
 
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <div style={{ height: '400px' }}>
+      <div className="p-0 bg-white rounded-lg">
+        <div style={{ height: '320px' }}>
           <Box sx={{ width: '100%', height: '100%' }}>
             {renderChart()}
           </Box>
         </div>
-      </div>
-
-      <div className="text-xs text-gray-400 mt-4">
-        Última actualización: 2023-11-15
       </div>
     </div>
   );
