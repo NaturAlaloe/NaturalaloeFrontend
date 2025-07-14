@@ -48,6 +48,7 @@ import ListaColaboradores from "./views/collaborators/viewCollaborators";
 import AddTrainingGeneral from "./views/training/generalTraining";
 import AssignRol from "./views/collaborators/assingRol";
 import { useUserFromToken } from "./hooks/useUserFromToken";
+import CapacitacionesPendientes from "./views/home/pendingTrainingsScreen";
 
 
 const drawerWidth = 270;
@@ -660,7 +661,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/training/evaluatedTraining/:id_capacitacion" element={<Evaluacion/>} />
           <Route path="/estadisticas" element={<Estadistica/>} />
           <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
-          
+          <Route path="/home/pendingTrainingsScreen" element={<CapacitacionesPendientes />} />
         </Routes>
       </Main>
     </Box>

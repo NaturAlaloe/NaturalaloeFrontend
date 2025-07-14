@@ -111,7 +111,7 @@ export default function GlobalDataTable<T>({
                 className={`
                   relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 border
                   ${page === p
-                    ? 'bg-gradient-to-r from-[#2AAC67] to-[#22965a] text-white border-[#2AAC67] shadow-md transform scale-105 cursor-default' 
+                    ? 'bg-[#2AAC67] text-white border-[#2AAC67] shadow-md transform scale-105 cursor-default' 
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:transform hover:scale-105 hover:shadow-md'
                   }
                 `}
