@@ -50,7 +50,14 @@ export const createNewPoliticsVersion = async (
       return response.data;
     };
     
-export const deletePolitics = async (id_politica: number) => {
-  const response = await api.delete(`/police/${id_politica}`);
+export const obsoletePolitics = async (
+  id_documento: number,
+  razon_cambio: string
+) => {
+  console.log("Obsoleting politics with ID:", id_documento, "Reason:", razon_cambio);
+  const response = await api.put(`/police/obsolete`, {
+    id_documento,
+    razon_cambio,
+  });
   return response.data;
 };

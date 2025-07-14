@@ -3,7 +3,7 @@ import {
   getPoliticsList,
   updatePolitics,
   createNewPoliticsVersion,
-  deletePolitics
+  obsoletePolitics,
 } from "../../services/politics/politicsService";
 import { getResponsibles } from "../../services/responsibles/getResponsibles";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
@@ -58,6 +58,10 @@ export default function usePoliticsList() {
   const [responsables, setResponsables] = useState<{ id_responsable: number; nombre_responsable: string }[]>([]);
   const [loadingResponsables, setLoadingResponsables] = useState(false);
 
+
+  const [reasonModalOpen, setReasonModalOpen] = useState(false);
+  const [deleteReason, setDeleteReason] = useState("");
+
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -95,6 +99,17 @@ export default function usePoliticsList() {
       ...prev,
       [codigoPolitica]: parseInt(versionId)
     }));
+  };
+
+  
+  const handleAskReason = () => {
+    setDeleteReason("");
+    setReasonModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    await handleDelete(deleteReason);
+    setReasonModalOpen(false);
   };
 
   const expandedPolitics = useMemo(() => {
@@ -264,18 +279,21 @@ export default function usePoliticsList() {
   };
 
 
-  const handleDelete = async () => {
+  const handleDelete = async (razon_cambio: string) => {
     if (!deletePoliticsObj) return;
     try {
       setLoading(true);
-      await deletePolitics(deletePoliticsObj.id_documento);
-      showCustomToast("Éxito", "Política eliminada", "success");
+      await obsoletePolitics(deletePoliticsObj.id_documento, razon_cambio);
+      showCustomToast("Éxito", "Política marcada como obsoleta", "success");
       const data = await getPoliticsList();
+      console.log("Lista actualizada:", data); // <-- Depura aquí
       setPolitics(data);
-    } catch (error: any) {
-      showCustomToast("Error", "No se pudo eliminar", "error");
-    } finally {
       setDeletePoliticsObj(null);
+      setReasonModalOpen(false);
+      setDeleteReason("");
+    } catch (error: any) {
+      showCustomToast("Error", "No se pudo marcar como obsoleta", "error");
+    } finally {
       setLoading(false);
     }
   };
@@ -319,5 +337,12 @@ export default function usePoliticsList() {
     pdfFile,
     setPdfFile,
     handlePdfChange,
+    handleConfirmDelete,
+    handleAskReason,
+    reasonModalOpen,
+    setReasonModalOpen,
+    setDeleteReason,
+    deleteReason,
+    
   };
 }

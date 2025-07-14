@@ -11,6 +11,7 @@ import SelectAutocomplete from "../../components/formComponents/SelectAutocomple
 import PdfInput from "../../components/formComponents/PdfInput";
 import FormContainer from "../../components/formComponents/FormContainer";
 import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export default function PoliticsList() {
   const ui = usePoliticsList();
@@ -97,33 +98,46 @@ export default function PoliticsList() {
 
     {
       name: "Acciones",
-      cell: (row: any) => (
-        <div className="flex gap-2">
-          <a
-            href={row.ruta_documento}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#2AAC67] hover:text-green-700"
-            title="Ver documento"
-          >
-            <Visibility fontSize="small" />
-          </a>
-          <button
-            className="text-[#2AAC67] hover:text-green-700"
-            onClick={() => ui.handleOpenEdit(row)}
-            title="Editar"
-          >
-            <Edit fontSize="small" />
-          </button>
-          <button
-            className="text-red-500 hover:text-red-700"
-            onClick={() => ui.handleOpenDelete(row)}
-            title="Eliminar"
-          >
-            <Delete fontSize="small" />
-          </button>
-        </div>
-      ),
+      cell: (row: any) => {
+        const selectedVersionId = ui.selectedVersions[row.codigo_politica];
+        const selectedVersion = row.versiones?.find((v: any) => v.id_documento === selectedVersionId);
+
+        return (
+          <div className="flex gap-2">
+            <button
+              className="text-green-600 hover:text-green-800"
+              title="Ver PDF"
+              onClick={() => {
+                if (!selectedVersion?.ruta_documento) {
+                  showCustomToast(
+                    "Documento no disponible",
+                    `No se encontró el archivo PDF para la versión ${selectedVersion?.revision || "actual"} de la política ${row.codigo_politica}`,
+                    "error"
+                  );
+                  return;
+                }
+                window.open(selectedVersion.ruta_documento, "_blank");
+              }}
+            >
+              <Visibility fontSize="small" />
+            </button>
+            <button
+              className="text-[#2AAC67] hover:text-green-700"
+              onClick={() => ui.handleOpenEdit(row)}
+              title="Editar"
+            >
+              <Edit fontSize="small" />
+            </button>
+            <button
+              className="text-red-500 hover:text-red-700"
+              onClick={() => ui.handleOpenDelete(row)}
+              title="Eliminar"
+            >
+              <Delete fontSize="small" />
+            </button>
+          </div>
+        );
+      },
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
@@ -146,7 +160,7 @@ export default function PoliticsList() {
       <GlobalDataTable
         columns={columns}
         data={ui.filteredPolitics}
-        rowsPerPage={5}
+        rowsPerPage={10}
         progressPending={ui.loading}
         currentPage={ui.currentPage}
         onChangePage={ui.setCurrentPage}
@@ -313,7 +327,8 @@ export default function PoliticsList() {
             </div>
 
             <div className="text-center mt-8">
-              <SubmitButton width="w-40" disabled={ui.saving} >
+            <SubmitButton width="w-40" loading={ui.saving} disabled={ui.saving}>
+
                 {ui.saving
                   ? (ui.esNuevaVersion ? "Creando Versión..." : "Actualizando...")
                   : (ui.esNuevaVersion ? "Crear Nueva Versión" : "Guardar Cambios")
@@ -327,7 +342,7 @@ export default function PoliticsList() {
       <GlobalModal
         open={ui.deletePoliticsObj !== null}
         onClose={() => ui.setDeletePoliticsObj(null)}
-        title="Eliminar Política"
+        title="Marcar como obsoleto"
         maxWidth="sm"
         actions={
           <div className="flex gap-2">
@@ -341,14 +356,58 @@ export default function PoliticsList() {
             <SubmitButton
               className="bg-red-500 hover:bg-red-600"
               type="button"
-              onClick={ui.handleDelete}
+              onClick={ui.handleAskReason}
             >
               Eliminar
             </SubmitButton>
           </div>
         }
       >
-        <div>¿Estás seguro de que deseas eliminar esta política?</div>
+        <div>¿Estás seguro de que deseas marcar esta política como obsoleta?</div>
+      </GlobalModal>
+
+      <GlobalModal
+        open={ui.reasonModalOpen}
+        onClose={() => ui.setReasonModalOpen(false)}
+        title="Razón de obsolescencia"
+        maxWidth="sm"
+        actions={
+          <div className="flex gap-2">
+            <SubmitButton
+              className="bg-gray-400 hover:bg-gray-500"
+              type="button"
+              onClick={() => ui.setReasonModalOpen(false)}
+              disabled={ui.loading}
+            >
+              Cancelar
+            </SubmitButton>
+            <SubmitButton
+              className="bg-red-500 hover:bg-red-600"
+              type="button"
+              onClick={ui.handleConfirmDelete}
+              disabled={!ui.deleteReason.trim() || ui.loading}
+              loading={ui.loading}
+            >
+              Confirmar
+            </SubmitButton>
+          </div>
+        }
+      >
+        <div>
+          <label className="block mb-2 font-medium text-gray-700">
+            Escribe la razón por la que esta política será marcada como obsoleta:
+          </label>
+          <textarea
+            className="w-full border border-gray-300 rounded p-2"
+            rows={3}
+            value={ui.deleteReason}
+            onChange={e => ui.setDeleteReason(e.target.value)}
+            placeholder="Motivo de obsolescencia"
+            autoFocus
+            required
+            disabled={ui.loading}
+          />
+        </div>
       </GlobalModal>
     </TableContainer>
   );

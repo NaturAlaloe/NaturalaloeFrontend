@@ -87,7 +87,7 @@ export default function PoliticsForm() {
         />
      
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
       <PdfInput
           pdfFile={pdfFile}
           onChange={handlePdfChange}

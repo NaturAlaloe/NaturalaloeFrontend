@@ -1,6 +1,34 @@
 import DataTable, { type TableColumn } from "react-data-table-component";
 import React from "react";
 
+// Utilidad para los números de página con elipsis
+function getPageNumbers(current: number, total: number, max: number = 5) {
+  if (total <= max) return Array.from({ length: total }, (_, i) => i + 1);
+
+  const pages: (number | string)[] = [];
+  const half = Math.floor(max / 2);
+
+  let start = Math.max(1, current - half);
+  let end = Math.min(total, current + half);
+
+  if (start === 1) end = max;
+  if (end === total) start = total - max + 1;
+
+  if (start > 1) {
+    pages.push(1, "...");
+  }
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  if (end < total) {
+    pages.push("...", total);
+  }
+
+  return pages;
+}
+
 interface AppDataTableProps<T> {
   columns: TableColumn<T>[];
   data: T[];
@@ -10,8 +38,8 @@ interface AppDataTableProps<T> {
   dense?: boolean;
   highlightOnHover?: boolean;
   rowsPerPage?: number;
-  currentPage?: number; // <-- Add this
-  onChangePage?: (page: number) => void; // <-- Add this
+  currentPage?: number;
+  onChangePage?: (page: number) => void;
   [key: string]: any;
 }
 
@@ -38,11 +66,10 @@ export default function GlobalDataTable<T>({
   dense = false,
   highlightOnHover = false,
   rowsPerPage = 10,
-  currentPage, // <-- Use this
-  onChangePage, // <-- Use this
+  currentPage,
+  onChangePage,
   ...rest
 }: AppDataTableProps<T>) {
-  // Use controlled pagination if props provided, otherwise fallback to internal state
   const [internalPage, setInternalPage] = React.useState(1);
   const page = currentPage ?? internalPage;
   const setPage = onChangePage ?? setInternalPage;
@@ -52,42 +79,70 @@ export default function GlobalDataTable<T>({
     ? data.slice((page - 1) * rowsPerPage, page * rowsPerPage)
     : data;
 
+  // Nuevo estilo de paginación
   const CustomPagination = () => (
-    <div className="flex justify-center mt-4">
-      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+    <div className="flex justify-center items-center mt-6">
+      <nav className="flex items-center space-x-1" aria-label="Pagination">
+        {/* Botón Anterior */}
         <button
-          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+          className={`
+            relative inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+            ${page === 1 
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' 
+              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow-md'
+            }
+          `}
           onClick={() => setPage(Math.max(page - 1, 1))}
           disabled={page === 1}
         >
-          <span className="sr-only">Anterior</span>
-          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+          <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
           </svg>
+          Anterior
         </button>
-        {[...Array(totalPages)].map((_, idx) => (
-          <button
-            key={idx + 1}
-            aria-current={page === idx + 1 ? "page" : undefined}
-            className={
-              page === idx + 1
-                ? "bg-gray-300 border-gray-500 text-gray-900 font-bold shadow-md relative inline-flex items-center px-4 py-2 border text-sm rounded-md z-10"
-                : "bg-white border-gray-300 text-gray-500 hover:bg-gray-100 relative inline-flex items-center px-4 py-2 border text-sm rounded-md"
-            }
-            onClick={() => setPage(idx + 1)}
-            style={page === idx + 1 ? { pointerEvents: 'none' } : {}}
-          >
-            {idx + 1}
-          </button>
-        ))}
+
+        {/* Números de página */}
+        <div className="flex items-center space-x-1">
+          {getPageNumbers(page, totalPages, 5).map((p, idx) =>
+            typeof p === "number" ? (
+              <button
+                key={p}
+                aria-current={page === p ? "page" : undefined}
+                className={`
+                  relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 border
+                  ${page === p
+                    ? 'bg-gradient-to-r from-[#2AAC67] to-[#22965a] text-white border-[#2AAC67] shadow-md transform scale-105 cursor-default' 
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:transform hover:scale-105 hover:shadow-md'
+                  }
+                `}
+                onClick={() => setPage(p)}
+                disabled={page === p}
+              >
+                {p}
+              </button>
+            ) : (
+              <span key={`ellipsis-${idx}`} className="px-2 py-2 text-gray-400 select-none text-sm">
+                ...
+              </span>
+            )
+          )}
+        </div>
+
+        {/* Botón Siguiente */}
         <button
-          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+          className={`
+            relative inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+            ${page === totalPages 
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' 
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow-md'
+            }
+          `}
           onClick={() => setPage(Math.min(page + 1, totalPages))}
           disabled={page === totalPages}
         >
-          <span className="sr-only">Siguiente</span>
-          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+          Siguiente
+          <svg className="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
           </svg>
         </button>
       </nav>
@@ -95,7 +150,7 @@ export default function GlobalDataTable<T>({
   );
 
   return (
-    <>
+    <div className="w-full">
       <DataTable
         columns={columns}
         data={paginatedData}
@@ -107,6 +162,6 @@ export default function GlobalDataTable<T>({
         {...rest}
       />
       {pagination && totalPages > 1 && <CustomPagination />}
-    </>
+    </div>
   );
 }
