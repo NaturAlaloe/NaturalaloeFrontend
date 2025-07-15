@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bar, Pie, Doughnut, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -12,7 +12,18 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
+import {
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Box,
+  CircularProgress,
+  Typography,
+  Button,
+  Alert
+} from '@mui/material';
+import api from "../../apiConfig/api";
 
 ChartJS.register(
   CategoryScale,
@@ -26,243 +37,289 @@ ChartJS.register(
   Legend
 );
 
-const areaOptions = [
-  { value: 'todas', label: 'Todas las áreas' },
-  { value: 'operaciones', label: 'Operaciones' },
-  { value: 'logistica', label: 'Logística' },
-  { value: 'calidad', label: 'Calidad' },
-];
+interface POEData {
+  id_lote: number;
+  area: string;
+  jefatura: string;
+  estado: string;
+  cantidad: number;
+  actualizados: string;
+  pendientes: string;
+  lista_documentos: {
+    tipo: string;
+    razon: string;
+    codigo: string;
+    estado: string;
+  }[];
+}
 
-const kpiOptions = [
-  { value: 'certification', label: 'Certificación del Personal' },
-  { value: 'procedures', label: 'Estado de Procedimientos' },
-  { value: 'training', label: 'Cumplimiento de Capacitaciones' },
-  { value: 'update', label: 'Actualización de Procedimientos' },
-];
-
-const chartOptions = [
-  { value: 'bar', label: 'Barras' },
-  { value: 'pie', label: 'Circular (Pie)' },
-  { value: 'doughnut', label: 'Dona (Doughnut)' },
-  { value: 'line', label: 'Líneas' },
-];
-
-const kpiData = {
-  certification: {
-    todas: {
-      labels: ['Certificados', 'No certificados'],
-      datasets: [{
-        label: 'Personal',
-        data: [120, 100],
-        backgroundColor: ['#4ade80', '#f87171'],
-        borderWidth: 1,
-      }]
-    },
-    operaciones: {
-      labels: ['Certificados', 'No certificados'],
-      datasets: [{
-        label: 'Operaciones',
-        data: [40, 5],
-        backgroundColor: ['#4ade80', '#f87171'],
-        borderWidth: 1,
-      }]
-    },
-    logistica: {
-      labels: ['Certificados', 'No certificados'],
-      datasets: [{
-        label: 'Logística',
-        data: [32, 3],
-        backgroundColor: ['#4ade80', '#f87171'],
-        borderWidth: 1,
-      }]
-    },
-    calidad: {
-      labels: ['Certificados', 'No certificados'],
-      datasets: [{
-        label: 'Calidad',
-        data: [28, 2],
-        backgroundColor: ['#4ade80', '#f87171'],
-        borderWidth: 1,
-      }]
-    },
-  },
-  procedures: {
-    todas: {
-      labels: ['Actualizados', 'Obsoletos', 'Sin cambios'],
-      datasets: [{
-        label: 'Procedimientos',
-        data: [42, 8, 15],
-        backgroundColor: ['#4ade80', '#f87171', '#fbbf24'],
-        borderWidth: 1,
-      }]
-    },
-    operaciones: {
-      labels: ['Actualizados', 'Obsoletos', 'Sin cambios'],
-      datasets: [{
-        label: 'Operaciones',
-        data: [20, 3, 5],
-        backgroundColor: ['#4ade80', '#f87171', '#fbbf24'],
-        borderWidth: 1,
-      }]
-    },
-    logistica: {
-      labels: ['Actualizados', 'Obsoletos', 'Sin cambios'],
-      datasets: [{
-        label: 'Logística',
-        data: [12, 2, 6],
-        backgroundColor: ['#4ade80', '#f87171', '#fbbf24'],
-        borderWidth: 1,
-      }]
-    },
-    calidad: {
-      labels: ['Actualizados', 'Obsoletos', 'Sin cambios'],
-      datasets: [{
-        label: 'Calidad',
-        data: [10, 3, 4],
-        backgroundColor: ['#4ade80', '#f87171', '#fbbf24'],
-        borderWidth: 1,
-      }]
-    },
-  },
-  training: {
-    todas: {
-      labels: ['Completadas', 'Pendientes'],
-      datasets: [{
-        label: 'Capacitaciones',
-        data: [85, 15],
-        backgroundColor: ['#4ade80', '#f87171'],
-        borderWidth: 1,
-      }]
-    },
-    operaciones: {
-      labels: ['Completadas', 'Pendientes'],
-      datasets: [{
-        label: 'Operaciones',
-        data: [40, 5],
-        backgroundColor: ['#4ade80', '#f87171'],
-        borderWidth: 1,
-      }]
-    },
-    logistica: {
-      labels: ['Completadas', 'Pendientes'],
-      datasets: [{
-        label: 'Logística',
-        data: [28, 4],
-        backgroundColor: ['#4ade80', '#f87171'],
-        borderWidth: 1,
-      }]
-    },
-    calidad: {
-      labels: ['Completadas', 'Pendientes'],
-      datasets: [{
-        label: 'Calidad',
-        data: [17, 6],
-        backgroundColor: ['#4ade80', '#f87171'],
-        borderWidth: 1,
-      }]
-    },
-  },
-  update: {
-    todas: {
-      labels: ['A tiempo', 'Atrasados'],
-      datasets: [{
-        label: 'Actualizaciones',
-        data: [42, 8],
-        backgroundColor: ['#4ade80', '#f87171'],
-        borderWidth: 1,
-      }]
-    }
-  }
-};
-
-const ChartSelector = ({ initialKpi = 'certification' }: { initialKpi?: keyof typeof kpiData }) => {
+const ChartSelector = () => {
+  // Chart state
   const [chartType, setChartType] = useState<'bar' | 'pie' | 'doughnut' | 'line'>('bar');
-  const [selectedArea, setSelectedArea] = useState<'todas' | 'operaciones' | 'logistica' | 'calidad'>('todas');
-  const [selectedKpi, setSelectedKpi] = useState<keyof typeof kpiData>(initialKpi);
+  const [groupBy, setGroupBy] = useState<'area' | 'jefatura'>('area');
+  const [poeData, setPoeData] = useState<POEData[]>([]);
+  const [chartLoading, setChartLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  const selectedData = (kpiData[selectedKpi] as typeof kpiData['certification'])[selectedArea] || (kpiData[selectedKpi] as typeof kpiData['certification'])['todas'];
+  const fetchChartData = async () => {
+    try {
+      setChartLoading(true);
+      setApiError(null);
+      const response = await api.get('/dataForGraphicWithKPI');
+
+      if (response.data.success) {
+        setPoeData(response.data.data);
+      } else {
+        setApiError('La API no devolvió datos válidos');
+      }
+    } catch (error: any) {
+      console.error('Error fetching POE data:', error);
+      setApiError('Error al cargar los datos. Intente nuevamente.');
+    } finally {
+      setChartLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchChartData();
+  }, []);
+
+  const getChartData = () => {
+    if (chartLoading) {
+      return {
+        labels: ['Cargando datos...'],
+        datasets: [{
+          label: 'Datos',
+          data: [1],
+          backgroundColor: ['#e5e7eb'],
+          borderWidth: 1,
+        }]
+      };
+    }
+
+    if (apiError || !poeData.length) {
+      return {
+        labels: ['Sin datos'],
+        datasets: [{
+          label: 'Datos',
+          data: [1],
+          backgroundColor: ['#e5e7eb'],
+          borderWidth: 1,
+        }]
+      };
+    }
+
+    const groupKey = groupBy === 'area' ? 'area' : 'jefatura';
+    const groups = poeData.reduce((acc: Record<string, { actualizados: number, pendientes: number }>, item) => {
+      const key = item[groupKey] || 'Sin especificar';
+      if (!acc[key]) {
+        acc[key] = { actualizados: 0, pendientes: 0 };
+      }
+      acc[key].actualizados += parseInt(item.actualizados) || 0;
+      acc[key].pendientes += parseInt(item.pendientes) || 0;
+      return acc;
+    }, {});
+
+    const labels = Object.keys(groups);
+    const actualizadosData = Object.values(groups).map(group => group.actualizados);
+    const pendientesData = Object.values(groups).map(group => group.pendientes);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Actualizados',
+          data: actualizadosData,
+          backgroundColor: '#4ade80',
+          borderWidth: 1,
+        },
+        {
+          label: 'Pendientes',
+          data: pendientesData,
+          backgroundColor: '#f87171',
+          borderWidth: 1,
+        }
+      ]
+    };
+  };
 
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right' as const,
+        position: 'bottom' as const,
+        align: 'center' as const,
         labels: {
-          boxWidth: 18,
-          padding: 10,
+          boxWidth: 20,
+          padding: 20,
+          usePointStyle: true,
         },
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
-            const label = context.label || '';
+          label: function (context: any) {
+            const label = context.dataset.label || '';
             const value = context.raw;
             const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
             const percentage = Math.round((value / total) * 100);
-            return `${label}: ${value} (${percentage}%)`;
+            return `${label}: ${value} (${!isNaN(percentage) ? percentage : 0}%)`;
           }
         }
       },
       title: {
-        display: false,
+        display: true,
+        text: 'Actualización de Procedimientos',
+        font: { size: 16 },
+        padding: {
+          top: 10,
+          bottom: 20
+        }
       },
     },
+    layout: {
+      padding: {
+        top: 20,
+        bottom: 20,
+        left: 20,
+        right: 20
+      }
+    }
   };
 
   const renderChart = () => {
+    if (chartLoading) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <CircularProgress />
+        </div>
+      );
+    }
+
+    if (apiError) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full gap-4">
+          <Alert severity="error" className="w-full max-w-md">
+            {apiError}
+          </Alert>
+          <Button variant="contained" onClick={fetchChartData}>
+            Reintentar
+          </Button>
+        </div>
+      );
+    }
+
+    if (!poeData.length) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full gap-4">
+          <Typography variant="h6" className="text-gray-500">
+            No hay datos disponibles
+          </Typography>
+          <Button variant="outlined" onClick={fetchChartData}>
+            Recargar datos
+          </Button>
+        </div>
+      );
+    }
+
+    const selectedData = getChartData();
+
+    // Wrapper div with proper centering
+    const ChartWrapper = ({ children }: { children: React.ReactNode }) => (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="w-full h-full max-w-full max-h-full">
+          {children}
+        </div>
+      </div>
+    );
+
     switch (chartType) {
       case 'bar':
-        return <Bar data={selectedData} options={commonOptions} />;
+        return (
+          <ChartWrapper>
+            <Bar data={selectedData} options={commonOptions} />
+          </ChartWrapper>
+        );
       case 'pie':
-        return <Pie data={selectedData} options={commonOptions} />;
+        return (
+          <ChartWrapper>
+            <Pie data={selectedData} options={commonOptions} />
+          </ChartWrapper>
+        );
       case 'doughnut':
-        return <Doughnut data={selectedData} options={commonOptions} />;
+        return (
+          <ChartWrapper>
+            <Doughnut data={selectedData} options={commonOptions} />
+          </ChartWrapper>
+        );
       case 'line':
-        return <Line data={selectedData} options={commonOptions} />;
+        return (
+          <ChartWrapper>
+            <Line data={selectedData} options={commonOptions} />
+          </ChartWrapper>
+        );
       default:
-        return <Bar data={selectedData} options={commonOptions} />;
+        return (
+          <ChartWrapper>
+            <Bar data={selectedData} options={commonOptions} />
+          </ChartWrapper>
+        );
     }
   };
 
   return (
-    <div className="bg-white p-0 rounded-lg shadow-none w-full">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-2 gap-2">
-        <span className="text-2xl font-semibold text-green-800">
-          {kpiOptions.find(k => k.value === selectedKpi)?.label}
-        </span>
-        <div className="flex gap-2 flex-wrap">
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel id="kpi-select-label">Indicador</InputLabel>
+    <div className="bg-white rounded-xl shadow-gray-300 shadow p-6 flex flex-col transition hover:shadow-lg h-full">
+      {/* Chart Controls */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+        <Typography variant="h6" className="text-green-800">
+          Actualización de Procedimientos Operativos Estándar (POE)
+        </Typography>
+
+        <div className="flex gap-4 flex-wrap">
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: 140,
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: '#2AAC67',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                '&.Mui-focused': {
+                  color: '#2AAC67',
+                },
+              },
+            }}
+          >
+            <InputLabel id="groupby-select-label">Agrupar por</InputLabel>
             <Select
-              labelId="kpi-select-label"
-              value={selectedKpi}
-              label="Indicador"
-              onChange={(e) => setSelectedKpi(e.target.value as keyof typeof kpiData)}
+              labelId="groupby-select-label"
+              value={groupBy}
+              label="Agrupar por"
+              onChange={(e) => setGroupBy(e.target.value as 'area' | 'jefatura')}
             >
-              {kpiOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-              ))}
+              <MenuItem value="area">Área</MenuItem>
+              <MenuItem value="jefatura">Jefatura</MenuItem>
             </Select>
           </FormControl>
 
-          {selectedKpi !== 'update' && (
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel id="area-select-label">Área</InputLabel>
-              <Select
-                labelId="area-select-label"
-                value={selectedArea}
-                label="Área"
-                onChange={(e) => setSelectedArea(e.target.value)}
-              >
-                {areaOptions.map((area) => (
-                  <MenuItem key={area.value} value={area.value}>{area.label}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-
-          <FormControl size="small" sx={{ minWidth: 120 }}>
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: 140,
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: '#2AAC67',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                '&.Mui-focused': {
+                  color: '#2AAC67',
+                },
+              },
+            }}
+          >
             <InputLabel id="chart-select-label">Gráfico</InputLabel>
             <Select
               labelId="chart-select-label"
@@ -270,20 +327,34 @@ const ChartSelector = ({ initialKpi = 'certification' }: { initialKpi?: keyof ty
               label="Gráfico"
               onChange={(e) => setChartType(e.target.value as any)}
             >
-              {chartOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-              ))}
+              <MenuItem value="bar">Barras</MenuItem>
+              <MenuItem value="pie">Circular</MenuItem>
+              <MenuItem value="doughnut">Dona</MenuItem>
+              <MenuItem value="line">Líneas</MenuItem>
             </Select>
           </FormControl>
         </div>
       </div>
 
-      <div className="p-0 bg-white rounded-lg">
-        <div style={{ height: '320px' }}>
-          <Box sx={{ width: '100%', height: '100%' }}>
-            {renderChart()}
-          </Box>
-        </div>
+      {/* Chart Container - Properly centered */}
+      <div className="flex-1 bg-gray-50 rounded-lg p-4" style={{ minHeight: '450px' }}>
+        <Box
+          sx={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          {renderChart()}
+        </Box>
+      </div>
+
+      {/* Chart Footer */}
+      <div className="flex justify-between items-center text-sm text-gray-500 mt-4 pt-4 border-t">
+        <span>Total registros: {poeData.length}</span>
+        <span>Última actualización: {new Date().toLocaleDateString('es-ES')}</span>
       </div>
     </div>
   );

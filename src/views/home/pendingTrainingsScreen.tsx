@@ -2,6 +2,7 @@ import { usePendingTrainings } from "../../hooks/usePendingTrainings";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import SelectField from "../../components/formComponents/SelectField";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
+import PersonIcon from '@mui/icons-material/Person';
 
 export default function PendingTrainingsScreen() {
     const {
@@ -26,7 +27,7 @@ export default function PendingTrainingsScreen() {
         <div className="min-h-screen bg-gradient-to-br from-[#fff] to-white px-0 py-4 rounded-xl shadow-lg transition-all duration-300 ease-in-out">
             <div className="max-w-6xl mx-auto px-4 pt-8 pb-2 mb-4">
                 <div className="flex w-full justify-center mb-2">
-                    <h1 className="text-4xl font-black text-[#2BAC67] text-center">
+                    <h1 className="text-4xl font-black text-[#2BAC67] text-center font-[Poppins]">
                         Pendientes de Capacitación
                     </h1>
                 </div>
@@ -83,15 +84,30 @@ export default function PendingTrainingsScreen() {
                     paginated.map((item, index) => (
                         <div
                             key={`${item.id_colaborador}-${item.id_documento}-${item.nombre_rol}-${index}`}
-                            className="bg-white rounded-2xl shadow-xl border border-green-200 hover:shadow-2xl transition flex flex-col p-6 gap-4 relative"
+                            className="bg-white rounded-2xl shadow-lg border border-green-100 hover:shadow-xl hover:border-green-300 transition-all duration-300 cursor-pointer flex flex-col p-6 gap-4 relative group hover:scale-105"
                         >
-                            <div className="flex items-center gap-4 mb-2">
-                                <div>
-                                    <div className="font-extrabold text-green-900 text-lg truncate">{item.nombre_completo}</div>
-                                    <div className="text-green-700 text-xs">{item.puesto}</div>
+                 
+                            <div className="flex items-center gap-4 mb-3">
+                                <div className="w-10 h-10 bg-[#2AAC66] rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                                    <PersonIcon className="text-white" fontSize="medium" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="font-bold text-gray-800 text-lg truncate group-hover:text-green-700 transition-colors">
+                                        {item.nombre_completo}
+                                    </div>
+                                    <div className="text-gray-500 text-sm font-medium truncate">
+                                        {item.puesto}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex flex-wrap gap-2 text-xs text-gray-600">
+
+             
+                            <div className="text-green-800 font-semibold text-sm truncate mb-2">
+                                {item.descripcion}
+                            </div>
+
+                 
+                            <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-2">
                                 <span className="bg-green-100 px-2 py-1 rounded font-semibold">
                                     Área: <span className="font-normal">{item.area}</span>
                                 </span>
@@ -103,15 +119,18 @@ export default function PendingTrainingsScreen() {
                                 </span>
                             </div>
 
-
-                            <div className="text-green-800 font-semibold text-sm mt-2 truncate">{item.descripcion}</div>
-                            <div className="flex flex-wrap gap-4 text-xs text-gray-500 mt-2">
-                                <span className="bg-white border border-green-200 rounded px-2 py-1">
-                                    <b>Código:</b> {item.codigo}
-                                </span>
-                                <span className="bg-white border border-green-200 rounded px-2 py-1">
-                                    <b>Versión:</b> {item.version}
-                                </span>
+                            {/* Bottom Info and Action */}
+                            <div className="flex justify-between items-center">
+                                <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+                                    <span className="bg-white border border-green-200 rounded px-2 py-1">
+                                        <b>Código:</b> {item.codigo}
+                                    </span>
+                                    <span className="bg-white border border-green-200 rounded px-2 py-1">
+                                        <b>Versión:</b> {item.version}
+                                    </span>
+                                </div>
+                                
+                             
                             </div>
                         </div>
                     ))
@@ -119,7 +138,6 @@ export default function PendingTrainingsScreen() {
             </div>
 
             <nav className="flex justify-center items-center mt-12 gap-2 mb-6">
-
                 <button
                     className={`w-28 h-10 rounded-lg border-2 font-bold flex items-center justify-center transition
                     ${page === 1

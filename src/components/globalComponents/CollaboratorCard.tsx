@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardContent, Avatar, Typography, Box } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 
 interface CollaboratorCardProps {
@@ -10,111 +9,49 @@ interface CollaboratorCardProps {
 }
 
 const CollaboratorCard: React.FC<CollaboratorCardProps> = ({ id, nombre, puesto, onClick }) => (
-  <Card
+  <div
     onClick={() => onClick(id)}
-    sx={{
-      height: 240,
-      minWidth: 0,
-      width: '100%',
-      minHeight: 120,
-      maxHeight: 240,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      cursor: 'pointer',
-      borderRadius: 3,
-      boxShadow: '0 2px 8px 0 rgba(42,172,103,0.06)',
-      background: '#ffffff',
-      border: '1px solid #2AAC67',
-      transition: 'transform 0.18s, box-shadow 0.18s, border 0.18s',
-      '&:hover': {
-        transform: 'scale(1.025)',
-        boxShadow: '0 6px 18px 0 #A6E8C7',
-        border: '1.5px solid #2AAC67',
-      },
-      fontFamily: 'Poppins, sans-serif',
-      p: 1.5,
-      m: 'auto',
-    }}
+    className="bg-white rounded-2xl shadow-lg border border-green-100 hover:shadow-xl hover:border-green-300 transition-all duration-300 cursor-pointer flex flex-col p-6 gap-4 relative group hover:scale-105"
   >
-    <CardContent
-      sx={{
-        flexGrow: 1,
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 1,
-        p: 0,
-      }}
-    >
-      <Avatar
-        sx={{
-          width: 54,
-          height: 54,
-          bgcolor: '#2AAC67',
-          color: '#fff',
-          fontFamily: 'Poppins, sans-serif',
-          mb: 1,
-          boxShadow: '0 2px 8px 0 rgba(42,172,103,0.10)',
-        }}
-      >
-        <PersonIcon sx={{ fontSize: 32 }} />
-      </Avatar>
-      <Typography
-        variant="body2"
-        sx={{
-          color: '#2AAC67',
-          fontFamily: 'Poppins, sans-serif',
-          textAlign: 'center',
-          fontWeight: 500,
-          letterSpacing: 1,
-          fontSize: '0.85rem',
-        }}
-      >
-        ID: {id}
-      </Typography>
-      <Typography
-        variant="subtitle1"
-        sx={{
-          color: '#2AAC67',
-          fontFamily: 'Poppins, sans-serif',
-          fontWeight: 600,
-          textAlign: 'center',
-          fontSize: '1rem',
-        }}
-      >
-        {nombre}
-      </Typography>
-      {puesto && (
-        <Box
-          sx={{
-            mt: 0.5,
-            px: 1.5,
-            py: 0.2,
-            bgcolor: '#E0F5EA',
-            borderRadius: 1,
-            display: 'inline-block',
-          }}
-        >
-          <Typography
-            variant="body2"
-            sx={{
-              color: '#2AAC67',
-              fontFamily: 'Poppins, sans-serif',
-              textAlign: 'center',
-              fontWeight: 500,
-              fontSize: '0.85rem',
-            }}
-          >
+    {/* Header with Avatar */}
+    <div className="flex items-center gap-4 mb-3">
+      <div className="w-10 h-10 bg-[#2AAC66] rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+        <PersonIcon className="text-white" fontSize="medium" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="font-bold text-gray-800 text-lg truncate group-hover:text-green-700 transition-colors">
+          {nombre}
+        </div>
+        {puesto && (
+          <div className="text-gray-500 text-sm font-medium truncate">
             {puesto}
-          </Typography>
-        </Box>
-      )}
-    </CardContent>
-  </Card>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* ID Badge */}
+    <div className="flex justify-between items-center">
+      <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+       
+        ID: {id}
+      </span>
+      
+      {/* Action indicator */}
+      <div className="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center group-hover:bg-green-50 transition-colors">
+        <svg 
+          className="w-4 h-4 text-gray-400 group-hover:text-green-600 transition-colors" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </div>
+
+    {/* Hover effect overlay */}
+  </div>
 );
 
 export default CollaboratorCard;

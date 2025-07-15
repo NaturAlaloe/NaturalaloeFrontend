@@ -9,7 +9,7 @@ export function usePendingTrainings() {
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filtros y paginación
+
   const [filterArea, setFilterArea] = useState("");
   const [filterNombre, setFilterNombre] = useState("");
   const [page, setPage] = useState(1);

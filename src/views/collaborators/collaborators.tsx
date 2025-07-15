@@ -13,7 +13,6 @@ const Collaborators: React.FC = () => {
     page,
     setPage,
     totalPages,
-    getPagination,
     firstLoad,
     handleCardClick,
     allCollaboratorsLength,
@@ -24,81 +23,89 @@ const Collaborators: React.FC = () => {
   }
 
   return (
-    <div className="p-2 sm:p-6 max-w-[1300px] mx-auto bg-white rounded-3xl shadow-2xl min-h-[90vh]">
-      <h1 className="text-3xl font-bold text-[#2AAC67] text-center mb-6">
-        Colaboradores
-      </h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#fff] to-white px-0 py-4 rounded-xl shadow-lg transition-all duration-300 ease-in-out">
+      <div className="max-w-6xl mx-auto px-4 pt-8 pb-2 mb-4">
+        <div className="flex w-full justify-center mb-2">
+          <h1 className="text-4xl font-black text-[#2BAC67] text-center font-[Poppins]">
+            Colaboradores
+          </h1>
+        </div>
+      </div>
 
-      <div className="mb-8 flex justify-center">
-        <input
-          type="text"
-          className="w-full max-w-xl rounded-xl border border-[#2AAC67] shadow-md px-4 py-2 focus:outline-none focus:border-green-600 text-base"
-          placeholder="Buscar por nombre o código"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="flex flex-col items-center mb-6">
+        <div className="flex w-full max-w-2xl bg-white rounded-xl shadow p-4 border border-green-100">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-12 px-3 border border-[#2AAC67] rounded-lg text-[#2AAC67] focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent"
+            placeholder="Buscar por nombre o código..."
+          />
+        </div>
       </div>
 
       {error && (
-        <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="max-w-6xl mx-auto mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mx-4">
           {error}
         </div>
       )}
 
-      {allCollaboratorsLength === 0 ? (
-        <div className="mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-center">
-          {searchTerm
-            ? `No se encontraron colaboradores con "${searchTerm}"`
-            : 'No hay colaboradores disponibles'}
-        </div>
-      ) : (
-        <>
-          <div
-            className="
-              grid
-              gap-6
-              mt-4
-              pb-8
-              grid-cols-1
-              sm:grid-cols-2
-              md:grid-cols-3
-              lg:grid-cols-4
-            "
-          >
-            {collaborators.map((colab) => (
-              <CollaboratorCard
-                key={colab.id_colaborador}
-                id={colab.id_colaborador}
-                nombre={`${colab.nombre} ${colab.apellido1} ${colab.apellido2}`}
-                puesto={colab.puesto}
-                onClick={handleCardClick}
-              />
-            ))}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+        {allCollaboratorsLength === 0 ? (
+          <div className="col-span-full text-center text-gray-400 text-lg font-semibold">
+            {searchTerm
+              ? `No se encontraron colaboradores con "${searchTerm}"`
+              : 'No hay colaboradores disponibles'}
           </div>
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-4">
-              <nav className="inline-flex space-x-2">
-                {getPagination(totalPages, page).map((p, idx) =>
-                  p === '...' ? (
-                    <span key={`ellipsis-${idx}`} className="px-3 py-1 text-gray-400 select-none">...</span>
-                  ) : (
-                    <button
-                      key={p}
-                      onClick={() => setPage(Number(p))}
-                      className={`px-3 py-1 rounded-lg border ${
-                        page === p
-                          ? 'bg-green-600 text-white border-green-600'
-                          : 'bg-white text-green-700 border-green-200 hover:bg-green-50'
-                      } transition`}
-                    >
-                      {p}
-                    </button>
-                  )
-                )}
-              </nav>
-            </div>
-          )}
-        </>
+        ) : (
+          collaborators.map((colab) => (
+            <CollaboratorCard
+              key={colab.id_colaborador}
+              id={colab.id_colaborador}
+              nombre={`${colab.nombre} ${colab.apellido1} ${colab.apellido2}`}
+              puesto={colab.puesto}
+              onClick={handleCardClick}
+            />
+          ))
+        )}
+      </div>
+
+      {totalPages > 1 && (
+        <nav className="flex justify-center items-center mt-12 gap-2 mb-6">
+          <button
+            className={`w-28 h-10 rounded-lg border-2 font-bold flex items-center justify-center transition
+              ${page === 1
+                ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                : "bg-white text-[#2BAC67] border-[#2BAC67] hover:bg-[#2BAC67] hover:text-white"}
+            `}
+            onClick={() => {
+              if (page > 1) {
+                setPage(page - 1);
+              }
+            }}
+            disabled={page === 1}
+            aria-label="Anterior"
+          >
+            {"‹ Anterior"}
+          </button>
+
+          <button
+            className={`w-28 h-10 rounded-lg border-2 font-bold flex items-center justify-center transition
+              ${page >= totalPages
+                ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                : "bg-white text-[#2BAC67] border-[#2BAC67] hover:bg-[#2BAC67] hover:text-white"}
+            `}
+            onClick={() => {
+              if (page < totalPages) {
+                setPage(page + 1);
+              }
+            }}
+            disabled={page >= totalPages}
+            aria-label="Siguiente"
+          >
+            {"Siguiente ›"}
+          </button>
+        </nav>
       )}
     </div>
   );
