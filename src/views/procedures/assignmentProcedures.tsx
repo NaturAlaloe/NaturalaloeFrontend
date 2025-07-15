@@ -1,7 +1,6 @@
 import { useRolesProceduresList } from "../../hooks/procedures/useRolesProceduresList";
 import { useRolesPoliticsList } from "../../hooks/procedures/useRolesPoliticsList";
 import { RolesProceduresProvider } from "../../hooks/procedures/RolesProceduresContext";
-import React, { useState } from "react";
 import {
   Button,
   Box,
