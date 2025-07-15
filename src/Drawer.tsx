@@ -49,6 +49,8 @@ import AddTrainingGeneral from "./views/training/generalTraining";
 import AssignRol from "./views/collaborators/assingRol";
 import { useUserFromToken } from "./hooks/useUserFromToken";
 import CapacitacionesPendientes from "./views/home/pendingTrainingsScreen";
+import KpiBatchYear from "./views/procedures/KpiBatchYear";
+
 
 
 const drawerWidth = 270;
@@ -309,46 +311,31 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               <ListItemButton
                 component={Link}
                 to="/procedures"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
+                sx={{ pl: 6, color: "#f4fcec", "&:hover": { background: "#2AAC67", color: "#fff" } }}
               >
                 <ListItemText primary="Agregar Procedimientos" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
                 to="/procedures/listProcedures"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
+                sx={{ pl: 6, color: "#f4fcec", "&:hover": { background: "#2AAC67", color: "#fff" } }}
               >
                 <ListItemText primary="Lista de Procedimientos" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
                 to="/procedures/assignmentProcedures"
-                sx={{
-                  pl: 6,
-                  color: "#f4fcec",
-                  "&:hover": {
-                    background: "#2AAC67",
-                    color: "#fff",
-                  },
-                }}
+                sx={{ pl: 6, color: "#f4fcec", "&:hover": { background: "#2AAC67", color: "#fff" } }}
               >
                 <ListItemText primary="Asignar Procedimientos" />
               </ListItemButton>
-             
+              <ListItemButton
+                component={Link}
+                to="/procedures/kpi-batch-year"
+                sx={{ pl: 6, color: "#f4fcec", "&:hover": { background: "#2AAC67", color: "#fff" } }}
+              >
+                <ListItemText primary="Crear lote de KPIs anuales" />
+              </ListItemButton>
             </List>
           </Collapse>
 
@@ -662,6 +649,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/estadisticas" element={<Estadistica/>} />
           <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
           <Route path="/home/pendingTrainingsScreen" element={<CapacitacionesPendientes />} />
+          <Route path="/procedures/kpi-batch-year" element={<KpiBatchYear />} />
         </Routes>
       </Main>
     </Box>
