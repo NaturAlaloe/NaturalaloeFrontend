@@ -50,6 +50,7 @@ export interface ICollaboratorDetailPOE {
 
 export interface ICollaboratorDetailRole {
   nombre_rol: string;
+  cedula?: string;
   puesto: string;
   departamento: string;
   area: string;
@@ -58,6 +59,7 @@ export interface ICollaboratorDetailRole {
 
 export interface ICollaboratorDetail {
   id_colaborador: number;
+  cedula?: string;
   nombre: string;
   apellido1: string;
   apellido2: string;
@@ -78,6 +80,7 @@ export const getCollaboratorDetail = async (
       if (!rolesMap[item.nombre_rol]) {
         rolesMap[item.nombre_rol] = {
           nombre_rol: item.nombre_rol,
+          cedula: item.cedula,
           puesto: item.puesto,
           departamento: item.departamento,
           area: item.area,
@@ -102,6 +105,7 @@ export const getCollaboratorDetail = async (
 
     return {
       id_colaborador: data[0].id_colaborador,
+      cedula: data[0].cedula,
       nombre: data[0].nombre,
       apellido1: data[0].apellido1,
       apellido2: data[0].apellido2,
