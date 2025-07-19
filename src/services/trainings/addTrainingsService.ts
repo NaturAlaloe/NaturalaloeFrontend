@@ -23,7 +23,6 @@ export const createCapacitacion = async (
   capacitacion: CreateCapacitacionRequest
 ): Promise<CreateCapacitacionResponse> => {
   try {
-    console.log("POST /training", capacitacion);
     const response = await api.post("/training", capacitacion);
     return {
       success: true,

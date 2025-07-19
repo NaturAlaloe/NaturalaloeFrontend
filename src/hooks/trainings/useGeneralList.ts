@@ -23,7 +23,6 @@ export function useGenerales() {
         const data = await getGenerales();
         setGenerales(data);
       } catch (error) {
-        console.error("Error al obtener los generales", error);
         showCustomToast("", "Error al obtener los generales");
       } finally {
         setLoading(false);
@@ -93,7 +92,6 @@ export function useGenerales() {
 
       closeModal();
     } catch (error) {
-      console.error("Error al guardar el general", error);
       showCustomToast("Error", "No se pudo guardar el general");
     }
   };

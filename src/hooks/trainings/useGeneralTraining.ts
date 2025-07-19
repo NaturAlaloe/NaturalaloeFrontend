@@ -168,7 +168,6 @@ export function useGeneralTraining() {
       const data = await getFacilitadores();
       setFacilitadores(data);
     } catch (error) {
-      console.error("Error al cargar facilitadores:", error);
       showCustomToast(
         "Error",
         "No se pudieron cargar los facilitadores",
@@ -197,7 +196,6 @@ export function useGeneralTraining() {
 
       setColaboradoresDisponibles(colaboradoresUnicos);
     } catch (error) {
-      console.error("Error al cargar colaboradores:", error);
       showCustomToast(
         "Error",
         "No se pudieron cargar los colaboradores",
@@ -220,7 +218,6 @@ export function useGeneralTraining() {
 
       setGeneralesDisponibles(generalesTransformadas);
     } catch (error) {
-      console.error("Error al cargar generales:", error);
       showCustomToast("Error", "No se pudieron cargar las generales", "error");
       setGeneralesDisponibles([]);
     } finally {
@@ -390,7 +387,6 @@ export function useGeneralTraining() {
           `Se registraron ${successCount} capacitaciones. ${errorCount} fallaron`,
           "info"
         );
-        console.error("Errores:", errors);
       } else {
         showCustomToast(
           "Error",
@@ -399,10 +395,8 @@ export function useGeneralTraining() {
           }`,
           "error"
         );
-        console.error("Todos los errores:", errors);
       }
     } catch (error) {
-      console.error("Error al enviar capacitación general:", error);
       showCustomToast(
         "Error",
         "Error inesperado al registrar la capacitación general",

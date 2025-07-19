@@ -122,7 +122,6 @@ export function useTrainingRegister({
       duracion: Number(form.duracionHoras) || 0,
       nota: isEvaluado ? Number(form.nota) : 0,
     };
-    console.log("Datos enviados a /training/individual:", payload);
     const ok = await register(payload);
     if (ok) {
       showCustomToast(

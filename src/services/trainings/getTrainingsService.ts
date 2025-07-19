@@ -44,17 +44,18 @@ export async function getColaboradores(): Promise<Colaboradores[]> {
 export async function getColaboradoresPendientes(): Promise<Colaboradores[]> {
   try {
     const response = await api.get("/training/pending");
-    console.log("getColaboradoresPendientes response:", response);
+
     if (response.data && response.data.data) {
       return response.data.data
-        .filter((item: any) => 
-          item.id_capacitacion === null &&
-          item.estado_capacitacion === null &&
-          item.seguimiento === null &&
-          item.comentario === null
+        .filter(
+          (item: any) =>
+            item.id_capacitacion === null &&
+            item.estado_capacitacion === null &&
+            item.seguimiento === null &&
+            item.comentario === null
         )
         .map((item: any) => ({
-          id_colaborador: item.id_colaborador, 
+          id_colaborador: item.id_colaborador,
           id_capacitacion: item.id_capacitacion,
           nombre_completo: item.nombre_completo,
           estado_capacitacion: item.estado_capacitacion,
