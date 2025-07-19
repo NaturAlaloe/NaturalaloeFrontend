@@ -1,6 +1,7 @@
 import api from "../apiConfig/api";
 export interface Facilitador {
   id_facilitador: number;
+  cedula: string;
   tipo_facilitador: string;
   disponibilidad: number;
   estado: number;
@@ -19,6 +20,7 @@ export const getColaboradoresDisponibles = async (): Promise<Facilitador[]> => {
     tipo_facilitador: "interno",
     disponibilidad: 1,
     estado: 1,
+    cedula: colab.cedula,
     nombre: colab.nombre,
     apellido1: colab.apellido1,
     apellido2: colab.apellido2,
@@ -31,6 +33,7 @@ export const createFacilitador = async (facilitador: {
   nombre: string;
   apellido1: string;
   apellido2: string;
+  cedula?: string;
   identificacion?: string;
   id_colaborador?: number;
 }) => {
