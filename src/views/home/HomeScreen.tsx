@@ -97,7 +97,6 @@ export default function HomeScreen() {
             {topCollaborators.slice(0, 3).map((col) => (
               <div
                 key={col.id_colaborador}
-                onClick={() => handleCardClick(col.id_colaborador)}
                 className="grid grid-cols-12 gap-2 px-3 py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer group last:border-b-0"
               >
 
