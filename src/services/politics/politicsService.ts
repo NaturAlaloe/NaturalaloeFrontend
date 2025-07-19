@@ -11,7 +11,7 @@ export async function createPolitics(data: FormData) {
 
 export async function getPoliticsConsecutive() {
   const response = await api.get("/police/consecutive");
-  return response.data.data[0]?.consecutivo_actual || "";
+  return response.data.data;
 }
 
 export async function getPoliticsList() {
