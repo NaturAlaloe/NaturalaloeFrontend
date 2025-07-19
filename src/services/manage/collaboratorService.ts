@@ -2,6 +2,7 @@ import api from "../../apiConfig/api";
 
 export interface ICollaborator {
   id_colaborador: string;
+  cedula: string;
   nombre: string;
   apellido1: string;
   apellido2: string;
@@ -18,6 +19,7 @@ export const getCollaborators = async (
     if (Array.isArray(response.data.data)) {
       return response.data.data.map((item: any) => ({
         id_colaborador: String(item.id_colaborador),
+        cedula: item.cedula,
         nombre: item.nombre,
         apellido1: item.apellido1,
         apellido2: item.apellido2,

@@ -3,12 +3,13 @@ import PersonIcon from '@mui/icons-material/Person';
 
 interface CollaboratorCardProps {
   id: string;
+  cedula: string;
   nombre: string;
   puesto?: string;
   onClick: (id: string) => void;
 }
 
-const CollaboratorCard: React.FC<CollaboratorCardProps> = ({ id, nombre, puesto, onClick }) => (
+const CollaboratorCard: React.FC<CollaboratorCardProps> = ({ id, cedula, nombre, puesto, onClick }) => (
   <div
     onClick={() => onClick(id)}
     className="bg-white rounded-2xl shadow-lg border border-green-100 hover:shadow-xl hover:border-green-300 transition-all duration-300 cursor-pointer flex flex-col p-6 gap-4 relative group hover:scale-105"
@@ -34,7 +35,7 @@ const CollaboratorCard: React.FC<CollaboratorCardProps> = ({ id, nombre, puesto,
     <div className="flex justify-between items-center">
       <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
        
-        ID: {id}
+        ID: {cedula}
       </span>
       
       {/* Action indicator */}
