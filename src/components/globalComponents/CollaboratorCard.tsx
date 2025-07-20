@@ -35,7 +35,7 @@ const CollaboratorCard: React.FC<CollaboratorCardProps> = ({ id, cedula, nombre,
     <div className="flex justify-between items-center">
       <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
        
-        ID: {cedula}
+      Cédula: {cedula}
       </span>
       
       {/* Action indicator */}
