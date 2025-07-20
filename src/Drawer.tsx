@@ -50,6 +50,8 @@ import AssignRol from "./views/collaborators/assingRol";
 import { useUserFromToken } from "./hooks/useUserFromToken";
 import CapacitacionesPendientes from "./views/home/pendingTrainingsScreen";
 import KpiBatchYear from "./views/procedures/KpiBatchYear";
+import PoeScreen from "./views/home/proceduresSreen";
+import CapacitacionesDepartamentos from ".//views/home/trainingScreen"
 
 
 
@@ -650,6 +652,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
           <Route path="/home/pendingTrainingsScreen" element={<CapacitacionesPendientes />} />
           <Route path="/procedures/kpi-batch-year" element={<KpiBatchYear />} />
+          <Route path="/home/trainingScreen" element={<CapacitacionesDepartamentos />} />
+          <Route path="/home/proceduresScreen" element={<PoeScreen />} />
         </Routes>
       </Main>
     </Box>
