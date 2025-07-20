@@ -19,6 +19,7 @@ export default function ViewCollaborators() {
     const [collaboratorToDelete, setCollaboratorToDelete] = useState<Collaborator | null>(null);
 
     const [editableData, setEditableData] = useState({
+        cedula: "",
         nombre: "",
         apellido1: "",
         apellido2: "",
@@ -35,7 +36,8 @@ export default function ViewCollaborators() {
                 apellido1: selectedCollaborator.apellido1,
                 apellido2: selectedCollaborator.apellido2,
                 correo: selectedCollaborator.correo,
-                numero: selectedCollaborator.numero
+                numero: selectedCollaborator.numero,
+                cedula: selectedCollaborator.cedula
             });
         }
     }, [selectedCollaborator]);
@@ -49,6 +51,7 @@ export default function ViewCollaborators() {
         if (!selectedCollaborator) return;
         const dataToUpdate = {
             id_colaborador: selectedCollaborator.id_colaborador,
+            cedula: editableData.cedula,
             nombre: editableData.nombre,
             apellido1: editableData.apellido1,
             apellido2: editableData.apellido2,
@@ -90,7 +93,7 @@ export default function ViewCollaborators() {
     });
 
     const columns = [
-        { name: "Cédula", selector: (row: Collaborator) => row.id_colaborador },
+        { name: "Cédula", selector: (row: Collaborator) => row.cedula },
         {
             name: "Nombre",
             selector: (row: Collaborator) => `${row.nombre} ${row.apellido1} ${row.apellido2}`
@@ -203,11 +206,14 @@ export default function ViewCollaborators() {
                             }
                         >
                             <div className="space-y-4">
-                                <div className="text-center text-2xl font-bold text-gray-600">
-                                    Cédula: {selectedCollaborator.id_colaborador}
-                                </div>
-
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <InputField
+                                        label="Cédula"
+                                        name="cedula"
+                                        value={editableData.cedula}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
                                     <InputField
                                         label="Nombre"
                                         name="nombre"
@@ -282,7 +288,7 @@ export default function ViewCollaborators() {
                                     {collaboratorToDelete.nombre} {collaboratorToDelete.apellido1} {collaboratorToDelete.apellido2}
                                 </p>
                                 <p className="text-sm text-gray-500">
-                                    Cédula: {collaboratorToDelete.id_colaborador}
+                                    Cédula: {collaboratorToDelete.cedula}
                                 </p>
                             </div>
                         </GlobalModal>
