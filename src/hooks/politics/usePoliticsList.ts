@@ -90,12 +90,23 @@ export default function usePoliticsList() {
       // Configurar versiones seleccionadas
       const initialSelections: Record<string, number> = {};
       data.forEach((politica: Politics) => {
-        const versionVigente = politica.versiones.find(v => v.vigente === 1);
-        if (versionVigente) {
-          initialSelections[politica.codigo_politica] = versionVigente.id_documento;
-        } else if (politica.versiones.length > 0) {
-          // Si no hay vigente, seleccionar la primera versión
-          initialSelections[politica.codigo_politica] = politica.versiones[0].id_documento;
+        if (politicsFilter === 'active') {
+          // Para políticas activas, buscar la versión vigente
+          const versionVigente = politica.versiones.find(v => v.vigente === 1);
+          if (versionVigente) {
+            initialSelections[politica.codigo_politica] = versionVigente.id_documento;
+          } else if (politica.versiones.length > 0) {
+            // Si no hay vigente, seleccionar la más reciente (último elemento del array)
+            const ultimaVersion = politica.versiones[politica.versiones.length - 1];
+            initialSelections[politica.codigo_politica] = ultimaVersion.id_documento;
+          }
+        } else {
+          // Para políticas obsoletas, seleccionar la más reciente (último elemento del array)
+          // que representa la versión que estaba vigente cuando se marcó como obsoleta
+          if (politica.versiones.length > 0) {
+            const ultimaVersion = politica.versiones[politica.versiones.length - 1];
+            initialSelections[politica.codigo_politica] = ultimaVersion.id_documento;
+          }
         }
       });
       setSelectedVersions(initialSelections);
@@ -310,7 +321,27 @@ export default function usePoliticsList() {
     if (!deletePoliticsObj) return;
     try {
       setLoading(true);
-      await obsoletePolitics(deletePoliticsObj.id_documento, razon_cambio);
+      
+      // Para obsolescencia, usar el id_documento de la versión más reciente/vigente
+      const politicaCompleta = politics.find(p => 
+        p.versiones.some(v => v.id_documento === deletePoliticsObj.id_documento)
+      );
+      
+      let idDocumentoAObsoletar = deletePoliticsObj.id_documento;
+      
+      if (politicaCompleta) {
+        // Buscar la versión vigente, o la más reciente si no hay vigente
+        const versionVigente = politicaCompleta.versiones.find(v => v.vigente === 1);
+        if (versionVigente) {
+          idDocumentoAObsoletar = versionVigente.id_documento;
+        } else {
+          // Si no hay vigente, usar la más reciente (último elemento del array)
+          const ultimaVersion = politicaCompleta.versiones[politicaCompleta.versiones.length - 1];
+          idDocumentoAObsoletar = ultimaVersion.id_documento;
+        }
+      }
+      
+      await obsoletePolitics(idDocumentoAObsoletar, razon_cambio);
       showCustomToast("Éxito", "Política marcada como obsoleta", "success");
       await loadPolitics(); // Recargar la lista
       setDeletePoliticsObj(null);
@@ -327,12 +358,14 @@ export default function usePoliticsList() {
     if (!deletePoliticsObj) return;
     try {
       setLoading(true);
+      
+      // Para reactivación, usar el id_documento que se muestra (la versión más reciente que estaba vigente)
       await unobsoletePolitics(deletePoliticsObj.id_documento, deleteReason);
       showCustomToast("Éxito", "Política reactivada exitosamente", "success");
       await loadPolitics(); // Recargar la lista
       setDeletePoliticsObj(null);
       setReasonModalOpen(false);
-      setDeleteReason(""); // Limpiar la razón
+      setDeleteReason("");
     } catch (error: any) {
       console.error("Error reactivating politics:", error);
       showCustomToast(

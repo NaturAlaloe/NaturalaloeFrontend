@@ -64,19 +64,22 @@ export default function PoliticsList() {
         const selectedVersionId = ui.selectedVersions[row.codigo_politica];
         const selectedVersion = row.versiones?.find((v: any) => v.id_documento === selectedVersionId);
         const isVigente = selectedVersion?.vigente === 1;
+        const isObsolete = ui.politicsFilter === 'obsolete';
 
         return (
           <select
             className={`border border-gray-300 rounded px-2 py-1 text-sm bg-white ${
               isVigente ? 'text-green-600 font-medium' : 'text-[#2AAC67]'
-            } ${ui.politicsFilter === 'obsolete' ? 'opacity-60' : ''}`}
+            } ${isObsolete ? 'opacity-60' : ''}`}
             value={selectedVersionId || ""}
             onChange={(e) => ui.handleVersionChange(row.codigo_politica, e.target.value)}
             style={{ minWidth: 80 }}
-            disabled={ui.politicsFilter === 'obsolete'}
+            disabled={isObsolete}
           >
             <option value="">Seleccionar</option>
-            {row.versiones?.map((version: any) => (
+            {row.versiones
+              ?.sort((a: any, b: any) => a.revision - b.revision) // Ordenar por número de revisión
+              ?.map((version: any) => (
               <option
                 key={version.id_documento}
                 value={version.id_documento}
@@ -85,7 +88,8 @@ export default function PoliticsList() {
                   fontWeight: version.vigente === 1 ? 'bold' : 'normal'
                 }}
               >
-                {version.revision} {version.vigente === 1 ? '(Vigente)' : ''}
+                {version.revision} {version.vigente === 1 ? '(Vigente)' : ''} 
+             
               </option>
             ))}
           </select>
@@ -211,7 +215,7 @@ export default function PoliticsList() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {ui.esNuevaVersion && (
                 <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">📋 Creando Nueva Versión</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">Creando Nueva Versión</h4>
                   <p className="text-gray-700 text-sm">
                     Se creará una nueva versión de la política <strong>{ui.editPoliticsObj.codigo_politica}</strong>.
                     Si marca esta versión como vigente, todas las versiones anteriores se desactivarán automáticamente.
@@ -222,7 +226,28 @@ export default function PoliticsList() {
               <StyledCheckbox
                 label="¿Es una nueva versión?"
                 checked={ui.esNuevaVersion || false}
-                onChange={(checked) => ui.setEsNuevaVersion(checked)}
+                onChange={(checked) => {
+                  ui.setEsNuevaVersion(checked);
+                  
+                  if (checked && ui.editPoliticsObj?.versiones) {
+                    // Calcular la siguiente revisión
+                    const versiones = ui.editPoliticsObj.versiones;
+                    const maxVersion = Math.max(...versiones.map((v: any) => v.revision));
+                    const nextVersion = maxVersion + 1;
+                    
+                    ui.setVersionInput(String(nextVersion));
+                    
+                    showCustomToast(
+                      "Nueva versión calculada",
+                      `Se ha asignado automáticamente la versión ${nextVersion}`,
+                      "info"
+                    );
+                  } else if (!checked) {
+                    // Si no es nueva versión, resetear a la versión actual o vacío
+                    const currentVersion = ui.editPoliticsObj?.revision || "";
+                    ui.setVersionInput(String(currentVersion));
+                  }
+                }}
               />
 
               <StyledCheckbox
@@ -307,11 +332,31 @@ export default function PoliticsList() {
 
               <div className="md:col-span-2">
                 <PdfInput
-                  label="Documento PDF (Opcional - Solo para actualizar)"
+                  label={
+                    ui.esNuevaVersion
+                      ? "Documento PDF (Opcional - Nueva versión)"
+                      : "Documento PDF (Opcional - Solo para actualizar)"
+                  }
                   pdfFile={ui.pdfFile}
                   onChange={ui.handlePdfChange}
                   onRemove={() => ui.setPdfFile(null)}
                 />
+                
+                {/* Aviso específico para nueva versión sin PDF */}
+                {ui.esNuevaVersion && !ui.pdfFile && (
+                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                    <p className="text-sm text-yellow-700">
+                      💡 <strong>Información:</strong> Se creará la nueva versión sin documento PDF asociado.
+                    </p>
+                    <p className="text-xs text-yellow-600 mt-1">
+                      Puede agregar un PDF ahora o subirlo más tarde editando esta versión.
+                    </p>
+                  </div>
+                )}
+                
+             
+                
+                {/* Mostrar PDF actual siempre que exista, incluso en nueva versión */}
                 {ui.editPoliticsObj?.ruta_documento ? (
                   <div className="mt-2 p-2 bg-gray-50 rounded border">
                     <p className="text-sm text-gray-600">
@@ -329,7 +374,10 @@ export default function PoliticsList() {
                       </button>
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Selecciona un nuevo archivo solo si deseas reemplazarlo
+                      {ui.esNuevaVersion 
+                        ? "PDF de la versión anterior - Se mantendrá para versiones previas"
+                        : "Selecciona un nuevo archivo solo si deseas reemplazarlo"
+                      }
                     </p>
                   </div>
                 ) : (
@@ -385,20 +433,14 @@ export default function PoliticsList() {
           </div>
         }
       >
-        <div className="space-y-2">
+        <div className="space-y-2 text-center">
           <p>
             {ui.politicsFilter === 'active' 
               ? "¿Estás seguro de que deseas marcar esta política como obsoleta?"
               : "¿Estás seguro de que deseas reactivar esta política?"
             }
           </p>
-          {ui.deletePoliticsObj && (
-            <div className="bg-gray-50 p-3 rounded border">
-              <p className="text-sm"><strong>Código:</strong> {ui.deletePoliticsObj.codigo_politica}</p>
-              <p className="text-sm"><strong>Título:</strong> {ui.deletePoliticsObj.descripcion}</p>
-              <p className="text-sm"><strong>Revisión:</strong> {ui.deletePoliticsObj.revision || ui.deletePoliticsObj.version}</p>
-            </div>
-          )}
+      
        
         </div>
       </GlobalModal>

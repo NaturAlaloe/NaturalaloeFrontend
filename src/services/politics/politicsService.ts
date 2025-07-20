@@ -77,3 +77,5 @@ export const unobsoletePolitics = async (
   });
   return response.data;
 };
+
+
