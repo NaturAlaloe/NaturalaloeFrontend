@@ -70,11 +70,6 @@ export function useVersionedTableColumns({
         return (
           <div className={`text-sm ${procedureFilter === 'obsolete' ? 'text-gray-500' : 'text-gray-700'}`}>
             {versionData}
-            {procedureFilter === 'obsolete' && (
-              <span className="ml-2 text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
-                OBSOLETO
-              </span>
-            )}
           </div>
         );
       }

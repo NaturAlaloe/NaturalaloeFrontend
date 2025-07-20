@@ -139,10 +139,7 @@ export function useNewProcedureForm() {
       showCustomToast("Campo requerido", "Por favor, selecciona un responsable", "error");
       return;
     }
-    if (!formData.revision || Number(formData.revision) < 1) {
-      showCustomToast("Campo requerido", "Por favor, ingresa un número de revisión válido (mayor a 0)", "error");
-      return;
-    }
+   
     if (!formData.fechaCreacion) {
       showCustomToast("Campo requerido", "Por favor, selecciona la fecha de creación", "error");
       return;

@@ -126,9 +126,9 @@ export default function Procedures() {
             name="revision"
             value={formData.revision}
             onChange={handleChange}
-            placeholder="1"
+            placeholder="0"
             type="number"
-            min="1"
+            min="0"
             step="1"
             pattern="^[0-9]+$"
             required

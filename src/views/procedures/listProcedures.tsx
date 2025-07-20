@@ -131,7 +131,7 @@ export default function ListProcedures() {
                   {controller.editModal.data.es_nueva_version && (
                     <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <h4 className="font-semibold text-gray-800 mb-2">
-                        📋 Creando Nueva Versión
+                        Creando Nueva Versión
                       </h4>
                       <p className="text-gray-700 text-sm">
                         Se creará una nueva versión del procedimiento{" "}
@@ -395,7 +395,7 @@ export default function ListProcedures() {
             </div>
           }
         >
-          <div>
+          <div className="text-center ">
             {controller.procedureFilter === 'active' 
               ? "¿Estás seguro de que deseas marcar este procedimiento como obsoleto?"
               : "¿Estás seguro de que deseas reactivar este procedimiento?"
