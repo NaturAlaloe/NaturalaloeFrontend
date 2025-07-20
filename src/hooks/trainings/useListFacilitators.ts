@@ -14,16 +14,24 @@ export function useFacilitadores() {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  const [facilitadorEditando, setFacilitadorEditando] = useState<Facilitador | null>(null);
+  const [facilitadorEditando, setFacilitadorEditando] =
+    useState<Facilitador | null>(null);
 
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const [facilitadorAEliminar, setFacilitadorAEliminar] = useState<Facilitador | null>(null);
+  const [facilitadorAEliminar, setFacilitadorAEliminar] =
+    useState<Facilitador | null>(null);
 
   useEffect(() => {
     setLoading(true);
     getFacilitadores()
       .then((data) => setFacilitadores(data))
-      .catch(() => showCustomToast("Error", "No se pudieron cargar los facilitadores", "error"))
+      .catch(() =>
+        showCustomToast(
+          "Error",
+          "No se pudieron cargar los facilitadores",
+          "error"
+        )
+      )
       .finally(() => setLoading(false));
   }, []);
 
@@ -34,11 +42,12 @@ export function useFacilitadores() {
 
   const filtered = useMemo(() => {
     const term = searchTerm.toLowerCase();
-    return facilitadores.filter((f) =>
-      f.nombre.toLowerCase().includes(term) ||
-      f.apellido1.toLowerCase().includes(term) ||
-      f.apellido2.toLowerCase().includes(term) ||
-      f.tipo_facilitador.toLowerCase().includes(term)
+    return facilitadores.filter(
+      (f) =>
+        f.nombre.toLowerCase().includes(term) ||
+        f.apellido1.toLowerCase().includes(term) ||
+        f.apellido2.toLowerCase().includes(term) ||
+        f.tipo_facilitador.toLowerCase().includes(term)
     );
   }, [facilitadores, searchTerm]);
 
@@ -48,7 +57,9 @@ export function useFacilitadores() {
     setShowEditModal(true);
   };
 
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleEditChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     if (!facilitadorEditando) return;
     const { name, value } = e.target;
     setFacilitadorEditando({
@@ -61,19 +72,14 @@ export function useFacilitadores() {
     if (e) e.preventDefault();
     if (!facilitadorEditando) return;
 
-    const { id_facilitador, nombre, apellido1, apellido2 } = facilitadorEditando;
+    const { id_facilitador, nombre, apellido1, apellido2 } =
+      facilitadorEditando;
 
     if (!nombre.trim() || !apellido1.trim() || !apellido2.trim()) {
       showCustomToast("Error", "Todos los campos son obligatorios", "error");
       return;
     }
 
-    console.log("Datos a enviar para editar:", {
-      id_facilitador,
-      nombre: nombre.trim(),
-      apellido1: apellido1.trim(),
-      apellido2: apellido2.trim(),
-    });
     const success = await updateFacilitadorById(id_facilitador, {
       nombre: nombre.trim(),
       apellido1: apellido1.trim(),
@@ -82,9 +88,15 @@ export function useFacilitadores() {
 
     if (success) {
       setFacilitadores((prev) =>
-        prev.map((f) => (f.id_facilitador === id_facilitador ? { ...facilitadorEditando } : f))
+        prev.map((f) =>
+          f.id_facilitador === id_facilitador ? { ...facilitadorEditando } : f
+        )
       );
-      showCustomToast("Éxito", "Facilitador actualizado correctamente", "success");
+      showCustomToast(
+        "Éxito",
+        "Facilitador actualizado correctamente",
+        "success"
+      );
       setShowEditModal(false);
       setFacilitadorEditando(null);
     } else {
@@ -109,7 +121,9 @@ export function useFacilitadores() {
     const success = await deleteFacilitador(id_facilitador);
 
     if (success) {
-      setFacilitadores((prev) => prev.filter((f) => f.id_facilitador !== id_facilitador));
+      setFacilitadores((prev) =>
+        prev.filter((f) => f.id_facilitador !== id_facilitador)
+      );
       showCustomToast("Éxito", "Facilitador eliminado exitosamente", "success");
     } else {
       showCustomToast("Error", "Error al eliminar el facilitador", "error");

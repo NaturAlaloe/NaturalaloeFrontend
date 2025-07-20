@@ -117,7 +117,6 @@ export function useCapacitation() {
       const data = await getFacilitadores();
       setFacilitadores(data);
     } catch (error) {
-      console.error("Error al cargar facilitadores:", error);
       showCustomToast(
         "Error",
         "No se pudieron cargar los facilitadores",
@@ -185,9 +184,6 @@ export function useCapacitation() {
             estado === "" ||
             estado === undefined;
 
-          console.log(
-            `Colaborador ${colab.nombre_completo}, estado: ${estado}, incluir: ${incluir}`
-          );
           return incluir;
         })
         .map((colab) => ({

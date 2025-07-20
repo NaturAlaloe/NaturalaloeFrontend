@@ -31,8 +31,7 @@ export const createCapacitacion = async (
       data: response.data,
     };
   } catch (error: any) {
-    console.error("Error al crear capacitación:", error);
-
+    
     const errorMessage =
       error.response?.data?.message || "Error al agendar la capacitación";
 
