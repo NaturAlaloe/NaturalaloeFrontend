@@ -13,8 +13,16 @@ export function useRegisterIndividualTraining() {
     try {
       await registerIndividualTraining(payload);
       return true;
-    } catch (error) {
-      showCustomToast("Error", "No se pudo registrar la capacitación", "error");
+    } catch (error: any) {
+      console.error("Error al registrar capacitación:", error);
+
+      // Mostrar mensaje de error más específico
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "No se pudo registrar la capacitación";
+
+      showCustomToast("Error", errorMessage, "error");
       return false;
     } finally {
       setLoading(false);

@@ -39,8 +39,8 @@ export function useTrainingRegister({
       );
       return;
     }
-    if (!form.facilitador) {
-      showCustomToast("Error", "Debe seleccionar un facilitador.", "error");
+    if (!form.facilitador || form.facilitador === "No hay facilitadores disponibles") {
+      showCustomToast("Error", "Debe seleccionar un facilitador válido.", "error");
       return;
     }
     if (!form.seguimiento) {
@@ -82,6 +82,34 @@ export function useTrainingRegister({
       return;
     }
 
+    // Validar que todos los IDs sean números válidos
+    if (!Number.isInteger(Number(id_colaborador)) || Number(id_colaborador) <= 0) {
+      showCustomToast(
+        "Error",
+        "ID de colaborador inválido.",
+        "error"
+      );
+      return;
+    }
+    
+    if (!Number.isInteger(Number(id_facilitador)) || Number(id_facilitador) <= 0) {
+      showCustomToast(
+        "Error",
+        "ID de facilitador inválido.",
+        "error"
+      );
+      return;
+    }
+    
+    if (!Number.isInteger(Number(id_documento_normativo)) || Number(id_documento_normativo) <= 0) {
+      showCustomToast(
+        "Error",
+        "ID de documento normativo inválido.",
+        "error"
+      );
+      return;
+    }
+
     if (isEvaluado) {
       if (!form.metodoEvaluacion) {
         showCustomToast(
@@ -91,37 +119,73 @@ export function useTrainingRegister({
         );
         return;
       }
-      if (
-        form.nota === "" ||
-        isNaN(Number(form.nota)) ||
-        Number(form.nota) < 0 ||
-        Number(form.nota) > 100
-      ) {
-        showCustomToast(
-          "Error",
-          "La nota debe ser un número entre 0 y 100.",
-          "error"
-        );
-        return;
+
+      const esMetodoTeorico = form.metodoEvaluacion?.toLowerCase() === "teórico";
+      const esMetodoPractico = form.metodoEvaluacion?.toLowerCase() === "práctico";
+
+      if (esMetodoTeorico) {
+        if (
+          form.nota === "" ||
+          isNaN(Number(form.nota)) ||
+          Number(form.nota) < 0 ||
+          Number(form.nota) > 100
+        ) {
+          showCustomToast(
+            "Error",
+            "La nota debe ser un número entre 0 y 100.",
+            "error"
+          );
+          return;
+        }
+      }
+
+      if (esMetodoPractico) {
+        if (!form.estadoAprobacion) {
+          showCustomToast(
+            "Error",
+            "Debe seleccionar el estado de aprobación.",
+            "error"
+          );
+          return;
+        }
       }
     }
 
+    let seguimientoFormatted = form.seguimiento.toLowerCase();
+    if (seguimientoFormatted === "reevaluación") {
+      seguimientoFormatted = "revaluacion";
+    }
+
+    let isAprobado = null;
+    if (isEvaluado && form.metodoEvaluacion?.toLowerCase() === "práctico") {
+      isAprobado = form.estadoAprobacion?.toLowerCase() === "aprobado" ? "aprobado" : "reprobado";
+    }
+    
+    // Para método teórico, aprobar automáticamente si la nota es >= 80
+    if (isEvaluado && form.metodoEvaluacion?.toLowerCase() === "teórico") {
+      const nota = Number(form.nota);
+      isAprobado = nota >= 80 ? "aprobado" : "reprobado";
+    }
+
     const payload = {
-      id_colaborador,
-      id_facilitador,
-      id_documento_normativo,
+      id_colaborador: Number(id_colaborador),
+      id_facilitador: Number(id_facilitador),
+      id_documento_normativo: Number(id_documento_normativo),
       titulo_capacitacion:
         initialData?.titulo_capacitacion || "Capacitación Individual",
       fecha_inicio: form.fechaInicio,
       fecha_fin: form.fechaFin,
-      tipo_capacitacion: "individual",
-      comentario: initialData?.comentario || "",
-      is_evaluado: isEvaluado ? 1 : 0,
+      comentario: form.comentario || "",
       metodo_empleado: isEvaluado ? form.metodoEvaluacion : null,
-      seguimiento: form.seguimiento,
+      seguimiento: seguimientoFormatted,
       duracion: Number(form.duracionHoras) || 0,
-      nota: isEvaluado ? Number(form.nota) : 0,
+      nota: isEvaluado && form.metodoEvaluacion?.toLowerCase() === "teórico" ? Number(form.nota) : 0,
+      is_aprobado: isAprobado,
+      is_evaluado: isEvaluado ? 1 : 0,
     };
+
+    console.log("Payload a enviar:", payload); // Para debugging
+
     const ok = await register(payload);
     if (ok) {
       showCustomToast(

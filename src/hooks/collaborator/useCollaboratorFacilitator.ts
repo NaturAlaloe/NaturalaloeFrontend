@@ -15,9 +15,11 @@ export default function useCollaboratorFacilitator() {
       .finally(() => setLoading(false));
   }, []);
 
-  const nombres = facilitadores.map((f) =>
-    `${f.nombre} ${f.apellido1} ${f.apellido2}`.trim()
-  );
+  const nombres = facilitadores.length > 0 
+    ? facilitadores.map((f) =>
+        `${f.nombre} ${f.apellido1} ${f.apellido2}`.trim()
+      )
+    : ["No hay facilitadores disponibles"];
 
   return { facilitadores, nombres, loading };
 }

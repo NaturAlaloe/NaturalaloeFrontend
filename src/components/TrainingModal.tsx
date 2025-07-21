@@ -16,6 +16,7 @@ interface TrainingModalProps {
 
 const metodoEvaluacionOptions = ["Teórico", "Práctico"];
 const seguimientoOptions = ["Satisfactorio", "Reprogramar", "Reevaluación"];
+const estadoAprobacionOptions = ["Aprobado", "Reprobado"];
 
 export default function TrainingModal({
   open,
@@ -33,6 +34,8 @@ export default function TrainingModal({
     seguimiento: initialData?.seguimiento || "",
     duracionHoras: initialData?.duracionHoras || "",
     nota: initialData?.nota || "",
+    estadoAprobacion: initialData?.estadoAprobacion || "",
+    comentario: initialData?.comentario || "",
   });
 
   const { facilitadores, nombres: facilitadoresList } =
@@ -48,24 +51,40 @@ export default function TrainingModal({
     });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
     const checked =
       type === "checkbox" ? (e.target as HTMLInputElement).checked : undefined;
+    
     if (name === "esEvaluado") {
       setIsEvaluado(!!checked);
     }
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    
+    // Si cambia el método de evaluación, limpiar campos relacionados
+    if (name === "metodoEvaluacion") {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+        nota: "", // Limpiar nota al cambiar método
+        estadoAprobacion: "", // Limpiar estado al cambiar método
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleRegister(isEvaluado, form);
   };
+
+  // Determinar si el método es teórico o práctico
+  const esMetodoTeorico = form.metodoEvaluacion?.toLowerCase() === "teórico";
+  const esMetodoPractico = form.metodoEvaluacion?.toLowerCase() === "práctico";
 
   return (
     <Modal
@@ -145,6 +164,7 @@ export default function TrainingModal({
                   className="bg-white"
                   min={0}
                 />
+                
                 {/* Campo facilitador con AutocompleteField */}
                 <AutocompleteField
                   label="Facilitador"
@@ -160,7 +180,9 @@ export default function TrainingModal({
                   required
                   className="bg-white"
                   placeholder="Selecciona un facilitador"
+                  noOptionsText="No hay facilitadores disponibles"
                 />
+                
                 <SelectField
                   label="Seguimiento"
                   name="seguimiento"
@@ -170,6 +192,7 @@ export default function TrainingModal({
                   className="bg-white min-h-[50px]"
                   required
                 />
+                
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -186,6 +209,7 @@ export default function TrainingModal({
                     Es Evaluado
                   </label>
                 </div>
+                
                 {isEvaluado && (
                   <>
                     <SelectField
@@ -197,20 +221,55 @@ export default function TrainingModal({
                       className="bg-white min-h-[50px]"
                       required
                     />
-                    <InputField
-                      label="Nota de la capacitación"
-                      type="number"
-                      name="nota"
-                      value={form.nota}
-                      onChange={handleChange}
-                      min={0}
-                      max={100}
-                      className="bg-white"
-                      required
-                    />
+                    
+                    {/* Campo de nota solo para método teórico */}
+                    {esMetodoTeorico && (
+                      <InputField
+                        label="Nota de la capacitación (0-100)"
+                        type="number"
+                        name="nota"
+                        value={form.nota}
+                        onChange={handleChange}
+                        min={0}
+                        max={100}
+                        className="bg-white"
+                        required
+                        placeholder="Ingrese nota entre 0 y 100"
+                      />
+                    )}
+                    
+                    {/* Campo de estado aprobación solo para método práctico */}
+                    {esMetodoPractico && (
+                      <SelectField
+                        label="Estado de aprobación"
+                        name="estadoAprobacion"
+                        value={form.estadoAprobacion}
+                        onChange={handleChange}
+                        options={estadoAprobacionOptions}
+                        className="bg-white min-h-[50px]"
+                        required
+                      />
+                    )}
                   </>
                 )}
               </div>
+
+              {/* Campo de comentario - ancho completo */}
+              <div className="mb-6">
+                <label htmlFor="comentario" className="block font-semibold text-[#2AAC67] mb-2">
+                  Comentario de la capacitación:
+                </label>
+                <textarea
+                  id="comentario"
+                  name="comentario"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] resize-y min-h-[100px] bg-white"
+                  placeholder="Agrega un comentario sobre la capacitación..."
+                  value={form.comentario}
+                  onChange={handleChange}
+                  rows={4}
+                />
+              </div>
+
               <div className="flex justify-center mt-6">
                 <button
                   type="submit"

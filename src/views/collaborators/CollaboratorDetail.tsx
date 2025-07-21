@@ -7,19 +7,40 @@ import React from "react";
 import useCollaboratorDetail from "../../hooks/collaborator/useCollaboratorDetail";
 import CollaboratorRolesList from "../../components/CollaboratorRolesList";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
+import NoProceduresMessage from "../../components/NoProceduresMessage";
 
 export default function CollaboratorDetail() {
   const { id } = useParams<{ id: string }>();
   const [refreshKey, setRefreshKey] = React.useState(0);
   const { data, loading, error } = useCollaboratorDetail(id || "", refreshKey);
 
-  if (loading) return  <FullScreenSpinner />;
-  if (error || !data)
+  if (loading) return <FullScreenSpinner />;
+  
+  // Manejar caso específico de colaborador sin procedimientos
+  if (error?.type === 'no_procedures') {
+    let nombreCompleto = "Colaborador";
+    
+    if (error.collaboratorInfo) {
+      const { nombre, apellido1, apellido2 } = error.collaboratorInfo;
+      nombreCompleto = `${nombre} ${[apellido1, apellido2].filter(Boolean).join(" ")}`.trim();
+    }
+    
+    return (
+      <NoProceduresMessage
+        collaboratorName={nombreCompleto}
+      />
+    );
+  }
+  
+  // Manejar otros tipos de errores
+  if (error || !data) {
+    const errorMessage = error?.message || "No se pudo cargar el colaborador.";
     return (
       <Box sx={{ p: 5, textAlign: "center", color: "red" }}>
-        No se pudo cargar el colaborador.
+        {errorMessage}
       </Box>
     );
+  }
 
   const personal = data.roles[0];
   const apellidos = [data.apellido1, data.apellido2].filter(Boolean).join(" ");
