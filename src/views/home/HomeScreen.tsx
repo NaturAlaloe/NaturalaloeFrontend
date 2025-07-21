@@ -62,7 +62,7 @@ export default function HomeScreen() {
                       e.stopPropagation();
                       // Navegación específica para cada KPI
                       if (kpi.label === 'Certificación del Personal') {
-                        navigate('home//trainingScreen');
+                        navigate('/home/trainingScreen');
                       } else if (kpi.label === 'Procedimientos Actualizados') {
                         navigate('/home/proceduresScreen');
                       }

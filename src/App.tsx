@@ -5,11 +5,13 @@ import CustomToaster from './components/globalComponents/CustomToaster';
 import Login from './views/login/login';
 import ChangePassword from './views/login/changePassword';
 import RecoverPassword from './views/login/recoverPassword';
+import TokenExpiredModal from './components/modals/TokenExpiredModal';
 import api from './apiConfig/api';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [showTokenExpiredModal, setShowTokenExpiredModal] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -29,6 +31,22 @@ function App() {
     checkSession();
   }, []);
 
+  // Listener para el evento de token expirado
+  useEffect(() => {
+    const handleTokenExpired = () => {
+      if (isAuthenticated) {
+        setShowTokenExpiredModal(true);
+      }
+      setIsAuthenticated(false);
+    };
+
+    window.addEventListener('tokenExpired', handleTokenExpired);
+    
+    return () => {
+      window.removeEventListener('tokenExpired', handleTokenExpired);
+    };
+  }, [isAuthenticated]);
+
   const handleLogout = async () => {
     try {
       await api.post('/logout');
@@ -39,18 +57,18 @@ function App() {
     console.log("Sesión cerrada.");
   };
 
-  useEffect(() => {
-    console.log("isAuthenticated cambió:", isAuthenticated);
-  }, [isAuthenticated]);
+  const handleCloseTokenExpiredModal = () => {
+    setShowTokenExpiredModal(false);
+  };
 
   if (checkingAuth) {
-    console.log("Verificando autenticación, mostrando loader...");
     return null; 
   }
 
   return (
     <>
       <CustomToaster />
+      
       <BrowserRouter>
         {!isAuthenticated ? (
           <Routes>
@@ -62,6 +80,12 @@ function App() {
           <Drawer onLogout={handleLogout} />
         )}
       </BrowserRouter>
+      
+
+      <TokenExpiredModal 
+        isOpen={showTokenExpiredModal} 
+        onClose={handleCloseTokenExpiredModal} 
+      />
     </>
   );
 }
