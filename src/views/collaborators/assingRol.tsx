@@ -163,7 +163,7 @@ export default function AssignRol() {
           name="busqueda"
           value={searchTerm}
           onChange={manejarCambioBusqueda}
-          placeholder="Buscar por nombre o código"
+          placeholder="Buscar Colaborador por nombre o cedula"
           className="mb-2 "
          
         />
