@@ -15,17 +15,16 @@ function App() {
 
   useEffect(() => {
     const checkSession = async () => {
-      console.log("Verificando sesión con el backend...");
+ 
       try {
-        const res = await api.get('/auth/endpoint'); 
-        console.log("Sesión válida:", res.data);
+        await api.get('/auth/endpoint');
+        
         setIsAuthenticated(true);
       } catch (err) {
         console.log("Sesión inválida o error:", err);
         setIsAuthenticated(false);
       } finally {
         setCheckingAuth(false);
-        console.log("Finalizó la verificación de sesión.");
       }
     };
     checkSession();
