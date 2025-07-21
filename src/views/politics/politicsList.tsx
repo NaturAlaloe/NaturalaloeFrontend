@@ -4,7 +4,7 @@ import GlobalModal from "../../components/globalComponents/GlobalModal";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 import InputField from "../../components/formComponents/InputField";
 import SearchBar from "../../components/globalComponents/SearchBarTable";
-import { Visibility, Edit, Delete } from "@mui/icons-material";
+import { Visibility, Edit, Delete, Restore } from "@mui/icons-material";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import usePoliticsList from "../../hooks/politics/usePoliticsList";
 import SelectAutocomplete from "../../components/formComponents/SelectAutocomplete";
@@ -23,7 +23,6 @@ export default function PoliticsList() {
       sortable: true,
       width: "110px",
     },
-
     {
       name: "Título",
       selector: (row: { descripcion: string }) => row.descripcion,
@@ -65,17 +64,22 @@ export default function PoliticsList() {
         const selectedVersionId = ui.selectedVersions[row.codigo_politica];
         const selectedVersion = row.versiones?.find((v: any) => v.id_documento === selectedVersionId);
         const isVigente = selectedVersion?.vigente === 1;
+        const isObsolete = ui.politicsFilter === 'obsolete';
 
         return (
           <select
-            className={`border border-gray-300 rounded px-2 py-1 text-sm bg-white ${isVigente ? 'text-green-600 font-medium' : 'text-[#2AAC67]'
-              }`}
+            className={`border border-gray-300 rounded px-2 py-1 text-sm bg-white ${
+              isVigente ? 'text-green-600 font-medium' : 'text-[#2AAC67]'
+            } ${isObsolete ? 'opacity-60' : ''}`}
             value={selectedVersionId || ""}
             onChange={(e) => ui.handleVersionChange(row.codigo_politica, e.target.value)}
             style={{ minWidth: 80 }}
+            disabled={isObsolete}
           >
             <option value="">Seleccionar</option>
-            {row.versiones?.map((version: any) => (
+            {row.versiones
+              ?.sort((a: any, b: any) => a.revision - b.revision) // Ordenar por número de revisión
+              ?.map((version: any) => (
               <option
                 key={version.id_documento}
                 value={version.id_documento}
@@ -84,7 +88,8 @@ export default function PoliticsList() {
                   fontWeight: version.vigente === 1 ? 'bold' : 'normal'
                 }}
               >
-                {version.revision} {version.vigente === 1 ? '(Vigente)' : ''}
+                {version.revision} {version.vigente === 1 ? '(Vigente)' : ''} 
+             
               </option>
             ))}
           </select>
@@ -95,17 +100,17 @@ export default function PoliticsList() {
       grow: 1.5,
       wrap: true,
     },
-
     {
       name: "Acciones",
       cell: (row: any) => {
         const selectedVersionId = ui.selectedVersions[row.codigo_politica];
         const selectedVersion = row.versiones?.find((v: any) => v.id_documento === selectedVersionId);
+        const isObsolete = ui.politicsFilter === 'obsolete';
 
         return (
           <div className="flex gap-2">
             <button
-              className="text-green-600 hover:text-green-800"
+              className="text-[#2AAC67] hover:text-green-700"
               title="Ver PDF"
               onClick={() => {
                 if (!selectedVersion?.ruta_documento) {
@@ -121,19 +126,27 @@ export default function PoliticsList() {
             >
               <Visibility fontSize="small" />
             </button>
+            
+            {!isObsolete && (
+              <button
+                className="text-[#2AAC67] hover:text-green-700"
+                onClick={() => ui.handleOpenEdit(row)}
+                title="Editar"
+              >
+                <Edit fontSize="small" />
+              </button>
+            )}
+            
             <button
-              className="text-[#2AAC67] hover:text-green-700"
-              onClick={() => ui.handleOpenEdit(row)}
-              title="Editar"
-            >
-              <Edit fontSize="small" />
-            </button>
-            <button
-              className="text-red-500 hover:text-red-700"
+              className={`${
+                isObsolete 
+                  ? "text-[#2AAC67] hover:text-green-700"
+                  : "text-red-500 hover:text-red-700"
+              }`}
               onClick={() => ui.handleOpenDelete(row)}
-              title="Eliminar"
+              title={isObsolete ? "Reactivar" : "Marcar como obsoleta"}
             >
-              <Delete fontSize="small" />
+              {isObsolete ? <Restore fontSize="small" /> : <Delete fontSize="small" />}
             </button>
           </div>
         );
@@ -149,14 +162,30 @@ export default function PoliticsList() {
   return (
     <TableContainer title="Políticas">
       {ui.loading && <FullScreenSpinner />}
-      <div className="flex items-center justify-between mb-4">
+      
+      <div className="flex items-center justify-between mb-4 gap-4">
+    
+       
+
         <SearchBar
           value={ui.search}
           onChange={ui.setSearch}
-          placeholder="Buscar política..."
-          className="w-full mr-4"
+          placeholder={`Buscar ${ui.politicsFilter === 'active' ? 'políticas activas' : 'políticas obsoletas'}...`}
+          className="flex-1"
         />
+         <div className="flex items-center gap-2">
+         
+          <select
+            className="border border-gray-300 rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent hover:border-gray-400"
+            value={ui.politicsFilter}
+            onChange={(e) => ui.handleFilterChange(e.target.value as 'active' | 'obsolete')}
+          >
+            <option  value="active">Políticas Activas</option>
+            <option value="obsolete">Políticas Obsoletas</option>
+          </select>
+        </div>
       </div>
+
       <GlobalDataTable
         columns={columns}
         data={ui.filteredPolitics}
@@ -166,12 +195,11 @@ export default function PoliticsList() {
         onChangePage={ui.setCurrentPage}
       />
 
+      {/* Modal de edición - solo para políticas activas */}
       <GlobalModal
         open={ui.modalOpen}
         onClose={() => !ui.saving && ui.setModalOpen(false)}
-        title={
-          ""
-        }
+        title=""
         maxWidth="lg"
         backgroundColor="#DDF6E8"
       >
@@ -187,7 +215,7 @@ export default function PoliticsList() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {ui.esNuevaVersion && (
                 <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">📋 Creando Nueva Versión</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">Creando Nueva Versión</h4>
                   <p className="text-gray-700 text-sm">
                     Se creará una nueva versión de la política <strong>{ui.editPoliticsObj.codigo_politica}</strong>.
                     Si marca esta versión como vigente, todas las versiones anteriores se desactivarán automáticamente.
@@ -198,17 +226,35 @@ export default function PoliticsList() {
               <StyledCheckbox
                 label="¿Es una nueva versión?"
                 checked={ui.esNuevaVersion || false}
-                onChange={(checked) => ui.setEsNuevaVersion(checked)}
-
+                onChange={(checked) => {
+                  ui.setEsNuevaVersion(checked);
+                  
+                  if (checked && ui.editPoliticsObj?.versiones) {
+                    // Calcular la siguiente revisión
+                    const versiones = ui.editPoliticsObj.versiones;
+                    const maxVersion = Math.max(...versiones.map((v: any) => v.revision));
+                    const nextVersion = maxVersion + 1;
+                    
+                    ui.setVersionInput(String(nextVersion));
+                    
+                    showCustomToast(
+                      "Nueva versión calculada",
+                      `Se ha asignado automáticamente la versión ${nextVersion}`,
+                      "info"
+                    );
+                  } else if (!checked) {
+                    // Si no es nueva versión, resetear a la versión actual o vacío
+                    const currentVersion = ui.editPoliticsObj?.revision || "";
+                    ui.setVersionInput(String(currentVersion));
+                  }
+                }}
               />
 
               <StyledCheckbox
                 label="¿Es Vigente?"
                 checked={ui.esVigente || false}
                 onChange={(checked) => ui.setEsVigente(checked)}
-
               />
-
 
               <InputField
                 label="Código"
@@ -227,7 +273,6 @@ export default function PoliticsList() {
                 disabled
               />
 
-
               <InputField
                 label="Título"
                 name="titulo"
@@ -237,7 +282,6 @@ export default function PoliticsList() {
                 required
                 className="w-full"
                 disabled={ui.saving}
-                
               />
 
               <SelectAutocomplete
@@ -288,11 +332,31 @@ export default function PoliticsList() {
 
               <div className="md:col-span-2">
                 <PdfInput
-                  label="Documento PDF (Opcional - Solo para actualizar)"
+                  label={
+                    ui.esNuevaVersion
+                      ? "Documento PDF (Opcional - Nueva versión)"
+                      : "Documento PDF (Opcional - Solo para actualizar)"
+                  }
                   pdfFile={ui.pdfFile}
                   onChange={ui.handlePdfChange}
                   onRemove={() => ui.setPdfFile(null)}
                 />
+                
+                {/* Aviso específico para nueva versión sin PDF */}
+                {ui.esNuevaVersion && !ui.pdfFile && (
+                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                    <p className="text-sm text-yellow-700">
+                      💡 <strong>Información:</strong> Se creará la nueva versión sin documento PDF asociado.
+                    </p>
+                    <p className="text-xs text-yellow-600 mt-1">
+                      Puede agregar un PDF ahora o subirlo más tarde editando esta versión.
+                    </p>
+                  </div>
+                )}
+                
+             
+                
+                {/* Mostrar PDF actual siempre que exista, incluso en nueva versión */}
                 {ui.editPoliticsObj?.ruta_documento ? (
                   <div className="mt-2 p-2 bg-gray-50 rounded border">
                     <p className="text-sm text-gray-600">
@@ -310,7 +374,10 @@ export default function PoliticsList() {
                       </button>
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Selecciona un nuevo archivo solo si deseas reemplazarlo
+                      {ui.esNuevaVersion 
+                        ? "PDF de la versión anterior - Se mantendrá para versiones previas"
+                        : "Selecciona un nuevo archivo solo si deseas reemplazarlo"
+                      }
                     </p>
                   </div>
                 ) : (
@@ -327,8 +394,7 @@ export default function PoliticsList() {
             </div>
 
             <div className="text-center mt-8">
-            <SubmitButton width="w-40" loading={ui.saving} disabled={ui.saving}>
-
+              <SubmitButton width="w-40" loading={ui.saving} disabled={ui.saving}>
                 {ui.saving
                   ? (ui.esNuevaVersion ? "Creando Versión..." : "Actualizando...")
                   : (ui.esNuevaVersion ? "Crear Nueva Versión" : "Guardar Cambios")
@@ -339,10 +405,11 @@ export default function PoliticsList() {
         )}
       </GlobalModal>
 
+      {/* Modal de confirmación para obsolescencia/reactivación */}
       <GlobalModal
         open={ui.deletePoliticsObj !== null}
         onClose={() => ui.setDeletePoliticsObj(null)}
-        title="Marcar como obsoleto"
+        title={ui.politicsFilter === 'active' ? "Marcar como obsoleto" : "Reactivar política"}
         maxWidth="sm"
         actions={
           <div className="flex gap-2">
@@ -354,22 +421,35 @@ export default function PoliticsList() {
               Cancelar
             </SubmitButton>
             <SubmitButton
-              className="bg-red-500 hover:bg-red-600"
+              className={ui.politicsFilter === 'active' 
+                ? "bg-red-500 hover:bg-red-600" 
+                : "bg-{#2BAC69} hover:bg-green-700"
+              }
               type="button"
               onClick={ui.handleAskReason}
             >
-              Eliminar
+              {ui.politicsFilter === 'active' ? "Continuar" : "Continuar"}
             </SubmitButton>
           </div>
         }
       >
-        <div>¿Estás seguro de que deseas marcar esta política como obsoleta?</div>
+        <div className="space-y-2 text-center">
+          <p>
+            {ui.politicsFilter === 'active' 
+              ? "¿Estás seguro de que deseas marcar esta política como obsoleta?"
+              : "¿Estás seguro de que deseas reactivar esta política?"
+            }
+          </p>
+      
+       
+        </div>
       </GlobalModal>
 
+      {/* Modal para razón de obsolescencia o reactivación */}
       <GlobalModal
         open={ui.reasonModalOpen}
         onClose={() => ui.setReasonModalOpen(false)}
-        title="Razón de obsolescencia"
+        title={ui.politicsFilter === 'active' ? "Razón de obsolescencia" : "Razón de reactivación"}
         maxWidth="sm"
         actions={
           <div className="flex gap-2">
@@ -382,31 +462,41 @@ export default function PoliticsList() {
               Cancelar
             </SubmitButton>
             <SubmitButton
-              className="bg-red-500 hover:bg-red-600"
+              className={ui.politicsFilter === 'active' 
+                ? "bg-red-500 hover:bg-red-600" 
+                : "bg-{#2BAC67} hover:bg-green-700"
+              }
               type="button"
               onClick={ui.handleConfirmDelete}
               disabled={!ui.deleteReason.trim() || ui.loading}
               loading={ui.loading}
             >
-              Confirmar
+              {ui.politicsFilter === 'active' ? "Confirmar obsolescencia" : "Confirmar reactivación"}
             </SubmitButton>
           </div>
         }
       >
         <div>
           <label className="block mb-2 font-medium text-gray-700">
-            Escribe la razón por la que esta política será marcada como obsoleta:
+            {ui.politicsFilter === 'active' 
+              ? "Escribe la razón por la que esta política será marcada como obsoleta:"
+              : "Escribe la razón por la que esta política será reactivada:"
+            }
           </label>
           <textarea
-            className="w-full border border-gray-300 rounded p-2"
+            className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent"
             rows={3}
             value={ui.deleteReason}
             onChange={e => ui.setDeleteReason(e.target.value)}
-            placeholder="Motivo de obsolescencia"
+            placeholder={ui.politicsFilter === 'active' 
+              ? "Ej: Política actualizada por cambios normativos..."
+              : "Ej: Se requiere reactivar esta política por cambios organizacionales..."
+            }
             autoFocus
             required
             disabled={ui.loading}
           />
+          
         </div>
       </GlobalModal>
     </TableContainer>

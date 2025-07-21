@@ -5,7 +5,19 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // <-- Esto permite enviar y recibir cookies
+  withCredentials: true, 
 });
 
-export default api;
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // Token vencido o no válido
+      const event = new CustomEvent('tokenExpired');
+      window.dispatchEvent(event);
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;

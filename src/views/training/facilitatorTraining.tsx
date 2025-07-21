@@ -8,6 +8,7 @@ export default function FacilitatorTraining() {
   const {
     tipo,
     internoSeleccionado,
+    cedula,
     nombre,
     apellido1,
     apellido2,
@@ -61,7 +62,7 @@ export default function FacilitatorTraining() {
           <InputField
             label="Identificación"
             name="identificacion"
-            value={identificacion}
+            value={cedula}
             onChange={(e) => setIdentificacion(e.target.value)}
             required
             readOnly

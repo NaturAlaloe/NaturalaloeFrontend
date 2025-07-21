@@ -47,24 +47,23 @@ export const getActiveProcedures = async (): Promise<Procedure[]> => {
   }
 };
 
-export const updateProcedure = async (data: any) => {
-  const formData = new FormData();
-  formData.append("id_documento", data.id_documento);
-  formData.append("descripcion", data.descripcion);
-  formData.append("id_responsable", data.id_responsable);
-  formData.append("fecha_creacion", data.fecha_creacion);
-  formData.append("fecha_vigencia", data.fecha_vigencia);
-  if (data.pdf instanceof File) {
-    formData.append("pdf", data.pdf);
-  }
-  // ...otros campos
+// Nueva función para obtener procedimientos obsoletos
+export const getObsoleteProcedures = async () => {
+  try {
+    const response = await api.get("/procedure/obsolete/versions");
+    
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Error al obtener procedimientos obsoletos");
+    }
 
-  const response = await api.post("/ruta-actualizar", formData, {
-    headers: { "Content-Type": "multipart/form-data" }
-  });
-  return response.data;
+    return response.data.data;
+  } catch (error) {
+    console.error("Error in getObsoleteProcedures:", error);
+    throw new Error("No se pudieron cargar los procedimientos obsoletos");
+  }
 };
 
+// OBSOLETAR POES
 export const obsoleteProcedure = async (id_documento: number, razon_cambio: string) => {
   try {
     const response = await api.put("/procedure/obsolete", {
@@ -75,5 +74,19 @@ export const obsoleteProcedure = async (id_documento: number, razon_cambio: stri
     return response.data;
   } catch (error: any) {
     throw error.response?.data || { success: false, message: "Error al marcar como obsoleto" };
+  }
+};
+
+// Nueva función para reactivar procedimientos
+export const unobsoleteProcedure = async (id_documento: number, razon_cambio: string) => {
+  try {
+    console.log("Reactivating procedure with ID:", id_documento, "Reason:", razon_cambio);
+    const response = await api.put("/procedure/unobsolete", {
+      id_documento,
+      razon_cambio,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || { success: false, message: "Error al reactivar procedimiento" };
   }
 };

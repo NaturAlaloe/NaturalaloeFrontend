@@ -11,7 +11,7 @@ export async function createPolitics(data: FormData) {
 
 export async function getPoliticsConsecutive() {
   const response = await api.get("/police/consecutive");
-  return response.data.data[0]?.consecutivo_actual || "";
+  return response.data.data;
 }
 
 export async function getPoliticsList() {
@@ -19,14 +19,16 @@ export async function getPoliticsList() {
   return response.data.data; 
 }
 
-
-
 export async function getActivePolitics() {
   const response = await api.get("/policeActive");
   return response.data.data;
 }
 
-
+// Nueva función para obtener políticas obsoletas
+export async function getObsoletePolitics() {
+  const response = await api.get("/police/obsolete");
+  return response.data.data;
+}
 
 export const updatePolitics = async (
   formData: FormData
@@ -49,7 +51,9 @@ export const createNewPoliticsVersion = async (
       });
       return response.data;
     };
-    
+
+
+  //MALA 
 export const obsoletePolitics = async (
   id_documento: number,
   razon_cambio: string
@@ -61,3 +65,17 @@ export const obsoletePolitics = async (
   });
   return response.data;
 };
+
+export const unobsoletePolitics = async (
+  id_documento: number,
+  razon_cambio: string
+) => {
+  console.log("Reactivating politics with ID:", id_documento, "Reason:", razon_cambio);
+  const response = await api.put(`/police/unobsolete`, {
+    id_documento,
+    razon_cambio,
+  });
+  return response.data;
+};
+
+

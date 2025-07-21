@@ -9,7 +9,6 @@ export interface Area {
 
 export const getAreas = async (): Promise<Area[]> => {
   const res = await api.get("/area");
-  console.log("getAreas response:", res.data);
   if (Array.isArray(res.data)) return res.data;
   if (Array.isArray(res.data.data)) return res.data.data;
   if (Array.isArray(res.data.areas)) return res.data.areas;

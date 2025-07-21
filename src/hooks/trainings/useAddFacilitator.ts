@@ -9,6 +9,7 @@ import { showCustomToast } from "../../components/globalComponents/CustomToaster
 export const useFacilitatorForm = () => {
   const [tipo, setTipo] = useState("");
   const [internoSeleccionado, setInternoSeleccionado] = useState("");
+  const [cedula, setCedula] = useState("");
   const [nombre, setNombre] = useState("");
   const [apellido1, setApellido1] = useState("");
   const [apellido2, setApellido2] = useState("");
@@ -45,6 +46,7 @@ export const useFacilitatorForm = () => {
       (f) => f.id_facilitador.toString() === id
     );
     if (found) {
+      setCedula(found.cedula);
       setNombre(found.nombre);
       setApellido1(found.apellido1);
       setApellido2(found.apellido2);
@@ -96,6 +98,7 @@ export const useFacilitatorForm = () => {
     tipo,
     setTipo,
     internoSeleccionado,
+    cedula,
     nombre,
     setNombre,
     apellido1,

@@ -6,14 +6,14 @@ import ChartSelector from '../../components/home/ChartSelector';
 import { Typography } from '@mui/material';
 
 const kpiList = [
-  { label: 'Procedimientos Actualizados', value: '87.0%', trend: '+1.5%', color: 'bg-green-50 text-green-700' },
-  { label: 'Políticas Actualizadas', value: '95.0%', trend: '+2.5%', color: 'bg-yellow-50 text-yellow-700' },
-  { label: 'Certificación del Personal', value: '90.0%', trend: '+3.0%', color: 'bg-blue-50 text-blue-700' },
+  { label: 'Certificación del Personal', value: '90.0%', trend: '+3.0%', color: 'bg-blue-50 text-blue-700', hasScreen: true },
+  { label: 'Procedimientos Actualizados', value: '87.0%', trend: '+1.5%', color: 'bg-green-50 text-green-700', hasScreen: true },
+  { label: 'Políticas Actualizadas', value: '95.0%', trend: '+2.5%', color: 'bg-yellow-50 text-yellow-700', hasScreen: false },
 ];
 
 export default function HomeScreen() {
   const navigate = useNavigate();
-  const { loading: homeLoading, topCollaborators, totalPending, handleCardClick } = useHomeData();
+  const { loading: homeLoading, topCollaborators, totalPending } = useHomeData();
 
   if (homeLoading) {
     return <FullScreenSpinner />;
@@ -26,21 +26,27 @@ export default function HomeScreen() {
         <h1 className="text-3xl font-bold text-green-800 text-center">Dashboard de Indicadores</h1>
       </div>
 
-
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
 
         <div className="lg:col-span-3">
           <ChartSelector />
         </div>
 
- 
         <div className="flex flex-col gap-5">
           {kpiList.map((kpi, idx) => (
             <div
               key={idx}
-              className="rounded-xl shadow-gray-300 shadow p-6 flex flex-col justify-between items-start border-l-4 border-green-600 bg-white cursor-pointer transition hover:shadow-lg relative"
+              className={`rounded-xl shadow-gray-300 shadow p-6 flex flex-col justify-between items-start border-l-4 border-green-600 bg-white transition hover:shadow-lg relative ${
+                kpi.hasScreen ? 'cursor-pointer' : 'cursor-default'
+              }`}
               onClick={() => {
-                // Aquí puedes navegar o abrir el apartado correspondiente
+                if (!kpi.hasScreen) return;
+                // Navegación específica para cada KPI
+                if (kpi.label === 'Certificación del Personal') {
+                  navigate('/home/trainingScreen');
+                } else if (kpi.label === 'Procedimientos Actualizados') {
+                  navigate('/home/proceduresScreen');
+                }
               }}
             >
               <span className="text-gray-500 text-sm mb-2">{kpi.label}</span>
@@ -49,23 +55,30 @@ export default function HomeScreen() {
                 Última actualización: Julio 2025
               </span>
               <div className="flex w-full justify-end mt-4">
-                <button
-                  className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-semibold hover:bg-green-200 transition"
-                  onClick={e => {
-                    e.stopPropagation();
-                    // Aquí puedes navegar o abrir el apartado correspondiente
-                  }}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                {kpi.hasScreen && (
+                  <button
+                    className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-semibold hover:bg-green-200 transition"
+                    onClick={e => {
+                      e.stopPropagation();
+                      // Navegación específica para cada KPI
+                      if (kpi.label === 'Certificación del Personal') {
+                        navigate('/home/trainingScreen');
+                      } else if (kpi.label === 'Procedimientos Actualizados') {
+                        navigate('/home/proceduresScreen');
+                      }
+                    }}
+                  >
+              
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
-
 
       <div className="bg-white rounded-xl shadow-gray-300 shadow p-4 transition hover:shadow-lg">
         <div className="flex justify-between items-center mb-4">
@@ -85,7 +98,6 @@ export default function HomeScreen() {
           </div>
         ) : (
           <div className="mb-4">
- 
             <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-gray-50 rounded-lg mb-1 text-xs font-semibold text-gray-600">
               <div className="col-span-5">Colaborador</div>
               <div className="col-span-3">Área</div>
@@ -93,14 +105,11 @@ export default function HomeScreen() {
               <div className="col-span-2 text-center">Pendientes</div>
             </div>
             
- 
             {topCollaborators.slice(0, 3).map((col) => (
               <div
                 key={col.id_colaborador}
-                onClick={() => handleCardClick(col.id_colaborador)}
                 className="grid grid-cols-12 gap-2 px-3 py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer group last:border-b-0"
               >
-
                 <div className="col-span-5">
                   <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
@@ -114,17 +123,14 @@ export default function HomeScreen() {
                   </div>
                 </div>
                 
-  
                 <div className="col-span-3 flex items-center">
                   <span className="text-xs text-gray-700 truncate">{col.area}</span>
                 </div>
                 
-   
                 <div className="col-span-2 flex items-center">
                   <span className="text-xs text-gray-700 truncate">{col.departamento}</span>
                 </div>
                 
-   
                 <div className="col-span-2 flex justify-center items-center">
                   <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold">
                     {col.pendingCount}
