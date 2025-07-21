@@ -88,20 +88,7 @@ export function useNewProcedureForm() {
     lastConsecutive
   );
 
-  // Debug logs para ver qué está pasando
-  useEffect(() => {
-    console.log("🔍 Debug - Estados actuales:");
-    console.log("- formData.area:", formData.area);
-    console.log("- formData.departamento:", formData.departamento);
-    console.log("- formData.categoria:", formData.categoria);
-    console.log("- areaSeleccionada:", areaSeleccionada);
-    console.log("- departamentoSeleccionado:", departamentoSeleccionado);
-    console.log("- categoriaSeleccionada:", categoriaSeleccionada);
-    console.log("- lastConsecutive:", lastConsecutive);
-    console.log("- codeVisual:", codeVisual);
-    console.log("- codeApi:", codeApi);
-  }, [formData, areaSeleccionada, departamentoSeleccionado, categoriaSeleccionada, lastConsecutive, codeVisual, codeApi]);
-
+  
   // PDF
   const { pdfFile, setPdfFile, handlePdfChange } = usePdfInput();
 
@@ -139,10 +126,7 @@ export function useNewProcedureForm() {
       showCustomToast("Campo requerido", "Por favor, selecciona un responsable", "error");
       return;
     }
-    if (!formData.revision || Number(formData.revision) < 1) {
-      showCustomToast("Campo requerido", "Por favor, ingresa un número de revisión válido (mayor a 0)", "error");
-      return;
-    }
+   
     if (!formData.fechaCreacion) {
       showCustomToast("Campo requerido", "Por favor, selecciona la fecha de creación", "error");
       return;
