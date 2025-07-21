@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://naturalaloebackend-production.up.railway.app/api',
+  baseURL: 'https://10.50.31.139/api',
   headers: {
     'Content-Type': 'application/json',
   },
