@@ -5,7 +5,9 @@ import { useProcedureEdit } from "./useProcedureEdit";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { updateProcedure } from "../../services/procedures/updateProcedureService";
 import { increaseVersion } from "../../services/procedures/increaseVersionService";
-import { obsoleteProcedure } from "../../services/procedures/procedureService";
+import { obsoleteProcedure, unobsoleteProcedure, getObsoleteProcedures } from "../../services/procedures/procedureService";
+
+type ProcedureFilter = 'active' | 'obsolete';
 
 export function useVersionedProceduresController() {
   // Hook principal de datos con versiones
@@ -19,6 +21,11 @@ export function useVersionedProceduresController() {
   // Hook de responsables
   const { responsibles, loading: loadingResponsibles } = useResponsibles();
 
+  // Estado para el filtro de procedimientos
+  const [procedureFilter, setProcedureFilter] = useState<ProcedureFilter>('active');
+  const [obsoleteProcedures, setObsoleteProcedures] = useState<any[]>([]);
+  const [loadingObsolete, setLoadingObsolete] = useState(false);
+
   // Estado para control de versiones seleccionadas por fila
   const [selectedRevision, setSelectedRevision] = useState<Record<string, number>>({});
 
@@ -27,11 +34,46 @@ export function useVersionedProceduresController() {
   const [departmentFilter, setDepartmentFilter] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Estado para obsoletar
+  // Estado para obsoletar/reactivar
   const [obsoleteModal, setObsoleteModal] = useState<{ open: boolean, id?: number }>({ open: false, id: undefined });
   const [reasonModal, setReasonModal] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
   const [obsoleteLoading, setObsoleteLoading] = useState(false);
+
+  // Función para cargar procedimientos obsoletos
+  const loadObsoleteProcedures = async () => {
+    setLoadingObsolete(true);
+    try {
+      const data = await getObsoleteProcedures();
+      console.log("Procedimientos obsoletos cargados:", data);
+      setObsoleteProcedures(data);
+    } catch (error) {
+      console.error("Error loading obsolete procedures:", error);
+      showCustomToast("Error", "No se pudieron cargar los procedimientos obsoletos", "error");
+      setObsoleteProcedures([]);
+    } finally {
+      setLoadingObsolete(false);
+    }
+  };
+
+  // Cargar procedimientos obsoletos cuando se selecciona el filtro
+  useEffect(() => {
+    if (procedureFilter === 'obsolete') {
+      loadObsoleteProcedures();
+    }
+  }, [procedureFilter]);
+
+  // Función para manejar el cambio de filtro
+  const handleFilterChange = (filter: ProcedureFilter) => {
+    setProcedureFilter(filter);
+    setCurrentPage(1);
+    setSearch("");
+    setSelectedRevision({});
+  };
+
+  // Obtener los procedimientos según el filtro actual
+  const currentProcedures = procedureFilter === 'active' ? versionProcedures : obsoleteProcedures;
+  const currentLoading = procedureFilter === 'active' ? versionLoading : loadingObsolete;
 
   // Resetear página cuando cambien los filtros
   useEffect(() => {
@@ -40,19 +82,21 @@ export function useVersionedProceduresController() {
 
   // Inicializar versiones seleccionadas por defecto con la versión vigente
   useEffect(() => {
-    if (versionProcedures.length > 0) {
+    if (currentProcedures.length > 0) {
       const initialSelection: Record<string, number> = {};
-      versionProcedures.forEach((proc) => {
-        // Buscar la versión vigente (vigente = 1)
-        const vigenteIndex = proc.versiones.findIndex(v => v.vigente === 1);
-        // Si no hay versión vigente, usar la última versión
-        initialSelection[proc.codigo_poe] = vigenteIndex !== -1 ? vigenteIndex : proc.versiones.length - 1;
+      currentProcedures.forEach((proc) => {
+        if (proc.versiones && Array.isArray(proc.versiones)) {
+          // Buscar la versión vigente (vigente = 1)
+          const vigenteIndex = proc.versiones.findIndex((v: { vigente: number }) => v.vigente === 1);
+          // Si no hay versión vigente, usar la última versión
+          initialSelection[proc.codigo_poe] = vigenteIndex !== -1 ? vigenteIndex : proc.versiones.length - 1;
+        }
       });
       setSelectedRevision(initialSelection);
     }
-  }, [versionProcedures]);
+  }, [currentProcedures]);
 
-  // Acciones de edición
+  // Acciones de edición - solo para procedimientos activos
   const editActions = useProcedureEdit({
     responsibles,
     updateProcedure: async (data: any) => {
@@ -68,14 +112,14 @@ export function useVersionedProceduresController() {
             fecha_creacion: data.fecha_creacion,
             fecha_vigencia: data.fecha_vigencia,
             vigente: data.es_vigente ? 1 : 0,
-            version_actual: data.es_vigente ? 1 : 0, // Si es vigente, también es versión actual
+            version_actual: data.es_vigente ? 1 : 0,
             documento: data.pdf || undefined,
           };
           
           await increaseVersion(newVersionData);
           return { success: true };
         } else {
-          // Actualizar procedimiento existente usando PUT /procedureList
+          // Actualizar procedimiento existente
           const updateData = {
             id_documento: data.id_documento,
             codigo: data.codigo,
@@ -86,7 +130,7 @@ export function useVersionedProceduresController() {
             fecha_creacion: data.fecha_creacion,
             fecha_vigencia: data.fecha_vigencia,
             vigente: data.es_vigente ? 1 : 0,
-            version_actual: data.es_vigente ? 1 : 0, // Si es vigente, también es versión actual
+            version_actual: data.es_vigente ? 1 : 0,
             documento: data.pdf || undefined,
           };
           
@@ -96,7 +140,6 @@ export function useVersionedProceduresController() {
       } catch (error: any) {
         console.error("Error al actualizar procedimiento:", error);
         
-        // Mejorar el manejo de errores con mensajes más específicos
         let errorMessage = "Error inesperado al actualizar el procedimiento";
         
         if (error?.response?.status === 400) {
@@ -117,7 +160,7 @@ export function useVersionedProceduresController() {
         };
       }
     },
-    fetchProcedures: refetchProcedures,
+    fetchProcedures: procedureFilter === 'active' ? refetchProcedures : loadObsoleteProcedures,
   });
 
   // Handler estable para cambiar versión seleccionada
@@ -138,7 +181,7 @@ export function useVersionedProceduresController() {
   }, [selectedRevision]);
 
   // Filtrar procedimientos
-  const filteredProcedures = versionProcedures.filter((proc) => {
+  const filteredProcedures = currentProcedures.filter((proc) => {
     const matchesSearch = 
       proc.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       proc.codigo_poe?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -152,12 +195,17 @@ export function useVersionedProceduresController() {
 
   // Obtener lista única de departamentos
   const departments = Array.from(
-    new Set(versionProcedures.map((p) => p.departamento).filter(Boolean))
+    new Set(currentProcedures.map((p) => p.departamento).filter(Boolean))
   );
+
+  // Función para buscar
+  const setSearch = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
 
   // Función para ver PDF
   const handleViewPdf = useCallback((procedure: any) => {
-    // Obtener la versión seleccionada del procedimiento
     const versionIndex = selectedRevision[procedure.codigo_poe] ?? procedure.versiones.length - 1;
     const selectedVersion = procedure.versiones[versionIndex];
     
@@ -178,20 +226,35 @@ export function useVersionedProceduresController() {
     }
   }, [selectedRevision]);
 
-  // Handler para marcar como obsoleto
+  // Handler para marcar como obsoleto o reactivar
   const handleAskObsolete = (id_documento: number) => setObsoleteModal({ open: true, id: id_documento });
-  const handleConfirmObsolete = async () => {
+  
+  const handleAskReason = () => {
+    setDeleteReason("");
+    setReasonModal(true);
+  };
+
+  const handleConfirmAction = async () => {
     if (!obsoleteModal.id || !deleteReason.trim()) return;
+    
     setObsoleteLoading(true);
     try {
-      await obsoleteProcedure(obsoleteModal.id, deleteReason);
-      showCustomToast("Procedimiento obsoleto", "El procedimiento fue marcado como obsoleto.", "success");
+      if (procedureFilter === 'active') {
+        await obsoleteProcedure(obsoleteModal.id, deleteReason);
+        showCustomToast("Procedimiento obsoleto", "El procedimiento fue marcado como obsoleto.", "success");
+        await refetchProcedures();
+      } else {
+        await unobsoleteProcedure(obsoleteModal.id, deleteReason);
+        showCustomToast("Procedimiento reactivado", "El procedimiento fue reactivado exitosamente.", "success");
+        await loadObsoleteProcedures();
+      }
+      
       setReasonModal(false);
       setObsoleteModal({ open: false, id: undefined });
       setDeleteReason("");
-      refetchProcedures();
-    } catch (e) {
-      showCustomToast("Error", "No se pudo marcar como obsoleto.", "error");
+    } catch (e: any) {
+      const action = procedureFilter === 'active' ? 'marcar como obsoleto' : 'reactivar';
+      showCustomToast("Error", `No se pudo ${action} el procedimiento.`, "error");
     } finally {
       setObsoleteLoading(false);
     }
@@ -200,11 +263,15 @@ export function useVersionedProceduresController() {
   return {
     // Datos
     procedures: filteredProcedures,
-    loading: versionLoading,
+    loading: currentLoading,
     error: versionError,
     responsibles,
     loadingResponsibles,
     departments,
+
+    // Filtro de procedimientos
+    procedureFilter,
+    handleFilterChange,
 
     // Control de versiones
     selectedRevision,
@@ -213,7 +280,7 @@ export function useVersionedProceduresController() {
 
     // Filtros y búsqueda
     searchTerm,
-    setSearchTerm,
+    setSearchTerm: setSearch,
     departmentFilter,
     setDepartmentFilter,
     currentPage,
@@ -221,26 +288,28 @@ export function useVersionedProceduresController() {
 
     // Acciones
     handleEdit: (procedure: any) => {
-      // Obtener la versión seleccionada del procedimiento
+      // Solo permitir edición en procedimientos activos
+      if (procedureFilter === 'obsolete') {
+        showCustomToast("Información", "No se pueden editar procedimientos obsoletos", "info");
+        return;
+      }
+      
       const versionIndex = selectedRevision[procedure.codigo_poe] ?? procedure.versiones.length - 1;
       const selectedVersion = procedure.versiones[versionIndex];
       
-      // Preparar los datos en el formato que espera useProcedureEdit
       const editData = {
-        // Campos requeridos por la interfaz Procedure
         id_documento: selectedVersion.id_documento,
         descripcion: selectedVersion.titulo,
         fecha_creacion: procedure.fecha_creacion,
         codigo: procedure.codigo_poe,
-        id_poe: null, // No disponible en la nueva estructura
-        titulo: selectedVersion.titulo, // useProcedureEdit usa este campo para el mapeo
+        id_poe: null,
+        titulo: selectedVersion.titulo,
         departamento: procedure.departamento,
-        responsable: selectedVersion.responsable, // useProcedureEdit usa este campo para buscar el ID
+        responsable: selectedVersion.responsable,
         revision: selectedVersion.revision.toString(),
         fecha_vigencia: selectedVersion.fecha_vigencia,
         estado: selectedVersion.vigente === 1 ? 'activo' : 'inactivo',
-        path: selectedVersion.ruta_documento || undefined, // Ruta del PDF actual
-        // Agregar campos adicionales necesarios para la actualización
+        path: selectedVersion.ruta_documento || undefined,
         categoria: procedure.categoria,
         id_area: procedure.id_area,
       };
@@ -249,8 +318,8 @@ export function useVersionedProceduresController() {
     },
     handleViewPdf,
 
-    // Props para modal de edición
-    editModal: {
+    // Props para modal de edición - solo para activos
+    editModal: procedureFilter === 'active' ? {
       isOpen: editActions.editModalOpen,
       onClose: editActions.closeEdit,
       onSubmit: editActions.handleSubmit,
@@ -266,14 +335,11 @@ export function useVersionedProceduresController() {
               [field]: checked,
             };
 
-            // Si se marca "es_nueva_version", calcular automáticamente la próxima versión
             if (field === 'es_nueva_version' && checked) {
               const currentCode = editActions.editData.codigo;
               if (currentCode) {
-                // Buscar el procedimiento en la lista para obtener todas sus versiones
                 const procedure = versionProcedures.find(p => p.codigo_poe === currentCode);
                 if (procedure && procedure.versiones && procedure.versiones.length > 0) {
-                  // Encontrar la versión más alta
                   const maxVersion = Math.max(...procedure.versiones.map(v => v.revision));
                   updatedData.revision = (maxVersion + 1).toString();
                   
@@ -285,7 +351,6 @@ export function useVersionedProceduresController() {
                 }
               }
               
-              // Marcar automáticamente como vigente cuando es nueva versión
               updatedData.es_vigente = true;
             }
 
@@ -299,13 +364,11 @@ export function useVersionedProceduresController() {
               [field]: value,
             };
 
-            // Validación especial para el campo de revisión cuando es nueva versión
             if (field === 'revision' && editActions.editData.es_nueva_version) {
               const currentCode = editActions.editData.codigo;
               const newVersion = Number(value);
               
               if (currentCode && newVersion > 0) {
-                // Buscar el procedimiento en la lista para validar que no exista esa versión
                 const procedure = versionProcedures.find(p => p.codigo_poe === currentCode);
                 if (procedure && procedure.versiones) {
                   const versionExists = procedure.versiones.some(v => v.revision === newVersion);
@@ -315,7 +378,7 @@ export function useVersionedProceduresController() {
                       `La versión ${newVersion} ya existe para este procedimiento`,
                       "error"
                     );
-                    return; // No actualizar si la versión ya existe
+                    return;
                   }
                 }
               }
@@ -335,9 +398,22 @@ export function useVersionedProceduresController() {
       },
       responsibles,
       loadingResponsibles: false,
+    } : {
+      isOpen: false,
+      onClose: () => {},
+      onSubmit: () => {},
+      data: null,
+      saving: false,
+      handlers: {
+        handleCheckboxChange: () => {},
+        handleInputChange: () => {},
+        handleFileChange: () => {},
+      },
+      responsibles: [],
+      loadingResponsibles: false,
     },
 
-    // Props para modal de obsoletar
+    // Props para modal de obsoletar/reactivar
     obsoleteModal,
     setObsoleteModal,
     reasonModal,
@@ -346,6 +422,7 @@ export function useVersionedProceduresController() {
     setDeleteReason,
     obsoleteLoading,
     handleAskObsolete,
-    handleConfirmObsolete,
+    handleAskReason,
+    handleConfirmAction,
   };
 }

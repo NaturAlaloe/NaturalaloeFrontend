@@ -62,6 +62,7 @@ const Collaborators: React.FC = () => {
             <CollaboratorCard
               key={colab.id_colaborador}
               id={colab.id_colaborador}
+              cedula={colab.cedula}
               nombre={`${colab.nombre} ${colab.apellido1} ${colab.apellido2}`}
               puesto={colab.puesto}
               onClick={handleCardClick}

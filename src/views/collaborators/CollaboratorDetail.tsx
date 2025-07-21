@@ -78,7 +78,7 @@ export default function CollaboratorDetail() {
           </Typography>
           <TextField
             label="Cédula"
-            value={data.id_colaborador}
+            value={data.cedula}
             InputProps={{ readOnly: true }}
             variant="outlined"
             size="small"

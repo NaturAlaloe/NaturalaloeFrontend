@@ -1,9 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
 import {
   getPoliticsList,
+  getObsoletePolitics,
   updatePolitics,
   createNewPoliticsVersion,
   obsoletePolitics,
+  unobsoletePolitics,
 } from "../../services/politics/politicsService";
 import { getResponsibles } from "../../services/responsibles/getResponsibles";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
@@ -34,12 +36,15 @@ interface Politics {
   versiones: PoliticsVersion[];
 }
 
+type PoliticsFilter = 'active' | 'obsolete';
+
 export default function usePoliticsList() {
   const [politics, setPolitics] = useState<Politics[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [politicsFilter, setPoliticsFilter] = useState<PoliticsFilter>('active');
 
   const [selectedVersions, setSelectedVersions] = useState<Record<string, number>>({});
 
@@ -58,33 +63,63 @@ export default function usePoliticsList() {
   const [responsables, setResponsables] = useState<{ id_responsable: number; nombre_responsable: string }[]>([]);
   const [loadingResponsables, setLoadingResponsables] = useState(false);
 
-
   const [reasonModalOpen, setReasonModalOpen] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
 
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  
   const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setPdfFile(e.target.files[0]);
     }
   };
 
-  useEffect(() => {
+  // Función para cargar políticas según el filtro
+  const loadPolitics = async () => {
     setLoading(true);
-    getPoliticsList()
-      .then((data) => {
-        setPolitics(data);
-        const initialSelections: Record<string, number> = {};
-        data.forEach((politica: Politics) => {
+    try {
+      let data;
+      if (politicsFilter === 'active') {
+        data = await getPoliticsList();
+      } else {
+        data = await getObsoletePolitics();
+      }
+      
+      setPolitics(data);
+      
+      // Configurar versiones seleccionadas
+      const initialSelections: Record<string, number> = {};
+      data.forEach((politica: Politics) => {
+        if (politicsFilter === 'active') {
+          // Para políticas activas, buscar la versión vigente
           const versionVigente = politica.versiones.find(v => v.vigente === 1);
           if (versionVigente) {
             initialSelections[politica.codigo_politica] = versionVigente.id_documento;
+          } else if (politica.versiones.length > 0) {
+            // Si no hay vigente, seleccionar la más reciente (último elemento del array)
+            const ultimaVersion = politica.versiones[politica.versiones.length - 1];
+            initialSelections[politica.codigo_politica] = ultimaVersion.id_documento;
           }
-        });
-        setSelectedVersions(initialSelections);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+        } else {
+          // Para políticas obsoletas, seleccionar la más reciente (último elemento del array)
+          // que representa la versión que estaba vigente cuando se marcó como obsoleta
+          if (politica.versiones.length > 0) {
+            const ultimaVersion = politica.versiones[politica.versiones.length - 1];
+            initialSelections[politica.codigo_politica] = ultimaVersion.id_documento;
+          }
+        }
+      });
+      setSelectedVersions(initialSelections);
+    } catch (error) {
+      showCustomToast("Error", "No se pudieron cargar las políticas", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPolitics();
+  }, [politicsFilter]);
 
   useEffect(() => {
     setLoadingResponsables(true);
@@ -93,7 +128,6 @@ export default function usePoliticsList() {
       .finally(() => setLoadingResponsables(false));
   }, []);
 
-
   const handleVersionChange = (codigoPolitica: string, versionId: string) => {
     setSelectedVersions(prev => ({
       ...prev,
@@ -101,14 +135,23 @@ export default function usePoliticsList() {
     }));
   };
 
-  
+  const handleFilterChange = (filter: PoliticsFilter) => {
+    setPoliticsFilter(filter);
+    setCurrentPage(1);
+    setSearch("");
+  };
+
   const handleAskReason = () => {
     setDeleteReason("");
     setReasonModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
-    await handleDelete(deleteReason);
+    if (politicsFilter === 'active') {
+      await handleDelete(deleteReason);
+    } else {
+      await handleReactivate(); // Ahora también usa deleteReason
+    }
     setReasonModalOpen(false);
   };
 
@@ -151,6 +194,12 @@ export default function usePoliticsList() {
   };
 
   const handleOpenEdit = (row: any) => {
+    // Solo permitir edición en políticas activas
+    if (politicsFilter === 'obsolete') {
+      showCustomToast("Información", "No se pueden editar políticas obsoletas", "info");
+      return;
+    }
+    
     setEditPoliticsObj(row);
     setDescripcionInput(row.titulo || row.descripcion);
 
@@ -175,7 +224,6 @@ export default function usePoliticsList() {
     setDeletePoliticsObj(row);
   };
 
-
   const formatDateToBackend = (dateString: string | Date | undefined): string => {
     if (!dateString) return "";
     try {
@@ -194,9 +242,6 @@ export default function usePoliticsList() {
       return "";
     }
   };
-
-
-
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,16 +266,13 @@ export default function usePoliticsList() {
         if (pdfFile) {
           formData.append("documento", pdfFile);
         }
-        console.log("FormData para nueva versión:", Object.fromEntries(formData.entries()));
 
         await createNewPoliticsVersion(formData);
         showCustomToast("Éxito", "Nueva versión creada exitosamente", "success");
 
       } else {
-        // Required field
         formData.append("id_politica", String(editPoliticsObj.id_documento));
 
-        // Optional fields - only append if values exist
         if (descripcionInput.trim()) {
           formData.append("descripcion", descripcionInput.trim());
         }
@@ -254,14 +296,11 @@ export default function usePoliticsList() {
           formData.append("documento", pdfFile);
         }
 
-        console.log("FormData para actualización:", Object.fromEntries(formData.entries()));
-
         await updatePolitics(formData);
         showCustomToast("Éxito", "Política actualizada exitosamente", "success");
       }
 
-      const data = await getPoliticsList();
-      setPolitics(data);
+      await loadPolitics(); // Recargar la lista
       setModalOpen(false);
       setEditPoliticsObj(null);
       setPdfFile(null);
@@ -278,21 +317,62 @@ export default function usePoliticsList() {
     }
   };
 
-
   const handleDelete = async (razon_cambio: string) => {
     if (!deletePoliticsObj) return;
     try {
       setLoading(true);
-      await obsoletePolitics(deletePoliticsObj.id_documento, razon_cambio);
+      
+      // Para obsolescencia, usar el id_documento de la versión más reciente/vigente
+      const politicaCompleta = politics.find(p => 
+        p.versiones.some(v => v.id_documento === deletePoliticsObj.id_documento)
+      );
+      
+      let idDocumentoAObsoletar = deletePoliticsObj.id_documento;
+      
+      if (politicaCompleta) {
+        // Buscar la versión vigente, o la más reciente si no hay vigente
+        const versionVigente = politicaCompleta.versiones.find(v => v.vigente === 1);
+        if (versionVigente) {
+          idDocumentoAObsoletar = versionVigente.id_documento;
+        } else {
+          // Si no hay vigente, usar la más reciente (último elemento del array)
+          const ultimaVersion = politicaCompleta.versiones[politicaCompleta.versiones.length - 1];
+          idDocumentoAObsoletar = ultimaVersion.id_documento;
+        }
+      }
+      
+      await obsoletePolitics(idDocumentoAObsoletar, razon_cambio);
       showCustomToast("Éxito", "Política marcada como obsoleta", "success");
-      const data = await getPoliticsList();
-      console.log("Lista actualizada:", data); // <-- Depura aquí
-      setPolitics(data);
+      await loadPolitics(); // Recargar la lista
       setDeletePoliticsObj(null);
       setReasonModalOpen(false);
       setDeleteReason("");
     } catch (error: any) {
       showCustomToast("Error", "No se pudo marcar como obsoleta", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReactivate = async () => {
+    if (!deletePoliticsObj) return;
+    try {
+      setLoading(true);
+      
+      // Para reactivación, usar el id_documento que se muestra (la versión más reciente que estaba vigente)
+      await unobsoletePolitics(deletePoliticsObj.id_documento, deleteReason);
+      showCustomToast("Éxito", "Política reactivada exitosamente", "success");
+      await loadPolitics(); // Recargar la lista
+      setDeletePoliticsObj(null);
+      setReasonModalOpen(false);
+      setDeleteReason("");
+    } catch (error: any) {
+      console.error("Error reactivating politics:", error);
+      showCustomToast(
+        "Error", 
+        error?.response?.data?.message || "No se pudo reactivar la política", 
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -309,6 +389,8 @@ export default function usePoliticsList() {
     setCurrentPage,
     selectedVersions,
     handleVersionChange,
+    politicsFilter,
+    handleFilterChange,
     modalOpen,
     setModalOpen,
     editPoliticsObj,
@@ -334,6 +416,7 @@ export default function usePoliticsList() {
     handleOpenDelete,
     handleSave,
     handleDelete,
+    handleReactivate,
     pdfFile,
     setPdfFile,
     handlePdfChange,
@@ -343,6 +426,5 @@ export default function usePoliticsList() {
     setReasonModalOpen,
     setDeleteReason,
     deleteReason,
-    
   };
 }

@@ -1,277 +1,189 @@
-import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
+import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
-import useCollaborators from '../../hooks/collaborator/useCollaborators';
+import useCollaborators from '../../hooks/collaborator/useCollaboratorsAssign';
 import useRoles from '../../hooks/collaborator/useRols';
 import TableRol from '../../components/globalComponents/TableRol';
 import InputField from '../../components/formComponents/InputField';
 import SubmitButton from '../../components/formComponents/SubmitButton';
 import CustomToaster, { showCustomToast } from '../../components/globalComponents/CustomToaster';
 
-// Extraer el ID del colaborador seleccionado
-const extractId = (colaborador: string) => colaborador.split(' - ')[0];
-
 export default function AssignRol() {
-  const [rolesSeleccionados, setRolesSeleccionados] = useState<string[]>([]);
-  const [colaboradorSeleccionado, setColaboradorSeleccionado] = useState<string | null>(null);
-  const [pagina, setPagina] = useState(0); // Estado para la página de paginación
-  const rolesPorPagina = 7; // Número de roles por página
-
+  // Hooks personalizados
   const { collaborators, loading, error, searchTerm, setSearchTerm } = useCollaborators();
-  const { roles, collaboratorRoles, loadingRoles, errorRoles, assignRoles, unassignRoles } = useRoles(
-    colaboradorSeleccionado ? extractId(colaboradorSeleccionado) : undefined
-  );
+  const { 
+    roles, 
+    loadingRoles, 
+    errorRoles, 
+    rolesSeleccionados,
+    colaboradorSeleccionado,
+    handleColaboradorSeleccion,
+    handleRolSeleccion,
+    clearColaboradorSeleccion,
+    processRoleChanges
+  } = useRoles();
 
   // Manejar cambio en el campo de búsqueda
   const manejarCambioBusqueda = (evento: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(evento.target.value);
-    setColaboradorSeleccionado(null);
-    setRolesSeleccionados([]);
-  };
-
-  // Función para cambiar de página
-  const manejarCambioPagina = (_event: unknown, newPage: number) => {
-    setPagina(newPage);
-  };
-
-  // Manejar selección de colaborador
-  const manejarSeleccionColaborador = (
-    id: string,
-    nombre?: string,
-    apellido1?: string,
-    apellido2?: string,
-  ) => {
-    const nombreCompleto = [nombre, apellido1, apellido2].filter(Boolean).join(' ').trim() || 'Sin nombre';
-    setColaboradorSeleccionado(`${id} - ${nombreCompleto}`);
-    setPagina(0);
-    setSearchTerm(''); 
-  };
-
-  // Manejar selección de roles
-  const manejarSeleccionRol = (rol: string) => {
-    const selectedCollaborator = collaborators.find(colab =>
-      colaboradorSeleccionado?.startsWith(`${colab.id_colaborador} -`)
-    );
-    if (rol !== selectedCollaborator?.puesto) {
-      setRolesSeleccionados(prev =>
-        prev.includes(rol) ? prev.filter(r => r !== rol) : [...prev, rol]
-      );
+    const valor = evento.target.value;
+    setSearchTerm(valor);
+    
+    if (colaboradorSeleccionado) {
+      clearColaboradorSeleccion();
     }
   };
 
+  // Manejar selección de colaborador desde la lista
+  const manejarSeleccionDesdeResultados = (colab: any) => {
+    handleColaboradorSeleccion(
+      colab.id_colaborador,
+      colab.nombre,
+      colab.apellido1,
+      colab.apellido2,
+      colab.cedula,
+      colab.puesto
+    );
+    setSearchTerm('');
+  };
 
   // Manejar asignación y desasignación de roles
   const manejarAsignarRoles = async () => {
-    if (!colaboradorSeleccionado) {
-      showCustomToast('Por favor, selecciona un colaborador.', undefined, 'error');
-      return;
-    }
-    const rolesExistentes = collaboratorRoles.map(role => role.nombre_rol);
-    const puesto = collaborators.find(colab => colab.id_colaborador === extractId(colaboradorSeleccionado))?.puesto || '';
-    const rolesAAsignar = rolesSeleccionados.filter(rol => !rolesExistentes.includes(rol) && rol !== puesto);
-    const rolesADesasignar = rolesExistentes.filter(rol => !rolesSeleccionados.includes(rol) && rol !== puesto);
-
-    if (rolesAAsignar.length === 0 && rolesADesasignar.length === 0) {
-      showCustomToast('No hay cambios para guardar.', undefined, 'info');
-      return;
-    }
-
     try {
-      if (rolesAAsignar.length > 0) {
-        await assignRoles(rolesAAsignar);
-      }
-      if (rolesADesasignar.length > 0) {
-        await unassignRoles(rolesADesasignar);
-      }
-      showCustomToast('Cambios actualizados', undefined, 'success');
-    } catch (error) {
-      showCustomToast('Fallo al actualizar', undefined, 'error');
+      await processRoleChanges();
+      showCustomToast('Éxito', 'Roles actualizados correctamente', 'success');
+    } catch (error: any) {
+      const mensaje = error.message || 'Error al actualizar los roles';
+      const tipo = mensaje.includes('selecciona') || mensaje.includes('cambios') ? 'info' : 'error';
+      showCustomToast(mensaje, undefined, tipo);
       console.error('Error al procesar roles:', error);
     }
-
   };
 
-  // Roles a mostrar en la página actual
-  const rolesPaginados =
-    roles.length > 0
-      ? roles.map(r => r.nombre_rol).slice(pagina * rolesPorPagina, pagina * rolesPorPagina + rolesPorPagina)
-      : [];
-
-  // Encontrar el colaborador seleccionado para obtener su puesto
-  const selectedCollaborator = collaborators.find(
-    colab => colaboradorSeleccionado && colaboradorSeleccionado.startsWith(`${colab.id_colaborador} -`)
-  );
-  const puestoSeleccionado = selectedCollaborator ? selectedCollaborator.puesto || 'Sin puesto' : 'Sin puesto';
-
-  // Sincronizar rolesSeleccionados con los roles actuales del colaborador
-  useEffect(() => {
-    if (colaboradorSeleccionado) {
-      const selected = collaborators.find(colab =>
-        colaboradorSeleccionado.startsWith(`${colab.id_colaborador} -`)
-      );
-      const puesto = selected?.puesto;
-      const nuevosSeleccionados = [
-        ...(puesto ? [puesto] : []),
-        ...collaboratorRoles.map(role => role.nombre_rol).filter(role => role !== puesto),
-      ].filter(Boolean);
-      setRolesSeleccionados(nuevosSeleccionados);
-    } else {
-      setRolesSeleccionados([]);
-    }
-  }, [colaboradorSeleccionado, collaboratorRoles]);
-
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #E6F3EA 0%, #F6FBF7 100%)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        py: 4,
-      }}
-    >
-      <Paper
-        elevation={8}
-        sx={{
-          width: '90%',
-          maxWidth: 800,
-          p: 4,
-          borderRadius: 6,
-          border: '2px solid #2AAC67',
-          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.1)',
-          transition: 'box-shadow 0.3s ease',
-          '&:hover': {
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
-          },
-        }}
-      >
-        <Typography
-          variant="h5"
-          sx={{ color: '#2AAC67', fontWeight: 'bold', mb: 3, letterSpacing: '1px', textAlign: 'center' }}
-        >
-          Asignar Roles a Colaborador
-        </Typography>
+    <div className="min-h-screen bg-gradient-to-br from-[#fff] to-white px-0 py-4 rounded-xl shadow-lg transition-all duration-300 ease-in-out">
+      <div className="max-w-6xl mx-auto px-4 pt-8 pb-2 mb-4">
+        <div className="flex w-full justify-center mb-8">
+          <h1 className="text-4xl font-black text-[#2BAC67] text-center font-[Poppins]">
+            Asignación de Roles
+          </h1>
+        </div>
 
-        {/* Buscador de colaboradores con resultados en tiempo real */}
-        <Box sx={{  maxWidth: '100%', mx: 'auto'  }}>
-        <InputField
-          name="busqueda"
-          value={searchTerm}
-          onChange={manejarCambioBusqueda}
-          placeholder="Buscar Colaborador por nombre o cedula"
-          className="mb-2 "
-         
-        />
-        </Box>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        {searchTerm && !colaboradorSeleccionado && (
-          <Box sx={{ mb: 3, maxHeight: 300, overflowY: 'auto', bgcolor: '#fff', borderRadius: 4, p: 2 }}>
-            {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <CircularProgress />
-              </Box>
-            ) : !collaborators || collaborators.length === 0 ? (
-              <Typography sx={{ color: '#888' }}>
-                {searchTerm ? `No se encontraron colaboradores con "${searchTerm}"` : 'Cargando...'}
-              </Typography>
-            ) : (
-              collaborators
-                .filter(colab => colab && typeof colab.id_colaborador === 'string')
-                .map(colab => (
-                  <Box
-                    key={colab.id_colaborador}
-                    onClick={() =>
-                      manejarSeleccionColaborador(
-                        colab.id_colaborador,
-                        colab.nombre,
-                        colab.apellido1,
-                        colab.apellido2,
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          {/* Buscador de colaboradores */}
+          <div className="mb-6">
+            <InputField
+              name="busqueda"
+              value={searchTerm}
+              onChange={manejarCambioBusqueda}
+              placeholder="Buscar por nombre o cédula"
+              className="w-full"
+            />
+          </div>
 
-                                         
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
 
-                      )
-                    }
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      py: 1, 
-                      px: 2,
-                      mb: 1,
-                      borderRadius: 2,
-                      border: '1px solid #2AAC67',
-                      background: '#fff',
-                      cursor: 'pointer',
-                      boxShadow: '0 1px 4px rgba(42,172,103,0.07)',
-                      transition: 'background 0.2s, box-shadow 0.2s, border 0.2s',
-                      '&:hover': {
-                        background: '#E6F3EA',
-                        borderColor: '#13bd62',
-                        boxShadow: '0 2px 8px rgba(42,172,103,0.15)',
-                      },
-                    }}
-                  >
-                    <Box sx={{ fontWeight: 700, color: '#2AAC67', mr: 2 }}>
-                      {colab.id_colaborador}
-                    </Box>
-                    <Box sx={{ color: '#333', fontWeight: 500 }}>
-                      {[colab.nombre, colab.apellido1, colab.apellido2].filter(Boolean).join(' ').trim() || 'Sin nombre'}
-                    </Box>                  
-                  </Box>
-                ))
-            )}
-          </Box>
-        )}
-        {colaboradorSeleccionado && (
-          <Box sx={{ mb: 3, mt: 2}}>
-            <Typography sx={{ color: 'black', mb: 1, fontWeight: 'bold' }}>
-              Colaborador seleccionado:{' '}
-              <span style={{ color: '#1F8A50' }}>{colaboradorSeleccionado}</span>
-            </Typography>
-            <Typography sx={{color: 'black', mb: 1, fontWeight: 'bold' }}>
-              Puesto de trabajo:{' '}
-              <span style={{ color: '#1F8A50' }}>{puestoSeleccionado}</span>
-            </Typography>
-          </Box>
-        )}
+          {/* Resultados de búsqueda */}
+          {searchTerm && !colaboradorSeleccionado && (
+            <div className={`mb-6 overflow-y-auto bg-gray-50 rounded-lg p-4 border ${
+              loading || (!collaborators || collaborators.length === 0) ? 'h-32' : 'max-h-80'
+            }`}>
+              {loading ? (
+                <div className="flex justify-center items-center h-full">
+                  <CircularProgress />
+                </div>
+              ) : !collaborators || collaborators.length === 0 ? (
+                <div className="flex justify-center items-center h-full">
+                  <p className="text-gray-500 text-center">
+                    {searchTerm ? `No se encontraron colaboradores con "${searchTerm}"` : 'Cargando...'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {collaborators
+                    .filter(colab => colab && typeof colab.id_colaborador === 'string')
+                    .map(colab => (
+                      <div
+                        key={colab.id_colaborador}
+                        onClick={() => manejarSeleccionDesdeResultados(colab)}
+                        className="flex items-center justify-between p-3 bg-white rounded-lg border border-[#2BAC67] hover:bg-[#E6F3EA] cursor-pointer transition-all duration-200 hover:shadow-md"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className="font-bold text-[#2BAC67] text-lg">
+                            {colab.cedula || 'Sin cédula'}
+                          </div>
+                          <div className="text-gray-700 font-medium">
+                            {[colab.nombre, colab.apellido1, colab.apellido2].filter(Boolean).join(' ').trim() || 'Sin nombre'}
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {colab.puesto || 'Sin puesto'}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
 
-        {errorRoles && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {errorRoles}
-          </Alert>
-        )}
+          {/* Información del colaborador seleccionado */}
+          {colaboradorSeleccionado && (
+            <div className="mb-6 p-4 bg-[#E6F3EA] rounded-lg border border-[#2BAC67]">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                <div>
+                  <span className="font-bold text-gray-700">Colaborador: </span>
+                  <span className="text-[#1F8A50] font-semibold">{colaboradorSeleccionado.cedula} - {colaboradorSeleccionado.nombre}</span>
+                </div>
+               
+            
+              </div>
+              <div className="mt-2">
+  
+                  <span className="font-bold text-gray-700">Puesto: </span>
+                  <span className="text-[#1F8A50] font-semibold">{colaboradorSeleccionado.puesto}</span>
+                </div>
 
-        {colaboradorSeleccionado && (
-          <TableRol
-            roles={roles.map(r => r.nombre_rol)}
-            rolesSeleccionados={rolesSeleccionados}
-            loadingRoles={loadingRoles}
-            errorRoles={errorRoles}
-            puestoSeleccionado={puestoSeleccionado}
-            onSeleccionRol={manejarSeleccionRol}
-          />
-        )}
+            </div>
+          )}
 
-        {colaboradorSeleccionado && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-            <SubmitButton
-              width="w-full"
-              disabled={loadingRoles}
-              onClick={manejarAsignarRoles}
-            >
-              {loadingRoles ? <CircularProgress size={24} color="inherit" /> : 'Guardar Cambios'}
-            </SubmitButton>
-          </Box>
-        )}
-      </Paper>
+          {errorRoles && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {errorRoles}
+            </Alert>
+          )}
+
+          {/* Tabla de roles */}
+          {colaboradorSeleccionado && (
+            <>
+              <div className="mb-6">
+                <TableRol
+                  roles={roles.map(r => r.nombre_rol)}
+                  rolesSeleccionados={rolesSeleccionados}
+                  loadingRoles={loadingRoles}
+                  errorRoles={errorRoles}
+                  puestoSeleccionado={colaboradorSeleccionado.puesto}
+                  onSeleccionRol={handleRolSeleccion}
+                />
+              </div>
+
+              {/* Botón de guardar */}
+              <div className="flex justify-center">
+                <SubmitButton
+                  width="w-full md:w-auto"
+                  disabled={loadingRoles}
+                  onClick={manejarAsignarRoles}
+                >
+                  {loadingRoles ? <CircularProgress size={24} color="inherit" /> : 'Guardar Cambios'}
+                </SubmitButton>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
       <CustomToaster />
-    </Box>
+    </div>
   );
 }
