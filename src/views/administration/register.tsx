@@ -9,7 +9,8 @@ import { showCustomToast } from "../../components/globalComponents/CustomToaster
 export default function Register() {
   const [formData, setFormData] = useState({
     nombre: "",
-    apellidos: "",
+    apellido1: "",
+    apellido2: "",
     correo: "",
     contrasena: "",
     confirmarContrasena: "",
@@ -35,7 +36,8 @@ export default function Register() {
 
     const userInfo = {
       nombre: formData.nombre,
-      apellido: formData.apellidos,
+      apellido1: formData.apellido1,
+      apellido2: formData.apellido2,
       email: formData.correo,
       contrasena: formData.contrasena,
     };
@@ -47,7 +49,8 @@ export default function Register() {
     if (success) {
       setFormData({
         nombre: "",
-        apellidos: "",
+        apellido1: "",
+        apellido2: "",
         correo: "",
         contrasena: "",
         confirmarContrasena: "",
@@ -93,18 +96,29 @@ export default function Register() {
               pattern={undefined}
             />
             <InputField
-              label="Apellidos"
-              name="apellidos"
-              value={formData.apellidos}
+              label="Apellido 1"
+              name="apellido1"
+              value={formData.apellido1}
               onChange={handleChange}
-              placeholder="Apellidos"
+              placeholder="Apellido 1"
               type="text"
               required
               pattern={undefined}
             />
+
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputField
+              label="Apellido 2"
+              name="apellido2"
+              value={formData.apellido2}
+              onChange={handleChange}
+              placeholder="Apellido 2"
+              type="text"
+              required
+              pattern={undefined}
+            />
             <InputField
               label="Correo Electrónico"
               name="correo"
@@ -115,6 +129,10 @@ export default function Register() {
               required
               pattern={undefined}
             />
+
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
               label="Contraseña"
               name="contrasena"
@@ -125,9 +143,6 @@ export default function Register() {
               required
               pattern={undefined}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
               label="Confirmar Contraseña"
               name="confirmarContrasena"

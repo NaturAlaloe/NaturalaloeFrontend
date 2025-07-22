@@ -2,7 +2,8 @@ import axiosInstance from "../../apiConfig/api";
 
 export interface User {
     nombre: string;
-    apellido: string;
+    apellido1: string;
+    apellido2: string;
     email: string;
     contrasena: string;
 }
