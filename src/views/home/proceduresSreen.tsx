@@ -1,6 +1,4 @@
-import { useNavigate } from 'react-router-dom';
 import { Typography, Card, CardContent, LinearProgress, Box } from '@mui/material';
-import DescriptionIcon from '@mui/icons-material/Description';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 
@@ -75,7 +73,6 @@ const getProgressBgColor = (percentage: number) => {
 };
 
 export default function ProceduresScreen() {
-  const navigate = useNavigate();
 
   const totalProcedures = proceduresData.reduce((sum, dept) => sum + dept.totalProcedures, 0);
   const totalUpdated = proceduresData.reduce((sum, dept) => sum + dept.updated, 0);
