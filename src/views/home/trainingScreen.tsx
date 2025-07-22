@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Typography, Card, CardContent, LinearProgress, Box, Alert } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
-import DescriptionIcon from '@mui/icons-material/Description';
 import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
 import api from '../../apiConfig/api';
 
@@ -27,6 +26,7 @@ type ProcedureDepartment = {
   cumplimiento_pct: string;
   fecha_actualizacion: string;
 };
+
 
 export default function CertificationScreen() {
   const [departments, setDepartments] = useState<ProcedureDepartment[]>([]);

@@ -12,7 +12,6 @@ export default function FacilitatorTraining() {
     nombre,
     apellido1,
     apellido2,
-    identificacion,
     handleTipoChange,
     handleInternoChange,
     setNombre,
