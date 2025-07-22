@@ -1,6 +1,4 @@
-import { useNavigate } from 'react-router-dom';
 import { Typography, Card, CardContent, LinearProgress, Box } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 
@@ -87,7 +85,6 @@ const getProgressBgColor = (percentage: number) => {
 };
 
 export default function CertificationScreen() {
-  const navigate = useNavigate();
 
   const totalEmployees = departmentData.reduce((sum, dept) => sum + dept.totalEmployees, 0);
   const totalCertified = departmentData.reduce((sum, dept) => sum + dept.certified, 0);
