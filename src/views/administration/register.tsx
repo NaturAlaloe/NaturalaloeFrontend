@@ -30,7 +30,7 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.contrasena !== formData.confirmarContrasena) {
-      alert("Las contraseñas no coinciden");
+      showCustomToast("Información", 'Las contraseñas no coinciden.', "info");
       return;
     }
 
