@@ -1,130 +1,177 @@
-import { useEffect, useState } from "react";
+import { usePendingTrainings } from "../../hooks/usePendingTrainings";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import SelectField from "../../components/formComponents/SelectField";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
-import { Card, CardContent, Box, Alert, Typography, LinearProgress } from "@mui/material";
-import api from "../../apiConfig/api";
-
-const getProgressColor = (percentage: number) => {
-  if (percentage >= 95) return "success";
-  if (percentage >= 85) return "warning";
-  return "error";
-};
+import PersonIcon from '@mui/icons-material/Person';
 
 export default function PendingTrainingsScreen() {
-  const [departments, setDepartments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+    const {
+        loading,
+        areas,
+        filtered,
+        paginated,
+        filterArea,
+        setFilterArea,
+        filterNombre,
+        setFilterNombre,
+        page,
+        setPage,
+        totalPages,
+    } = usePendingTrainings();
 
-  useEffect(() => {
-    api.get("/dataForGraphicTrainingPendings")
-      .then(res => {
-        if (res.data.success) {
-          setDepartments(res.data.data);
-        } else {
-          setError(res.data.message || "Error al obtener datos");
-        }
-      })
-      .catch(() => setError("Error al obtener datos"))
-      .finally(() => setLoading(false));
-  }, []);
+    if (loading) {
+        return <FullScreenSpinner />;
+    }
 
-  const totalEmployees = departments.reduce((sum, dept: any) => sum + Number(dept.total_empleados), 0);
-  const totalCertified = departments.reduce((sum, dept: any) => sum + Number(dept.total_certificados), 0);
-  const totalPending = departments.reduce((sum, dept: any) => sum + Number(dept.pendientes), 0);
-  const overallPercentage = totalEmployees ? ((totalCertified / totalEmployees) * 100).toFixed(1) : "0";
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-[#fff] to-white px-0 py-4 rounded-xl shadow-lg transition-all duration-300 ease-in-out">
+            <div className="max-w-6xl mx-auto px-4 pt-8 pb-2 mb-4">
+                <div className="flex w-full justify-center mb-2">
+                    <h1 className="text-4xl font-black text-[#2BAC67] text-center font-[Poppins]">
+                        Pendientes de Capacitación
+                    </h1>
+                </div>
+                <div className="flex w-full justify-end">
+                    <div className="flex items-center gap-2 bg-green-100 px-4 py-2 rounded-xl shadow">
+                        <PersonRoundedIcon className="text-green-600" fontSize="medium" />
+                        <span className="font-bold text-green-800">{filtered.length}</span>
+                        <span className="text-green-700 text-sm">Pendientes</span>
+                    </div>
+                </div>
+            </div>
+            <div className="flex flex-col items-center mb-6">
+                <div className="flex flex-col md:flex-row gap-4 w-full max-w-2xl bg-white rounded-xl shadow p-4 border border-green-100">
+                    <div className="w-full md:w-1/2">
+                        <input
+                            type="text"
+                            value={filterNombre}
+                            onChange={e => setFilterNombre(e.target.value)}
+                            className="w-full h-12 px-3 border border-[#2AAC67] rounded-lg text-[#2AAC67] focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent"
+                            placeholder="Buscar por nombre..."
+                        />
+                    </div>
+                    <div className="w-full md:w-1/2">
+                        <SelectField
+                            name="filterArea"
+                            label=""
+                            value={filterArea}
+                            onChange={e => setFilterArea(e.target.value)}
+                            options={[
+                                { value: "", label: "Todas las áreas" },
+                                ...areas
+                                    .filter(area => area.titulo && area.titulo.trim() !== "")
+                                    .reduce((acc, area) => {
+                                        if (!acc.some(a => a.value === area.titulo)) {
+                                            acc.push({ value: area.titulo, label: area.titulo });
+                                        }
+                                        return acc;
+                                    }, [] as { value: string; label: string }[]),
+                            ]}
+                            optionLabel="label"
+                            optionValue="value"
+                            className="h-12 px-3 py-0"
+                        />
+                    </div>
+                </div>
+            </div>
 
-  if (loading) return <FullScreenSpinner />;
+            <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+                {paginated.length === 0 ? (
+                    <div className="col-span-full text-center text-gray-400 text-lg font-semibold">
+                        No hay capacitaciones pendientes.
+                    </div>
+                ) : (
+                    paginated.map((item, index) => (
+                        <div
+                            key={`${item.id_colaborador}-${item.id_documento}-${item.nombre_rol}-${index}`}
+                            className="bg-white rounded-2xl shadow-lg border border-green-100 hover:shadow-xl hover:border-green-300 transition-all duration-300 cursor-pointer flex flex-col p-6 gap-4 relative group hover:scale-105"
+                        >
+                 
+                            <div className="flex items-center gap-4 mb-3">
+                                <div className="w-10 h-10 bg-[#2AAC66] rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                                    <PersonIcon className="text-white" fontSize="medium" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="font-bold text-gray-800 text-lg truncate group-hover:text-green-700 transition-colors">
+                                        {item.nombre_completo}
+                                    </div>
+                                    <div className="text-gray-500 text-sm font-medium truncate">
+                                        {item.puesto}
+                                    </div>
+                                </div>
+                            </div>
 
-  return (
-    <div className="min-h-screen bg-[#FFF] px-6 py-8">
-      <div className="mb-8">
-        <div className="mb-10 text-center">
-          <h1 className="text-4xl font-black text-[#2BAC67] text-center font-[Poppins]">
-            Pendientes de Capacitación
-          </h1>
+             
+                            <div className="text-green-800 font-semibold text-sm truncate mb-2">
+                                {item.descripcion}
+                            </div>
+
+                 
+                            <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-2">
+                                <span className="bg-green-100 px-2 py-1 rounded font-semibold">
+                                    Área: <span className="font-normal">{item.area}</span>
+                                </span>
+                                <span className="bg-green-100 px-2 py-1 rounded font-semibold">
+                                    Departamento: <span className="font-normal">{item.departamento}</span>
+                                </span>
+                                <span className="bg-green-100 px-2 py-1 rounded font-semibold">
+                                    Rol: <span className="font-normal">{item.nombre_rol}</span>
+                                </span>
+                            </div>
+
+                            {/* Bottom Info and Action */}
+                            <div className="flex justify-between items-center">
+                                <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+                                    <span className="bg-white border border-green-200 rounded px-2 py-1">
+                                        <b>Código:</b> {item.codigo}
+                                    </span>
+                                    <span className="bg-white border border-green-200 rounded px-2 py-1">
+                                        <b>Versión:</b> {item.version}
+                                    </span>
+                                </div>
+                                
+                             
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            <nav className="flex justify-center items-center mt-12 gap-2 mb-6">
+                <button
+                    className={`w-28 h-10 rounded-lg border-2 font-bold flex items-center justify-center transition
+                    ${page === 1
+                            ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                            : "bg-white text-[#2BAC67] border-[#2BAC67] hover:bg-[#2BAC67] hover:text-white"}
+                    `}
+                    onClick={() => {
+                        if (page > 1) {
+                            setPage(page - 1);
+                        }
+                    }}
+                    disabled={page === 1}
+                    aria-label="Anterior"
+                >
+                    {"‹ Anterior"}
+                </button>
+
+                <button
+                    className={`w-28 h-10 rounded-lg border-2 font-bold flex items-center justify-center transition
+                    ${page >= totalPages
+                            ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                            : "bg-white text-[#2BAC67] border-[#2BAC67] hover:bg-[#2BAC67] hover:text-white"}
+                    `}
+                    onClick={() => {
+                        if (page < totalPages) {
+                            setPage(page + 1);
+                        }
+                    }}
+                    disabled={page >= totalPages}
+                    aria-label="Siguiente"
+                >
+                    {"Siguiente ›"}
+                </button>
+            </nav>
         </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-800">{totalEmployees}</div>
-              <div className="text-sm text-gray-600">Total Empleados</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{totalCertified}</div>
-              <div className="text-sm text-gray-600">Certificados</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">{totalPending}</div>
-              <div className="text-sm text-gray-600">Pendientes</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-black">{overallPercentage}%</div>
-              <div className="text-sm text-gray-600">Cobertura General</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 4 }}>
-          {error}
-        </Alert>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {departments.map((dept: any) => (
-          <Card key={dept.id_departamento} className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <Typography variant="h6" className="text-green-800 font-bold">
-                  {dept.departamento}
-                </Typography>
-                <div className="px-3 py-1 rounded-full text-xs font-bold bg-green-50">
-                  {Number(dept.cobertura_pct).toFixed(1)}%
-                </div>
-              </div>
-              <Box className="mb-4">
-                <LinearProgress
-                  variant="determinate"
-                  value={Number(dept.cobertura_pct)}
-                  color={getProgressColor(Number(dept.cobertura_pct))}
-                  className="h-2 rounded-full"
-                />
-              </Box>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <PersonRoundedIcon className="text-green-600" fontSize="small" />
-                    <span className="text-lg font-bold text-green-600">{dept.total_certificados}</span>
-                  </div>
-                  <div className="text-xs text-gray-600">Certificados</div>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <PersonRoundedIcon className="text-yellow-600" fontSize="small" />
-                    <span className="text-lg font-bold text-yellow-600">{dept.pendientes}</span>
-                  </div>
-                  <div className="text-xs text-gray-600">Pendientes</div>
-                </div>
-              </div>
-              <div className="border-t pt-4 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-600">Total Empleados:</span>
-                  <span className="text-xs font-semibold">{dept.total_empleados}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-600">Última Actualización:</span>
-                  <span className="text-xs font-semibold text-green-600">
-                    {dept.fehcha_actualizacion
-                      ? new Date(dept.fehcha_actualizacion).toLocaleDateString()
-                      : ""}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
+    );
 }
