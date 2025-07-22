@@ -64,10 +64,9 @@ export default function HomeScreen() {
               }`}
               onClick={() => {
                 if (!kpi.hasScreen) return;
-                // Navegación específica para cada KPI
-                if (kpi.label === 'Certificación del Personal') {
+                if (kpi.label === 'Pendientes de Capacitación por Departamento') {
                   navigate('/home/trainingScreen');
-                } else if (kpi.label === 'Procedimientos Actualizados') {
+                } else if (kpi.label === 'Procedimientos Pendientes por Departamento') {
                   navigate('/home/proceduresScreen');
                 }
               }}
@@ -83,10 +82,9 @@ export default function HomeScreen() {
                     className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-semibold hover:bg-green-200 transition"
                     onClick={e => {
                       e.stopPropagation();
-                      // Navegación específica para cada KPI
-                      if (kpi.label === 'Certificación del Personal') {
+                      if (kpi.label === 'Pendientes de Capacitación por Departamento') {
                         navigate('/home/trainingScreen');
-                      } else if (kpi.label === 'Procedimientos Actualizados') {
+                      } else if (kpi.label === 'Procedimientos Pendientes por Departamento') {
                         navigate('/home/proceduresScreen');
                       }
                     }}
