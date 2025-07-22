@@ -6,6 +6,7 @@ export function useTrainingRegister({
   facilitadores,
   initialData,
   onClose,
+  onSuccess,
 }: any) {
   const [errorMsg] = useState<string | null>(null);
   const { register, loading } = useRegisterIndividualTraining();
@@ -19,7 +20,35 @@ export function useTrainingRegister({
       showCustomToast("Error", "La fecha de fin es obligatoria.", "error");
       return;
     }
-    if (new Date(form.fechaFin) < new Date(form.fechaInicio)) {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const fechaInicio = new Date(form.fechaInicio);
+    fechaInicio.setHours(0, 0, 0, 0);
+
+    const fechaFin = new Date(form.fechaFin);
+    fechaFin.setHours(0, 0, 0, 0);
+
+    if (fechaInicio > today) {
+      showCustomToast(
+        "Error",
+        "La fecha de inicio no puede ser mayor a la fecha actual.",
+        "error"
+      );
+      return;
+    }
+
+    if (fechaFin > today) {
+      showCustomToast(
+        "Error",
+        "La fecha de fin no puede ser mayor a la fecha actual.",
+        "error"
+      );
+      return;
+    }
+
+    if (fechaFin < fechaInicio) {
       showCustomToast(
         "Error",
         "La fecha de fin no puede ser anterior a la fecha de inicio.",
@@ -82,7 +111,6 @@ export function useTrainingRegister({
       return;
     }
 
-    // Validar que todos los IDs sean números válidos
     if (!Number.isInteger(Number(id_colaborador)) || Number(id_colaborador) <= 0) {
       showCustomToast(
         "Error",
@@ -160,12 +188,6 @@ export function useTrainingRegister({
     if (isEvaluado && form.metodoEvaluacion?.toLowerCase() === "práctico") {
       isAprobado = form.estadoAprobacion?.toLowerCase() === "aprobado" ? "aprobado" : "reprobado";
     }
-    
-    // Para método teórico, aprobar automáticamente si la nota es >= 80
-    if (isEvaluado && form.metodoEvaluacion?.toLowerCase() === "teórico") {
-      const nota = Number(form.nota);
-      isAprobado = nota >= 80 ? "aprobado" : "reprobado";
-    }
 
     const payload = {
       id_colaborador: Number(id_colaborador),
@@ -184,8 +206,6 @@ export function useTrainingRegister({
       is_evaluado: isEvaluado ? 1 : 0,
     };
 
-    console.log("Payload a enviar:", payload); // Para debugging
-
     const ok = await register(payload);
     if (ok) {
       showCustomToast(
@@ -193,6 +213,7 @@ export function useTrainingRegister({
         "Capacitación registrada correctamente",
         "success"
       );
+      if (typeof onSuccess === "function") onSuccess(); // Llamar onSuccess primero
       if (typeof onClose === "function") onClose();
     }
   };

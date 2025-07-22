@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCollaborators from './useCollaborators';
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 9;
 
 const getPagination = (totalPages: number, currentPage: number) => {
   const pages: (number | string)[] = [];

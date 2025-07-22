@@ -42,7 +42,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(({
           required={required}
           readOnly={readOnly}
           pattern={pattern}
-          className={`w-full p-3 border border-[#2AAC67] rounded-lg text-[#2AAC67] ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""} ${endAdornment ? 'pr-12' : ''} ${className}`}
+          className={`w-full p-3 border border-[#2AAC67] rounded-lg text-[#2AAC67] focus:outline-none focus:ring-0 focus:border-[#2AAC67] focus:border-2 ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""} ${endAdornment ? 'pr-12' : ''} ${className}`}
           {...props}
         />
         {endAdornment && (

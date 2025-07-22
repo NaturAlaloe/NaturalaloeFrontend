@@ -28,7 +28,6 @@ export const getCollaborators = async (
     }
     return [];
   } catch (error) {
-    console.error("Error fetching collaborators:", error);
     return [];
   }
 };
@@ -37,7 +36,9 @@ export const getCollaborators = async (
 const getBasicCollaboratorInfo = async (id_colaborador: string | number) => {
   try {
     const collaborators = await getCollaborators();
-    const collaborator = collaborators.find(c => c.id_colaborador === String(id_colaborador));
+    const collaborator = collaborators.find(
+      (c) => c.id_colaborador === String(id_colaborador)
+    );
     if (collaborator) {
       return {
         nombre: collaborator.nombre,
@@ -48,7 +49,6 @@ const getBasicCollaboratorInfo = async (id_colaborador: string | number) => {
     }
     return null;
   } catch (error) {
-    console.error("Error getting basic collaborator info:", error);
     return null;
   }
 };
@@ -88,7 +88,7 @@ export interface ICollaboratorDetail {
 }
 
 export interface ICollaboratorDetailError {
-  type: 'no_procedures' | 'not_found' | 'general_error';
+  type: "no_procedures" | "not_found" | "general_error";
   message: string;
   collaboratorInfo?: {
     nombre: string;
@@ -144,29 +144,25 @@ export const getCollaboratorDetail = async (
       id_documento: data[0].id_documento,
     };
   } catch (error: any) {
-    console.error("Error fetching collaborator detail:", error);
-    
-    // Manejar el caso específico de colaborador sin procedimientos
     if (error.response?.status === 404) {
       const errorMessage = error.response?.data?.message;
       if (errorMessage && errorMessage.includes("procedimientos")) {
-        // Intentar obtener información básica del colaborador
         const basicInfo = await getBasicCollaboratorInfo(id_colaborador);
         return {
-          type: 'no_procedures',
+          type: "no_procedures",
           message: errorMessage,
-          collaboratorInfo: basicInfo || undefined
+          collaboratorInfo: basicInfo || undefined,
         };
       }
       return {
-        type: 'not_found',
-        message: "Colaborador no encontrado"
+        type: "not_found",
+        message: "Colaborador no encontrado",
       };
     }
-    
+
     return {
-      type: 'general_error',
-      message: "Error al cargar la información del colaborador"
+      type: "general_error",
+      message: "Error al cargar la información del colaborador",
     };
   }
 };

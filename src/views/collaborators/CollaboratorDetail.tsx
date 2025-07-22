@@ -1,7 +1,4 @@
 import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
 import { useParams } from "react-router-dom";
 import React from "react";
 import useCollaboratorDetail from "../../hooks/collaborator/useCollaboratorDetail";
@@ -54,212 +51,81 @@ export default function CollaboratorDetail() {
         py: 4,
       }}
     >
-      {/*Cuadro que contiene TODA la información del colaborador*/}
-      <Paper
-        elevation={8}
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          borderRadius: 6,
-          p: 5,
-          width: "90%",
-          maxWidth: 1200,
-          bgcolor: "#fff",
-          border: "2px solid #2AAC67",
-          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        {/*cuadro que contiene la información del colaborador*/}
-        <Box
-          sx={{
-            minWidth: 300,
-            maxWidth: 340,
-            height: "fit-content",
-            alignSelf: "flex-start",
-            mr: 5,
-            bgcolor: "#F6FBF7",
-            borderRadius: 4,
-            p: 3,
-            border: "1px solid #2AAC67",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              color: "#2AAC67",
-              fontWeight: "bold",
-              mb: 2.5,
-              letterSpacing: "0.5px",
-            }}
-          >
+      {/*Cuadro que contiene toda la información completa del colaborador*/}
+      <div className="flex flex-row rounded-3xl p-8 w-[100%] max-w-[1400px] bg-white border-2 border-[#2AAC67] shadow-xl">
+        {/*cuadro que contiene la información básica del colaborador*/}
+        <div className="min-w-80 max-w-96 h-fit mr-8 bg-[#f8fefb] rounded-2xl p-6 border-2 border-[#2AAC67] flex flex-col">
+          <h3 className="text-xl font-bold text-[#2AAC67] mb-6 text-center tracking-wide">
             Información del Colaborador
-          </Typography>
-          <TextField
-            label="Cédula"
-            value={data.cedula}
-            InputProps={{ readOnly: true }}
-            variant="outlined"
-            size="small"
-            disabled
-            sx={{
-              mb: 2.5,
-              width: "100%",
-              borderRadius: 3,
-              backgroundColor: "#fff",
-              WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": {
-                WebkitTextFillColor: "#222 !important",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#2AAC67 !important" },
-                "&:hover fieldset": { borderColor: "black !important" },
-                transition: "background-color 0.3s ease",
-                "&:hover": { backgroundColor: "#E6F3EA" },
-              },
-            }}
-          />
-          <TextField
-            label="Nombre"
-            value={data.nombre}
-            InputProps={{ readOnly: true }}
-            variant="outlined"
-            size="small"
-            disabled
-            sx={{
-              mb: 2.5,
-              width: "100%",
-              borderRadius: 3,
-              backgroundColor: "#fff",
-              WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": {
-                WebkitTextFillColor: "#222 !important",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#2AAC67 !important" },
-                "&:hover fieldset": { borderColor: "black !important" },
-                transition: "background-color 0.3s ease",
-                "&:hover": { backgroundColor: "#E6F3EA" },
-              },
-            }}
-          />
-          <TextField
-            label="Apellidos"
-            value={apellidos}
-            InputProps={{ readOnly: true }}
-            variant="outlined"
-            size="small"
-            disabled
-            sx={{
-              mb: 2.5,
-              width: "100%",
-              borderRadius: 3,
-              backgroundColor: "#fff",
-              WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": {
-                WebkitTextFillColor: "#222 !important",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#2AAC67 !important" },
-                "&:hover fieldset": { borderColor: "black !important" },
-                transition: "background-color 0.3s ease",
-                "&:hover": { backgroundColor: "#E6F3EA" },
-              },
-            }}
-          />
-          <TextField
-            label="Puesto"
-            value={personal.puesto}
-            InputProps={{ readOnly: true }}
-            variant="outlined"
-            size="small"
-            disabled
-            sx={{
-              mb: 2.5,
-              width: "100%",
-              borderRadius: 3,
-              backgroundColor: "#fff",
-              WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": {
-                WebkitTextFillColor: "#222 !important",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#2AAC67 !important" },
-                "&:hover fieldset": { borderColor: "black !important" },
-                transition: "background-color 0.3s ease",
-                "&:hover": { backgroundColor: "#E6F3EA" },
-              },
-            }}
-          />
-          <TextField
-            label="Departamento"
-            value={personal.departamento}
-            InputProps={{ readOnly: true }}
-            variant="outlined"
-            size="small"
-            disabled
-            sx={{
-              mb: 2.5,
-              width: "100%",
-              borderRadius: 3,
-              backgroundColor: "#fff",
-              WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": {
-                WebkitTextFillColor: "#222 !important",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#2AAC67 !important" },
-                "&:hover fieldset": { borderColor: "black !important" },
-                transition: "background-color 0.3s ease",
-                "&:hover": { backgroundColor: "#E6F3EA" },
-              },
-            }}
-          />
-          <TextField
-            label="Área"
-            value={personal.area}
-            InputProps={{ readOnly: true }}
-            variant="outlined"
-            size="small"
-            disabled
-            sx={{
-              mb: 2.5,
-              width: "100%",
-              borderRadius: 3,
-              backgroundColor: "#fff",
-              WebkitTextFillColor: "#18703f",
-              "& .MuiInputBase-input": {
-                WebkitTextFillColor: "#222 !important",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#2AAC67 !important" },
-                "&:hover fieldset": { borderColor: "black !important" },
-                transition: "background-color 0.3s ease",
-                "&:hover": { backgroundColor: "#E6F3EA" },
-              },
-            }}
-          />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Typography
-            variant="h5"
-            sx={{
-              color: "#2AAC67",
-              fontWeight: "bold",
-              mb: 2.5,
-              letterSpacing: "0.5px",
-            }}
-          >
+          </h3>
+          
+          <div className="space-y-4">
+            <div className="flex flex-col">
+              <label className="block text-sm font-semibold text-[#2AAC67] mb-2">
+                Cédula
+              </label>
+              <div className="w-full border border-[#2AAC67] rounded-lg px-4 py-3 bg-white text-[#333] font-medium focus:outline-none focus:ring-2 focus:ring-[#2AAC67] transition-all duration-300 hover:bg-[#E6F3EA]">
+                {data.cedula}
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="block text-sm font-semibold text-[#2AAC67] mb-2">
+                Nombre
+              </label>
+              <div className="w-full border border-[#2AAC67] rounded-lg px-4 py-3 bg-white text-[#333] font-medium focus:outline-none focus:ring-2 focus:ring-[#2AAC67] transition-all duration-300 hover:bg-[#E6F3EA]">
+                {data.nombre}
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="block text-sm font-semibold text-[#2AAC67] mb-2">
+                Apellidos
+              </label>
+              <div className="w-full border border-[#2AAC67] rounded-lg px-4 py-3 bg-white text-[#333] font-medium focus:outline-none focus:ring-2 focus:ring-[#2AAC67] transition-all duration-300 hover:bg-[#E6F3EA]">
+                {apellidos}
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="block text-sm font-semibold text-[#2AAC67] mb-2">
+                Puesto
+              </label>
+              <div className="w-full border border-[#2AAC67] rounded-lg px-4 py-3 bg-white text-[#333] font-medium focus:outline-none focus:ring-2 focus:ring-[#2AAC67] transition-all duration-300 hover:bg-[#E6F3EA]">
+                {personal.puesto}
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="block text-sm font-semibold text-[#2AAC67] mb-2">
+                Departamento
+              </label>
+              <div className="w-full border border-[#2AAC67] rounded-lg px-4 py-3 bg-white text-[#333] font-medium focus:outline-none focus:ring-2 focus:ring-[#2AAC67] transition-all duration-300 hover:bg-[#E6F3EA]">
+                {personal.departamento}
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="block text-sm font-semibold text-[#2AAC67] mb-2">
+                Área
+              </label>
+              <div className="w-full border border-[#2AAC67] rounded-lg px-4 py-3 bg-white text-[#333] font-medium focus:outline-none focus:ring-2 focus:ring-[#2AAC67] transition-all duration-300 hover:bg-[#E6F3EA]">
+                {personal.area}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex-1">
+          <h2 className="text-2xl font-bold text-[#2AAC67] mb-6 tracking-wide">
             Roles de Trabajo
-          </Typography>
+          </h2>
           <CollaboratorRolesList
             roles={data.roles}
             onRefresh={() => setRefreshKey((k) => k + 1)}
           />
-        </Box>
-      </Paper>
+        </div>
+      </div>
     </Box>
   );
 }
