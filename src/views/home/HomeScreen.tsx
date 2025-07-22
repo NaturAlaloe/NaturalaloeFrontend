@@ -210,7 +210,7 @@ export default function HomeScreen() {
 
         {/* Solo mantén esta sección de departamentos */}
         <PendingSection
-          title="Pendientes a Capacitaciones por Departamento"
+          title="Pendientes a Capacitaciones"
           data={pendingDepartments}
           loading={loadingPendings}
           columns={departmentColumns}
