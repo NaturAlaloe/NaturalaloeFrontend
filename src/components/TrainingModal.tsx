@@ -7,7 +7,7 @@ import {
   GeneralInfoSection,
   EvaluationSection,
   CommentSection,
-} from "./training/TrainingFormSections";
+} from "./TrainingFormSections";
 
 interface TrainingModalProps {
   open: boolean;

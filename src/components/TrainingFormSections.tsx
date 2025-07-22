@@ -1,6 +1,6 @@
 import React from "react";
-import InputField from "../formComponents/InputField";
-import SelectAutocomplete from "../formComponents/SelectAutocomplete";
+import InputField from "./formComponents/InputField";
+import SelectAutocomplete from "./formComponents/SelectAutocomplete";
 
 interface FormSectionProps {
   title: string;
