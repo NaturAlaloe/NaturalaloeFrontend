@@ -76,7 +76,6 @@ export default function PoliticsList() {
             style={{ minWidth: 80 }}
             disabled={isObsolete}
           >
-            <option value="">Seleccionar</option>
             {row.versiones
               ?.sort((a: any, b: any) => a.revision - b.revision) // Ordenar por número de revisión
               ?.map((version: any) => (
@@ -89,7 +88,6 @@ export default function PoliticsList() {
                 }}
               >
                 {version.revision} {version.vigente === 1 ? '(Vigente)' : ''} 
-             
               </option>
             ))}
           </select>
