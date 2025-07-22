@@ -28,8 +28,28 @@ export const getCollaborators = async (
     }
     return [];
   } catch (error) {
-    console.error("Error fetching collaborators:", error);
     return [];
+  }
+};
+
+// Función auxiliar para obtener información básica de un colaborador
+const getBasicCollaboratorInfo = async (id_colaborador: string | number) => {
+  try {
+    const collaborators = await getCollaborators();
+    const collaborator = collaborators.find(
+      (c) => c.id_colaborador === String(id_colaborador)
+    );
+    if (collaborator) {
+      return {
+        nombre: collaborator.nombre,
+        apellido1: collaborator.apellido1,
+        apellido2: collaborator.apellido2,
+        cedula: collaborator.cedula,
+      };
+    }
+    return null;
+  } catch (error) {
+    return null;
   }
 };
 
@@ -67,9 +87,20 @@ export interface ICollaboratorDetail {
   id_documento: number;
 }
 
+export interface ICollaboratorDetailError {
+  type: "no_procedures" | "not_found" | "general_error";
+  message: string;
+  collaboratorInfo?: {
+    nombre: string;
+    apellido1: string;
+    apellido2: string;
+    cedula?: string;
+  };
+}
+
 export const getCollaboratorDetail = async (
   id_colaborador: string | number
-): Promise<ICollaboratorDetail | null> => {
+): Promise<ICollaboratorDetail | ICollaboratorDetailError | null> => {
   try {
     const response = await api.get(`/collaboratorList/${id_colaborador}`);
     const data = response.data.data;
@@ -112,8 +143,26 @@ export const getCollaboratorDetail = async (
       roles: Object.values(rolesMap),
       id_documento: data[0].id_documento,
     };
-  } catch (error) {
-    console.error("Error fetching collaborator detail:", error);
-    return null;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      const errorMessage = error.response?.data?.message;
+      if (errorMessage && errorMessage.includes("procedimientos")) {
+        const basicInfo = await getBasicCollaboratorInfo(id_colaborador);
+        return {
+          type: "no_procedures",
+          message: errorMessage,
+          collaboratorInfo: basicInfo || undefined,
+        };
+      }
+      return {
+        type: "not_found",
+        message: "Colaborador no encontrado",
+      };
+    }
+
+    return {
+      type: "general_error",
+      message: "Error al cargar la información del colaborador",
+    };
   }
 };

@@ -1,22 +1,4 @@
-import React, { useState } from "react";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import Collapse from "@mui/material/Collapse";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import { Button } from "@mui/material";
-import EditDocumentIcon from "@mui/icons-material/EditDocument";
-import Box from "@mui/material/Box";
+import { useState } from "react";
 import TrainingModal from "./TrainingModal";
 import type { ICollaboratorDetailRole } from "../services/manage/collaboratorService";
 import { useParams } from "react-router-dom";
@@ -40,17 +22,24 @@ export default function CollaboratorRolesList({
   };
 
   const handleOpenModal = (row: any) => {
-    setModalData({
+    const modalDataToSet = {
       ...row,
       id_colaborador: Number(id_colaborador),
       id_documento_normativo: row.id_documento,
-    });
+    };
+
+    setModalData(modalDataToSet);
     setModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setModalOpen(false);
     setModalData(null);
+    // No refrescar automáticamente al cerrar - solo al guardar exitosamente
+  };
+
+  const handleSuccessfulSave = () => {
+    // Refrescar solo cuando se guarde exitosamente
     if (typeof onRefresh === "function") {
       onRefresh();
     }
@@ -58,196 +47,211 @@ export default function CollaboratorRolesList({
 
   return (
     <>
-      <List
-        sx={{
-          width: "100%",
-          bgcolor: "background.paper",
-          borderRadius: 4,
-          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.12)",
-          border: "1px solid #2AAC67",
-          px: 0,
-          transition: "box-shadow 0.3s ease",
-          "&:hover": {
-            boxShadow: "0 6px 20px rgba(0, 0, 0, 0.18)",
-          },
-        }}
-        component="nav"
-      >
-        {roles.map((role) => (
-          <React.Fragment key={role.nombre_rol}>
+      <div className="w-full bg-white rounded-2xl shadow-lg border-2 border-[#2AAC67] transition-shadow duration-300 hover:shadow-xl overflow-hidden">
+        {roles.map((role, roleIndex) => (
+          <div key={role.nombre_rol}>
             {/* Botón de cada rol */}
-            <ListItemButton
+            <button
               onClick={() => handleClick(role.nombre_rol)}
-              sx={{
-                py: 1.2,
-                transition: "background-color 0.3s ease, transform 0.3s ease",
-                "&:hover": {
-                  backgroundColor: "#E6F3EA",
-                  transform: "translateX(5px)",
-                },
-              }}
+              className={`w-full py-4 px-6 flex items-center justify-between text-left transition-all duration-300 hover:bg-[#E6F3EA] hover:translate-x-2 ${
+                roleIndex === 0 ? "rounded-t-2xl" : ""
+              } ${
+                roleIndex === roles.length - 1 && !open[role.nombre_rol]
+                  ? "rounded-b-2xl"
+                  : ""
+              }`}
             >
-              <ListItemText
-                primary={role.nombre_rol}
-                primaryTypographyProps={{
-                  fontWeight: "bold",
-                  color: "black",
-                  letterSpacing: "0.5px",
-                }}
-              />
-              {open[role.nombre_rol] ? (
-                <ExpandLess sx={{ color: "#2AAC67" }} />
-              ) : (
-                <ExpandMore sx={{ color: "#2AAC67" }} />
-              )}
-            </ListItemButton>
-            <Collapse in={!!open[role.nombre_rol]} timeout="auto" unmountOnExit>
-              <TableContainer
-                component={Paper}
-                sx={{
-                  my: 1,
-                  mx: 2,
-                  borderRadius: 3,
-                  boxShadow: "0 3px 10px rgba(0, 0, 0, 0.1)",
-                  border: "1px solid #2AAC67",
-                  animation: "fadeIn 0.5s ease-out",
-                  "@keyframes fadeIn": {
-                    "0%": { opacity: 0, transform: "translateY(10px)" },
-                    "100%": { opacity: 1, transform: "translateY(0)" },
-                  },
-                }}
+              <span className="font-bold text-black text-lg tracking-wide">
+                {role.nombre_rol}
+              </span>
+              <div className="text-[#2AAC67]">
+                {open[role.nombre_rol] ? (
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 15l7-7 7 7"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                )}
+              </div>
+            </button>
+
+            {/* Contenido colapsable */}
+            {open[role.nombre_rol] && (
+              <div
+                className={`mx-4 my-2 bg-white rounded-xl border-2 border-[#2AAC67] shadow-md animate-fadeIn ${
+                  roleIndex === roles.length - 1 ? "mb-4" : ""
+                }`}
               >
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        sx={{
-                          color: "#2AAC67",
-                          fontWeight: "bold",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        POE
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          color: "#2AAC67",
-                          fontWeight: "bold",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        Descripción
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          color: "#2AAC67",
-                          fontWeight: "bold",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        Versión
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          color: "#2AAC67",
-                          fontWeight: "bold",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        Fecha de inducción
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          color: "#2AAC67",
-                          fontWeight: "bold",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        Estado
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {(role.poes || []).map((row, idx) => (
-                      <TableRow
-                        key={idx}
-                        sx={{
-                          transition: "background-color 0.3s ease",
-                          "&:hover": {
-                            backgroundColor: "#F0F8F2",
-                          },
-                        }}
-                      >
-                        <TableCell>{row.codigo}</TableCell>
-                        <TableCell>{row.descripcion}</TableCell>
-                        <TableCell>{Math.floor(Number(row.version))}</TableCell>
-                        <TableCell>
-                          {row.fecha_inicio
-                            ? new Date(row.fecha_inicio).toLocaleDateString()
-                            : "-"}
-                        </TableCell>
-                        <TableCell>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            {row.estado_capacitacion === "Capacitado" ? (
-                              <CheckCircleIcon
-                                sx={{ color: "#2AAC67", fontSize: "1.6rem" }}
-                              />
-                            ) : (
-                              <>
-                                <CancelIcon
-                                  sx={{ color: "#e53935", fontSize: "1.6rem" }}
-                                />
-                                <Button
-                                  variant="contained"
-                                  color="primary"
-                                  size="small"
-                                  sx={{
-                                    backgroundColor: "#2AAC67",
-                                    "&:hover": { backgroundColor: "#1F8A50" },
-                                    textTransform: "none",
-                                    fontWeight: "bold",
-                                    borderRadius: 2,
-                                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                                    transition: "all 0.3s ease",
-                                  }}
-                                  onClick={() => handleOpenModal(row)}
-                                >
-                                  <EditDocumentIcon />
-                                </Button>
-                              </>
-                            )}
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {(role.poes || []).length === 0 && (
-                      <TableRow>
-                        <TableCell
-                          colSpan={5}
-                          align="center"
-                          sx={{ color: "#888" }}
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="px-4 py-3 text-left text-sm font-bold text-[#2AAC67] tracking-wide border-b border-[#2AAC67] first:rounded-tl-xl last:rounded-tr-xl">
+                          POE
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-[#2AAC67] tracking-wide border-b border-[#2AAC67]">
+                          Descripción
+                        </th>
+                        <th className="px-4 py-3 text-center text-sm font-bold text-[#2AAC67] tracking-wide border-b border-[#2AAC67]">
+                          Versión
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-[#2AAC67] tracking-wide border-b border-[#2AAC67]">
+                          Fecha de inducción
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-[#2AAC67] tracking-wide border-b border-[#2AAC67] first:rounded-tl-xl last:rounded-tr-xl">
+                          Estado
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(role.poes || []).map((row, idx) => (
+                        <tr
+                          key={idx}
+                          className={`transition-colors duration-300 hover:bg-[#F0F8F2] border-b border-gray-100 last:border-b-0 ${
+                            idx === 0 ? "hover:rounded-t-xl" : ""
+                          } ${
+                            idx === (role.poes || []).length - 1
+                              ? "hover:rounded-b-xl"
+                              : ""
+                          }`}
                         >
-                          No hay registros de procedimientos para este rol.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Collapse>
-          </React.Fragment>
+                          <td className="px-4 py-3 text-sm text-gray-800">
+                            {row.codigo}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-800">
+                            {row.descripcion}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-800 text-center">
+                            {Math.floor(Number(row.version))}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-800">
+                            {row.fecha_inicio
+                              ? (() => {
+                                  // Crear fecha sin interpretación de zona horaria
+                                  const fechaParts =
+                                    row.fecha_inicio.split("-");
+                                  if (fechaParts.length === 3) {
+                                    const fecha = new Date(
+                                      parseInt(fechaParts[0]),
+                                      parseInt(fechaParts[1]) - 1,
+                                      parseInt(fechaParts[2])
+                                    );
+                                    return fecha.toLocaleDateString("es-ES", {
+                                      year: "numeric",
+                                      month: "2-digit",
+                                      day: "2-digit",
+                                    });
+                                  } else {
+                                    // Fallback para formatos de fecha con hora
+                                    const fecha = new Date(
+                                      row.fecha_inicio + "T00:00:00"
+                                    );
+                                    return fecha.toLocaleDateString("es-ES", {
+                                      year: "numeric",
+                                      month: "2-digit",
+                                      day: "2-digit",
+                                    });
+                                  }
+                                })()
+                              : "-"}
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              {row.estado_capacitacion === "Capacitado" ? (
+                                <svg
+                                  className="w-6 h-6 text-[#2AAC67]"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              ) : (
+                                <>
+                                  <svg
+                                    className="w-6 h-6 text-red-600"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                  <button
+                                    onClick={() => handleOpenModal(row)}
+                                    className="bg-[#2AAC67] hover:bg-[#1F8A50] text-white font-bold py-2 px-3 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg transform hover:scale-105"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                      />
+                                    </svg>
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {(role.poes || []).length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={5}
+                            className="px-4 py-8 text-center text-gray-500 text-sm"
+                          >
+                            No hay registros de procedimientos para este rol.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
         ))}
-      </List>
+      </div>
+
       {/* Modal de capacitación */}
       <TrainingModal
         open={modalOpen}
         onClose={handleCloseModal}
+        onSuccess={handleSuccessfulSave}
         initialData={modalData}
       />
     </>
