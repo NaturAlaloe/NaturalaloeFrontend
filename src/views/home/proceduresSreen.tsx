@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
 import { Typography, Card, CardContent, LinearProgress, Box, Alert } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
-import api from '../../apiConfig/api';
+import { useProceduresDepartments } from '../../hooks/useProceduresDepartments';
 
 const getProgressColor = (percentage: number) => {
   if (percentage >= 95) return 'success';
@@ -17,39 +16,16 @@ const getProgressBgColor = (percentage: number) => {
   return 'bg-red-50';
 };
 
-type ProcedureDepartment = {
-  id_departamento: number;
-  departamento: string;
-  total_poes: number;
-  total_actualizados: string;
-  no_actualizados: string;
-  cumplimiento_pct: string;
-  fecha_actualizacion: string;
-};
-
-
-export default function CertificationScreen() {
-  const [departments, setDepartments] = useState<ProcedureDepartment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    api.get('/dataForGraphicPendingProceduresByDepartment')
-      .then(res => {
-        if (res.data.success) {
-          setDepartments(res.data.data);
-        } else {
-          setError(res.data.message || 'Error al obtener datos');
-        }
-      })
-      .catch(() => setError('Error al obtener datos de procedimientos'))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const totalProcedures = departments.reduce((sum, dept) => sum + Number(dept.total_poes), 0);
-  const totalUpdated = departments.reduce((sum, dept) => sum + Number(dept.total_actualizados), 0);
-  const totalPending = departments.reduce((sum, dept) => sum + Number(dept.no_actualizados), 0);
-  const overallPercentage = totalProcedures ? ((totalUpdated / totalProcedures) * 100).toFixed(1) : "0";
+export default function ProceduresScreen() {
+  const {
+    departments,
+    loading,
+    error,
+    totalProcedures,
+    totalUpdated,
+    totalPending,
+    overallPercentage,
+  } = useProceduresDepartments();
 
   if (loading) {
     return <FullScreenSpinner />;

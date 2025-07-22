@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import { Card, CardContent, Box, Alert, Typography, LinearProgress } from "@mui/material";
-import api from "../../apiConfig/api";
+import { useTrainingDepartments } from "../../hooks/useTrainingDepartments";
 
 const getProgressColor = (percentage: number) => {
   if (percentage >= 95) return "success";
@@ -10,28 +9,16 @@ const getProgressColor = (percentage: number) => {
   return "error";
 };
 
-export default function PendingTrainingsScreen() {
-  const [departments, setDepartments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    api.get("/dataForGraphicTrainingPendings")
-      .then(res => {
-        if (res.data.success) {
-          setDepartments(res.data.data);
-        } else {
-          setError(res.data.message || "Error al obtener datos");
-        }
-      })
-      .catch(() => setError("Error al obtener datos"))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const totalEmployees = departments.reduce((sum, dept: any) => sum + Number(dept.total_empleados), 0);
-  const totalCertified = departments.reduce((sum, dept: any) => sum + Number(dept.total_certificados), 0);
-  const totalPending = departments.reduce((sum, dept: any) => sum + Number(dept.pendientes), 0);
-  const overallPercentage = totalEmployees ? ((totalCertified / totalEmployees) * 100).toFixed(1) : "0";
+export default function TrainingScreen() {
+  const {
+    departments,
+    loading,
+    error,
+    totalEmployees,
+    totalCertified,
+    totalPending,
+    overallPercentage,
+  } = useTrainingDepartments();
 
   if (loading) return <FullScreenSpinner />;
 
@@ -72,7 +59,7 @@ export default function PendingTrainingsScreen() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {departments.map((dept: any) => (
+        {departments.map((dept) => (
           <Card key={dept.id_departamento} className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
