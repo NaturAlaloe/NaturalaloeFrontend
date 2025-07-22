@@ -96,7 +96,7 @@ export default function Register() {
               pattern={undefined}
             />
             <InputField
-              label="Apellidos"
+              label="Apellido 1"
               name="apellido1"
               value={formData.apellido1}
               onChange={handleChange}
