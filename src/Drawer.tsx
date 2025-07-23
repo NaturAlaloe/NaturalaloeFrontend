@@ -54,6 +54,7 @@ import CapacitacionesPendientes from "./views/home/pendingTrainingsScreen";
 import KpiBatchYear from "./views/procedures/KpiBatchYear";
 import PoeScreen from "./views/home/proceduresSreen";
 import CapacitacionesDepartamentos from ".//views/home/trainingScreen"
+import ViewUsers from "./views/users/viewUsers";
 
 
 
@@ -273,6 +274,24 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                 <ListItemText primary="Registrar Usuarios" />
               </ListItemButton>
             </List>
+
+             <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/users/viewUsers"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Lista Usuarios" />
+              </ListItemButton>
+            </List>
+
             <List component="div" disablePadding>
               <ListItemButton
                 component={Link}
@@ -573,6 +592,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
         <Routes>
           <Route path="/administration/register" element={<Register />} />
           <Route path="/administration/manage" element={<Manage />} />
+          <Route path="/users/viewUsers" element={<ViewUsers/>} />
           <Route path="/administration/listAreas" element={<ListaAreas />} />
           <Route path="/administration/listDepartments" element={<ListaDepartamentos />} />
           <Route path="/administration/listWorkstations" element={<ListaPuestos />} />

@@ -26,6 +26,8 @@ const useLogin = () => {
           showCustomToast("Información", 'Credenciales incorrectas.', "info");
         } else if (status === 404) {
           showCustomToast("Error", "Usuario no encontrado.", "error");
+        } else if (status === 403) {
+          showCustomToast("Información", "Usuario deshabilitado, por favor, contactese con el administrador.", "info");
         } else if (status === 500) {
           showCustomToast("Error", "Error del servidor, por favor intenta más tarde.", "error");
         } else {
