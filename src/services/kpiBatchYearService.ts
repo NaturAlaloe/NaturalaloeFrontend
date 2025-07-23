@@ -40,7 +40,7 @@ export interface KpiBatchYearPayload {
 export interface KpiBatchYearFormData {
   idArea: number | null;
   idResponsable: number | null;
-  estado: "actualizar" | "obsoletar";
+  estado: "actualizar" | "obsoleto";
 }
 
 export const kpiBatchYearService = {
@@ -112,7 +112,7 @@ export const kpiBatchYearService = {
   getEstadoOptions() {
     return [
       { id: "actualizar", nombre: "Actualizar" },
-      { id: "obsoletar", nombre: "Obsoletar" }
+      { id: "obsoleto", nombre: "Obsoleto" }
     ];
   },
 
