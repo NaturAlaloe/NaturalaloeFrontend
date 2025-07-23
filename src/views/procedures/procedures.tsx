@@ -31,6 +31,7 @@ export default function Procedures() {
     handleSubmit,
     procedureCode,
     loadingConsecutivo,
+    fileInputRef,
   } = useNewProcedureForm();
 
   return (
@@ -54,7 +55,7 @@ export default function Procedures() {
             optionValue="id_area"
             value={areaSeleccionada}
             onChange={(newValue) =>
-              handleAutocompleteChange("area", newValue, "codigo")
+              handleAutocompleteChange("area", newValue, "id_area")
             }
             placeholder="Buscar o seleccionar área..."
             disabled={loadingAreas}
@@ -159,6 +160,7 @@ export default function Procedures() {
             onChange={handlePdfChange}
             onRemove={() => setPdfFile(null)}
             required={!pdfFile}
+            fileInputRef={fileInputRef}
           />
         </div>
         

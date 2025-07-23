@@ -11,6 +11,7 @@ interface PdfInputProps {
   required?: boolean;
   error?: string;
   helperText?: string;
+  fileInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 const PdfInput: React.FC<PdfInputProps> = ({
@@ -22,8 +23,10 @@ const PdfInput: React.FC<PdfInputProps> = ({
   required = false,
   error,
   helperText,
+  fileInputRef: externalRef,
 }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const internalRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = externalRef || internalRef;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
