@@ -110,7 +110,7 @@ export default function Register() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField
-              label="Segundo Apelido "
+              label="Segundo Apellido"
               name="apellido2"
               value={formData.apellido2}
               onChange={handleChange}
