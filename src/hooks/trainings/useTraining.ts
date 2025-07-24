@@ -277,6 +277,16 @@ export function useCapacitation() {
       return false;
     }
 
+    if(isEvaluado && !formData.metodoEvaluacion) {
+      showCustomToast("Error", "El método de evaluación es obligatorio", "error");
+      return false;
+    }
+
+    if (isEvaluado && (!formData.metodoEvaluacion || formData.metodoEvaluacion === "" || formData.metodoEvaluacion === "Seleccione...")) {
+      showCustomToast("Error", "El método de evaluación es obligatorio cuando la capacitación es evaluada", "error");
+      return false;
+    }
+
     if (colaboradoresAsignados.length === 0) {
       showCustomToast("Error", "Debe asignar al menos un colaborador", "error");
       return false;
