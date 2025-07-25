@@ -100,7 +100,7 @@ export default function Register() {
               name="apellido1"
               value={formData.apellido1}
               onChange={handleChange}
-              placeholder="Apellido 1"
+              placeholder="Primer Apellido"
               type="text"
               required
               pattern={undefined}
@@ -114,7 +114,7 @@ export default function Register() {
               name="apellido2"
               value={formData.apellido2}
               onChange={handleChange}
-              placeholder="Apellido 2"
+              placeholder="Segundo Apellido"
               type="text"
               required
               pattern={undefined}
