@@ -81,6 +81,12 @@ export const validateCapacitacionData = (
     errors.push("La fecha de inicio no puede ser posterior a la fecha de fin");
   }
 
+  
+  if (!data.is_evaluado) {
+    errors.push("La capacitación debe ser evaluada");
+  }
+
+
   if (
     data.is_evaluado &&
     (!data.metodo_empleado ||

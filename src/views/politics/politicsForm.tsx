@@ -15,6 +15,7 @@ export default function PoliticsForm() {
     handlePdfChange,
     responsables,
     loadingResponsables,
+    fileInputRef,
   } = usePolitics();
 
   return (
@@ -93,6 +94,7 @@ export default function PoliticsForm() {
           onChange={handlePdfChange}
           onRemove={() => setPdfFile(null)}
           required={!pdfFile}
+          fileInputRef={fileInputRef}
         />
     
       </div>
