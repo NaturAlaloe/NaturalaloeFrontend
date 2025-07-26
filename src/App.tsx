@@ -15,7 +15,7 @@ function App() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [showTokenExpiredModal, setShowTokenExpiredModal] = useState(false);
   const [showForceChangePasswordModal, setShowForceChangePasswordModal] = useState(false);
-  const [userData, setUserData] = useState(null);
+  const [, setUserData] = useState(null);
 
   // Verifica sesión y cambio_contrasena cada vez que la app carga
   useEffect(() => {
