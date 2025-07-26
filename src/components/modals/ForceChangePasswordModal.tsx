@@ -40,7 +40,8 @@ export default function ForceChangePasswordModal({
 
     await handleEditUser({ nuevaContrasena: newPassword });
 
-    onLogout();
+    showCustomToast('Éxito', 'Contraseña actualizada correctamente.', 'success');
+    setTimeout(() => onLogout(), 3000);
   };
 
   return (
