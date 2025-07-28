@@ -72,7 +72,7 @@ function addCollaborator() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const collaboratorData = {
-      id_colaborador: Number(formData.cedula),
+      cedula: (formData.cedula),
       id_puesto: Number(formData.puesto),
       nombre: formData.nombreCompleto,
       apellido1: formData.apellido1,

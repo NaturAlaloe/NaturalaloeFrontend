@@ -9,7 +9,7 @@ export interface Facilitador {
 }
 
 export async function getFacilitadores(): Promise<Facilitador[]> {
-  const response = await api.get("/facilitatorsList");
+  const response = await api.get("/facilitators");
   return (response.data.data as any[]).map((f) => ({
     id_facilitador: f.id_facilitador,
     nombre: f.nombre,

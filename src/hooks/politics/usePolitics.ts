@@ -1,4 +1,4 @@
-import { useState, useEffect, type ChangeEvent } from "react";
+import { useState, useEffect, useRef, type ChangeEvent } from "react";
 import { createPolitics, getPoliticsConsecutive } from "../../services/politics/politicsService";
 import { getResponsibles } from "../../services/responsibles/getResponsibles";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
@@ -16,6 +16,7 @@ export function usePolitics() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [responsables, setResponsables] = useState<{ id_responsable: number; nombre_responsable: string }[]>([]);
   const [loadingResponsables, setLoadingResponsables] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getPoliticsConsecutive().then((codigo) => {
@@ -85,6 +86,10 @@ export function usePolitics() {
 
       });
       setPdfFile(null);
+      // Resetear el input del archivo HTML
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error: any) {
       showCustomToast(
         "Error",
@@ -104,5 +109,6 @@ export function usePolitics() {
     handlePdfChange,
     responsables,
     loadingResponsables,
+    fileInputRef,
   };
 }

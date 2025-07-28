@@ -2,18 +2,43 @@ import { useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
 import { useHomeData } from '../../hooks/useHomeData';
+import { usePoliciesCompliance } from '../../hooks/usePoliciesCompliance';
 import ChartSelector from '../../components/home/ChartSelector';
 import { Typography } from '@mui/material';
-
-const kpiList = [
-  { label: 'Certificación del Personal', value: '90.0%', trend: '+3.0%', color: 'bg-blue-50 text-blue-700', hasScreen: true },
-  { label: 'Procedimientos Actualizados', value: '87.0%', trend: '+1.5%', color: 'bg-green-50 text-green-700', hasScreen: true },
-  { label: 'Políticas Actualizadas', value: '95.0%', trend: '+2.5%', color: 'bg-yellow-50 text-yellow-700', hasScreen: false },
-];
 
 export default function HomeScreen() {
   const navigate = useNavigate();
   const { loading: homeLoading, topCollaborators, totalPending } = useHomeData();
+  const { percentage: policiesPercentage, formattedDate: policiesDate, loading: loadingPolicies } = usePoliciesCompliance();
+
+  // Crear la lista de KPIs con datos dinámicos
+  const kpiList = [
+    { 
+      label: 'Pendientes de Capacitación por Departamento', 
+      value: '90.0%', 
+      trend: '+3.0%', 
+      color: 'bg-blue-50 text-blue-700', 
+      hasScreen: true,
+      lastUpdate: "Julio 2025"
+    },
+    { 
+      label: 'Procedimientos Pendientes por Departamento', 
+      value: '87.0%', 
+      trend: '+1.5%', 
+      color: 'bg-green-50 text-green-700', 
+      hasScreen: true,
+      lastUpdate: "Julio 2025"
+    },
+    { 
+      label: 'Cumplimiento de POEs', 
+      value: loadingPolicies ? "..." : policiesPercentage, 
+      trend: '+2.5%', 
+      color: 'bg-yellow-50 text-yellow-700', 
+      hasScreen: false,
+      lastUpdate: policiesDate,
+      isRealTime: true
+    },
+  ];
 
   if (homeLoading) {
     return <FullScreenSpinner />;
@@ -21,13 +46,11 @@ export default function HomeScreen() {
 
   return (
     <div className="min-h-screen bg-[#FFF] px-6 py-8 rounded-xl">
-
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-green-800 text-center">Dashboard de Indicadores</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-
         <div className="lg:col-span-3">
           <ChartSelector />
         </div>
@@ -41,10 +64,9 @@ export default function HomeScreen() {
               }`}
               onClick={() => {
                 if (!kpi.hasScreen) return;
-                // Navegación específica para cada KPI
-                if (kpi.label === 'Certificación del Personal') {
+                if (kpi.label === 'Pendientes de Capacitación por Departamento') {
                   navigate('/home/trainingScreen');
-                } else if (kpi.label === 'Procedimientos Actualizados') {
+                } else if (kpi.label === 'Procedimientos Pendientes por Departamento') {
                   navigate('/home/proceduresScreen');
                 }
               }}
@@ -52,7 +74,7 @@ export default function HomeScreen() {
               <span className="text-gray-500 text-sm mb-2">{kpi.label}</span>
               <span className="text-2xl font-bold mb-1 text-green-800">{kpi.value}</span>
               <span className="text-xs text-gray-400 mb-2">
-                Última actualización: Julio 2025
+                Última actualización: {kpi.lastUpdate}
               </span>
               <div className="flex w-full justify-end mt-4">
                 {kpi.hasScreen && (
@@ -60,15 +82,13 @@ export default function HomeScreen() {
                     className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-semibold hover:bg-green-200 transition"
                     onClick={e => {
                       e.stopPropagation();
-                      // Navegación específica para cada KPI
-                      if (kpi.label === 'Certificación del Personal') {
+                      if (kpi.label === 'Pendientes de Capacitación por Departamento') {
                         navigate('/home/trainingScreen');
-                      } else if (kpi.label === 'Procedimientos Actualizados') {
+                      } else if (kpi.label === 'Procedimientos Pendientes por Departamento') {
                         navigate('/home/proceduresScreen');
                       }
                     }}
                   >
-              
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>

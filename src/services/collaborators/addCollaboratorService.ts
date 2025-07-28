@@ -3,7 +3,7 @@ import api from "../../apiConfig/api";
 
 export interface Collaborator {
 
-    id_colaborador: number;
+    cedula: string;
     id_puesto: number;
     nombre: string;
     apellido1: string;

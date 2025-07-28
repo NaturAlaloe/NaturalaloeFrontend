@@ -223,7 +223,7 @@ export const useEvaluatedTraining = (
       if (
         !colab.seguimiento ||
         colab.seguimiento === "" ||
-        colab.seguimiento === "Seleccionar"
+        colab.seguimiento === "Seleccione"
       ) {
         errores.push("Seguimiento incompleto");
       }
@@ -340,7 +340,7 @@ export const useEvaluatedTraining = (
     baseColumns.push({
       name: "Seguimiento",
       cell: (row: Colaborador) => {
-        let selectValue = "Seleccionar";
+        let selectValue = "Seleccione";
 
         switch (row.seguimiento.toLowerCase()) {
           case "satisfactorio":
@@ -354,7 +354,7 @@ export const useEvaluatedTraining = (
             selectValue = "Reevaluación";
             break;
           default:
-            selectValue = "Seleccionar";
+         
         }
 
         return React.createElement(SelectField, {
@@ -368,6 +368,7 @@ export const useEvaluatedTraining = (
               "seguimiento",
               e.target.value
             ),
+          options: ["Seleccione", "Satisfactorio", "Reprogramar", "Reevaluación"],
         });
       },
     });

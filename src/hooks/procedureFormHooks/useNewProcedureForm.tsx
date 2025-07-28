@@ -49,7 +49,7 @@ export function useNewProcedureForm() {
   const { responsibles, loading: loadingResponsibles } = useResponsibles();
 
   // SelectFields: buscan por ID
-  const areaSeleccionada = useSelectField(areas, formData.area, "codigo");
+  const areaSeleccionada = useSelectField(areas, formData.area, "id_area");
   const departamentoSeleccionado = useSelectField(
     departments,
     formData.departamento,
@@ -72,7 +72,7 @@ export function useNewProcedureForm() {
     loading: loadingConsecutivo,
     fetchLastConsecutive,
   } = useLastConsecutive();
-  
+
   // Buscar consecutivo cuando cambian depto/cat
   useEffect(() => {
     if (departamentoSeleccionado && categoriaSeleccionada) {
@@ -88,58 +88,98 @@ export function useNewProcedureForm() {
     lastConsecutive
   );
 
-  
   // PDF
-  const { pdfFile, setPdfFile, handlePdfChange } = usePdfInput();
+  const { pdfFile, setPdfFile, handlePdfChange, resetPdfInput, fileInputRef } =
+    usePdfInput();
 
   // Reset
-  const limpiarFormulario = useFormReset(initialState, setFormData, setPdfFile);
+  const limpiarFormulario = useFormReset(
+    initialState,
+    setFormData,
+    resetPdfInput
+  );
 
   // Submit
   const { submitProcedure, loading: loadingSubmit } =
     useCreateProcedureSubmit();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // Validación completa de campos requeridos
     if (!pdfFile) {
-      showCustomToast("Campo requerido", "Por favor, carga un archivo PDF", "error");
+      showCustomToast(
+        "Campo requerido",
+        "Por favor, carga un archivo PDF",
+        "error"
+      );
       return;
     }
     if (!formData.titulo.trim()) {
-      showCustomToast("Campo requerido", "Por favor, ingresa el título del procedimiento", "error");
+      showCustomToast(
+        "Campo requerido",
+        "Por favor, ingresa el título del procedimiento",
+        "error"
+      );
       return;
     }
     if (!formData.area || !areaSeleccionada) {
-      showCustomToast("Campo requerido", "Por favor, selecciona un área", "error");
+      showCustomToast(
+        "Campo requerido",
+        "Por favor, selecciona un área",
+        "error"
+      );
       return;
     }
     if (!formData.departamento || !departamentoSeleccionado) {
-      showCustomToast("Campo requerido", "Por favor, selecciona un departamento", "error");
+      showCustomToast(
+        "Campo requerido",
+        "Por favor, selecciona un departamento",
+        "error"
+      );
       return;
     }
     if (!formData.categoria || !categoriaSeleccionada) {
-      showCustomToast("Campo requerido", "Por favor, selecciona una categoría", "error");
+      showCustomToast(
+        "Campo requerido",
+        "Por favor, selecciona una categoría",
+        "error"
+      );
       return;
     }
     if (!formData.responsable || !responsableSeleccionado) {
-      showCustomToast("Campo requerido", "Por favor, selecciona un responsable", "error");
+      showCustomToast(
+        "Campo requerido",
+        "Por favor, selecciona un responsable",
+        "error"
+      );
       return;
     }
-   
+
     if (!formData.fechaCreacion) {
-      showCustomToast("Campo requerido", "Por favor, selecciona la fecha de creación", "error");
+      showCustomToast(
+        "Campo requerido",
+        "Por favor, selecciona la fecha de creación",
+        "error"
+      );
       return;
     }
     if (!formData.fechaVigencia) {
-      showCustomToast("Campo requerido", "Por favor, selecciona la fecha de vigencia", "error");
+      showCustomToast(
+        "Campo requerido",
+        "Por favor, selecciona la fecha de vigencia",
+        "error"
+      );
       return;
     }
     if (!codeApi) {
-      showCustomToast("Código no generado", "Espera a que se genere el código del procedimiento automáticamente", "error");
+      showCustomToast(
+        "Código no generado",
+        "Espera a que se genere el código del procedimiento automáticamente",
+        "error"
+      );
       return;
     }
-    
+
     try {
       await submitProcedure({
         descripcion: formData.titulo,
@@ -182,5 +222,6 @@ export function useNewProcedureForm() {
     handleSubmit,
     procedureCode: codeVisual,
     loadingConsecutivo,
+    fileInputRef,
   };
 }

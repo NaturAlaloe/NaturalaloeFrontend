@@ -1,5 +1,68 @@
 @import "tailwindcss";
+
 main {
    background-color: #DEF7E9 ;
    min-height: 100vh;
+}
+
+/* Animación fadeIn para CollaboratorRolesList */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
   }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Hover redondeado para filas de tabla */
+.hover\:rounded-t-xl:hover td:first-child {
+  border-top-left-radius: 0.75rem;
+  transition: border-radius 0.3s ease;
+}
+
+.hover\:rounded-t-xl:hover td:last-child {
+  border-top-right-radius: 0.75rem;
+  transition: border-radius 0.3s ease;
+}
+
+.hover\:rounded-b-xl:hover td:first-child {
+  border-bottom-left-radius: 0.75rem;
+  transition: border-radius 0.3s ease;
+}
+
+.hover\:rounded-b-xl:hover td:last-child {
+  border-bottom-right-radius: 0.75rem;
+  transition: border-radius 0.3s ease;
+}
+
+/* Transiciones para cuando sale del hover */
+.hover\:rounded-t-xl td:first-child,
+.hover\:rounded-t-xl td:last-child,
+.hover\:rounded-b-xl td:first-child,
+.hover\:rounded-b-xl td:last-child {
+  transition: border-radius 0.3s ease, background-color 0.3s ease;
+}
+
+/* Estado normal (sin hover) */
+.hover\:rounded-t-xl td:first-child {
+  border-top-left-radius: 0;
+}
+
+.hover\:rounded-t-xl td:last-child {
+  border-top-right-radius: 0;
+}
+
+.hover\:rounded-b-xl td:first-child {
+  border-bottom-left-radius: 0;
+}
+
+.hover\:rounded-b-xl td:last-child {
+  border-bottom-right-radius: 0;
+}

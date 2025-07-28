@@ -7,13 +7,13 @@ export interface RegisterIndividualTrainingPayload {
   titulo_capacitacion: string;
   fecha_inicio: string;
   fecha_fin: string;
-  tipo_capacitacion: string;
   comentario: string;
   is_evaluado: number;
-  metodo_empleado: string;
+  metodo_empleado: string | null;
   seguimiento: string;
   duracion: number;
   nota: number;
+  is_aprobado: string | null;
 }
 
 export async function registerIndividualTraining(

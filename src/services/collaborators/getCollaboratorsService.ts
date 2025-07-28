@@ -2,6 +2,7 @@ import axiosInstance from "../../apiConfig/api";
 
 export interface Collaborator {
     id_colaborador: number;
+    cedula: string;
     puesto: string;
     nombre: string;
     apellido1: string;
