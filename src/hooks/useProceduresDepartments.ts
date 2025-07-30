@@ -40,19 +40,9 @@ export function useProceduresDepartments() {
     fetchProceduresDepartments();
   }, []);
 
-  // Cálculos derivados
-  const totalProcedures = departments.reduce((sum, dept) => sum + Number(dept.total_poes), 0);
-  const totalUpdated = departments.reduce((sum, dept) => sum + Number(dept.total_actualizados), 0);
-  const totalPending = departments.reduce((sum, dept) => sum + Number(dept.no_actualizados), 0);
-  const overallPercentage = totalProcedures ? ((totalUpdated / totalProcedures) * 100).toFixed(1) : "0";
-
   return {
     departments,
     loading,
     error,
-    totalProcedures,
-    totalUpdated,
-    totalPending,
-    overallPercentage,
   };
 }

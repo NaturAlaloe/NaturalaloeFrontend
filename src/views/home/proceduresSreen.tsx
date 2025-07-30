@@ -3,6 +3,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
 import { useProceduresDepartments } from '../../hooks/useProceduresDepartments';
+import { useGlobalPoeKpi } from '../../hooks/useGlobalPoeKpi';
 
 const getProgressColor = (percentage: number) => {
   if (percentage >= 95) return 'success';
@@ -19,13 +20,21 @@ const getProgressBgColor = (percentage: number) => {
 export default function ProceduresScreen() {
   const {
     departments,
-    loading,
-    error,
+    loading: departmentsLoading,
+    error: departmentsError,
+  } = useProceduresDepartments();
+
+  const {
     totalProcedures,
     totalUpdated,
     totalPending,
     overallPercentage,
-  } = useProceduresDepartments();
+    loading: globalPoeKpiLoading,
+    error: globalPoeKpiError,
+  } = useGlobalPoeKpi();
+
+  const loading = departmentsLoading || globalPoeKpiLoading;
+  const error = departmentsError || globalPoeKpiError;
 
   if (loading) {
     return <FullScreenSpinner />;

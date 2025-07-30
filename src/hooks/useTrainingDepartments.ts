@@ -40,19 +40,9 @@ export function useTrainingDepartments() {
     fetchTrainingDepartments();
   }, []);
 
-  // Cálculos derivados
-  const totalEmployees = departments.reduce((sum, dept) => sum + Number(dept.total_empleados), 0);
-  const totalCertified = departments.reduce((sum, dept) => sum + Number(dept.total_certificados), 0);
-  const totalPending = departments.reduce((sum, dept) => sum + Number(dept.pendientes), 0);
-  const overallPercentage = totalEmployees ? ((totalCertified / totalEmployees) * 100).toFixed(1) : "0";
-
   return {
     departments,
     loading,
     error,
-    totalEmployees,
-    totalCertified,
-    totalPending,
-    overallPercentage,
   };
 }

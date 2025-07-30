@@ -2,6 +2,7 @@ import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import { Card, CardContent, Box, Alert, Typography, LinearProgress } from "@mui/material";
 import { useTrainingDepartments } from "../../hooks/useTrainingDepartments";
+import { useGlobalTrainingKpi } from "../../hooks/useGlobalTrainingKpi";
 
 const getProgressColor = (percentage: number) => {
   if (percentage >= 95) return "success";
@@ -12,13 +13,21 @@ const getProgressColor = (percentage: number) => {
 export default function TrainingScreen() {
   const {
     departments,
-    loading,
-    error,
+    loading: departmentsLoading,
+    error: departmentsError,
+  } = useTrainingDepartments();
+
+  const {
     totalEmployees,
     totalCertified,
     totalPending,
     overallPercentage,
-  } = useTrainingDepartments();
+    loading: globalKpiLoading,
+    error: globalKpiError,
+  } = useGlobalTrainingKpi();
+
+  const loading = departmentsLoading || globalKpiLoading;
+  const error = departmentsError || globalKpiError;
 
   if (loading) return <FullScreenSpinner />;
 

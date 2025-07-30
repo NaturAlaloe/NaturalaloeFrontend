@@ -3,6 +3,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
 import { useHomeData } from '../../hooks/useHomeData';
 import { usePoliciesCompliance } from '../../hooks/usePoliciesCompliance';
+import { useGlobalTrainingKpi } from '../../hooks/useGlobalTrainingKpi';
+import { useGlobalPoeKpi } from '../../hooks/useGlobalPoeKpi';
 import ChartSelector from '../../components/home/ChartSelector';
 import { Typography } from '@mui/material';
 
@@ -10,24 +12,51 @@ export default function HomeScreen() {
   const navigate = useNavigate();
   const { loading: homeLoading, topCollaborators, totalPending } = useHomeData();
   const { percentage: policiesPercentage, formattedDate: policiesDate, loading: loadingPolicies } = usePoliciesCompliance();
+  const { 
+    overallPercentage, 
+    lastUpdate, 
+    loading: loadingTrainingKpi 
+  } = useGlobalTrainingKpi();
+  
+  const { 
+    overallPercentage: poePercentage, 
+    lastUpdate: poeLastUpdate, 
+    loading: loadingPoeKpi 
+  } = useGlobalPoeKpi();
+
+  // Formatear la fecha de actualización
+  const formatLastUpdate = (dateString: string) => {
+    if (!dateString) return "Sin datos";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', { 
+        year: 'numeric', 
+        month: 'long'
+      });
+    } catch {
+      return "Fecha inválida";
+    }
+  };
 
   // Crear la lista de KPIs con datos dinámicos
   const kpiList = [
     { 
       label: 'Pendientes de Capacitación por Departamento', 
-      value: '90.0%', 
+      value: loadingTrainingKpi ? "..." : `${overallPercentage}%`, 
       trend: '+3.0%', 
       color: 'bg-blue-50 text-blue-700', 
       hasScreen: true,
-      lastUpdate: "Julio 2025"
+      lastUpdate: loadingTrainingKpi ? "Cargando..." : formatLastUpdate(lastUpdate),
+      isRealTime: true
     },
     { 
       label: 'Procedimientos Pendientes por Departamento', 
-      value: '87.0%', 
+      value: loadingPoeKpi ? "..." : `${poePercentage}%`, 
       trend: '+1.5%', 
       color: 'bg-green-50 text-green-700', 
       hasScreen: true,
-      lastUpdate: "Julio 2025"
+      lastUpdate: loadingPoeKpi ? "Cargando..." : formatLastUpdate(poeLastUpdate),
+      isRealTime: true
     },
     { 
       label: 'Cumplimiento de POEs', 
@@ -40,7 +69,7 @@ export default function HomeScreen() {
     },
   ];
 
-  if (homeLoading) {
+  if (homeLoading || loadingTrainingKpi || loadingPoeKpi) {
     return <FullScreenSpinner />;
   }
 
