@@ -12,6 +12,15 @@ export function useTrainingRegister({
   const { register, loading } = useRegisterIndividualTraining();
 
   const handleRegister = async (isEvaluado: boolean, form: any) => {
+    if (!isEvaluado) {
+      showCustomToast(
+        "Error",
+        "La capacitación individual debe ser evaluada.",
+        "error"
+      );
+      return;
+    }
+
     if (!form.fechaInicio) {
       showCustomToast("Error", "La fecha de inicio es obligatoria.", "error");
       return;
@@ -68,8 +77,15 @@ export function useTrainingRegister({
       );
       return;
     }
-    if (!form.facilitador || form.facilitador === "No hay facilitadores disponibles") {
-      showCustomToast("Error", "Debe seleccionar un facilitador válido.", "error");
+    if (
+      !form.facilitador ||
+      form.facilitador === "No hay facilitadores disponibles"
+    ) {
+      showCustomToast(
+        "Error",
+        "Debe seleccionar un facilitador válido.",
+        "error"
+      );
       return;
     }
     if (!form.seguimiento) {
@@ -111,30 +127,27 @@ export function useTrainingRegister({
       return;
     }
 
-    if (!Number.isInteger(Number(id_colaborador)) || Number(id_colaborador) <= 0) {
-      showCustomToast(
-        "Error",
-        "ID de colaborador inválido.",
-        "error"
-      );
+    if (
+      !Number.isInteger(Number(id_colaborador)) ||
+      Number(id_colaborador) <= 0
+    ) {
+      showCustomToast("Error", "ID de colaborador inválido.", "error");
       return;
     }
-    
-    if (!Number.isInteger(Number(id_facilitador)) || Number(id_facilitador) <= 0) {
-      showCustomToast(
-        "Error",
-        "ID de facilitador inválido.",
-        "error"
-      );
+
+    if (
+      !Number.isInteger(Number(id_facilitador)) ||
+      Number(id_facilitador) <= 0
+    ) {
+      showCustomToast("Error", "ID de facilitador inválido.", "error");
       return;
     }
-    
-    if (!Number.isInteger(Number(id_documento_normativo)) || Number(id_documento_normativo) <= 0) {
-      showCustomToast(
-        "Error",
-        "ID de documento normativo inválido.",
-        "error"
-      );
+
+    if (
+      !Number.isInteger(Number(id_documento_normativo)) ||
+      Number(id_documento_normativo) <= 0
+    ) {
+      showCustomToast("Error", "ID de documento normativo inválido.", "error");
       return;
     }
 
@@ -148,8 +161,10 @@ export function useTrainingRegister({
         return;
       }
 
-      const esMetodoTeorico = form.metodoEvaluacion?.toLowerCase() === "teórico";
-      const esMetodoPractico = form.metodoEvaluacion?.toLowerCase() === "práctico";
+      const esMetodoTeorico =
+        form.metodoEvaluacion?.toLowerCase() === "teórico";
+      const esMetodoPractico =
+        form.metodoEvaluacion?.toLowerCase() === "práctico";
 
       if (esMetodoTeorico) {
         if (
@@ -186,7 +201,10 @@ export function useTrainingRegister({
 
     let isAprobado = null;
     if (isEvaluado && form.metodoEvaluacion?.toLowerCase() === "práctico") {
-      isAprobado = form.estadoAprobacion?.toLowerCase() === "aprobado" ? "aprobado" : "reprobado";
+      isAprobado =
+        form.estadoAprobacion?.toLowerCase() === "aprobado"
+          ? "aprobado"
+          : "reprobado";
     }
 
     const payload = {
@@ -201,7 +219,10 @@ export function useTrainingRegister({
       metodo_empleado: isEvaluado ? form.metodoEvaluacion : null,
       seguimiento: seguimientoFormatted,
       duracion: Number(form.duracionHoras) || 0,
-      nota: isEvaluado && form.metodoEvaluacion?.toLowerCase() === "teórico" ? Number(form.nota) : 0,
+      nota:
+        isEvaluado && form.metodoEvaluacion?.toLowerCase() === "teórico"
+          ? Number(form.nota)
+          : 0,
       is_aprobado: isAprobado,
       is_evaluado: isEvaluado ? 1 : 0,
     };
