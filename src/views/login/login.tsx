@@ -50,9 +50,19 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="w-full max-w-2xl bg-white rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.1)] px-15 py-8"
+        className="w-full max-w-2xl bg-white rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.1)] px-6 sm:px-8 md:px-15 py-8"
       >
-        <div className="flex flex-row items-center justify-between mb-8">
+        {/* Logo para pantallas pequeñas */}
+        <div className="flex justify-center mb-6 md:hidden">
+          <img
+            src={LogoNaturaloe}
+            alt="Natural Aloe Logo"
+            className="w-32 h-32 drop-shadow-md"
+          />
+        </div>
+
+        {/* Header para pantallas medianas y grandes */}
+        <div className="hidden md:flex flex-row items-center justify-between mb-8">
           <div className="flex flex-col items-start">
             <h2 className="text-4xl font-bold text-[#2AAC67] mb-1">¡Bienvenido!</h2>
             <p className="text-gray-500 text-base">Por favor, inicia sesión para continuar</p>
@@ -62,6 +72,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             alt="Natural Aloe Logo"
             className="w-46 h-46 ml-6 drop-shadow-md"
           />
+        </div>
+
+        {/* Header para pantallas pequeñas */}
+        <div className="md:hidden text-center mb-8">
+          <h2 className="text-3xl font-bold text-[#2AAC67] mb-1">¡Bienvenido!</h2>
+          <p className="text-gray-500 text-sm">Por favor, inicia sesión para continuar</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
