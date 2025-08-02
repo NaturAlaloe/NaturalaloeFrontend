@@ -314,8 +314,8 @@ export default function PoliticsList() {
                 onChange={(e) => ui.setVersionInput(e.target.value)}
                 placeholder="0"
                 required
-                disabled={ui.saving || !ui.esNuevaVersion}
-                readOnly={!ui.esNuevaVersion}
+                disabled={ui.saving}
+                readOnly={false}
               />
 
               <InputField
