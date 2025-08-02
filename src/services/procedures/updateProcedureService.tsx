@@ -12,12 +12,12 @@ export async function updateProcedure(data: {
   fecha_creacion?: string;
   fecha_vigencia?: string;
   vigente?: number;
-  version_actual?: number;
   documento?: File;
 }) {
+  
   const formData = new FormData();
 
-  // Agregar todos los campos al FormData
+  // Agregar todos los campos al FormData según la documentación de la API
   formData.append("id_documento", data.id_documento.toString());
   
   if (data.codigo) formData.append("codigo", data.codigo);
@@ -30,7 +30,6 @@ export async function updateProcedure(data: {
   if (data.fecha_creacion) formData.append("fecha_creacion", data.fecha_creacion);
   if (data.fecha_vigencia) formData.append("fecha_vigencia", data.fecha_vigencia);
   if (data.vigente !== undefined) formData.append("vigente", data.vigente.toString());
-  if (data.version_actual !== undefined) formData.append("version_actual", data.version_actual.toString());
   if (data.documento) formData.append("documento", data.documento);
 
   const response = await api.put("/procedureList", formData, {
@@ -38,5 +37,6 @@ export async function updateProcedure(data: {
       "Content-Type": "multipart/form-data",
     },
   });
+  
   return response.data;
 }
