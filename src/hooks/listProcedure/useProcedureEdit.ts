@@ -106,22 +106,20 @@ export function useProcedureEdit({
 
     setSaving(true);
     try {
-      // Validación de campos obligatorios
-      const isNewVersion = editData.es_nueva_version;
-      
+      // Validación de campos obligatorios - SIEMPRE incluir revision
       if (
         !editData.descripcion ||
         !editData.id_responsable ||
         !editData.fecha_creacion ||
         !editData.fecha_vigencia ||
-        (isNewVersion && !editData.revision)
+        !editData.revision
       ) {
         const missingFields = [];
         if (!editData.descripcion) missingFields.push("título");
         if (!editData.id_responsable) missingFields.push("responsable");
         if (!editData.fecha_creacion) missingFields.push("fecha de creación");
         if (!editData.fecha_vigencia) missingFields.push("fecha de vigencia");
-        if (isNewVersion && !editData.revision) missingFields.push("número de revisión");
+        if (!editData.revision) missingFields.push("número de revisión");
 
         showCustomToast(
           "Campos obligatorios incompletos", 
@@ -131,19 +129,22 @@ export function useProcedureEdit({
         return;
       }
 
-      const result = await updateProcedure({
+      // Preparar datos para envío - mapear nombres de campos
+      const dataToSend = {
         id_documento: editData.id_documento,
         descripcion: editData.descripcion,
         id_responsable: Number(editData.id_responsable),
         id_area: editData.id_area,
         fecha_creacion: formatDateToBackend(editData.fecha_creacion),
         fecha_vigencia: formatDateToBackend(editData.fecha_vigencia),
-        revision: editData.revision,
+        version: Number(editData.revision), // API usa 'version', no 'revision'
         codigo: editData.codigo,
-        es_vigente: editData.es_vigente,
+        vigente: editData.es_vigente ? 1 : 0, // API usa 'vigente', no 'es_vigente'
         es_nueva_version: editData.es_nueva_version,
-        pdf: editData.pdf,
-      });
+        documento: editData.pdf, // API usa 'documento', no 'pdf'
+      };
+
+      const result = await updateProcedure(dataToSend);
 
       if (result.success) {
         const isNewVersion = editData.es_nueva_version;
