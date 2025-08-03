@@ -254,11 +254,7 @@ export default function ListProcedures() {
                     }
                     placeholder="1"
                     required
-                    disabled={
-                      controller.editModal.saving ||
-                      !controller.editModal.data.es_nueva_version
-                    }
-                    readOnly={!controller.editModal.data.es_nueva_version}
+                    disabled={controller.editModal.saving}
                   />
 
                   <InputField

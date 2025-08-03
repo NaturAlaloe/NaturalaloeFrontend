@@ -108,12 +108,12 @@ export function useVersionedProceduresController() {
             codigo: data.codigo,
             descripcion: data.descripcion,
             id_responsable: Number(data.id_responsable),
-            nueva_version: Number(data.revision),
+            nueva_version: Number(data.version), // API usa nueva_version para el endpoint increase
             fecha_creacion: data.fecha_creacion,
             fecha_vigencia: data.fecha_vigencia,
-            vigente: data.es_vigente ? 1 : 0,
-            version_actual: data.es_vigente ? 1 : 0,
-            documento: data.pdf || undefined,
+            vigente: data.vigente,
+            version_actual: data.vigente, // Si es vigente, también es actual
+            documento: data.documento || undefined,
           };
           
           await increaseVersion(newVersionData);
@@ -126,12 +126,11 @@ export function useVersionedProceduresController() {
             descripcion: data.descripcion,
             id_area: data.id_area,
             id_responsable: Number(data.id_responsable),
-            version: Number(data.revision),
+            version: Number(data.version), // API usa version para el endpoint update
             fecha_creacion: data.fecha_creacion,
             fecha_vigencia: data.fecha_vigencia,
-            vigente: data.es_vigente ? 1 : 0,
-            version_actual: data.es_vigente ? 1 : 0,
-            documento: data.pdf || undefined,
+            vigente: data.vigente,
+            documento: data.documento || undefined,
           };
           
           await updateProcedure(updateData);
@@ -146,6 +145,8 @@ export function useVersionedProceduresController() {
           errorMessage = "Datos inválidos. Verifique que todos los campos estén correctos";
         } else if (error?.response?.status === 404) {
           errorMessage = "El procedimiento no fue encontrado";
+        } else if (error?.response?.status === 409) {
+          errorMessage = "Debe quedar al menos una versión vigente del POE";
         } else if (error?.response?.status === 500) {
           errorMessage = "Error interno del servidor. Intente nuevamente";
         } else if (error?.response?.data?.message) {
