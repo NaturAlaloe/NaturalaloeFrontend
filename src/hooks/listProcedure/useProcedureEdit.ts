@@ -112,14 +112,14 @@ export function useProcedureEdit({
         !editData.id_responsable ||
         !editData.fecha_creacion ||
         !editData.fecha_vigencia ||
-        !editData.revision
+        editData.revision === undefined || editData.revision === null || editData.revision === ""
       ) {
         const missingFields = [];
         if (!editData.descripcion) missingFields.push("título");
         if (!editData.id_responsable) missingFields.push("responsable");
         if (!editData.fecha_creacion) missingFields.push("fecha de creación");
         if (!editData.fecha_vigencia) missingFields.push("fecha de vigencia");
-        if (!editData.revision) missingFields.push("número de revisión");
+        if (editData.revision === undefined || editData.revision === null || editData.revision === "") missingFields.push("número de revisión");
 
         showCustomToast(
           "Campos obligatorios incompletos", 

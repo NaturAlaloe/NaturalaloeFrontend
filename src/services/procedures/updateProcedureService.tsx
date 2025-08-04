@@ -26,7 +26,7 @@ export async function updateProcedure(data: {
   if (data.id_departamento) formData.append("id_departamento", data.id_departamento.toString());
   if (data.id_categoria) formData.append("id_categoria", data.id_categoria.toString());
   if (data.id_responsable) formData.append("id_responsable", data.id_responsable.toString());
-  if (data.version) formData.append("version", data.version.toString());
+  if (data.version !== undefined && data.version !== null) formData.append("version", data.version.toString());
   if (data.fecha_creacion) formData.append("fecha_creacion", data.fecha_creacion);
   if (data.fecha_vigencia) formData.append("fecha_vigencia", data.fecha_vigencia);
   if (data.vigente !== undefined) formData.append("vigente", data.vigente.toString());

@@ -243,7 +243,7 @@ export default function ListProcedures() {
                     label="Revisión"
                     name="revision"
                     type="number"
-                    min="1"
+                    min="0"
                     step="1"
                     value={controller.editModal.data.revision || ""}
                     onChange={(e) =>
@@ -252,7 +252,7 @@ export default function ListProcedures() {
                         e.target.value
                       )
                     }
-                    placeholder="1"
+                    placeholder="0"
                     required
                     disabled={controller.editModal.saving}
                   />
