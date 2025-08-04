@@ -308,7 +308,7 @@ export default function PoliticsList() {
                 label="Revisión"
                 name="revision"
                 type="number"
-                min="1"
+                min="0"
                 step="1"
                 value={ui.versionInput}
                 onChange={(e) => ui.setVersionInput(e.target.value)}
