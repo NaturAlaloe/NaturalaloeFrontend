@@ -308,14 +308,14 @@ export default function PoliticsList() {
                 label="Revisión"
                 name="revision"
                 type="number"
-                min="1"
+                min="0"
                 step="1"
                 value={ui.versionInput}
                 onChange={(e) => ui.setVersionInput(e.target.value)}
                 placeholder="0"
                 required
-                disabled={ui.saving || !ui.esNuevaVersion}
-                readOnly={!ui.esNuevaVersion}
+                disabled={ui.saving}
+                readOnly={false}
               />
 
               <InputField
