@@ -1,8 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
 import {
   getManapolList,
+  updateManapol,
 } from "../../services/manapol/manapolService";
+import { getResponsibles } from "../../services/responsibles/getResponsibles";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+import { useEditManapol } from "./useEditManapol";
 
 interface ManapolVersion {
     titulo: string;
@@ -14,17 +17,17 @@ interface ManapolVersion {
     ruta_documento: string;
 }
 
-interface ExpandedManapolVersion extends ManapolVersion {
-    codigo_rm: string;
-    fecha_creacion: string;
-    id_area: number;
-    area: string;
-    departamento: string;
-    versiones: ManapolVersion[];
-    codigo: string;
-    descripcion: string;
-    version: string;
-}
+// interface ExpandedManapolVersion extends ManapolVersion {
+//     codigo_rm: string;
+//     fecha_creacion: string;
+//     id_area: number;
+//     area: string;
+//     departamento: string;
+//     versiones: ManapolVersion[];
+//     codigo: string;
+//     descripcion: string;
+//     version: string;
+// }
 
 interface RegistroManapol {
     codigo_rm: string;
@@ -45,6 +48,25 @@ export default function useManapolList() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [registrosFilter, setRegistrosFilter] = useState<ManapolFilter>('active');
     const [selectedVersions, setSelectedVersions] = useState<Record<string, number>>({});
+
+    // Estados para responsables
+    const [responsables, setResponsables] = useState<{ id_responsable: number; nombre_responsable: string }[]>([]);
+    const [loadingResponsables, setLoadingResponsables] = useState(false);
+
+    // Función para cargar responsables
+    const loadResponsables = async () => {
+        setLoadingResponsables(true);
+        try {
+            const data = await getResponsibles();
+            setResponsables(data || []);
+        } catch (error) {
+            console.error('Error loading responsables:', error);
+            showCustomToast("Error", "No se pudieron cargar los responsables", "error");
+            setResponsables([]);
+        } finally {
+            setLoadingResponsables(false);
+        }
+    };
 
     // Función para cargar registros según el filtro
     const loadRegistros = async () => {
@@ -74,9 +96,50 @@ export default function useManapolList() {
         }
     };
 
+    // Función wrapper para actualizar registros
+    const updateManapolWrapper = async (formData: FormData): Promise<{ success: boolean; error?: string }> => {
+        try {
+            await updateManapol(formData);
+            return { success: true };
+        } catch (error: any) {
+            console.error('Error updating Manapol:', error);
+            return { 
+                success: false, 
+                error: error.response?.data?.message || "Error al actualizar el registro" 
+            };
+        }
+    };
+
+    // Hook de edición
+    const editHook = useEditManapol({
+        responsibles: responsables.map(r => ({
+            id_responsable: r.id_responsable.toString(),
+            nombre_responsable: r.nombre_responsable
+        })),
+        updateManapol: updateManapolWrapper,
+        fetchRegistros: loadRegistros,
+    });
+
+    // Función para abrir el modal de edición
+    const handleOpenEdit = (registro: RegistroManapol) => {
+        const selectedVersionId = selectedVersions[registro.codigo_rm];
+        const selectedVersion = registro.versiones?.find(v => v.id_documento === selectedVersionId);
+        
+        if (!selectedVersion) {
+            showCustomToast("Error", "No se pudo encontrar la versión seleccionada", "error");
+            return;
+        }
+
+        editHook.startEdit(registro, selectedVersion);
+    };
+
     useEffect(() => {
         loadRegistros();
     }, [registrosFilter]);
+
+    useEffect(() => {
+        loadResponsables();
+    }, []);
 
     const handleVersionChange = (codigoRm: string, versionId: string) => {
         setSelectedVersions(prev => ({
@@ -154,5 +217,10 @@ export default function useManapolList() {
         registrosFilter,
         handleFilterChange,
         handleViewPdf,
+        // Funcionalidades de edición
+        responsables,
+        loadingResponsables,
+        handleOpenEdit,
+        editHook,
     };
 }
