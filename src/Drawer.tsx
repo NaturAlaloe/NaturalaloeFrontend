@@ -49,14 +49,14 @@ import AddTrainingGeneral from "./views/training/generalTraining";
 import TrainingRegisters from "./views/training/trainingRegisters";
 import TrainingLists from "./views/training/trainingLists";
 import AssignRol from "./views/collaborators/assingRol";
+import RmForm from "./views/manapol/rmForm";
+import RmList from "./views/manapol/rmList";
 import { useUserFromToken } from "./hooks/useUserFromToken";
 import CapacitacionesPendientes from "./views/home/pendingTrainingsScreen";
 import KpiBatchYear from "./views/procedures/KpiBatchYear";
 import PoeScreen from "./views/home/proceduresSreen";
-import CapacitacionesDepartamentos from ".//views/home/trainingScreen"
+import CapacitacionesDepartamentos from ".//views/home/trainingScreen";
 import ViewUsers from "./views/users/viewUsers";
-
-
 
 const drawerWidth = 270;
 
@@ -119,11 +119,11 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
   const [openLogin, setOpenLogin] = React.useState(false);
   const [openProcedimientos, setOpenProcedimientos] = React.useState(false);
   const [openPoliticas, setOpenPoliticas] = React.useState(false);
+  const [openManapol, setOpenManapol] = React.useState(false);
   const [openCapacitaciones, setOpenCapacitaciones] = React.useState(false);
   const [openColaboradores, setOpenColaboradores] = React.useState(false);
 
-  const {  loading, fullName } = useUserFromToken();
-
+  const { loading, fullName } = useUserFromToken();
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -210,7 +210,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
             sx={{ fontSize: 48, color: "#ddebd7", mb: 1, mt: 1 }}
           />
           <Box sx={{ fontWeight: "bold", color: "#fff", fontSize: 18, mt: 1 }}>
-          {loading ? "Cargando..." : fullName || "Usuario"}
+            {loading ? "Cargando..." : fullName || "Usuario"}
           </Box>
         </Box>
         <Divider sx={{ borderColor: "#fff", opacity: 0.7, my: 2, mx: 0 }} />
@@ -234,8 +234,6 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               <ListItemText primary="Inicio" />
             </ListItemButton>
           </ListItem>
-      
-         
 
           {/* Administración */}
           <ListItem disablePadding>
@@ -275,7 +273,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               </ListItemButton>
             </List>
 
-             <List component="div" disablePadding>
+            <List component="div" disablePadding>
               <ListItemButton
                 component={Link}
                 to="/users/viewUsers"
@@ -334,28 +332,44 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               <ListItemButton
                 component={Link}
                 to="/procedures"
-                sx={{ pl: 6, color: "#f4fcec", "&:hover": { background: "#2AAC67", color: "#fff" } }}
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": { background: "#2AAC67", color: "#fff" },
+                }}
               >
                 <ListItemText primary="Agregar Procedimientos" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
                 to="/procedures/listProcedures"
-                sx={{ pl: 6, color: "#f4fcec", "&:hover": { background: "#2AAC67", color: "#fff" } }}
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": { background: "#2AAC67", color: "#fff" },
+                }}
               >
                 <ListItemText primary="Lista de Procedimientos" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
                 to="/procedures/assignmentProcedures"
-                sx={{ pl: 6, color: "#f4fcec", "&:hover": { background: "#2AAC67", color: "#fff" } }}
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": { background: "#2AAC67", color: "#fff" },
+                }}
               >
                 <ListItemText primary="Asignar Procedimientos" />
               </ListItemButton>
               <ListItemButton
                 component={Link}
                 to="/procedures/kpi-batch-year"
-                sx={{ pl: 6, color: "#f4fcec", "&:hover": { background: "#2AAC67", color: "#fff" } }}
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": { background: "#2AAC67", color: "#fff" },
+                }}
               >
                 <ListItemText primary="Crear lote de KPIs anuales" />
               </ListItemButton>
@@ -412,6 +426,60 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                 }}
               >
                 <ListItemText primary="Lista de Políticas" />
+              </ListItemButton>
+            </List>
+          </Collapse>
+
+          {/* Registros Manapol */}
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setOpenManapol(!openManapol)}
+              sx={{
+                color: "#fff",
+                pl: 3,
+                "&:hover": {
+                  background: "#21824f",
+                  color: "#fff",
+                  "& .MuiSvgIcon-root": { color: "#13bd62" },
+                },
+              }}
+            >
+              <ArticleIcon sx={{ color: "#b4ebce", mr: 2 }} />
+              <ListItemText primary="Registros Manapol" />
+              {openManapol ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={openManapol} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/manapol/rmForm"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Agregar Registros Manapol" />
+              </ListItemButton>
+            </List>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/manapol/rmList"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Lista de Registros Manapol" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -503,7 +571,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Añadir Colaborador" />
               </ListItemButton>
- <ListItemButton
+              <ListItemButton
                 component={Link}
                 to="/collaborators/viewCollaborators"
                 sx={{
@@ -531,7 +599,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Buscar Colaboradores" />
               </ListItemButton>
-                <ListItemButton
+              <ListItemButton
                 component={Link}
                 to="/collaborators/assingRol"
                 sx={{
@@ -592,37 +660,89 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
         <Routes>
           <Route path="/administration/register" element={<Register />} />
           <Route path="/administration/manage" element={<Manage />} />
-          <Route path="/users/viewUsers" element={<ViewUsers/>} />
+          <Route path="/users/viewUsers" element={<ViewUsers />} />
           <Route path="/administration/listAreas" element={<ListaAreas />} />
-          <Route path="/administration/listDepartments" element={<ListaDepartamentos />} />
-          <Route path="/administration/listWorkstations" element={<ListaPuestos />} />
-          <Route path="/administration/listCategory" element={<ListaCategorias />} />
+          <Route
+            path="/administration/listDepartments"
+            element={<ListaDepartamentos />}
+          />
+          <Route
+            path="/administration/listWorkstations"
+            element={<ListaPuestos />}
+          />
+          <Route
+            path="/administration/listCategory"
+            element={<ListaCategorias />}
+          />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
-          <Route path="/procedures/listProcedures"element={<ListaProcedimientos />}/>
-          <Route path="/procedures/assignmentProcedures"element={<AsignacionProcedimientos />}/>
+          <Route
+            path="/procedures/listProcedures"
+            element={<ListaProcedimientos />}
+          />
+          <Route
+            path="/procedures/assignmentProcedures"
+            element={<AsignacionProcedimientos />}
+          />
           <Route path="/training/" element={<Capacitaciones />} />
-          <Route path="/training/listTraining"element={<ListaCapacitaciones />} />
-          <Route path="/collaborators/collaborators" element={<Colaboradores />} />
-          <Route path="/collaborators/detail/:id" element={<CollaboratorDetail />} />
-          <Route path="/training/facilitatorTraining" element={<RegistroFacilitadores />} />
-          <Route path="/training/listFacilitators" element={<ListaFacilitadores />} />
-          <Route path="/collaborators/addCollaborator" element={<AddCollaborator />} />
+          <Route
+            path="/training/listTraining"
+            element={<ListaCapacitaciones />}
+          />
+          <Route
+            path="/collaborators/collaborators"
+            element={<Colaboradores />}
+          />
+          <Route
+            path="/collaborators/detail/:id"
+            element={<CollaboratorDetail />}
+          />
+          <Route
+            path="/training/facilitatorTraining"
+            element={<RegistroFacilitadores />}
+          />
+          <Route
+            path="/training/listFacilitators"
+            element={<ListaFacilitadores />}
+          />
+          <Route
+            path="/collaborators/addCollaborator"
+            element={<AddCollaborator />}
+          />
           <Route path="/politics/politicsForm" element={<Politicies />} />
           <Route path="/politics/politicsList" element={<PoliticiesLista />} />
-          <Route path="/collaborators/assingRol" element={<AssignRol/>} />
-          <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores/>} />
-          <Route path="/training/listTrainingsGeneral" element={<CapacitacionesGenerales/>} />
-          <Route path="/training/evaluatedTraining/:id_capacitacion" element={<Evaluacion/>} />
-          <Route path="/estadisticas" element={<Estadistica/>} />
-          <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
-          <Route path="/home/pendingTrainingsScreen" element={<CapacitacionesPendientes />} />
+          <Route path="/collaborators/assingRol" element={<AssignRol />} />
+          <Route
+            path="/collaborators/viewCollaborators"
+            element={<ListaColaboradores />}
+          />
+          <Route
+            path="/training/listTrainingsGeneral"
+            element={<CapacitacionesGenerales />}
+          />
+          <Route
+            path="/training/evaluatedTraining/:id_capacitacion"
+            element={<Evaluacion />}
+          />
+          <Route path="/estadisticas" element={<Estadistica />} />
+          <Route
+            path="/training/generalTraining"
+            element={<AddTrainingGeneral />}
+          />
+          <Route
+            path="/home/pendingTrainingsScreen"
+            element={<CapacitacionesPendientes />}
+          />
           <Route path="/procedures/kpi-batch-year" element={<KpiBatchYear />} />
-          <Route path="/home/trainingScreen" element={<CapacitacionesDepartamentos />} />
+          <Route
+            path="/home/trainingScreen"
+            element={<CapacitacionesDepartamentos />}
+          />
           <Route path="/home/proceduresScreen" element={<PoeScreen />} />
           <Route path="/training/registers" element={<TrainingRegisters />} />
           <Route path="/training/lists" element={<TrainingLists />} />
-
+          <Route path="/manapol/rmForm" element={<RmForm />} />
+          <Route path="/manapol/rmList" element={<RmList />} />
         </Routes>
       </Main>
     </Box>
