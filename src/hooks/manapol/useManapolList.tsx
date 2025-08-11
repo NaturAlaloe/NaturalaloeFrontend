@@ -17,18 +17,6 @@ interface ManapolVersion {
     ruta_documento: string;
 }
 
-// interface ExpandedManapolVersion extends ManapolVersion {
-//     codigo_rm: string;
-//     fecha_creacion: string;
-//     id_area: number;
-//     area: string;
-//     departamento: string;
-//     versiones: ManapolVersion[];
-//     codigo: string;
-//     descripcion: string;
-//     version: string;
-// }
-
 interface RegistroManapol {
     codigo_rm: string;
     titulo: string;
