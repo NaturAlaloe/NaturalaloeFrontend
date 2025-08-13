@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../apiConfig/api';
 import { getAreas, type Area as AreaType } from '../../services/manage/areaService';
 import { getResponsibles } from '../../services/responsibles/getResponsibles';
+import { showCustomToast } from '../../components/globalComponents/CustomToaster';
 
 interface FormData {
   idArea: number | null;
@@ -62,12 +63,14 @@ export const useKpiRulesYear = () => {
   // Función para mostrar mensajes de error
   const showError = (message: string) => {
     setError(message);
+    showCustomToast('Error', message, 'error');
     setTimeout(() => setError(null), 5000);
   };
 
   // Función para mostrar mensajes de éxito
   const showSuccess = (message: string) => {
     setSuccess(message);
+    showCustomToast('Éxito', message, 'success');
     setTimeout(() => setSuccess(null), 3000);
   };
 
@@ -315,7 +318,7 @@ export const useKpiRulesYear = () => {
       console.log('API Response status:', response.status);
 
       if (response.data.success) {
-        showSuccess('Lote de KPIs para reglas anuales creado exitosamente');
+        showSuccess('Lote de KPIs para Manapol creado exitosamente');
         
         // Reset form
         setFormData({

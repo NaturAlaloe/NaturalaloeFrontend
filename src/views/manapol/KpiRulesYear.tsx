@@ -110,7 +110,7 @@ export default function KpiRulesYear() {
               onClick={openModal}
               className="px-6 py-3 bg-[#2AAC67] text-white rounded-md hover:bg-[#238B5B] font-medium transition-colors"
             >
-              + Seleccionar Documentos
+              + Seleccionar Manapol
             </button>
           </div>
           
@@ -189,7 +189,7 @@ export default function KpiRulesYear() {
           ) : (
             <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
               <div className="text-sm">
-                No hay documentos seleccionados. Haga clic en "Seleccionar Documentos" para agregar.
+                No hay Manapol seleccionados. Haga clic en "Seleccionar Manapol" para agregar.
               </div>
             </div>
           )}
@@ -210,7 +210,7 @@ export default function KpiRulesYear() {
       <GlobalModal
         open={isModalOpen}
         onClose={handleModalCancel}
-        title="Seleccionar Documentos (POE, Políticas, Registro MANAPOL)"
+        title="Seleccionar Manapol"
         maxWidth="lg"
         fullWidth={true}
         actions={
