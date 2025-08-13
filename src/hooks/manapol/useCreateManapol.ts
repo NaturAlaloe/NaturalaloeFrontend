@@ -59,8 +59,8 @@ export function useCreateManapol() {
       // El usuario verá que hay un problema y puede reintentar
       showCustomToast(
         "Advertencia", 
-        "No se pudo cargar el código consecutivo. El código se asignará automáticamente al guardar.", 
-        "info"
+        error.message || "No se pudo cargar el código consecutivo. El código se asignará automáticamente al guardar.", 
+        "error"
       );
     });
   }, []);
@@ -184,8 +184,13 @@ export function useCreateManapol() {
       try {
         const nuevoCodigo = await getManapoolLastConsecutive();
         setFormData(prev => ({ ...prev, codigo: nuevoCodigo }));
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error al obtener nuevo código consecutivo:", error);
+        showCustomToast(
+          "Advertencia",
+          error.message || "No se pudo obtener el nuevo código consecutivo",
+          "error"
+        );
       }
 
 
@@ -193,7 +198,7 @@ export function useCreateManapol() {
       console.error("Error al crear registro Manapol:", error);
       showCustomToast(
         "Error",
-        error?.response?.data?.message || "Error al crear el registro Manapol",
+        error.message || "Error al crear el registro Manapol",
         "error"
       );
     } finally {

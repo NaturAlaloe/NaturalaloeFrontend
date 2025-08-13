@@ -178,7 +178,10 @@ const RmList = () => {
                   ? "text-[#2AAC67] hover:text-green-700"
                   : "text-red-500 hover:text-red-700"
               }`}
-              onClick={() => console.log(isObsolete ? 'Reactivar:' : 'Obsoleto:', row)}
+              onClick={() => ui.obsoleteHook.handleAskObsolete(
+                selectedVersion?.id_documento || 0, 
+                isObsolete
+              )}
               title={isObsolete ? "Reactivar" : "Marcar como obsoleto"}
             >
               {isObsolete ? <Restore fontSize="small" /> : <Delete fontSize="small" />}
@@ -447,6 +450,95 @@ const RmList = () => {
             </div>
           </FormContainer>
         )}
+      </GlobalModal>
+
+      {/* Modal de confirmación para obsolescencia/reactivación */}
+      <GlobalModal
+        open={ui.obsoleteHook.confirmModalOpen}
+        onClose={ui.obsoleteHook.handleCloseModals}
+        title={ui.obsoleteHook.selectedRecord?.isObsolete ? "Reactivar registro" : "Marcar como obsoleto"}
+        maxWidth="sm"
+        actions={
+          <div className="flex gap-2">
+            <SubmitButton
+              className="bg-gray-400 hover:bg-gray-500"
+              type="button"
+              onClick={ui.obsoleteHook.handleCloseModals}
+            >
+              Cancelar
+            </SubmitButton>
+            <SubmitButton
+              className={ui.obsoleteHook.selectedRecord?.isObsolete 
+                ? "bg-[#2BAC67] hover:bg-green-700" 
+                : "bg-red-500 hover:bg-red-600"
+              }
+              type="button"
+              onClick={ui.obsoleteHook.handleAskReason}
+            >
+              Continuar
+            </SubmitButton>
+          </div>
+        }
+      >
+        <div className="text-center">
+          {ui.obsoleteHook.selectedRecord?.isObsolete 
+            ? "¿Estás seguro de que deseas reactivar este registro Manapol?"
+            : "¿Estás seguro de que deseas marcar este registro Manapol como obsoleto?"
+          }
+        </div>
+      </GlobalModal>
+
+      {/* Modal para razón de obsolescencia o reactivación */}
+      <GlobalModal
+        open={ui.obsoleteHook.reasonModalOpen}
+        onClose={ui.obsoleteHook.handleCloseModals}
+        title={ui.obsoleteHook.selectedRecord?.isObsolete ? "Razón de reactivación" : "Razón de obsolescencia"}
+        maxWidth="sm"
+        actions={
+          <div className="flex gap-2">
+            <SubmitButton
+              className="bg-gray-400 hover:bg-gray-500"
+              type="button"
+              onClick={ui.obsoleteHook.handleCloseModals}
+              disabled={ui.obsoleteHook.obsoleteLoading}
+            >
+              Cancelar
+            </SubmitButton>
+            <SubmitButton
+              className={ui.obsoleteHook.selectedRecord?.isObsolete 
+                ? "bg-[#2BAC67] hover:bg-green-700" 
+                : "bg-red-500 hover:bg-red-600"
+              }
+              type="button"
+              onClick={ui.obsoleteHook.handleConfirmAction}
+              disabled={!ui.obsoleteHook.deleteReason.trim() || ui.obsoleteHook.obsoleteLoading}
+              loading={ui.obsoleteHook.obsoleteLoading}
+            >
+              {ui.obsoleteHook.selectedRecord?.isObsolete ? "Confirmar reactivación" : "Confirmar obsolescencia"}
+            </SubmitButton>
+          </div>
+        }
+      >
+        <div>
+          <label className="block mb-2 font-medium text-gray-700">
+            {ui.obsoleteHook.selectedRecord?.isObsolete 
+              ? "Escribe la razón por la que este registro será reactivado:"
+              : "Escribe la razón por la que este registro será marcado como obsoleto:"
+            }
+          </label>
+          <textarea
+            className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent"
+            rows={3}
+            value={ui.obsoleteHook.deleteReason}
+            onChange={(e) => ui.obsoleteHook.setDeleteReason(e.target.value)}
+            placeholder={ui.obsoleteHook.selectedRecord?.isObsolete 
+              ? "Ej: Se requiere reactivar este registro por cambios operacionales..."
+              : "Ej: Registro actualizado por nueva normativa ISO..."
+            }
+            autoFocus
+            disabled={ui.obsoleteHook.obsoleteLoading}
+          />
+        </div>
       </GlobalModal>
     </TableContainer>
   );
