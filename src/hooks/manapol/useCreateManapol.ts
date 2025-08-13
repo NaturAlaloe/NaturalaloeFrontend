@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { createManapol } from "../../services/manapol/manapolService";
+import { getManapoolLastConsecutive } from "../../services/manapol/manapolService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { useAreas } from "../procedureFormHooks/useAreas";
 import { useDepartments } from "../procedureFormHooks/useDepartments";
@@ -44,20 +46,25 @@ export function useCreateManapol() {
     fileInputRef 
   } = usePdfInput();
 
-  // Por ahora, el código se genera automáticamente en el backend
-  // Cuando se implemente getManapolConsecutive en la API, se puede descomentar este useEffect
-  /*
+  // Obtener código consecutivo al cargar el componente
   useEffect(() => {
-    getManapolConsecutive().then((codigo) => {
+    getManapoolLastConsecutive().then((codigo) => {
       setFormData((prev) => ({
         ...prev,
         codigo,
       }));
     }).catch((error) => {
       console.error("Error al obtener código consecutivo:", error);
+      // No setear ningún código, dejar el campo vacío
+      // El usuario verá que hay un problema y puede reintentar
+      showCustomToast(
+        "Advertencia", 
+        "No se pudo cargar el código consecutivo. El código se asignará automáticamente al guardar.", 
+        "info"
+      );
     });
   }, []);
-  */
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -174,14 +181,13 @@ export function useCreateManapol() {
       resetPdfInput();
 
       // Cuando se implemente getManapolConsecutive, obtener nuevo código consecutivo
-      /*
       try {
-        const nuevoCodigo = await getManapolConsecutive();
+        const nuevoCodigo = await getManapoolLastConsecutive();
         setFormData(prev => ({ ...prev, codigo: nuevoCodigo }));
       } catch (error) {
         console.error("Error al obtener nuevo código consecutivo:", error);
       }
-      */
+
 
     } catch (error: any) {
       console.error("Error al crear registro Manapol:", error);

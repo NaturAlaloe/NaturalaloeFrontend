@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
+import { useCreateNewManapolVersion } from "./useCreateNewManapolVersion";
+import type { CreateNewManapolVersionData } from "./useCreateNewManapolVersion";
 
 interface ResponsibleOption {
   id_responsable: string;
@@ -77,6 +79,12 @@ export function useEditManapol({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editData, setEditData] = useState<EditManapolData | null>(null);
   const [saving, setSaving] = useState(false);
+  const [originalVersion, setOriginalVersion] = useState<string>(""); // Guardar versión original
+
+  // Hook para crear nueva versión
+  const newVersionHook = useCreateNewManapolVersion({
+    onSuccess: fetchRegistros,
+  });
 
   const startEdit = (registro: RegistroManapol, selectedVersion: ManapolVersion) => {
     const responsableObj = responsibles.find(
@@ -99,6 +107,9 @@ export function useEditManapol({
       es_vigente: selectedVersion.vigente === 1,
       es_nueva_version: false,
     };
+    
+    // Guardar la versión original
+    setOriginalVersion(selectedVersion.revision?.toString() || "");
     
     setEditData(editDataToSet);
     setEditModalOpen(true);
@@ -141,7 +152,27 @@ export function useEditManapol({
         return;
       }
 
-      // Preparar FormData
+      // Si es una nueva versión, usar el hook de crear nueva versión
+      if (editData.es_nueva_version) {
+        const newVersionData: CreateNewManapolVersionData = {
+          codigo: editData.codigo || "",
+          descripcion: editData.descripcion,
+          id_responsable: editData.id_responsable,
+          nueva_version: parseFloat(editData.version),
+          fecha_creacion: formatDateToBackend(editData.fecha_creacion),
+          fecha_vigencia: formatDateToBackend(editData.fecha_vigencia),
+          vigente: editData.es_vigente || false,
+          documento: editData.pdf,
+        };
+
+        const success = await newVersionHook.createNewVersion(newVersionData);
+        if (success) {
+          closeEdit();
+        }
+        return;
+      }
+
+      // Edición normal (código existente)
       const formData = new FormData();
       formData.append("id_documento", editData.id_documento.toString());
       formData.append("descripcion", editData.descripcion);
@@ -190,6 +221,7 @@ export function useEditManapol({
     editModalOpen,
     editData,
     saving,
+    originalVersion,
     startEdit,
     closeEdit,
     handleSubmit,

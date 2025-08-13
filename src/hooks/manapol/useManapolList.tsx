@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import {
   getManapolList,
+  getObsoleteManapolList,
   updateManapol,
 } from "../../services/manapol/manapolService";
 import { getResponsibles } from "../../services/responsibles/getResponsibles";
@@ -60,24 +61,43 @@ export default function useManapolList() {
     const loadRegistros = async () => {
         setLoading(true);
         try {
-            const data = await getManapolList();
+            let data;
+            if (registrosFilter === 'active') {
+                data = await getManapolList();
+            } else {
+                data = await getObsoleteManapolList();
+            }
+            
             // Asegurar que data es un array
             const registrosArray = Array.isArray(data) ? data : [];
             setRegistros(registrosArray);
             
-            // Configurar versiones seleccionadas por defecto (versión vigente o la primera)
+            // Configurar versiones seleccionadas por defecto
             const initialSelections: Record<string, number> = {};
             registrosArray.forEach((registro: RegistroManapol) => {
-                const vigenteVersion = registro.versiones?.find(v => v.vigente === 1);
-                const defaultVersion = vigenteVersion || registro.versiones?.[0];
-                if (defaultVersion) {
-                    initialSelections[registro.codigo_rm] = defaultVersion.id_documento;
+                if (registrosFilter === 'active') {
+                    // Para registros activos, buscar la versión vigente o la primera
+                    const vigenteVersion = registro.versiones?.find(v => v.vigente === 1);
+                    const defaultVersion = vigenteVersion || registro.versiones?.[0];
+                    if (defaultVersion) {
+                        initialSelections[registro.codigo_rm] = defaultVersion.id_documento;
+                    }
+                } else {
+                    // Para registros obsoletos, seleccionar la más reciente (último elemento del array)
+                    // que representa la versión que estaba vigente cuando se marcó como obsoleta
+                    if (registro.versiones && registro.versiones.length > 0) {
+                        const ultimaVersion = registro.versiones[registro.versiones.length - 1];
+                        initialSelections[registro.codigo_rm] = ultimaVersion.id_documento;
+                    }
                 }
             });
             setSelectedVersions(initialSelections);
         } catch (error) {
             console.error('Error loading Manapol records:', error);
-            showCustomToast("Error", "No se pudieron cargar los registros Manapol", "error");
+            const errorMessage = registrosFilter === 'active' 
+                ? "No se pudieron cargar los registros Manapol"
+                : "No se pudieron cargar los registros Manapol obsoletos";
+            showCustomToast("Error", errorMessage, "error");
             setRegistros([]); // Asegurar que siempre sea un array
         } finally {
             setLoading(false);

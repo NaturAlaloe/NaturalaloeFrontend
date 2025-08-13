@@ -250,8 +250,10 @@ const RmList = () => {
               {ui.editHook.editData.es_nueva_version && (
                 <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <h4 className="font-semibold text-gray-800 mb-2">Creando Nueva Versión</h4>
-                  <p className="text-gray-700 text-sm">
-                    Se creará una nueva versión del registro <strong>{ui.editHook.editData.codigo}</strong>.
+                  <p className="text-gray-700 text-sm mb-2">
+                    Se creará la versión <strong>{ui.editHook.editData.version}</strong> del registro <strong>{ui.editHook.editData.codigo}</strong>.
+                  </p>
+                  <p className="text-gray-600 text-xs">
                     Si marca esta versión como vigente, todas las versiones anteriores se desactivarán automáticamente.
                   </p>
                 </div>
@@ -261,13 +263,31 @@ const RmList = () => {
                 label="¿Es una nueva versión?"
                 checked={ui.editHook.editData?.es_nueva_version || false}
                 onChange={(checked) => {
-                  ui.editHook.setEditData(prev => prev ? {...prev, es_nueva_version: checked} : null);
-                  
                   if (checked) {
-                    // Aquí podrías calcular la siguiente versión automáticamente
-                    const currentVersion = parseInt(ui.editHook.editData?.version || "0");
-                    const nextVersion = currentVersion + 1;
-                    ui.editHook.setEditData(prev => prev ? {...prev, version: nextVersion.toString()} : null);
+                    // Calcular la siguiente versión basada en todas las versiones existentes del registro
+                    const codigo = ui.editHook.editData?.codigo;
+                    if (codigo) {
+                      const registro = ui.registros.find(r => r.codigo_rm === codigo);
+                      if (registro && registro.versiones) {
+                        // Encontrar la versión más alta
+                        const maxVersion = Math.max(...registro.versiones.map(v => v.revision));
+                        const nextVersion = maxVersion + 1;
+                        
+                        ui.editHook.setEditData(prev => prev ? {
+                          ...prev, 
+                          es_nueva_version: checked,
+                          version: nextVersion.toString(),
+                          es_vigente: true // Por defecto, las nuevas versiones son vigentes
+                        } : null);
+                      }
+                    }
+                  } else {
+                    // Restaurar la versión original cuando se desmarca
+                    ui.editHook.setEditData(prev => prev ? {
+                      ...prev, 
+                      es_nueva_version: checked,
+                      version: ui.editHook.originalVersion // Restaurar versión original
+                    } : null);
                   }
                 }}
               />
@@ -340,7 +360,7 @@ const RmList = () => {
                 placeholder="0"
                 required
                 disabled={ui.editHook.saving}
-                readOnly={false}
+                readOnly={false} // Siempre editable
               />
 
               <InputField
