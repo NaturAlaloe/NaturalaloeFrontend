@@ -241,7 +241,7 @@ export default function KpiRulesYear() {
           procedimientos={availableDocs}
           procedimientosSeleccionados={selectedDocIds}
           onSeleccionChange={setSelectedDocIds}
-          tipo="poe"
+          tipo="manapol"
         />
       </GlobalModal>
     </>

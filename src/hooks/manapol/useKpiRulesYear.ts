@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../apiConfig/api';
+import { getAreas, type Area as AreaType } from '../../services/manage/areaService';
+import { getResponsibles } from '../../services/responsibles/getResponsibles';
 
 interface FormData {
   idArea: number | null;
@@ -30,7 +32,8 @@ interface AvailableDoc {
   codigo: string;
   titulo: string;
   tipo: string;
-  area: string;
+  departamento: string;
+  responsable: string;
   estado: string;
 }
 
@@ -74,26 +77,101 @@ export const useKpiRulesYear = () => {
       try {
         setLoadingData(true);
         
-        // Cargar áreas
-        const areasResponse = await api.get('/areas');
-        if (areasResponse.data.success) {
-          setAreas(areasResponse.data.data);
-        }
-
-        // Cargar responsables
-        const responsablesResponse = await api.get('/responsables');
-        if (responsablesResponse.data.success) {
-          setResponsables(responsablesResponse.data.data);
-        }
-
-        // Cargar documentos disponibles (mixtos: POE, Políticas, Registro MANAPOL)
-        const docsResponse = await api.get('/procedimientos/available');
-        if (docsResponse.data.success) {
-          const mixedDocs = docsResponse.data.data.map((doc: any) => ({
-            ...doc,
-            tipo: doc.tipo || 'POE'
+        // Cargar áreas usando el servicio existente
+        const areasData = await getAreas();
+        const formattedAreas = areasData
+          .filter((area: AreaType) => area.id_area && area.id_area > 0)
+          .map((area: AreaType) => ({
+            id: area.id_area!,
+            nombre: area.titulo
           }));
-          setAvailableDocs(mixedDocs);
+        setAreas(formattedAreas);
+
+        // Cargar responsables usando el servicio existente
+        const responsablesData = await getResponsibles();
+        const formattedResponsables = responsablesData.map((resp: any) => ({
+          id: resp.id_responsable,
+          nombre: resp.nombre_responsable,
+        }));
+        setResponsables(formattedResponsables);
+
+        // Cargar documentos MANAPOL disponibles
+        const docsResponse = await api.get('/registerMan/available');
+        console.log('MANAPOL API Response:', docsResponse.data);
+        
+        // Handle different possible response structures
+        let docsData = [];
+        if (docsResponse.data) {
+          if (Array.isArray(docsResponse.data)) {
+            docsData = docsResponse.data;
+          } else if (docsResponse.data.data && Array.isArray(docsResponse.data.data)) {
+            docsData = docsResponse.data.data;
+          } else if (docsResponse.data.message && docsResponse.data.data) {
+            docsData = docsResponse.data.data;
+          }
+        }
+        
+        console.log('Extracted docs data:', docsData);
+        console.log('First document raw data:', docsData[0]);
+        console.log('First document keys:', docsData[0] ? Object.keys(docsData[0]) : 'No documents');
+        
+        if (docsData.length > 0) {
+          const manapols = docsData.map((doc: any, index: number) => {
+            console.log(`Mapping MANAPOL doc ${index}:`, doc);
+            console.log(`Available fields in doc ${index}:`, Object.keys(doc));
+            console.log(`Doc codigo field value:`, doc.codigo);
+            console.log(`Doc codigo_rm field value:`, doc.codigo_rm);
+            console.log(`Doc all field values:`, {
+              id_documento: doc.id_documento,
+              codigo: doc.codigo,
+              codigo_rm: doc.codigo_rm,
+              titulo: doc.titulo,
+              departamento: doc.departamento,
+              responsable: doc.responsable,
+              estado: doc.estado
+            });
+            
+            // Ensure we have a valid id_documento, or create a fallback
+            let documentId = doc.id_documento;
+            if (!documentId || documentId === null || documentId === undefined) {
+              console.warn(`Document at index ${index} has no id_documento, using fallback`);
+              documentId = `manapol_${index}_${doc.codigo || 'unknown'}`;
+            }
+            
+            const mapped = {
+              id_documento: documentId,
+              codigo: doc.codigo_rm || doc.codigo || doc.code || doc.cod || doc.rm || '', // Try codigo_rm first (MANAPOL field)
+              titulo: doc.titulo || doc.title || '',
+              tipo: 'REGISTRO MANAPOL',
+              departamento: doc.departamento || doc.department || '',
+              responsable: doc.responsable || doc.responsible || '',
+              estado: doc.estado || doc.status || ''
+            };
+            console.log(`Mapped result ${index}:`, mapped);
+            return mapped;
+          });
+          
+          // Verify all IDs are unique
+          const ids = manapols.map((doc: any) => doc.id_documento);
+          const uniqueIds = new Set(ids);
+          if (ids.length !== uniqueIds.size) {
+            console.error('Found duplicate IDs in MANAPOL documents:', ids);
+            // Add unique suffix to duplicates
+            const seen = new Set();
+            manapols.forEach((doc: any, index: number) => {
+              if (seen.has(doc.id_documento)) {
+                doc.id_documento = `${doc.id_documento}_dup_${index}`;
+                console.warn(`Added unique suffix to duplicate ID: ${doc.id_documento}`);
+              }
+              seen.add(doc.id_documento);
+            });
+          }
+          
+          console.log('All formatted MANAPOL docs:', manapols);
+          setAvailableDocs(manapols);
+        } else {
+          console.warn('No MANAPOL documents found in response');
+          setAvailableDocs([]);
         }
 
       } catch (error) {
@@ -194,12 +272,30 @@ export const useKpiRulesYear = () => {
     try {
       setLoading(true);
 
+      // Debug: Check docs before mapping
+      console.log('Documents before mapping:', docs);
+
+      // Validar que todos los documentos tengan codigo
+      const docsWithoutCodigo = docs.filter(doc => !doc.codigo || doc.codigo.trim() === '');
+      if (docsWithoutCodigo.length > 0) {
+        console.error('Documents without codigo:', docsWithoutCodigo);
+        showError('Algunos documentos no tienen código válido');
+        return;
+      }
+
       // Preparar datos para enviar
-      const docsJson = docs.map(doc => ({
-        codigo: doc.codigo,
-        tipo: doc.tipo,
-        razon: doc.razon
-      }));
+      const docsJson = docs.map(doc => {
+        console.log('Mapping document:', doc);
+        const mapped = {
+          codigo: doc.codigo,
+          tipo: doc.tipo,
+          razon: doc.razon
+        };
+        console.log('Mapped to:', mapped);
+        return mapped;
+      });
+
+      console.log('Final docsJson:', docsJson);
 
       const requestData = {
         id_area: formData.idArea,
@@ -214,6 +310,10 @@ export const useKpiRulesYear = () => {
 
       const response = await api.post('/registerMan/kpi/rules/year', requestData);
 
+      console.log('API Response:', response);
+      console.log('API Response data:', response.data);
+      console.log('API Response status:', response.status);
+
       if (response.data.success) {
         showSuccess('Lote de KPIs para reglas anuales creado exitosamente');
         
@@ -225,10 +325,14 @@ export const useKpiRulesYear = () => {
         });
         setDocs([]);
       } else {
+        console.warn('API returned success=false:', response.data);
         showError(response.data.message || 'Error al crear el lote de KPIs');
       }
     } catch (error: any) {
       console.error('Error creating KPI batch for rules:', error);
+      console.error('Error response:', error.response);
+      console.error('Error response data:', error.response?.data);
+      console.error('Error response status:', error.response?.status);
       
       if (error.response?.status === 422) {
         showError(error.response.data.message || 'Error de validación: Cantidad planificada no coincide');

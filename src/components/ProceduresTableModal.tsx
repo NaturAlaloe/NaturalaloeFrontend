@@ -9,13 +9,18 @@ export type Procedimiento = {
   id_documento?: number;
   id_politica?: number;
   numero_politica?: string;
+  // MANAPOL fields
+  tipo?: string;
+  departamento?: string;
+  responsable?: string;
+  estado?: string;
 };
 
 interface ProceduresTableModalProps {
   procedimientos: Procedimiento[];
   procedimientosSeleccionados: string[];
   onSeleccionChange: (seleccion: string[]) => void;
-  tipo?: 'poe' | 'politica';
+  tipo?: 'poe' | 'politica' | 'manapol';
   isSaving?: boolean; // <-- Añade esta prop opcional
 }
 
@@ -62,7 +67,18 @@ export default function ProceduresTableModal({
   );
 
   const getItemId = (row: Procedimiento): string => {
-    return row.id_documento?.toString() || '';
+    // Primary: use id_documento if available
+    if (row.id_documento) {
+      return row.id_documento.toString();
+    }
+    
+    // Fallback: use id_politica for politics
+    if (row.id_politica) {
+      return `pol_${row.id_politica}`;
+    }
+    
+    // Last resort: use codigo as unique identifier
+    return row.codigo || '';
   };
 
   const columns: TableColumn<Procedimiento>[] = [
@@ -93,7 +109,7 @@ export default function ProceduresTableModal({
     },
    
     {
-      name: tipo === 'poe' ? "Código POE" : "Código",
+      name: tipo === 'poe' ? "Código POE" : tipo === 'politica' ? "Código" : "Código MANAPOL",
       selector: (row) => row.codigo || '',
       sortable: true,
       width: "150px",
@@ -108,7 +124,9 @@ export default function ProceduresTableModal({
 
   const noDataMessage = tipo === 'poe' 
     ? "No se encontraron procedimientos" 
-    : "No se encontraron políticas";
+    : tipo === 'politica' 
+      ? "No se encontraron políticas"
+      : "No se encontraron registros MANAPOL";
 
   return (
     <div className="w-full">
@@ -117,6 +135,7 @@ export default function ProceduresTableModal({
         <DataTable
           columns={columns}
           data={paginatedProcedimientos}
+          keyField="id_documento"
           noDataComponent={
             <div className="px-6 py-8 text-center text-sm text-gray-500">
               <div className="flex flex-col items-center">
@@ -135,7 +154,9 @@ export default function ProceduresTableModal({
                 </svg>
                 <p className="font-medium">{noDataMessage}</p>
                 <p className="text-xs text-gray-400 mt-1">
-                  {tipo === 'poe' ? 'Prueba ajustando los filtros de búsqueda' : 'Revisa los criterios de búsqueda'}
+                  {tipo === 'poe' ? 'Prueba ajustando los filtros de búsqueda' : 
+                   tipo === 'politica' ? 'Revisa los criterios de búsqueda' :
+                   'Verifica los filtros de búsqueda para registros MANAPOL'}
                 </p>
               </div>
             </div>
