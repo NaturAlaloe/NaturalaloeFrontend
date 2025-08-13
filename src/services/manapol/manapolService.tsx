@@ -45,19 +45,12 @@ export async function getManapoolLastConsecutive() {
     const response = await api.get("/registerMan/consecutive");
     const data = response.data.data;
     
-    // Si no hay datos, el primer registro será RM-001
-    if (!data || !Array.isArray(data) || data.length === 0) {
-      return "RM-001";
+    // La API ahora devuelve el consecutivo ya formateado y sumado
+    if (!data || typeof data !== 'string') {
+      throw new Error("Formato de respuesta inválido del servidor");
     }
     
-    const { prefijo, consecutivo_actual } = data[0];
-    
-    // El consecutivo_actual es el último que existe en BD
-    // Por lo tanto, el siguiente disponible es consecutivo_actual + 1
-    const siguienteNumero = parseInt(consecutivo_actual) + 1;
-    const siguienteConsecutivo = siguienteNumero.toString().padStart(3, '0');
-    
-    return `${prefijo}-${siguienteConsecutivo}`;
+    return data;
   } catch (error: any) {
     console.error("Error al obtener consecutivo:", error);
     

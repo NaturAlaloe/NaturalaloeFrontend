@@ -13,6 +13,9 @@ const RmForm = () => {
     handleAutocompleteChange,
     handleSubmit,
     saving,
+    // Código consecutivo
+    consecutivo,
+    loadingConsecutive,
     // Datos auxiliares
     areas,
     departments,
@@ -36,11 +39,11 @@ const RmForm = () => {
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          {/* Código (solo lectura, preparado para futura implementación) */}
+          {/* Código (solo lectura, muestra el consecutivo del hook) */}
           <InputField
             label="Código"
             name="codigo"
-            value={formData.codigo}
+            value={loadingConsecutive ? "Generando..." : (consecutivo || "Error al generar")}
             readOnly
             disabled
             placeholder="Se generará automáticamente"
