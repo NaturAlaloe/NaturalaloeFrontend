@@ -57,7 +57,7 @@ import KpiBatchYear from "./views/procedures/KpiBatchYear";
 import PoeScreen from "./views/home/proceduresSreen";
 import CapacitacionesDepartamentos from ".//views/home/trainingScreen";
 import ViewUsers from "./views/users/viewUsers";
-import KpiRulesYear from "./views/procedures/KpiRulesYear";
+import KpiRulesYear from "./views/manapol/KpiRulesYear";
 
 const drawerWidth = 270;
 
@@ -374,13 +374,6 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Crear lote de KPIs anuales (POE)" />
               </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to="/procedures/kpi-rules-year"
-                sx={{ pl: 6, color: "#f4fcec", "&:hover": { background: "#2AAC67", color: "#fff" } }}
-              >
-                <ListItemText primary="Crear lote de KPIs reglas anuales" />
-              </ListItemButton>
             </List>
           </Collapse>
 
@@ -488,6 +481,22 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                 }}
               >
                 <ListItemText primary="Lista de Registros Manapol" />
+              </ListItemButton>
+            </List>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/manapol/KpiRulesYear"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Crear lote de KPIs reglas anuales" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -687,7 +696,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/procedures/listProcedures"element={<ListaProcedimientos />}/>
           <Route path="/procedures/assignmentProcedures"element={<AsignacionProcedimientos />}/>
           <Route path="/procedures/kpi-batch-year" element={<KpiBatchYear />} />
-          <Route path="/procedures/kpi-rules-year" element={<KpiRulesYear />} />
+          <Route path="/manapol/kpiRulesYear" element={<KpiRulesYear />} />
           <Route path="/training/" element={<Capacitaciones />} />
           <Route
             path="/training/listTraining"

@@ -7,7 +7,7 @@ import CustomToaster from "../../components/globalComponents/CustomToaster";
 import ProceduresTableModal from "../../components/ProceduresTableModal";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
-import { useKpiRulesYear } from "../../hooks/procedures/useKpiRulesYear";
+import { useKpiRulesYear } from "../../hooks/manapol/useKpiRulesYear";
 
 type StatusType = "actualizar" | "obsoletar";
 
