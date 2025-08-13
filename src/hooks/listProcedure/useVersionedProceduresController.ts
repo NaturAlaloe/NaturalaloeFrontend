@@ -112,7 +112,6 @@ export function useVersionedProceduresController() {
             fecha_creacion: data.fecha_creacion,
             fecha_vigencia: data.fecha_vigencia,
             vigente: data.vigente,
-            version_actual: data.vigente, // Si es vigente, también es actual
             documento: data.documento || undefined,
           };
           
@@ -139,21 +138,8 @@ export function useVersionedProceduresController() {
       } catch (error: any) {
         console.error("Error al actualizar procedimiento:", error);
         
-        let errorMessage = "Error inesperado al actualizar el procedimiento";
-        
-        if (error?.response?.status === 400) {
-          errorMessage = "Datos inválidos. Verifique que todos los campos estén correctos";
-        } else if (error?.response?.status === 404) {
-          errorMessage = "El procedimiento no fue encontrado";
-        } else if (error?.response?.status === 409) {
-          errorMessage = "Debe quedar al menos una versión vigente del POE";
-        } else if (error?.response?.status === 500) {
-          errorMessage = "Error interno del servidor. Intente nuevamente";
-        } else if (error?.response?.data?.message) {
-          errorMessage = error.response.data.message;
-        } else if (error?.message) {
-          errorMessage = error.message;
-        }
+        // Usar directamente el mensaje de error del servicio mejorado
+        let errorMessage = error.message || "Error inesperado al actualizar el procedimiento";
         
         return { 
           success: false, 
