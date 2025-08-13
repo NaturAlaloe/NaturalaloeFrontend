@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
-import { useCreateNewManapolVersion } from "./useCreateNewManapolVersion";
-import type { CreateNewManapolVersionData } from "./useCreateNewManapolVersion";
 
 interface ResponsibleOption {
   id_responsable: string;
@@ -81,11 +79,6 @@ export function useEditManapol({
   const [saving, setSaving] = useState(false);
   const [originalVersion, setOriginalVersion] = useState<string>(""); // Guardar versión original
 
-  // Hook para crear nueva versión
-  const newVersionHook = useCreateNewManapolVersion({
-    onSuccess: fetchRegistros,
-  });
-
   const startEdit = (registro: RegistroManapol, selectedVersion: ManapolVersion) => {
     const responsableObj = responsibles.find(
       (r) => r.nombre_responsable === selectedVersion.responsable
@@ -105,7 +98,7 @@ export function useEditManapol({
       ruta_documento: selectedVersion.ruta_documento || "",
       pdf: null, // El archivo File para nuevos PDFs
       es_vigente: selectedVersion.vigente === 1,
-      es_nueva_version: false,
+      es_nueva_version: false, // Inicializar como edición normal
     };
     
     // Guardar la versión original
@@ -117,7 +110,7 @@ export function useEditManapol({
     // Toast informativo al abrir el modal
     showCustomToast(
       "Editor de registro Manapol",
-      `Abriendo editor para: ${registro.codigo_rm || 'Registro'}`,
+      `Editando versión ${selectedVersion.revision} del registro: ${registro.codigo_rm}`,
       "info"
     );
   };
@@ -135,7 +128,7 @@ export function useEditManapol({
 
     setSaving(true);
     try {
-      // Validación de campos obligatorios
+      // Validación de campos obligatorios para edición
       if (
         !editData.descripcion ||
         !editData.id_responsable ||
@@ -152,27 +145,7 @@ export function useEditManapol({
         return;
       }
 
-      // Si es una nueva versión, usar el hook de crear nueva versión
-      if (editData.es_nueva_version) {
-        const newVersionData: CreateNewManapolVersionData = {
-          codigo: editData.codigo || "",
-          descripcion: editData.descripcion,
-          id_responsable: editData.id_responsable,
-          nueva_version: parseFloat(editData.version),
-          fecha_creacion: formatDateToBackend(editData.fecha_creacion),
-          fecha_vigencia: formatDateToBackend(editData.fecha_vigencia),
-          vigente: editData.es_vigente || false,
-          documento: editData.pdf,
-        };
-
-        const success = await newVersionHook.createNewVersion(newVersionData);
-        if (success) {
-          closeEdit();
-        }
-        return;
-      }
-
-      // Edición normal (código existente)
+      // Preparar FormData para edición
       const formData = new FormData();
       formData.append("id_documento", editData.id_documento.toString());
       formData.append("descripcion", editData.descripcion);

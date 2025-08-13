@@ -1,16 +1,17 @@
-import TableContainer from '../../components/TableContainer';
-import GlobalDataTable from '../../components/globalComponents/GlobalDataTable';
-import SearchBarTable from '../../components/globalComponents/SearchBarTable';
-import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
-import GlobalModal from '../../components/globalComponents/GlobalModal';
-import FormContainer from '../../components/formComponents/FormContainer';
-import InputField from '../../components/formComponents/InputField';
-import SelectAutocomplete from '../../components/formComponents/SelectAutocomplete';
-import StyledCheckbox from '../../components/formComponents/StyledCheckbox';
-import PdfInput from '../../components/formComponents/PdfInput';
-import SubmitButton from '../../components/formComponents/SubmitButton';
-import { Visibility, Edit, Delete, Restore } from '@mui/icons-material';
-import useManapolList from '../../hooks/manapol/useManapolList';
+import TableContainer from "../../components/TableContainer";
+import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
+import SearchBarTable from "../../components/globalComponents/SearchBarTable";
+import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
+import GlobalModal from "../../components/globalComponents/GlobalModal";
+import FormContainer from "../../components/formComponents/FormContainer";
+import InputField from "../../components/formComponents/InputField";
+import SelectAutocomplete from "../../components/formComponents/SelectAutocomplete";
+import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
+import PdfInput from "../../components/formComponents/PdfInput";
+import SubmitButton from "../../components/formComponents/SubmitButton";
+import { Visibility, Edit, Delete, Restore } from "@mui/icons-material";
+import useManapolList from "../../hooks/manapol/useManapolList";
+import type { CreateNewManapolVersionData } from "../../hooks/manapol/useCreateNewManapolVersion";
 
 interface Version {
   titulo: string;
@@ -37,9 +38,11 @@ const RmList = () => {
 
   const getSelectedVersion = (registro: RegistroManapol) => {
     const selectedVersionId = ui.selectedVersions[registro.codigo_rm];
-    return registro.versiones?.find(v => v.id_documento === selectedVersionId) || 
-           registro.versiones?.find(v => v.vigente === 1) || 
-           registro.versiones?.[0];
+    return (
+      registro.versiones?.find((v) => v.id_documento === selectedVersionId) ||
+      registro.versiones?.find((v) => v.vigente === 1) ||
+      registro.versiones?.[0]
+    );
   };
 
   const columns = [
@@ -80,9 +83,13 @@ const RmList = () => {
       name: "Fecha Creación",
       selector: (row: RegistroManapol) => {
         // Extraer solo la parte de la fecha sin la hora y zona horaria
-        const dateStr = row.fecha_creacion.split('T')[0]; // "2025-08-10"
-        const [year, month, day] = dateStr.split('-');
-        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        const dateStr = row.fecha_creacion.split("T")[0]; // "2025-08-10"
+        const [year, month, day] = dateStr.split("-");
+        const date = new Date(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day)
+        );
         return date.toLocaleDateString();
       },
       sortable: true,
@@ -94,10 +101,14 @@ const RmList = () => {
       selector: (row: RegistroManapol) => {
         const selectedVersion = getSelectedVersion(row);
         if (!selectedVersion?.fecha_vigencia) return "N/A";
-        
+
         // La fecha de vigencia viene como "2026-08-10", sin zona horaria
-        const [year, month, day] = selectedVersion.fecha_vigencia.split('-');
-        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        const [year, month, day] = selectedVersion.fecha_vigencia.split("-");
+        const date = new Date(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day)
+        );
         return date.toLocaleDateString();
       },
       sortable: true,
@@ -110,32 +121,34 @@ const RmList = () => {
         const selectedVersionId = ui.selectedVersions[row.codigo_rm];
         const selectedVersion = getSelectedVersion(row);
         const isVigente = selectedVersion?.vigente === 1;
-        const isObsolete = ui.registrosFilter === 'obsolete';
+        const isObsolete = ui.registrosFilter === "obsolete";
 
         return (
           <select
             className={`border border-gray-300 rounded px-2 py-1 text-sm bg-white ${
-              isVigente ? 'text-green-600 font-medium' : 'text-[#2AAC67]'
-            } ${isObsolete ? 'opacity-60' : ''}`}
+              isVigente ? "text-green-600 font-medium" : "text-[#2AAC67]"
+            } ${isObsolete ? "opacity-60" : ""}`}
             value={selectedVersionId || selectedVersion?.id_documento || ""}
-            onChange={(e) => ui.handleVersionChange(row.codigo_rm, e.target.value)}
+            onChange={(e) =>
+              ui.handleVersionChange(row.codigo_rm, e.target.value)
+            }
             style={{ minWidth: 80 }}
             disabled={isObsolete}
           >
             {row.versiones
               ?.sort((a, b) => a.revision - b.revision)
               ?.map((version) => (
-              <option
-                key={version.id_documento}
-                value={version.id_documento}
-                style={{
-                  color: version.vigente === 1 ? '#16a34a' : '#2AAC67',
-                  fontWeight: version.vigente === 1 ? 'bold' : 'normal'
-                }}
-              >
-                {version.revision} {version.vigente === 1 ? '(Vigente)' : ''} 
-              </option>
-            ))}
+                <option
+                  key={version.id_documento}
+                  value={version.id_documento}
+                  style={{
+                    color: version.vigente === 1 ? "#16a34a" : "#2AAC67",
+                    fontWeight: version.vigente === 1 ? "bold" : "normal",
+                  }}
+                >
+                  {version.revision} {version.vigente === 1 ? "(Vigente)" : ""}
+                </option>
+              ))}
           </select>
         );
       },
@@ -147,21 +160,23 @@ const RmList = () => {
       name: "Acciones",
       cell: (row: RegistroManapol) => {
         const selectedVersion = getSelectedVersion(row);
-        const isObsolete = ui.registrosFilter === 'obsolete';
+        const isObsolete = ui.registrosFilter === "obsolete";
 
         return (
           <div className="flex gap-2">
             <button
               className="text-[#2AAC67] hover:text-green-700"
               title="Ver PDF"
-              onClick={() => ui.handleViewPdf(
-                selectedVersion?.ruta_documento || "", 
-                selectedVersion?.titulo || row.titulo
-              )}
+              onClick={() =>
+                ui.handleViewPdf(
+                  selectedVersion?.ruta_documento || "",
+                  selectedVersion?.titulo || row.titulo
+                )
+              }
             >
               <Visibility fontSize="small" />
             </button>
-            
+
             {!isObsolete && (
               <button
                 className="text-[#2AAC67] hover:text-green-700"
@@ -171,20 +186,26 @@ const RmList = () => {
                 <Edit fontSize="small" />
               </button>
             )}
-            
+
             <button
               className={`${
-                isObsolete 
+                isObsolete
                   ? "text-[#2AAC67] hover:text-green-700"
                   : "text-red-500 hover:text-red-700"
               }`}
-              onClick={() => ui.obsoleteHook.handleAskObsolete(
-                selectedVersion?.id_documento || 0, 
-                isObsolete
-              )}
+              onClick={() =>
+                ui.obsoleteHook.handleAskObsolete(
+                  selectedVersion?.id_documento || 0,
+                  isObsolete
+                )
+              }
               title={isObsolete ? "Reactivar" : "Marcar como obsoleto"}
             >
-              {isObsolete ? <Restore fontSize="small" /> : <Delete fontSize="small" />}
+              {isObsolete ? (
+                <Restore fontSize="small" />
+              ) : (
+                <Delete fontSize="small" />
+              )}
             </button>
           </div>
         );
@@ -196,20 +217,26 @@ const RmList = () => {
   return (
     <TableContainer title="Registros Manapol">
       {ui.loading && <FullScreenSpinner />}
-      
+
       <div className="flex items-center justify-between mb-4 gap-4">
         <SearchBarTable
           value={ui.search}
           onChange={ui.setSearch}
-          placeholder={`Buscar ${ui.registrosFilter === 'active' ? 'registros activos' : 'registros obsoletos'} por título, código o departamento...`}
+          placeholder={`Buscar ${
+            ui.registrosFilter === "active"
+              ? "registros activos"
+              : "registros obsoletos"
+          } por título, código o departamento...`}
           className="flex-1"
         />
-        
+
         <div className="flex items-center gap-2">
           <select
             className="border border-gray-300 rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent hover:border-gray-400"
             value={ui.registrosFilter}
-            onChange={(e) => ui.handleFilterChange(e.target.value as 'active' | 'obsolete')}
+            onChange={(e) =>
+              ui.handleFilterChange(e.target.value as "active" | "obsolete")
+            }
           >
             <option value="active">Registros Activos</option>
             <option value="obsolete">Registros Obsoletos</option>
@@ -224,10 +251,9 @@ const RmList = () => {
         progressPending={ui.loading}
         noDataComponent={
           <div className="p-4 text-center text-gray-500">
-            {ui.registrosFilter === 'active' 
+            {ui.registrosFilter === "active"
               ? "No se encontraron registros activos"
-              : "No se encontraron registros obsoletos"
-            }
+              : "No se encontraron registros obsoletos"}
           </div>
         }
       />
@@ -235,7 +261,7 @@ const RmList = () => {
       {/* Modal de edición */}
       <GlobalModal
         open={ui.editHook.editModalOpen}
-        onClose={() => !ui.editHook.saving && ui.editHook.closeEdit()}
+        onClose={() => !(ui.editHook.saving || ui.newVersionHook.creating) && ui.editHook.closeEdit()}
         title=""
         maxWidth="lg"
         backgroundColor="#DDF6E8"
@@ -247,17 +273,46 @@ const RmList = () => {
                 ? "Crear Nueva Versión"
                 : "Editar Registro Manapol"
             }
-            onSubmit={ui.editHook.handleSubmit}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              
+              // Si está marcado como nueva versión, usar el hook de crear nueva versión
+              if (ui.editHook.editData?.es_nueva_version) {
+                const newVersionData: CreateNewManapolVersionData = {
+                  codigo: ui.editHook.editData.codigo || "",
+                  descripcion: ui.editHook.editData.descripcion || "",
+                  id_responsable: ui.editHook.editData.id_responsable || "",
+                  nueva_version: parseFloat(ui.editHook.editData.version || "1"),
+                  fecha_creacion: ui.editHook.editData.fecha_creacion || "",
+                  fecha_vigencia: ui.editHook.editData.fecha_vigencia || "",
+                  vigente: Boolean(ui.editHook.editData.es_vigente),
+                  documento: ui.editHook.editData.pdf,
+                };
+                
+                const success = await ui.newVersionHook.createNewVersion(newVersionData);
+                if (success) {
+                  ui.editHook.closeEdit();
+                }
+              } else {
+                // Si no es nueva versión, usar el hook de edición normal
+                await ui.editHook.handleSubmit(e);
+              }
+            }}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {ui.editHook.editData.es_nueva_version && (
                 <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">Creando Nueva Versión</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">
+                    Creando Nueva Versión
+                  </h4>
                   <p className="text-gray-700 text-sm mb-2">
-                    Se creará la versión <strong>{ui.editHook.editData.version}</strong> del registro <strong>{ui.editHook.editData.codigo}</strong>.
+                    Se creará la versión{" "}
+                    <strong>{ui.editHook.editData.version}</strong> del registro{" "}
+                    <strong>{ui.editHook.editData.codigo}</strong>.
                   </p>
                   <p className="text-gray-600 text-xs">
-                    Si marca esta versión como vigente, todas las versiones anteriores se desactivarán automáticamente.
+                    Si marca esta versión como vigente, todas las versiones
+                    anteriores se desactivarán automáticamente.
                   </p>
                 </div>
               )}
@@ -270,27 +325,39 @@ const RmList = () => {
                     // Calcular la siguiente versión basada en todas las versiones existentes del registro
                     const codigo = ui.editHook.editData?.codigo;
                     if (codigo) {
-                      const registro = ui.registros.find(r => r.codigo_rm === codigo);
+                      const registro = ui.registros.find(
+                        (r) => r.codigo_rm === codigo
+                      );
                       if (registro && registro.versiones) {
                         // Encontrar la versión más alta
-                        const maxVersion = Math.max(...registro.versiones.map(v => v.revision));
+                        const maxVersion = Math.max(
+                          ...registro.versiones.map((v) => v.revision)
+                        );
                         const nextVersion = maxVersion + 1;
-                        
-                        ui.editHook.setEditData(prev => prev ? {
-                          ...prev, 
-                          es_nueva_version: checked,
-                          version: nextVersion.toString(),
-                          es_vigente: true // Por defecto, las nuevas versiones son vigentes
-                        } : null);
+
+                        ui.editHook.setEditData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                es_nueva_version: checked,
+                                version: nextVersion.toString(),
+                                es_vigente: true, // Por defecto, las nuevas versiones son vigentes
+                              }
+                            : null
+                        );
                       }
                     }
                   } else {
                     // Restaurar la versión original cuando se desmarca
-                    ui.editHook.setEditData(prev => prev ? {
-                      ...prev, 
-                      es_nueva_version: checked,
-                      version: ui.editHook.originalVersion // Restaurar versión original
-                    } : null);
+                    ui.editHook.setEditData((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            es_nueva_version: checked,
+                            version: ui.editHook.originalVersion, // Restaurar versión original
+                          }
+                        : null
+                    );
                   }
                 }}
               />
@@ -298,7 +365,11 @@ const RmList = () => {
               <StyledCheckbox
                 label="¿Es Vigente?"
                 checked={ui.editHook.editData?.es_vigente || false}
-                onChange={(checked) => ui.editHook.setEditData(prev => prev ? {...prev, es_vigente: checked} : null)}
+                onChange={(checked) =>
+                  ui.editHook.setEditData((prev) =>
+                    prev ? { ...prev, es_vigente: checked } : null
+                  )
+                }
               />
 
               <InputField
@@ -322,7 +393,11 @@ const RmList = () => {
                 label="Título"
                 name="titulo"
                 value={ui.editHook.editData?.descripcion || ""}
-                onChange={(e) => ui.editHook.setEditData(prev => prev ? {...prev, descripcion: e.target.value} : null)}
+                onChange={(e) =>
+                  ui.editHook.setEditData((prev) =>
+                    prev ? { ...prev, descripcion: e.target.value } : null
+                  )
+                }
                 placeholder="Ingrese título del registro"
                 required
                 className="w-full"
@@ -337,15 +412,24 @@ const RmList = () => {
                 value={
                   ui.editHook.editData?.id_responsable
                     ? ui.responsables.find(
-                      (r) => r.id_responsable === Number(ui.editHook.editData?.id_responsable)
-                    ) || null
+                        (r) =>
+                          r.id_responsable ===
+                          Number(ui.editHook.editData?.id_responsable)
+                      ) || null
                     : null
                 }
                 onChange={(selected) => {
-                  ui.editHook.setEditData(prev => prev ? {
-                    ...prev, 
-                    id_responsable: selected && !Array.isArray(selected) ? String(selected.id_responsable) : ""
-                  } : null);
+                  ui.editHook.setEditData((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          id_responsable:
+                            selected && !Array.isArray(selected)
+                              ? String(selected.id_responsable)
+                              : "",
+                        }
+                      : null
+                  );
                 }}
                 placeholder="Selecciona un responsable"
                 disabled={ui.loadingResponsables || ui.editHook.saving}
@@ -359,7 +443,11 @@ const RmList = () => {
                 min="0"
                 step="1"
                 value={ui.editHook.editData?.version || ""}
-                onChange={(e) => ui.editHook.setEditData(prev => prev ? {...prev, version: e.target.value} : null)}
+                onChange={(e) =>
+                  ui.editHook.setEditData((prev) =>
+                    prev ? { ...prev, version: e.target.value } : null
+                  )
+                }
                 placeholder="0"
                 required
                 disabled={ui.editHook.saving}
@@ -371,7 +459,11 @@ const RmList = () => {
                 name="fecha_vigencia"
                 type="date"
                 value={ui.editHook.editData?.fecha_vigencia || ""}
-                onChange={(e) => ui.editHook.setEditData(prev => prev ? {...prev, fecha_vigencia: e.target.value} : null)}
+                onChange={(e) =>
+                  ui.editHook.setEditData((prev) =>
+                    prev ? { ...prev, fecha_vigencia: e.target.value } : null
+                  )
+                }
                 required
                 disabled={ui.editHook.saving}
               />
@@ -386,23 +478,32 @@ const RmList = () => {
                   pdfFile={ui.editHook.editData?.pdf || null}
                   onChange={(e) => {
                     const file = e.target.files?.[0] || null;
-                    ui.editHook.setEditData(prev => prev ? {...prev, pdf: file} : null);
+                    ui.editHook.setEditData((prev) =>
+                      prev ? { ...prev, pdf: file } : null
+                    );
                   }}
-                  onRemove={() => ui.editHook.setEditData(prev => prev ? {...prev, pdf: null} : null)}
+                  onRemove={() =>
+                    ui.editHook.setEditData((prev) =>
+                      prev ? { ...prev, pdf: null } : null
+                    )
+                  }
                 />
-                
+
                 {/* Aviso específico para nueva versión sin PDF */}
-                {ui.editHook.editData.es_nueva_version && !ui.editHook.editData?.pdf && (
-                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                    <p className="text-sm text-yellow-700">
-                      💡 <strong>Información:</strong> Se creará la nueva versión sin documento PDF asociado.
-                    </p>
-                    <p className="text-xs text-yellow-600 mt-1">
-                      Puede agregar un PDF ahora o subirlo más tarde editando esta versión.
-                    </p>
-                  </div>
-                )}
-                
+                {ui.editHook.editData.es_nueva_version &&
+                  !ui.editHook.editData?.pdf && (
+                    <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                      <p className="text-sm text-yellow-700">
+                        💡 <strong>Información:</strong> Se creará la nueva
+                        versión sin documento PDF asociado.
+                      </p>
+                      <p className="text-xs text-yellow-600 mt-1">
+                        Puede agregar un PDF ahora o subirlo más tarde editando
+                        esta versión.
+                      </p>
+                    </div>
+                  )}
+
                 {/* Mostrar PDF actual siempre que exista, incluso en nueva versión */}
                 {ui.editHook.editData?.ruta_documento ? (
                   <div className="mt-2 p-2 bg-gray-50 rounded border">
@@ -412,7 +513,10 @@ const RmList = () => {
                         type="button"
                         onClick={() => {
                           if (ui.editHook.editData?.ruta_documento) {
-                            window.open(ui.editHook.editData.ruta_documento, '_blank');
+                            window.open(
+                              ui.editHook.editData.ruta_documento,
+                              "_blank"
+                            );
                           }
                         }}
                         className="ml-2 text-[#2AAC67] hover:text-[#228B55] underline"
@@ -421,19 +525,20 @@ const RmList = () => {
                       </button>
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {ui.editHook.editData.es_nueva_version 
+                      {ui.editHook.editData.es_nueva_version
                         ? "PDF de la versión anterior - Se mantendrá para versiones previas"
-                        : "Selecciona un nuevo archivo solo si deseas reemplazarlo"
-                      }
+                        : "Selecciona un nuevo archivo solo si deseas reemplazarlo"}
                     </p>
                   </div>
                 ) : (
                   <div className="mt-2 p-2 bg-orange-50 border border-orange-200 rounded">
                     <p className="text-sm text-orange-700">
-                      ⚠️ <strong>Sin documento PDF:</strong> Esta versión del registro no tiene un documento PDF asociado.
+                      ⚠️ <strong>Sin documento PDF:</strong> Esta versión del
+                      registro no tiene un documento PDF asociado.
                     </p>
                     <p className="text-xs text-orange-600 mt-1">
-                      Puede subir un archivo PDF nuevo usando el selector de archivos arriba.
+                      Puede subir un archivo PDF nuevo usando el selector de
+                      archivos arriba.
                     </p>
                   </div>
                 )}
@@ -441,11 +546,18 @@ const RmList = () => {
             </div>
 
             <div className="text-center mt-8">
-              <SubmitButton width="w-40" loading={ui.editHook.saving} disabled={ui.editHook.saving}>
-                {ui.editHook.saving
-                  ? (ui.editHook.editData.es_nueva_version ? "Creando Versión..." : "Actualizando...")
-                  : (ui.editHook.editData.es_nueva_version ? "Crear Nueva Versión" : "Guardar Cambios")
-                }
+              <SubmitButton
+                width="w-40"
+                loading={ui.editHook.editData.es_nueva_version ? ui.newVersionHook.creating : ui.editHook.saving}
+                disabled={ui.editHook.editData.es_nueva_version ? ui.newVersionHook.creating : ui.editHook.saving}
+              >
+                {ui.editHook.editData.es_nueva_version
+                  ? ui.newVersionHook.creating
+                    ? "Creando Versión..."
+                    : "Crear Nueva Versión"
+                  : ui.editHook.saving
+                  ? "Actualizando..."
+                  : "Guardar Cambios"}
               </SubmitButton>
             </div>
           </FormContainer>
@@ -456,7 +568,11 @@ const RmList = () => {
       <GlobalModal
         open={ui.obsoleteHook.confirmModalOpen}
         onClose={ui.obsoleteHook.handleCloseModals}
-        title={ui.obsoleteHook.selectedRecord?.isObsolete ? "Reactivar registro" : "Marcar como obsoleto"}
+        title={
+          ui.obsoleteHook.selectedRecord?.isObsolete
+            ? "Reactivar registro"
+            : "Marcar como obsoleto"
+        }
         maxWidth="sm"
         actions={
           <div className="flex gap-2">
@@ -468,9 +584,10 @@ const RmList = () => {
               Cancelar
             </SubmitButton>
             <SubmitButton
-              className={ui.obsoleteHook.selectedRecord?.isObsolete 
-                ? "bg-[#2BAC67] hover:bg-green-700" 
-                : "bg-red-500 hover:bg-red-600"
+              className={
+                ui.obsoleteHook.selectedRecord?.isObsolete
+                  ? "bg-[#2BAC67] hover:bg-green-700"
+                  : "bg-red-500 hover:bg-red-600"
               }
               type="button"
               onClick={ui.obsoleteHook.handleAskReason}
@@ -481,10 +598,9 @@ const RmList = () => {
         }
       >
         <div className="text-center">
-          {ui.obsoleteHook.selectedRecord?.isObsolete 
+          {ui.obsoleteHook.selectedRecord?.isObsolete
             ? "¿Estás seguro de que deseas reactivar este registro Manapol?"
-            : "¿Estás seguro de que deseas marcar este registro Manapol como obsoleto?"
-          }
+            : "¿Estás seguro de que deseas marcar este registro Manapol como obsoleto?"}
         </div>
       </GlobalModal>
 
@@ -492,7 +608,11 @@ const RmList = () => {
       <GlobalModal
         open={ui.obsoleteHook.reasonModalOpen}
         onClose={ui.obsoleteHook.handleCloseModals}
-        title={ui.obsoleteHook.selectedRecord?.isObsolete ? "Razón de reactivación" : "Razón de obsolescencia"}
+        title={
+          ui.obsoleteHook.selectedRecord?.isObsolete
+            ? "Razón de reactivación"
+            : "Razón de obsolescencia"
+        }
         maxWidth="sm"
         actions={
           <div className="flex gap-2">
@@ -505,35 +625,41 @@ const RmList = () => {
               Cancelar
             </SubmitButton>
             <SubmitButton
-              className={ui.obsoleteHook.selectedRecord?.isObsolete 
-                ? "bg-[#2BAC67] hover:bg-green-700" 
-                : "bg-red-500 hover:bg-red-600"
+              className={
+                ui.obsoleteHook.selectedRecord?.isObsolete
+                  ? "bg-[#2BAC67] hover:bg-green-700"
+                  : "bg-red-500 hover:bg-red-600"
               }
               type="button"
               onClick={ui.obsoleteHook.handleConfirmAction}
-              disabled={!ui.obsoleteHook.deleteReason.trim() || ui.obsoleteHook.obsoleteLoading}
+              disabled={
+                !ui.obsoleteHook.deleteReason.trim() ||
+                ui.obsoleteHook.obsoleteLoading
+              }
               loading={ui.obsoleteHook.obsoleteLoading}
             >
-              {ui.obsoleteHook.selectedRecord?.isObsolete ? "Confirmar reactivación" : "Confirmar obsolescencia"}
+              {ui.obsoleteHook.selectedRecord?.isObsolete
+                ? "Confirmar reactivación"
+                : "Confirmar obsolescencia"}
             </SubmitButton>
           </div>
         }
       >
         <div>
           <label className="block mb-2 font-medium text-gray-700">
-            {ui.obsoleteHook.selectedRecord?.isObsolete 
+            {ui.obsoleteHook.selectedRecord?.isObsolete
               ? "Escribe la razón por la que este registro será reactivado:"
-              : "Escribe la razón por la que este registro será marcado como obsoleto:"
-            }
+              : "Escribe la razón por la que este registro será marcado como obsoleto:"}
           </label>
           <textarea
             className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent"
             rows={3}
             value={ui.obsoleteHook.deleteReason}
             onChange={(e) => ui.obsoleteHook.setDeleteReason(e.target.value)}
-            placeholder={ui.obsoleteHook.selectedRecord?.isObsolete 
-              ? "Ej: Se requiere reactivar este registro por cambios operacionales..."
-              : "Ej: Registro actualizado por nueva normativa ISO..."
+            placeholder={
+              ui.obsoleteHook.selectedRecord?.isObsolete
+                ? "Ej: Se requiere reactivar este registro por cambios operacionales..."
+                : "Ej: Registro actualizado por nueva normativa ISO..."
             }
             autoFocus
             disabled={ui.obsoleteHook.obsoleteLoading}

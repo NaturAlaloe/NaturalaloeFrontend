@@ -7,6 +7,7 @@ import {
 import { getResponsibles } from "../../services/responsibles/getResponsibles";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { useEditManapol } from "./useEditManapol";
+import { useCreateNewManapolVersion } from "./useCreateNewManapolVersion";
 import { useObsoleteManapol } from "./useObsoleteManapol";
 
 interface ManapolVersion {
@@ -129,6 +130,11 @@ export default function useManapolList() {
         fetchRegistros: loadRegistros,
     });
 
+    // Hook para crear nueva versión
+    const newVersionHook = useCreateNewManapolVersion({
+        onSuccess: loadRegistros,
+    });
+
     // Hook de obsolescencia
     const obsoleteHook = useObsoleteManapol({
         onSuccess: loadRegistros,
@@ -236,6 +242,8 @@ export default function useManapolList() {
         loadingResponsables,
         handleOpenEdit,
         editHook,
+        // Funcionalidades de crear nueva versión
+        newVersionHook,
         // Funcionalidades de obsolescencia
         obsoleteHook,
     };
