@@ -59,6 +59,7 @@ export function useProcedureEdit({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editData, setEditData] = useState<EditData | null>(null);
   const [saving, setSaving] = useState(false);
+  const [originalRevision, setOriginalRevision] = useState<string>(""); // Guardar revisión original
 
   const startEdit = (procedure: Procedure) => {
     const responsableObj = responsibles.find(
@@ -81,6 +82,9 @@ export function useProcedureEdit({
       es_vigente: procedure.estado === 'activo',
       es_nueva_version: false,
     };
+    
+    // Guardar la revisión original
+    setOriginalRevision(procedure.revision || "");
     
     setEditData(editDataToSet);
     setEditModalOpen(true);
@@ -181,6 +185,7 @@ export function useProcedureEdit({
     editModalOpen,
     editData,
     saving,
+    originalRevision,
     startEdit,
     closeEdit,
     handleSubmit,
