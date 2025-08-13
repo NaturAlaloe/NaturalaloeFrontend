@@ -58,6 +58,7 @@ import PoeScreen from "./views/home/proceduresSreen";
 import CapacitacionesDepartamentos from ".//views/home/trainingScreen";
 import ViewUsers from "./views/users/viewUsers";
 import KpiRulesYear from "./views/manapol/KpiRulesYear";
+import KpiPoliticsYear from "./views/politics/KpiPoliticsYear";
 
 const drawerWidth = 270;
 
@@ -429,6 +430,22 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                 <ListItemText primary="Lista de Políticas" />
               </ListItemButton>
             </List>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/politics/kpiPoliticsYear"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Crear lote de KPIs anuales (Políticas)" />
+              </ListItemButton>
+            </List>
           </Collapse>
 
           {/* Registros Manapol */}
@@ -724,6 +741,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           />
           <Route path="/politics/politicsForm" element={<Politicies />} />
           <Route path="/politics/politicsList" element={<PoliticiesLista />} />
+          <Route path="/politics/kpiPoliticsYear" element={<KpiPoliticsYear />} />
           <Route path="/collaborators/assingRol" element={<AssignRol/>} />
           <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores/>} />
           <Route path="/training/listTrainingsGeneral" element={<CapacitacionesGenerales/>} />
