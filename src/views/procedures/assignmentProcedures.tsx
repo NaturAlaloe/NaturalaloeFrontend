@@ -1,5 +1,6 @@
 import { useRolesProceduresList } from "../../hooks/procedures/useRolesProceduresList";
 import { useRolesPoliticsList } from "../../hooks/procedures/useRolesPoliticsList";
+import { useRolesManapolList } from "../../hooks/procedures/useRolesManapolList";
 import { RolesProceduresProvider } from "../../hooks/procedures/RolesProceduresContext";
 import { Button, Box, Chip, Tooltip, Checkbox, useMediaQuery, useTheme, Select, MenuItem, FormControl, ListItemText, OutlinedInput, } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress"; 
@@ -17,6 +18,7 @@ interface ColumnVisibility {
   rol: boolean;
   poe: boolean;
   politicas: boolean;
+  manapol: boolean;
   acciones: boolean;
 }
 
@@ -24,15 +26,14 @@ function RolesProceduresContent() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-
   // Estados para visibilidad de columnas
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     rol: true,
     poe: !isMobile,
     politicas: !isMobile,
+    manapol: !isMobile,
     acciones: true,
   });
-
 
   // Hook para procedimientos (POE)
   const {
@@ -71,13 +72,28 @@ function RolesProceduresContent() {
     savingPoliticas,
   } = useRolesPoliticsList();
 
-  
+  // Hook para manapol
+  const {
+    modalManapolOpen,
+    handleOpenModalManapol,
+    handleCloseModalManapol,
+    rolActualManapol,
+    manapolSeleccionados,
+    modalSearchManapol,
+    setModalSearchManapol,
+    manapolFiltradosModal,
+    modalLoadingManapol,
+    handleSeleccionChangeManapol,
+    handleSaveManapolWithLoading,
+    savingManapol,
+  } = useRolesManapolList();
 
   // Para el select de columnas visibles
   const getVisibleColumns = () => {
     const visibleColumns = [];
     if (columnVisibility.poe) visibleColumns.push('poe');
     if (columnVisibility.politicas) visibleColumns.push('politicas');
+    if (columnVisibility.manapol) visibleColumns.push('manapol');
     return visibleColumns;
   };
 
@@ -86,7 +102,8 @@ function RolesProceduresContent() {
     setColumnVisibility(prev => ({
       ...prev,
       poe: value.includes('poe'),
-      politicas: value.includes('politicas')
+      politicas: value.includes('politicas'),
+      manapol: value.includes('manapol')
     }));
   };
 
@@ -163,6 +180,36 @@ function RolesProceduresContent() {
       omit: !columnVisibility.politicas,
     },
     {
+      name: "Manapol Asignados",
+      cell: (rol) =>
+        rol.manapol && rol.manapol.length > 0 ? (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {rol.manapol.map((m: any) => (
+              <Chip
+                key={m.id_documento}
+                label={m.codigo}
+                size={isMobile ? "small" : "small"}
+                sx={{ 
+                  backgroundColor: "#247349",
+                  color: "#fff",
+                  borderRadius: 1,
+                  fontSize: isMobile ? "0.65rem" : "0.75rem",
+                  fontWeight: 500,
+                  border: "none",
+                  "&:hover": {
+                    backgroundColor: "#E55A2B"
+                  }
+                }}
+              />
+            ))}
+          </Box>
+        ) : (
+          <span className="text-gray-400">Sin manapol</span>
+        ),
+      grow: isMobile ? 4 : 2,
+      omit: !columnVisibility.manapol,
+    },
+    {
       name: "Asignar",
       cell: (rol) => (
         <Box sx={{ 
@@ -219,9 +266,34 @@ function RolesProceduresContent() {
               {isMobile ? "Pol." : "Políticas"}
             </Button>
           </Tooltip>
+          <Tooltip title="Asignar Manapol" arrow>
+            <Button
+              onClick={() => handleOpenModalManapol(rol)}
+              variant="contained"
+              size="small"
+              style={{
+                backgroundColor: "#247349",
+                color: "#fff",
+                textTransform: "none",
+                fontWeight: 500,
+                fontSize: isMobile ? "0.6rem" : "0.7rem",
+                minWidth: isMobile ? "70px" : 0,
+                padding: isMobile ? "2px 4px" : "4px 8px",
+                borderRadius: "4px",
+                boxShadow: "none",
+              }}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#E55A2B"
+                }
+              }}
+            >
+              {isMobile ? "Man." : "Manapol"}
+            </Button>
+          </Tooltip>
         </Box>
       ),
-      width: isMobile ? "100px" : "180px",
+      width: isMobile ? "120px" : "260px",
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
@@ -232,10 +304,8 @@ function RolesProceduresContent() {
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
-        Asignar Procedimientos y Políticas a Roles
+        Asignar Procedimientos, Políticas y Manapol a Roles
       </h1>
-
-  
 
       {/* Buscador y selector de columnas */}
       <Box sx={{ 
@@ -249,7 +319,7 @@ function RolesProceduresContent() {
           <SearchBar
             value={search}
             onChange={setSearch}
-            placeholder="Buscar roles por nombre, código POE o número de política..."
+            placeholder="Buscar roles por nombre, código POE, política o manapol..."
           />
         </Box>
         
@@ -261,9 +331,8 @@ function RolesProceduresContent() {
             input={<OutlinedInput />}
             renderValue={(selected) => {
               if (selected.length === 0) return "Mostrar columnas";
-              if (selected.length === 2) return "Mostrar columnas";
-              if (selected.includes('poe')) return "Solo POE";
-              return "Solo Políticas";
+              if (selected.length === 3) return "Mostrar todas";
+              return `${selected.length} columnas`;
             }}
             displayEmpty
             startAdornment={
@@ -304,6 +373,17 @@ function RolesProceduresContent() {
                 size="small"
               />
               <ListItemText primary="Políticas Asignadas" />
+            </MenuItem>
+            <MenuItem value="manapol">
+              <Checkbox 
+                checked={columnVisibility.manapol}
+                sx={{ 
+                  color: "#247349",
+                  '&.Mui-checked': { color: "#247349" }
+                }}
+                size="small"
+              />
+              <ListItemText primary="Manapol Asignados" />
             </MenuItem>
           </Select>
         </FormControl>
@@ -357,7 +437,6 @@ function RolesProceduresContent() {
               procedimientos={
                 [...procedimientosFiltradosModal].sort(
                   (a, b) => {
-                    // Ordenar por número de POE (codigo), numérico si es posible
                     const aNum = Number(a.codigo);
                     const bNum = Number(b.codigo);
                     if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
@@ -409,7 +488,6 @@ function RolesProceduresContent() {
               procedimientos={
                 [...politicasFiltradosModal].sort(
                   (a, b) => {
-                    // Ordenar por número de política (numero_politica), numérico si es posible
                     const aNum = Number(a.numero_politica ?? a.codigo);
                     const bNum = Number(b.numero_politica ?? b.codigo);
                     if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
@@ -420,6 +498,63 @@ function RolesProceduresContent() {
               procedimientosSeleccionados={politicasSeleccionadas.map(String)}
               onSeleccionChange={handleSeleccionChangePolitics}
               tipo="politica"
+            />
+          )}
+        </div>
+      </GlobalModal>
+
+      {/* Modal para Manapol */}
+      <GlobalModal
+        open={modalManapolOpen}
+        onClose={handleCloseModalManapol}
+        title={`Asignar manapol a ${rolActualManapol?.nombre_rol || ""}`}
+        maxWidth="md"
+        actions={
+          <div className="flex justify-center items-center gap-1">
+            <SubmitButton 
+              onClick={handleSaveManapolWithLoading} 
+              loading={savingManapol}
+              style={{ backgroundColor: "#247349" }}
+            >
+              Guardar Manapol
+            </SubmitButton>
+          </div>
+        }
+      >
+        <div className="relative mb-2">
+          <SearchBar
+            value={modalSearchManapol}
+            onChange={setModalSearchManapol}
+            placeholder="Buscar manapol por ID, código o descripción..."
+          />
+        </div>
+
+        <div style={{ maxHeight: 350, overflowY: "auto" }}>
+          {modalLoadingManapol ? (
+            <div className="flex justify-center items-center py-8">
+              <CircularProgress 
+                size={40} 
+                style={{ color: "#247349" }}
+              />
+              <span className="ml-3 text-gray-600">Cargando manapol...</span>
+            </div>
+          ) : (
+            <ProceduresTableModal
+              procedimientos={
+                [...manapolFiltradosModal].sort((a, b) => {
+                  const codigoA = a.codigo_rm || a.codigo;
+                  const codigoB = b.codigo_rm || b.codigo;
+                  
+                  const aNum = Number(codigoA?.replace(/[^\d]/g, ''));
+                  const bNum = Number(codigoB?.replace(/[^\d]/g, ''));
+                  
+                  if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+                  return (codigoA || '').localeCompare(codigoB || '');
+                })
+              }
+              procedimientosSeleccionados={manapolSeleccionados}
+              onSeleccionChange={handleSeleccionChangeManapol}
+              tipo="manapol"
             />
           )}
         </div>

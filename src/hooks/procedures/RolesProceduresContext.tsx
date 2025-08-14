@@ -1,8 +1,7 @@
 import  { createContext, useContext, type ReactNode } from 'react';
 import { useRolesProcedures } from '../../hooks/procedures/useRolesProcedures';
 
-
-// Este hook maneja los roles y sus procedimientos/políticas
+// Este hook maneja los roles y sus procedimientos/políticas/manapol
 
 interface RolesProceduresContextType {
   rolesProcedures: any[];
@@ -11,6 +10,8 @@ interface RolesProceduresContextType {
   removeProcedures: (id_rol: number, procedimientos: number[]) => Promise<void>;
   savePolitics: (id_rol: number, politicas: number[]) => Promise<void>;
   removePolitics: (id_rol: number, politicas: number[]) => Promise<void>;
+  saveManapol: (id_rol: number, manapol: number[]) => Promise<void>;
+  removeManapol: (id_rol: number, manapol: number[]) => Promise<void>;
   refreshData: () => Promise<void>;
 }
 

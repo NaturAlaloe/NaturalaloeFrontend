@@ -6,17 +6,20 @@ export type Procedimiento = {
   poe?: string; 
   titulo: string; 
   codigo: string;
+  descripcion?: string;
+  nombre?: string;
   id_documento?: number;
   id_politica?: number;
   numero_politica?: string;
+  codigo_rm?: string; // Agregar este campo para manapol
 };
 
 interface ProceduresTableModalProps {
   procedimientos: Procedimiento[];
   procedimientosSeleccionados: string[];
   onSeleccionChange: (seleccion: string[]) => void;
-  tipo?: 'poe' | 'politica';
-  isSaving?: boolean; // <-- Añade esta prop opcional
+  tipo?: 'poe' | 'politica' | 'manapol';
+  isSaving?: boolean;
 }
 
 function getPageNumbers(current: number, total: number, max: number = 10) {
@@ -65,6 +68,47 @@ export default function ProceduresTableModal({
     return row.id_documento?.toString() || '';
   };
 
+  const getTitulo = (row: Procedimiento): string => {
+    switch (tipo) {
+      case 'manapol':
+        return row.descripcion || row.titulo || row.nombre || '';
+      case 'politica':
+        return row.titulo || row.nombre || row.descripcion || '';
+      default:
+        return row.titulo || row.descripcion || '';
+    }
+  };
+
+  const getColor = () => {
+    switch (tipo) {
+      case 'manapol':
+        return '#247349';
+      case 'politica':
+        return '#2AAC67';
+      default:
+        return '#2AAC67';
+    }
+  };
+
+  const handleCheckboxChange = (itemId: string, isChecked: boolean) => {
+    
+    let nuevaSeleccion: string[];
+    
+    if (isChecked) {
+      // Agregar el item si no está en la selección
+      if (!procedimientosSeleccionados.includes(itemId)) {
+        nuevaSeleccion = [...procedimientosSeleccionados, itemId];
+      } else {
+        nuevaSeleccion = procedimientosSeleccionados;
+      }
+    } else {
+      // Remover el item de la selección
+      nuevaSeleccion = procedimientosSeleccionados.filter(id => id !== itemId);
+    }
+    
+    onSeleccionChange(nuevaSeleccion);
+  };
+
   const columns: TableColumn<Procedimiento>[] = [
     {
       name: "",
@@ -75,44 +119,99 @@ export default function ProceduresTableModal({
         return (
           <Checkbox
             checked={isChecked}
-            onChange={(e) => {
-              if (e.target.checked) {
-                const nuevaSeleccion = [...procedimientosSeleccionados, itemId];
-                onSeleccionChange(nuevaSeleccion);
-              } else {
-                const nuevaSeleccion = procedimientosSeleccionados.filter((id) => id !== itemId);
-                onSeleccionChange(nuevaSeleccion);
-              }
+            onChange={(e) => handleCheckboxChange(itemId, e.target.checked)}
+            sx={{ 
+              color: getColor(),
+              '&.Mui-checked': { color: getColor() }
             }}
-            style={{ color: "#2AAC67" }}
           />
         );
       },
       width: "60px",
       sortable: false,
     },
-   
     {
-      name: tipo === 'poe' ? "Código POE" : "Código",
-      selector: (row) => row.codigo || '',
+      name: (() => {
+        switch (tipo) {
+          case 'manapol':
+            return "Código Manapol";
+          case 'politica':
+            return "Código";
+          default:
+            return "Código POE";
+        }
+      })(),
+      selector: (row) => {
+        // Para manapol, usar codigo_rm si está disponible, sino codigo
+        if (tipo === 'manapol') {
+          return row.codigo_rm || row.codigo || '';
+        }
+        return row.codigo || '';
+      },
+      cell: (row) => {
+        // Renderizado custom para mejor control
+        let codigo = '';
+        if (tipo === 'manapol') {
+          codigo = row.codigo_rm || row.codigo || '';
+        } else {
+          codigo = row.codigo || '';
+        }
+        return <span>{codigo}</span>;
+      },
       sortable: true,
       width: "150px",
     },
     {
-      name: "Título",
-      selector: (row) => row.titulo,
+      name: (() => {
+        switch (tipo) {
+          case 'manapol':
+            return "Descripción";
+          case 'politica':
+            return "Título";
+          default:
+            return "Título";
+        }
+      })(),
+      selector: (row) => getTitulo(row),
+      cell: (row) => {
+        const titulo = getTitulo(row);
+        return <span>{titulo}</span>;
+      },
       sortable: true,
       grow: 2,
     },
   ];
 
-  const noDataMessage = tipo === 'poe' 
-    ? "No se encontraron procedimientos" 
-    : "No se encontraron políticas";
+  const noDataMessage = (() => {
+    switch (tipo) {
+      case 'manapol':
+        return "No se encontraron registros de manapol";
+      case 'politica':
+        return "No se encontraron políticas";
+      default:
+        return "No se encontraron procedimientos";
+    }
+  })();
+
+  const searchHint = (() => {
+    switch (tipo) {
+      case 'manapol':
+        return "Prueba ajustando los filtros de búsqueda de manapol";
+      case 'politica':
+        return "Revisa los criterios de búsqueda de políticas";
+      default:
+        return "Prueba ajustando los filtros de búsqueda";
+    }
+  })();
+
+  const gradientColor = tipo === 'manapol' 
+    ? "linear-gradient(135deg, #FFF5F0 0%, #FFEDE4 100%)"
+    : "linear-gradient(135deg, #F0FFF4 0%, #E8F5E8 100%)";
+
+  const borderColor = getColor();
 
   return (
     <div className="w-full">
-      {/* Container principal con borde y border radius SIN overflow-hidden */}
       <div className="border border-gray-300 rounded-lg shadow-sm bg-white">
         <DataTable
           columns={columns}
@@ -135,7 +234,7 @@ export default function ProceduresTableModal({
                 </svg>
                 <p className="font-medium">{noDataMessage}</p>
                 <p className="text-xs text-gray-400 mt-1">
-                  {tipo === 'poe' ? 'Prueba ajustando los filtros de búsqueda' : 'Revisa los criterios de búsqueda'}
+                  {searchHint}
                 </p>
               </div>
             </div>
@@ -148,15 +247,15 @@ export default function ProceduresTableModal({
             },
             headRow: {
               style: {
-                background: "linear-gradient(135deg, #F0FFF4 0%, #E8F5E8 100%)",
-                borderBottom: "2px solid #2AAC67",
+                background: gradientColor,
+                borderBottom: `2px solid ${borderColor}`,
                 minHeight: "48px",
               },
             },
             headCells: {
               style: {
                 background: "transparent",
-                color: "#2AAC67",
+                color: borderColor,
                 fontWeight: "600",
                 fontSize: "13px",
                 textTransform: "uppercase",
@@ -172,7 +271,7 @@ export default function ProceduresTableModal({
                 borderBottom: "1px solid #f1f5f9",
                 transition: "all 0.2s ease",
                 "&:hover": {
-                  backgroundColor: "#f8fffe",
+                  backgroundColor: tipo === 'manapol' ? "#fffaf8" : "#f8fffe",
                 },
                 "&:last-child": {
                   borderBottom: "none",
@@ -192,11 +291,9 @@ export default function ProceduresTableModal({
         />
       </div>
 
-      {/* Paginación mejorada */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-6">
           <nav className="flex items-center space-x-1" aria-label="Pagination">
-            {/* Botón Anterior */}
             <button
               className={`
                 relative inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
@@ -214,7 +311,6 @@ export default function ProceduresTableModal({
               Anterior
             </button>
 
-            {/* Números de página */}
             <div className="flex items-center space-x-1">
               {getPageNumbers(currentPage, totalPages, 5).map((page, idx) =>
                 typeof page === "number" ? (
@@ -224,7 +320,7 @@ export default function ProceduresTableModal({
                     className={`
                       relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 border
                       ${currentPage === page
-                        ? 'bg-gradient-to-r from-[#2AAC67] to-[#22965a] text-white border-[#2AAC67] shadow-md transform scale-105 cursor-default' 
+                        ? `bg-gradient-to-r ${tipo === 'manapol' ? 'from-[#247349] to-[#247349]' : 'from-[#2AAC67] to-[#22965a]'} text-white border-[${borderColor}] shadow-md transform scale-105 cursor-default` 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:transform hover:scale-105 hover:shadow-md'
                       }
                     `}
@@ -241,7 +337,6 @@ export default function ProceduresTableModal({
               )}
             </div>
 
-            {/* Botón Siguiente */}
             <button
               className={`
                 relative inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
