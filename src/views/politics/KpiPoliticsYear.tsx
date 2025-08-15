@@ -20,11 +20,9 @@ export default function KpiPoliticsYear() {
     loading,
     loadingData,
     estadoOptions,
-    areas,
     responsables,
     handleDocReasonChange,
     handleStateChange,
-    handleAreaChange,
     handleResponsableChange,
     addSelectedDocs,
     removeDoc,
@@ -53,21 +51,7 @@ export default function KpiPoliticsYear() {
     <>
       <CustomToaster />
       <FormContainer title="Crear lote de KPIs para reglas anuales de Políticas" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <SelectAutocomplete
-            label="Área"
-            options={areas}
-            optionLabel="nombre"
-            optionValue="id"
-            value={areas.find(area => area.id === formData.idArea) || null}
-            onChange={(value: { id: number; nombre: string } | { id: number; nombre: string }[] | null) => {
-              const selected = Array.isArray(value) ? value[0] : value;
-              handleAreaChange(selected);
-            }}
-            placeholder="Seleccionar área..."
-            disabled={false}
-          />
-          
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <SelectAutocomplete
             label="Responsable"
             options={responsables}
@@ -100,7 +84,7 @@ export default function KpiPoliticsYear() {
         </div>
 
         {/* Sección de políticas seleccionadas */}
-        <div className="col-span-1 md:col-span-3 mt-6">
+        <div className="col-span-1 md:col-span-2 mt-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-[#2AAC67]">
               Políticas Seleccionadas (Cantidad: {docs.length})

@@ -5,7 +5,6 @@ import { useUserFromToken } from '../useUserFromToken';
 import { showCustomToast } from '../../components/globalComponents/CustomToaster';
 
 interface FormData {
-  idArea: number | null;
   idResponsable: number | null;
   estado: "actualizar" | "obsoletar" | "";
 }
@@ -16,11 +15,6 @@ interface DocData {
   titulo: string;
   tipo: string;
   razon: string;
-}
-
-interface Area {
-  id: number;
-  nombre: string;
 }
 
 interface Responsable {
@@ -41,7 +35,6 @@ export const useKpiPoliticsYear = () => {
   const { fullName } = useUserFromToken();
   
   const [formData, setFormData] = useState<FormData>({
-    idArea: null,
     idResponsable: null,
     estado: "",
   });
@@ -51,7 +44,6 @@ export const useKpiPoliticsYear = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
-  const [areas, setAreas] = useState<Area[]>([]);
   const [responsables, setResponsables] = useState<Responsable[]>([]);
 
   const estadoOptions = [
@@ -65,22 +57,7 @@ export const useKpiPoliticsYear = () => {
       try {
         setLoadingData(true);
         
-        // Cargar áreas
-        const areasResponse = await api.get('/area');
-        if (areasResponse.data) {
-          // Manejar diferentes estructuras de respuesta
-          const areasData = Array.isArray(areasResponse.data) 
-            ? areasResponse.data 
-            : Array.isArray(areasResponse.data.data) 
-              ? areasResponse.data.data 
-              : [];
-          setAreas(areasData.map((area: any) => ({
-            id: area.id_area,
-            nombre: area.titulo
-          })));
-        }
-
-        // Cargar responsables
+        // Cargar todos los responsables (sin filtrar por área)
         const responsablesResponse = await api.get('/responsible');
         console.log('Responsables response:', responsablesResponse.data);
         if (responsablesResponse.data.data) {
@@ -116,37 +93,6 @@ export const useKpiPoliticsYear = () => {
 
     fetchInitialData();
   }, []);
-
-  // Cargar responsables cuando cambia el área
-  useEffect(() => {
-    const fetchResponsables = async () => {
-      if (formData.idArea) {
-        try {
-          const response = await api.get(`/responsible/area/${formData.idArea}`);
-          if (response.data.data) {
-            setResponsables(response.data.data.map((resp: any) => ({
-              id: resp.id_responsable,
-              nombre: resp.nombre_responsable || resp.nombre
-            })));
-            setFormData(prev => ({ ...prev, idResponsable: null }));
-          }
-        } catch (error) {
-          console.error('Error loading responsables:', error);
-          // Si falla la carga por área, mantener todos los responsables
-        }
-      }
-    };
-
-    fetchResponsables();
-  }, [formData.idArea]);
-
-  const handleAreaChange = (selected: { id: number; nombre: string } | null) => {
-    setFormData(prev => ({
-      ...prev,
-      idArea: selected?.id || null,
-      idResponsable: null
-    }));
-  };
 
   const handleResponsableChange = (selected: { id: number; nombre: string } | null) => {
     setFormData(prev => ({
@@ -261,7 +207,6 @@ export const useKpiPoliticsYear = () => {
         
         // Resetear formulario
         setFormData({
-          idArea: null,
           idResponsable: null,
           estado: "",
         });
@@ -299,11 +244,9 @@ export const useKpiPoliticsYear = () => {
     loading,
     loadingData,
     estadoOptions,
-    areas,
     responsables,
     handleDocReasonChange,
     handleStateChange,
-    handleAreaChange,
     handleResponsableChange,
     addSelectedDocs,
     removeDoc,
