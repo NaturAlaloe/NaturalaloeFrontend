@@ -2,7 +2,7 @@ import { useRolesProceduresList } from "../../hooks/procedures/useRolesProcedure
 import { useRolesPoliticsList } from "../../hooks/procedures/useRolesPoliticsList";
 import { useRolesManapolList } from "../../hooks/procedures/useRolesManapolList";
 import { RolesProceduresProvider } from "../../hooks/procedures/RolesProceduresContext";
-import { Button, Box, Chip, Tooltip, useMediaQuery, useTheme, Typography, Tab, Tabs, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Button, Box, Tooltip, useMediaQuery, useTheme, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress"; 
 import { useState } from "react";
 import ProceduresTableModal from "../../components/ProceduresTableModal";
@@ -21,6 +21,9 @@ function RolesProceduresContent() {
   const [modalVistaOpen, setModalVistaOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
   const [rolSeleccionado, setRolSeleccionado] = useState<any>(null);
+
+  // Nuevo estado para el buscador del modal de vista
+  const [modalSearch, setModalSearch] = useState("");
 
   // Hook para procedimientos (POE)
   const {
@@ -74,6 +77,28 @@ function RolesProceduresContent() {
     handleSaveManapolWithLoading,
     savingManapol,
   } = useRolesManapolList();
+
+  // Filtrado para cada tab según el buscador
+  const procedimientosFiltrados = rolSeleccionado?.procedimientos?.filter(
+    (p: any) =>
+      p.codigo?.toLowerCase().includes(modalSearch.toLowerCase()) ||
+      p.titulo?.toLowerCase().includes(modalSearch.toLowerCase()) ||
+      p.descripcion?.toLowerCase().includes(modalSearch.toLowerCase())
+  ) || [];
+
+  const politicasFiltradas = rolSeleccionado?.politicas?.filter(
+    (p: any) =>
+      p.codigo?.toLowerCase().includes(modalSearch.toLowerCase()) ||
+      p.titulo?.toLowerCase().includes(modalSearch.toLowerCase()) ||
+      p.descripcion?.toLowerCase().includes(modalSearch.toLowerCase())
+  ) || [];
+
+  const manapolFiltrados = rolSeleccionado?.manapol?.filter(
+    (m: any) =>
+      (m.codigo_rm || m.codigo)?.toLowerCase().includes(modalSearch.toLowerCase()) ||
+      m.titulo?.toLowerCase().includes(modalSearch.toLowerCase()) ||
+      m.descripcion?.toLowerCase().includes(modalSearch.toLowerCase())
+  ) || [];
 
   // Función para abrir modal de vista
   const handleOpenModalVista = (rol: any) => {
@@ -262,294 +287,153 @@ function RolesProceduresContent() {
         open={modalVistaOpen}
         onClose={handleCloseModalVista}
         title={`Documentos asignados al rol: ${rolSeleccionado?.nombre_rol || ""}`}
-        maxWidth="lg"
+        maxWidth="md"
       >
         <Box sx={{ width: "100%", p: 1 }}>
-          <Tabs 
-            value={tabValue} 
-            onChange={(_e, newValue) => setTabValue(newValue)}
-            sx={{
-              mb: 3,
-              "& .MuiTab-root": {
-                textTransform: "none",
+          {/* Buscador */}
+          <Box sx={{ mb: 2 }}>
+            <SearchBar
+              value={modalSearch}
+              onChange={setModalSearch}
+              placeholder="Buscar por código o título..."
+            />
+          </Box>
+
+          {/* Botones tipo tabs */}
+          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+            <Button
+              variant={tabValue === 0 ? "contained" : "outlined"}
+              onClick={() => setTabValue(0)}
+              sx={{
+                flex: 1,
+                backgroundColor: tabValue === 0 ? "#2AAC67" : undefined,
+                color: tabValue === 0 ? "#fff" : "#2AAC67",
+                borderColor: "#2AAC67",
                 fontWeight: 600,
                 fontSize: "1rem",
-                minWidth: "auto",
-                px: 4,
-                py: 2,
-                mr: 1,
-                borderRadius: "8px 8px 0 0",
-                color: "#6B7280",
-                "&.Mui-selected": {
-                  color: "#fff",
-                  backgroundColor: "#2AAC67",
-                },
-              },
-              "& .MuiTabs-indicator": {
-                display: "none",
-              },
-            }}
-          >
-            <Tab label={`POE (${rolSeleccionado?.procedimientos?.length || 0})`} />
-            <Tab label={`Políticas (${rolSeleccionado?.politicas?.length || 0})`} />
-            <Tab label={`Manapol (${rolSeleccionado?.manapol?.length || 0})`} />
-          </Tabs>
+                borderRadius: "6px",
+                boxShadow: "none",
+                textTransform: "none",
+              }}
+            >
+              POE
+            </Button>
+            <Button
+              variant={tabValue === 1 ? "contained" : "outlined"}
+              onClick={() => setTabValue(1)}
+              sx={{
+                flex: 1,
+                backgroundColor: tabValue === 1 ? "#2AAC67" : undefined,
+                color: tabValue === 1 ? "#fff" : "#2AAC67",
+                borderColor: "#2AAC67",
+                fontWeight: 600,
+                fontSize: "1rem",
+                borderRadius: "6px",
+                boxShadow: "none",
+                textTransform: "none",
+              }}
+            >
+              Políticas
+            </Button>
+            <Button
+              variant={tabValue === 2 ? "contained" : "outlined"}
+              onClick={() => setTabValue(2)}
+              sx={{
+                flex: 1,
+                backgroundColor: tabValue === 2 ? "#2AAC67" : undefined,
+                color: tabValue === 2 ? "#fff" : "#2AAC67",
+                borderColor: "#247349",
+                fontWeight: 600,
+                fontSize: "1rem",
+                borderRadius: "6px",
+                boxShadow: "none",
+                textTransform: "none",
+              }}
+            >
+              Manapol
+            </Button>
+          </Box>
 
-          {/* Tab POE */}
+          {/* Tabla según tab */}
           {tabValue === 0 && (
-            <Box sx={{ backgroundColor: "#2AAC67", borderRadius: "0 12px 12px 12px", p: 0, overflow: "hidden" }}>
-              <Box sx={{ backgroundColor: "#fff", m: 0 }}>
-                {rolSeleccionado?.procedimientos && rolSeleccionado.procedimientos.length > 0 ? (
-                  <Paper sx={{ border: "2px solid rgb(224, 224, 224)", borderRadius: "8px", overflow: "hidden" }}>
-                    <TableContainer sx={{ maxHeight: 400 }}>
-                      <Table stickyHeader size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell sx={{ 
-                              backgroundColor: "#2AAC67", 
-                              color: "#fff", 
-                              fontWeight: 700, 
-                              fontSize: "0.9rem",
-                            }}>
-                              Código POE
-                            </TableCell>
-                            <TableCell sx={{ 
-                              backgroundColor: "#2AAC67", 
-                              color: "#fff", 
-                              fontWeight: 700, 
-                              fontSize: "0.9rem",
-                            }}>
-                              Título del Procedimiento
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {rolSeleccionado.procedimientos.map((poe: any, index: number) => (
-                            <TableRow 
-                              key={poe.id_documento} 
-                              sx={{ 
-                                "&:hover": { backgroundColor: "#f8fffe" },
-                                backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9",
-                                borderBottom: "1px solid #e0e0e0"
-                              }}
-                            >
-                              <TableCell sx={{ py: 2, borderRight: "1px solid #e0e0e0" }}>
-                                <Box sx={{
-                                  backgroundColor: "#2AAC67",
-                                  color: "#fff",
-                                  fontSize: "0.8rem",
-                                  fontWeight: 600,
-                                  minWidth: "80px",
-                                  textAlign: "center",
-                                  padding: "6px 12px",
-                                  borderRadius: "4px",
-                                  border: "1px solid #1e7d4d",
-                                  display: "inline-block"
-                                }}>
-                                  {poe.codigo}
-                                </Box>
-                              </TableCell>
-                              <TableCell sx={{ py: 2, fontSize: "0.9rem" }}>
-                                {poe.titulo || poe.descripcion || 'Sin título disponible'}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Paper>
-                ) : (
-                  <Box sx={{ 
-                    textAlign: "center", 
-                    py: 8, 
-                    color: "#6B7280",
-                    border: "2px dashed #e0e0e0",
-                    borderRadius: "8px",
-                    backgroundColor: "#f9f9f9"
-                  }}>
-                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 500 }}>
-                      Sin procedimientos POE
-                    </Typography>
-                    <Typography variant="body2">
-                      Este rol no tiene procedimientos POE asignados
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-            </Box>
+            <Paper sx={{ border: "2px solid #e0e0e0", borderRadius: "8px", overflow: "hidden" }}>
+              <TableContainer sx={{ maxHeight: 400 }}>
+                <Table stickyHeader size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ backgroundColor: "#2AAC67", color: "#fff", fontWeight: 700 }}>Código POE</TableCell>
+                      <TableCell sx={{ backgroundColor: "#2AAC67", color: "#fff", fontWeight: 700 }}>Título</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {procedimientosFiltrados.length > 0 ? procedimientosFiltrados.map((poe: any, idx: number) => (
+                      <TableRow key={poe.id_documento}>
+                        <TableCell>{poe.codigo}</TableCell>
+                        <TableCell>{poe.titulo || poe.descripcion || 'Sin título'}</TableCell>
+                      </TableRow>
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={2} align="center">No hay procedimientos POE</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
           )}
 
-          {/* Tab Políticas */}
           {tabValue === 1 && (
-            <Box sx={{ backgroundColor: "#2AAC67", borderRadius: "0 12px 12px 12px", p: 0, overflow: "hidden" }}>
-              <Box sx={{ backgroundColor: "#fff", m: 0 }}>
-                {rolSeleccionado?.politicas && rolSeleccionado.politicas.length > 0 ? (
-                  <Paper sx={{ border: "2px solid #e0e0e0", borderRadius: "8px", overflow: "hidden" }}>
-                    <TableContainer sx={{ maxHeight: 400 }}>
-                      <Table stickyHeader size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell sx={{ 
-                              backgroundColor: "#2AAC67", 
-                              color: "#fff", 
-                              fontWeight: 700, 
-                              fontSize: "0.9rem",
-                              borderBottom: "2px solid #1e7d4d"
-                            }}>
-                              Código de Política
-                            </TableCell>
-                            <TableCell sx={{ 
-                              backgroundColor: "#2AAC67", 
-                              color: "#fff", 
-                              fontWeight: 700, 
-                              fontSize: "0.9rem",
-                              borderBottom: "2px solid #1e7d4d"
-                            }}>
-                              Título de la Política
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {rolSeleccionado.politicas.map((politica: any, index: number) => (
-                            <TableRow 
-                              key={politica.id_documento} 
-                              sx={{ 
-                                "&:hover": { backgroundColor: "#f8fffe" },
-                                backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9",
-                                borderBottom: "1px solid #e0e0e0"
-                              }}
-                            >
-                              <TableCell sx={{ py: 2, borderRight: "1px solid #e0e0e0" }}>
-                                <Box sx={{
-                                  borderColor: "#2AAC67",
-                                  color: "#2AAC67",
-                                  fontSize: "0.8rem",
-                                  fontWeight: 600,
-                                  minWidth: "80px",
-                                  textAlign: "center",
-                                  padding: "6px 12px",
-                                  borderRadius: "4px",
-                                  border: "2px solid #2AAC67",
-                                  backgroundColor: "transparent",
-                                  display: "inline-block"
-                                }}>
-                                  {politica.codigo}
-                                </Box>
-                              </TableCell>
-                              <TableCell sx={{ py: 2, fontSize: "0.9rem" }}>
-                                {politica.titulo || politica.descripcion || 'Sin título disponible'}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Paper>
-                ) : (
-                  <Box sx={{ 
-                    textAlign: "center", 
-                    py: 8, 
-                    color: "#6B7280",
-                    border: "2px dashed #e0e0e0",
-                    borderRadius: "8px",
-                    backgroundColor: "#f9f9f9"
-                  }}>
-                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 500 }}>
-                      Sin políticas
-                    </Typography>
-                    <Typography variant="body2">
-                      Este rol no tiene políticas asignadas
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-            </Box>
+            <Paper sx={{ border: "2px solid #e0e0e0", borderRadius: "8px", overflow: "hidden" }}>
+              <TableContainer sx={{ maxHeight: 400 }}>
+                <Table stickyHeader size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ backgroundColor: "#2AAC67", color: "#fff", fontWeight: 700 }}>Código</TableCell>
+                      <TableCell sx={{ backgroundColor: "#2AAC67", color: "#fff", fontWeight: 700 }}>Título</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {politicasFiltradas.length > 0 ? politicasFiltradas.map((p: any, idx: number) => (
+                      <TableRow key={p.id_documento}>
+                        <TableCell>{p.codigo}</TableCell>
+                        <TableCell>{p.titulo || p.descripcion || 'Sin título'}</TableCell>
+                      </TableRow>
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={2} align="center">No hay políticas</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
           )}
 
-          {/* Tab Manapol */}
           {tabValue === 2 && (
-            <Box sx={{ backgroundColor: "#247349", borderRadius: "0 12px 12px 12px", p: 0, overflow: "hidden" }}>
-              <Box sx={{ backgroundColor: "#fff", m: 0 }}>
-                {rolSeleccionado?.manapol && rolSeleccionado.manapol.length > 0 ? (
-                  <Paper sx={{ border: "2px solid #e0e0e0", borderRadius: "8px", overflow: "hidden" }}>
-                    <TableContainer sx={{ maxHeight: 400 }}>
-                      <Table stickyHeader size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell sx={{ 
-                              backgroundColor: "#247349", 
-                              color: "#fff", 
-                              fontWeight: 700, 
-                              fontSize: "0.9rem",
-                              borderBottom: "2px solid #1a5c37"
-                            }}>
-                              Código Manapol
-                            </TableCell>
-                            <TableCell sx={{ 
-                              backgroundColor: "#247349", 
-                              color: "#fff", 
-                              fontWeight: 700, 
-                              fontSize: "0.9rem",
-                              borderBottom: "2px solid #1a5c37"
-                            }}>
-                              Descripción del Manapol
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {rolSeleccionado.manapol.map((manapol: any, index: number) => (
-                            <TableRow 
-                              key={manapol.id_documento} 
-                              sx={{ 
-                                "&:hover": { backgroundColor: "#f8fff8" },
-                                backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9",
-                                borderBottom: "1px solid #e0e0e0"
-                              }}
-                            >
-                              <TableCell sx={{ py: 2, borderRight: "1px solid #e0e0e0" }}>
-                                <Box sx={{
-                                  backgroundColor: "#247349",
-                                  color: "#fff",
-                                  fontSize: "0.8rem",
-                                  fontWeight: 600,
-                                  minWidth: "80px",
-                                  textAlign: "center",
-                                  padding: "6px 12px",
-                                  borderRadius: "4px",
-                                  border: "1px solid #1a5c37",
-                                  display: "inline-block"
-                                }}>
-                                  {manapol.codigo_rm || manapol.codigo}
-                                </Box>
-                              </TableCell>
-                              <TableCell sx={{ py: 2, fontSize: "0.9rem" }}>
-                                {manapol.descripcion || manapol.titulo || 'Sin descripción disponible'}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Paper>
-                ) : (
-                  <Box sx={{ 
-                    textAlign: "center", 
-                    py: 8, 
-                    color: "#6B7280",
-                    border: "2px dashed #e0e0e0",
-                    borderRadius: "8px",
-                    backgroundColor: "#f9f9f9"
-                  }}>
-                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 500 }}>
-                      Sin manapol
-                    </Typography>
-                    <Typography variant="body2">
-                      Este rol no tiene manapol asignados
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-            </Box>
+            <Paper sx={{ border: "2px solid #e0e0e0", borderRadius: "8px", overflow: "hidden" }}>
+              <TableContainer sx={{ maxHeight: 400 }}>
+                <Table stickyHeader size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ backgroundColor: "#2AAC67", color: "#fff", fontWeight: 700 }}>Código Manapol</TableCell>
+                      <TableCell sx={{ backgroundColor: "#2AAC67", color: "#fff", fontWeight: 700 }}>Título</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {manapolFiltrados.length > 0 ? manapolFiltrados.map((m: any, idx: number) => (
+                      <TableRow key={m.id_documento}>
+                        <TableCell>{m.codigo_rm || m.codigo}</TableCell>
+                        <TableCell>{m.descripcion || m.titulo || 'Sin descripción'}</TableCell>
+                      </TableRow>
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={2} align="center">No hay manapol</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
           )}
         </Box>
       </GlobalModal>
@@ -668,7 +552,7 @@ function RolesProceduresContent() {
             <SubmitButton 
               onClick={handleSaveManapolWithLoading} 
               loading={savingManapol}
-              style={{ backgroundColor: "#247349" }}
+              style={{ backgroundColor: "#2AAC67" }}
             >
               Guardar Manapol
             </SubmitButton>
@@ -688,7 +572,7 @@ function RolesProceduresContent() {
             <div className="flex justify-center items-center py-8">
               <CircularProgress 
                 size={40} 
-                style={{ color: "#247349" }}
+                style={{ color: "#2AAC67" }}
               />
               <span className="ml-3 text-gray-600">Cargando manapol...</span>
             </div>

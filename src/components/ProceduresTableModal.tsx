@@ -82,7 +82,7 @@ export default function ProceduresTableModal({
   const getColor = () => {
     switch (tipo) {
       case 'manapol':
-        return '#247349';
+        return '#2AAC67';
       case 'politica':
         return '#2AAC67';
       default:
@@ -320,7 +320,7 @@ export default function ProceduresTableModal({
                     className={`
                       relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 border
                       ${currentPage === page
-                        ? `bg-gradient-to-r ${tipo === 'manapol' ? 'from-[#247349] to-[#247349]' : 'from-[#2AAC67] to-[#22965a]'} text-white border-[${borderColor}] shadow-md transform scale-105 cursor-default` 
+                        ? `bg-gradient-to-r ${tipo === 'manapol' ? 'from-[#2AAC67] to-[#2AAC67]' : 'from-[#2AAC67] to-[#2AAC67]'} text-white border-[${borderColor}] shadow-md transform scale-105 cursor-default` 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:transform hover:scale-105 hover:shadow-md'
                       }
                     `}
