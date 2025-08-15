@@ -112,7 +112,6 @@ export function useVersionedProceduresController() {
             fecha_creacion: data.fecha_creacion,
             fecha_vigencia: data.fecha_vigencia,
             vigente: data.vigente,
-            version_actual: data.vigente, // Si es vigente, también es actual
             documento: data.documento || undefined,
           };
           
@@ -139,21 +138,8 @@ export function useVersionedProceduresController() {
       } catch (error: any) {
         console.error("Error al actualizar procedimiento:", error);
         
-        let errorMessage = "Error inesperado al actualizar el procedimiento";
-        
-        if (error?.response?.status === 400) {
-          errorMessage = "Datos inválidos. Verifique que todos los campos estén correctos";
-        } else if (error?.response?.status === 404) {
-          errorMessage = "El procedimiento no fue encontrado";
-        } else if (error?.response?.status === 409) {
-          errorMessage = "Debe quedar al menos una versión vigente del POE";
-        } else if (error?.response?.status === 500) {
-          errorMessage = "Error interno del servidor. Intente nuevamente";
-        } else if (error?.response?.data?.message) {
-          errorMessage = error.response.data.message;
-        } else if (error?.message) {
-          errorMessage = error.message;
-        }
+        // Usar directamente el mensaje de error del servicio mejorado
+        let errorMessage = error.message || "Error inesperado al actualizar el procedimiento";
         
         return { 
           success: false, 
@@ -328,34 +314,49 @@ export function useVersionedProceduresController() {
         ...editActions.editData,
       } : null,
       saving: editActions.saving,
+      originalRevision: editActions.originalRevision, // Exponer originalRevision
       handlers: {
         handleCheckboxChange: (field: 'es_vigente' | 'es_nueva_version', checked: boolean) => {
           if (editActions.editData) {
-            const updatedData = {
-              ...editActions.editData,
-              [field]: checked,
-            };
-
-            if (field === 'es_nueva_version' && checked) {
-              const currentCode = editActions.editData.codigo;
-              if (currentCode) {
-                const procedure = versionProcedures.find(p => p.codigo_poe === currentCode);
-                if (procedure && procedure.versiones && procedure.versiones.length > 0) {
-                  const maxVersion = Math.max(...procedure.versiones.map(v => v.revision));
-                  updatedData.revision = (maxVersion + 1).toString();
-                  
-                  showCustomToast(
-                    "Nueva versión calculada",
-                    `Se ha asignado automáticamente la versión ${maxVersion + 1}`,
-                    "info"
-                  );
+            if (field === 'es_nueva_version') {
+              if (checked) {
+                // Calcular la siguiente versión basada en todas las versiones existentes
+                const currentCode = editActions.editData.codigo;
+                if (currentCode) {
+                  const procedure = versionProcedures.find(p => p.codigo_poe === currentCode);
+                  if (procedure && procedure.versiones && procedure.versiones.length > 0) {
+                    const maxVersion = Math.max(...procedure.versiones.map(v => v.revision));
+                    const nextVersion = maxVersion + 1;
+                    
+                    editActions.setEditData({
+                      ...editActions.editData,
+                      es_nueva_version: checked,
+                      revision: nextVersion.toString(),
+                      es_vigente: true, // Por defecto, las nuevas versiones son vigentes
+                    });
+                    
+                    showCustomToast(
+                      "Nueva versión calculada",
+                      `Se ha asignado automáticamente la versión ${nextVersion}`,
+                      "info"
+                    );
+                  }
                 }
+              } else {
+                // Restaurar la revisión original cuando se desmarca
+                editActions.setEditData({
+                  ...editActions.editData,
+                  es_nueva_version: checked,
+                  revision: editActions.originalRevision, // Restaurar revisión original
+                });
               }
-              
-              updatedData.es_vigente = true;
+            } else {
+              // Para otros campos, comportamiento normal
+              editActions.setEditData({
+                ...editActions.editData,
+                [field]: checked,
+              });
             }
-
-            editActions.setEditData(updatedData);
           }
         },
         handleInputChange: (field: any, value: string) => {
@@ -405,6 +406,7 @@ export function useVersionedProceduresController() {
       onSubmit: () => {},
       data: null,
       saving: false,
+      originalRevision: "",
       handlers: {
         handleCheckboxChange: () => {},
         handleInputChange: () => {},

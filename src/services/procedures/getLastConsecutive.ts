@@ -2,34 +2,57 @@ import api from "../../apiConfig/api";
 
 export async function getLastConsecutive(prefix: string) {
   try {
-    console.log("Llamando a API con prefijo:", prefix);
     const response = await api.get(`/procedure/${prefix}`);
-    console.log("Respuesta completa de la API:", response.data);
     
-    if (response.data && response.data.success && Array.isArray(response.data.data)) {
-      // Si el array está vacío, es el primer procedimiento para este prefijo
-      if (response.data.data.length === 0) {
-        console.log("No hay procedimientos previos para este prefijo, asignando 001");
-        return 0; // Retornamos 0, que se mostrará como 001 después del padding
-      }
-      
-      // Si hay datos, obtenemos el consecutivo actual
-      if (response.data.data.length > 0) {
-        const consecutivoActual = response.data.data[0].consecutivo_actual;
-        console.log("Consecutivo actual obtenido:", consecutivoActual);
+    if (response.data && response.data.success) {
+      // Verificar si data es un array
+      if (Array.isArray(response.data.data)) {
+        // Si el array está vacío, es el primer procedimiento
+        if (response.data.data.length === 0) {
+          return null;
+        }
         
-        if (consecutivoActual !== undefined && consecutivoActual !== null) {
-          const numeroConsecutivo = Number(consecutivoActual);
-          console.log("Consecutivo convertido a número:", numeroConsecutivo);
+        // Si hay elementos en el array, tomar el primero
+        if (response.data.data.length > 0 && response.data.data[0].consecutivo_actual !== undefined) {
+          const consecutivoActual = response.data.data[0].consecutivo_actual;
+          
+          // Convertir a número, manejando tanto strings como números
+          const numeroConsecutivo = typeof consecutivoActual === 'string' 
+            ? parseInt(consecutivoActual, 10) 
+            : Number(consecutivoActual);
+          
+          // Verificar que es un número válido
+          if (!isNaN(numeroConsecutivo) && numeroConsecutivo >= 0) {
+            return numeroConsecutivo;
+          } else {
+            return null;
+          }
+        }
+      } else if (response.data.data && response.data.data.consecutivo_actual !== undefined) {
+        // Caso donde data es un objeto directo (fallback por si cambia la API)
+        const consecutivoActual = response.data.data.consecutivo_actual;
+        
+        // Convertir a número, manejando tanto strings como números
+        const numeroConsecutivo = typeof consecutivoActual === 'string' 
+          ? parseInt(consecutivoActual, 10) 
+          : Number(consecutivoActual);
+        
+        // Verificar que es un número válido
+        if (!isNaN(numeroConsecutivo) && numeroConsecutivo >= 0) {
           return numeroConsecutivo;
+        } else {
+          return null;
         }
       }
     }
     
-    console.log("No se encontró consecutivo válido en la respuesta");
-    return null;
-  } catch (error) {
-    console.error("Error al obtener consecutivo:", error);
-    return null;
+    return null; // null indica que es el primer procedimiento (consecutivo 000)
+  } catch (error: any) {
+    // Si es un 404 o error similar, significa que no existe el prefijo (primer procedimiento)
+    if (error.response && error.response.status === 404) {
+      return null; // null indica que es el primer procedimiento (consecutivo 000)
+    }
+    
+    throw error; // Re-lanzamos otros errores
   }
 }

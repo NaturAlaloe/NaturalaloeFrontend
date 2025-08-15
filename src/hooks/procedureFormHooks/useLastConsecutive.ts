@@ -8,10 +8,7 @@ export function useLastConsecutive() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchLastConsecutive = useCallback(async (prefix: string) => {
-    console.log("fetchLastConsecutive llamado con prefijo:", prefix);
-    
     if (!prefix || !prefix.includes('-')) {
-      console.log("Prefijo inválido:", prefix);
       setError("Prefijo inválido");
       setLastConsecutive(null);
       return null;
@@ -21,42 +18,46 @@ export function useLastConsecutive() {
     setError(null);
     try {
       const consecutivoActual = await getLastConsecutive(prefix);
-      console.log("Consecutivo actual recibido en hook:", consecutivoActual);
       
-      if (typeof consecutivoActual === "number" && !isNaN(consecutivoActual)) {
-        const siguienteConsecutivo = consecutivoActual + 1;
-        console.log("Siguiente consecutivo calculado:", siguienteConsecutivo);
-        setLastConsecutive(siguienteConsecutivo);
-        
+      let siguienteConsecutivo: number;
+      let mensaje: string;
+      
+      if (consecutivoActual === null) {
+        // Primer procedimiento para esta combinación depto-categoria
+        siguienteConsecutivo = 0; // 000
+        mensaje = `Primer procedimiento para este prefijo: 000`;
+      } else if (typeof consecutivoActual === "number" && consecutivoActual >= 0 && !isNaN(consecutivoActual)) {
+        // Ya existe al menos un procedimiento, sumamos 1
+        siguienteConsecutivo = consecutivoActual + 1;
         const consecutivoFormateado = String(siguienteConsecutivo).padStart(3, "0");
-        const mensaje = consecutivoActual === 1 
-          ? `Primer procedimiento para este prefijo: ${consecutivoFormateado}`
-          : `El próximo consecutivo será ${consecutivoFormateado}`;
-          
-        showCustomToast(
-          "Consecutivo obtenido",
-          mensaje,
-          "success"
-        );
-        return siguienteConsecutivo;
+        mensaje = `El próximo consecutivo será ${consecutivoFormateado}`;
       } else {
-        console.log("Consecutivo no válido:", consecutivoActual);
         setError("No se pudo obtener el consecutivo");
         setLastConsecutive(null);
         showCustomToast(
           "Error al obtener consecutivo",
-          "No se encontró información para este prefijo",
+          "No se encontró información válida para este prefijo",
           "error"
         );
         return null;
       }
-    } catch (e) {
-      console.error("Error en fetchLastConsecutive:", e);
+      
+      setLastConsecutive(siguienteConsecutivo);
+      showCustomToast(
+        "Consecutivo obtenido",
+        mensaje,
+        "success"
+      );
+      return siguienteConsecutivo;
+    } catch (e: any) {
       setError("Error al obtener el consecutivo");
       setLastConsecutive(null);
+      
+      // Si es un error de conexión u otro error del servidor
+      const errorMessage = e.response?.data?.message || "No se pudo conectar con el servidor";
       showCustomToast(
         "Error de conexión",
-        "No se pudo conectar con el servidor",
+        errorMessage,
         "error"
       );
       return null;
