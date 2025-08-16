@@ -57,6 +57,8 @@ import KpiBatchYear from "./views/procedures/KpiBatchYear";
 import PoeScreen from "./views/home/proceduresSreen";
 import CapacitacionesDepartamentos from ".//views/home/trainingScreen";
 import ViewUsers from "./views/users/viewUsers";
+import ChangePassword from "./views/login/changePassword";
+import RecoverPassword from "./views/login/recoverPassword";
 
 const drawerWidth = 270;
 
@@ -743,6 +745,10 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/training/lists" element={<TrainingLists />} />
           <Route path="/manapol/rmForm" element={<RmForm />} />
           <Route path="/manapol/rmList" element={<RmList />} />
+
+          {/* Rutas públicas necesarias aun con sesión activa */}
+          <Route path="/login/changePassword" element={<ChangePassword />} />
+          <Route path="/login/recoverPassword" element={<RecoverPassword />} />
         </Routes>
       </Main>
     </Box>
