@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getTrainingList,
@@ -53,6 +53,7 @@ export function useTrainingList() {
   const [selectedTraining, setSelectedTraining] = useState<Training | null>(
     null
   );
+  const didFetchRef = useRef(false);
   const navigate = useNavigate();
 
   const handleSearchTermChange = (term: string) => {
@@ -204,6 +205,8 @@ export function useTrainingList() {
     }
   };
   useEffect(() => {
+    if (didFetchRef.current) return;
+    didFetchRef.current = true;
     loadTrainings();
   }, []);
 
