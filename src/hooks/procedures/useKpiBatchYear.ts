@@ -9,7 +9,7 @@ import {
   type POE
 } from "../../services/kpiBatchYearService";
 
-type StatusType = "actualizar" | "obsoletar";
+type StatusType = "actualizar" | "obsoleto";
 
 export const useKpiBatchYear = () => {
   const [formData, setFormData] = useState<KpiBatchYearFormData>({
