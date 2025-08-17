@@ -6,7 +6,7 @@ import { showCustomToast } from '../../components/globalComponents/CustomToaster
 
 interface FormData {
   idResponsable: number | null;
-  estado: "actualizar" | "obsoletar" | "";
+  estado: "actualizar" | "obsoleto" | ""; // Cambiado de "obsoletar" a "obsoleto"
 }
 
 interface DocData {
@@ -48,7 +48,7 @@ export const useKpiPoliticsYear = () => {
 
   const estadoOptions = [
     { id: "actualizar", nombre: "Actualizar" },
-    { id: "obsoletar", nombre: "Obsoletar" },
+    { id: "obsoleto", nombre: "Obsoletar" }, // Cambiado de "obsoletar" a "obsoleto"
   ];
 
   // Cargar datos iniciales
@@ -101,7 +101,7 @@ export const useKpiPoliticsYear = () => {
     }));
   };
 
-  const handleStateChange = (estado: "actualizar" | "obsoletar") => {
+  const handleStateChange = (estado: "actualizar" | "obsoleto") => { // Cambiado tipo
     setFormData(prev => ({ ...prev, estado }));
   };
 
@@ -187,7 +187,7 @@ export const useKpiPoliticsYear = () => {
 
       const payload = {
         id_responsable: formData.idResponsable!,
-        estado: formData.estado as "actualizar" | "obsoletar",
+        estado: formData.estado as "actualizar" | "obsoleto", // Cambiado tipo
         cantidad_planificada: docs.length,
         docs_json: JSON.stringify(docsJson),
         usuario: fullName || "Usuario no identificado"

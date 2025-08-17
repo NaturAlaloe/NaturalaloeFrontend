@@ -59,6 +59,8 @@ import CapacitacionesDepartamentos from ".//views/home/trainingScreen";
 import ViewUsers from "./views/users/viewUsers";
 import KpiRulesYear from "./views/manapol/KpiRulesYear";
 import KpiPoliticsYear from "./views/politics/KpiPoliticsYear";
+import PolicyTrainingScreen from "./views/home/policyTrainingScreen";
+import RmDepartmentScreen from "./views/home/rmDepartmentScreen";
 
 const drawerWidth = 270;
 
@@ -755,6 +757,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/training/lists" element={<TrainingLists />} />
           <Route path="/manapol/rmForm" element={<RmForm />} />
           <Route path="/manapol/rmList" element={<RmList />} />
+          <Route path="/home/policyTrainingScreen" element={<PolicyTrainingScreen />} />
+          <Route path="/home/rmDepartmentScreen" element={<RmDepartmentScreen />} />
         </Routes>
       </Main>
     </Box>

@@ -7,7 +7,7 @@ import { showCustomToast } from '../../components/globalComponents/CustomToaster
 interface FormData {
   idArea: number | null;
   idResponsable: number | null;
-  estado: "actualizar" | "obsoletar" | "";
+  estado: "actualizar" | "obsoleto" | ""; // Cambiado de "obsoletar" a "obsoleto"
 }
 
 interface DocData {
@@ -57,7 +57,7 @@ export const useKpiRulesYear = () => {
 
   const estadoOptions = [
     { id: "actualizar", nombre: "Actualizar" },
-    { id: "obsoletar", nombre: "Obsoletar" },
+    { id: "obsoleto", nombre: "Obsoletar" }, // Cambiado de "obsoletar" a "obsoleto"
   ];
 
   // Función para mostrar mensajes de error
@@ -196,7 +196,7 @@ export const useKpiRulesYear = () => {
     setFormData(prev => ({ ...prev, idResponsable: responsable?.id || null }));
   };
 
-  const handleStateChange = (estado: "actualizar" | "obsoletar") => {
+  const handleStateChange = (estado: "actualizar" | "obsoleto") => { // Cambiado tipo
     setFormData(prev => ({ ...prev, estado }));
   };
 

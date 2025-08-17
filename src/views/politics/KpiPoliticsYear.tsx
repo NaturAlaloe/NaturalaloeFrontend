@@ -9,7 +9,7 @@ import GlobalModal from "../../components/globalComponents/GlobalModal";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import { useKpiPoliticsYear } from "../../hooks/politics/useKpiPoliticsYear";
 
-type StatusType = "actualizar" | "obsoletar";
+type StatusType = "actualizar" | "obsoleto"; // Cambiado de "obsoletar" a "obsoleto"
 
 export default function KpiPoliticsYear() {
   const {

@@ -160,9 +160,16 @@ const ChartSelector = () => {
           label: function (context: any) {
             const label = context.dataset.label || '';
             const value = context.raw;
-            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-            const percentage = Math.round((value / total) * 100);
-            return `${label}: ${value} (${!isNaN(percentage) ? percentage : 0}%)`;
+            
+            // Para gráficos circulares
+            if (chartType === 'pie' || chartType === 'doughnut') {
+              const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${context.label}: ${value} (${!isNaN(percentage) ? percentage : 0}%)`;
+            }
+            
+            // Para gráficos de barras
+            return `${label}: ${value}`;
           }
         }
       },
@@ -206,34 +213,53 @@ const ChartSelector = () => {
           color: '#374151',
           generateLabels: function(chart: any) {
             const data = chart.data;
-            if (data.datasets.length > 0 && data.datasets[0].data.length === 2) {
-              return [
-                {
-                  text: 'Actualizados',
-                  fillStyle: '#4ade80',
-                  strokeStyle: '#fff',
-                  lineWidth: 2,
-                  hidden: false,
-                  index: 0
-                },
-                {
-                  text: 'Pendientes',
-                  fillStyle: '#f87171',
-                  strokeStyle: '#fff',
-                  lineWidth: 2,
-                  hidden: false,
-                  index: 1
+            if (data.datasets.length > 0) {
+              // Para POE y MANAPOL (estados: actualizar/obsoleto)
+              if (dataSource === 'poe' || dataSource === 'manapol') {
+                if (data.labels.includes('Actualizar') && data.labels.includes('Obsoleto')) {
+                  return [
+                    {
+                      text: 'Actualizar',
+                      fillStyle: '#f87171',
+                      strokeStyle: '#fff',
+                      lineWidth: 2,
+                      hidden: false,
+                      index: 0
+                    },
+                    {
+                      text: 'Obsoleto',
+                      fillStyle: '#94a3b8',
+                      strokeStyle: '#fff',
+                      lineWidth: 2,
+                      hidden: false,
+                      index: 1
+                    }
+                  ];
                 }
-              ];
+              }
+              
+              // Para políticas (manejo dinámico de estados)
+              if (dataSource === 'politics') {
+                return data.labels.map((label: string, index: number) => ({
+                  text: label,
+                  fillStyle: data.datasets[0].backgroundColor[index],
+                  strokeStyle: '#fff',
+                  lineWidth: 2,
+                  hidden: false,
+                  index: index
+                }));
+              }
             }
-            return data.datasets[0].data.map((_value: number, index: number) => ({
-              text: data.labels[index],
-              fillStyle: data.datasets[0].backgroundColor[index] || data.datasets[0].backgroundColor,
+            
+            // Fallback para casos sin datos
+            return [{
+              text: 'Sin datos',
+              fillStyle: '#e5e7eb',
               strokeStyle: '#fff',
               lineWidth: 2,
               hidden: false,
-              index: index
-            }));
+              index: 0
+            }];
           }
         },
       },

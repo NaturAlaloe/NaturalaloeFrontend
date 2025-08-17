@@ -35,15 +35,19 @@ export const useChartData = () => {
 
       const groupKey = groupBy === 'area' ? 'area' : 'jefatura';
       const groups = data.reduce((acc: Record<string, { actualizados: number, pendientes: number }>, item) => {
-        // Mejorar la obtención de la clave de agrupación
-        let key = item[groupKey];
+        // Obtener la clave de agrupación
+        let baseKey = item[groupKey];
         
-        // Limpiar y validar la clave
-        if (!key || key.trim() === '' || key.toLowerCase() === 'n/a' || key === 'null' || key === 'undefined') {
-          key = groupBy === 'area' ? 'Área no especificada' : 'Jefatura no especificada';
+        // Limpiar y validar la clave base
+        if (!baseKey || baseKey.trim() === '' || baseKey.toLowerCase() === 'n/a' || baseKey === 'null' || baseKey === 'undefined') {
+          baseKey = groupBy === 'area' ? 'Área no especificada' : 'Jefatura no especificada';
         }
         
-        key = key.trim();
+        baseKey = baseKey.trim();
+        
+        // Agregar el estado a la etiqueta
+        const estado = item.estado || 'Estado no especificado';
+        const key = `${baseKey} - ${estado}`;
         
         if (!acc[key]) {
           acc[key] = { actualizados: 0, pendientes: 0 };
@@ -169,6 +173,59 @@ export const useChartData = () => {
     }, []
   );
 
+  // Función específica para RM por departamento
+  const processRmData = useMemo(() => 
+    (data: any[]): ChartData | null => {
+      if (!data.length) return null;
+
+      const labels = data.map(item => item.departamento);
+      const actualizadosData = data.map(item => item.total_actualizados);
+      const pendientesData = data.map(item => item.no_actualizados);
+
+      return {
+        labels,
+        datasets: [
+          {
+            label: 'Actualizados',
+            data: actualizadosData,
+            backgroundColor: '#4ade80',
+            borderWidth: 1,
+          },
+          {
+            label: 'Pendientes',
+            data: pendientesData,
+            backgroundColor: '#f87171',
+            borderWidth: 1,
+          }
+        ]
+      };
+    }, []
+  );
+
+  // Función para datos circulares de RM
+  const processRmDataForCircular = useMemo(() => 
+    (data: any[]): ChartData | null => {
+      if (!data.length) return null;
+
+      const totals = data.reduce((acc, item) => {
+        acc.actualizados += item.total_actualizados || 0;
+        acc.pendientes += item.no_actualizados || 0;
+        return acc;
+      }, { actualizados: 0, pendientes: 0 });
+
+      return {
+        labels: ['Actualizados', 'Pendientes'],
+        datasets: [{
+          label: 'Registros MAN',
+          data: [totals.actualizados, totals.pendientes],
+          backgroundColor: ['#4ade80', '#f87171'],
+          borderColor: ['#fff', '#fff'],
+          borderWidth: 2,
+        }]
+      };
+    }, []
+  );
+
   const getEmptyChartData = useMemo(() => 
     (message: string): ChartData => ({
       labels: [message],
@@ -186,6 +243,8 @@ export const useChartData = () => {
     processKpiDataForCircular,
     processPoliticsData,
     processPoliticsDataForCircular,
+    processRmData,
+    processRmDataForCircular,
     getEmptyChartData,
   };
 };

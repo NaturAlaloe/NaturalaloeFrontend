@@ -9,7 +9,7 @@ import GlobalModal from "../../components/globalComponents/GlobalModal";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import { useKpiBatchYear } from "../../hooks/procedures/useKpiBatchYear";
 
-type StatusType = "actualizar" | "obsoletar";
+type StatusType = "actualizar" | "obsoleto"; // Cambiado de "obsoletar" a "obsoleto"
 
 export default function KpiBatchYear() {
   const {

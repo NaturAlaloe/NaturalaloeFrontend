@@ -2,7 +2,7 @@ import api from "../../apiConfig/api";
 
 export interface KpiPoliticsYearData {
   id_responsable: number;
-  estado: "actualizar" | "obsoletar";
+  estado: "actualizar" | "obsoleto"; // Cambiado de "obsoletar" a "obsoleto"
   cantidad_planificada: number;
   docs_json: string;
   usuario?: string;
