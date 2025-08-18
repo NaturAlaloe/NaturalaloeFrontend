@@ -61,6 +61,8 @@ import KpiRulesYear from "./views/manapol/KpiRulesYear";
 import KpiPoliticsYear from "./views/politics/KpiPoliticsYear";
 import PolicyTrainingScreen from "./views/home/policyTrainingScreen";
 import RmDepartmentScreen from "./views/home/rmDepartmentScreen";
+import ChangePassword from "./views/login/changePassword";
+import RecoverPassword from "./views/login/recoverPassword";
 
 const drawerWidth = 270;
 
@@ -759,6 +761,10 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/manapol/rmList" element={<RmList />} />
           <Route path="/home/policyTrainingScreen" element={<PolicyTrainingScreen />} />
           <Route path="/home/rmDepartmentScreen" element={<RmDepartmentScreen />} />
+
+          <Route path="/login/changePassword" element={<ChangePassword />} />
+          <Route path="/login/recoverPassword" element={<RecoverPassword />} />
+
         </Routes>
       </Main>
     </Box>
