@@ -87,7 +87,7 @@ export default function ChangePassword() {
     <div className="min-h-screen w-full bg-gradient-to-br from-[#eafbf2] to-[#d6f5e3] flex items-center justify-center p-6 font-[Poppins]">
       <div className="bg-white rounded-[2rem] p-8 shadow-[0_20px_40px_rgba(0,0,0,0.1)] w-full max-w-md relative z-10  flex flex-col items-center">
         <h1 className="text-2xl font-bold text-[#2AAC67] mb-2 uppercase tracking-wide text-center drop-shadow">
-          Restablecer Contraseña
+          Restablecer la Contraseña
         </h1>
         <form className="w-full flex flex-col gap-4" onSubmit={handleChangePassword}>
           <InputField
