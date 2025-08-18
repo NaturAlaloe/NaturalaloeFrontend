@@ -34,7 +34,6 @@ export const useRmByDepartment = (): UseRmByDepartmentReturn => {
       
       const response = await api.get('/dataForGraphicPendingRMByDepartment');
       
-      console.log('RM API Response:', response.data); // Para debugging
       
       if (response.data && response.data.success && Array.isArray(response.data.data)) {
         // Asegurar que todos los valores numéricos sean enteros

@@ -51,7 +51,7 @@ export function useAreasList() {
           titulo: areaInput,
           activa: true,
         };
-        console.log("Actualizando área con:", updatePayload);
+        
         await updateArea(updatePayload);
         showCustomToast("Éxito", "Área actualizada correctamente", "success");
         setModalOpen(false);
