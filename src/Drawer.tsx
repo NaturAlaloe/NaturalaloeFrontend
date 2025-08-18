@@ -467,7 +467,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               }}
             >
               <ArticleIcon sx={{ color: "#b4ebce", mr: 2 }} />
-              <ListItemText primary="Registros Manapol" />
+              <ListItemText primary="Registros Maestros" />
               {openManapol ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
@@ -485,7 +485,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Agregar Registros Manapol" />
+                <ListItemText primary="Agregar Registros Maestros" />
               </ListItemButton>
             </List>
             <List component="div" disablePadding>
@@ -501,7 +501,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Lista de Registros Manapol" />
+                <ListItemText primary="Lista de Registros Maestros" />
               </ListItemButton>
             </List>
             <List component="div" disablePadding>

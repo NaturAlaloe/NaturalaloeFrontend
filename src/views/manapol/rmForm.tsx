@@ -31,7 +31,7 @@ const RmForm = () => {
     <>
       <CustomToaster />
       <FormContainer
-        title="Crear Nuevo Registro Manapol"
+        title="Crear Nuevo Registro Maestro"
         onSubmit={handleSubmit}
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -154,7 +154,7 @@ const RmForm = () => {
             onRemove={removePdf}
             required
             fileInputRef={fileInputRef}
-            helperText="Seleccione el archivo PDF del registro Manapol (obligatorio)"
+            helperText="Seleccione el archivo PDF del registro maestro (obligatorio)"
           />
         </div>
 

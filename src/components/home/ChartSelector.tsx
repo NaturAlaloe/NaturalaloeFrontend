@@ -117,7 +117,7 @@ const ChartSelector = () => {
   const getChartTitle = () => {
     switch (dataSource) {
       case 'poe': return 'KPI Anual - Procedimientos Operativos Estándar (POE)';
-      case 'manapol': return 'KPI Anual - Registros MANAPOL';
+      case 'manapol': return 'KPI Anual - Registros Maestros';
       case 'politics': return 'KPI Anual - Políticas Empresariales';
       default: return 'KPI Anual - Datos del Sistema';
     }
@@ -351,7 +351,7 @@ const ChartSelector = () => {
           }}
         >
           <Tab label="POE" value="poe" />
-          <Tab label="MANAPOL" value="manapol" />
+          <Tab label="Maestro" value="manapol" />
           <Tab label="Políticas" value="politics" />
         </Tabs>
       </div>

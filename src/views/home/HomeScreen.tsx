@@ -105,7 +105,7 @@ export default function HomeScreen() {
       isRealTime: true
     },
     {
-      label: 'Registros MANAPOL por Departamento',
+      label: 'Registros Maestros por Departamento',
       value: loadingRmDepartment ? "..." : `${rmPercentage}%`,
       trend: '+1.8%',
       color: 'bg-orange-50 text-orange-700',
@@ -127,7 +127,7 @@ export default function HomeScreen() {
       case 'Capacitación por Política':
         navigate('/home/policyTrainingScreen');
         break;
-      case 'Registros MANAPOL por Departamento':
+      case 'Registros Maestros por Departamento':
         navigate('/home/rmDepartmentScreen');
         break;
       default:

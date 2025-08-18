@@ -37,7 +37,7 @@ export default function RmDepartmentScreen() {
       <div className="mb-8">
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-black text-[#2BAC67] text-center font-[Poppins]">
-            Registros MANAPOL Pendientes por Departamento
+            Registros Maestros Pendientes por Departamento
           </h1>
         </div>
         

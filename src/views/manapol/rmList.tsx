@@ -215,7 +215,7 @@ const RmList = () => {
   ];
 
   return (
-    <TableContainer title="Registros Manapol">
+    <TableContainer title="Registros Maestros">
       {ui.loading && <FullScreenSpinner />}
 
       <div className="flex items-center justify-between mb-4 gap-4">
@@ -271,7 +271,7 @@ const RmList = () => {
             title={
               ui.editHook.editData.es_nueva_version
                 ? "Crear Nueva Versión"
-                : "Editar Registro Manapol"
+                : "Editar Registro Maestros"
             }
             onSubmit={async (e) => {
               e.preventDefault();
@@ -599,8 +599,8 @@ const RmList = () => {
       >
         <div className="text-center">
           {ui.obsoleteHook.selectedRecord?.isObsolete
-            ? "¿Estás seguro de que deseas reactivar este registro Manapol?"
-            : "¿Estás seguro de que deseas marcar este registro Manapol como obsoleto?"}
+            ? "¿Estás seguro de que deseas reactivar este registro maestro?"
+            : "¿Estás seguro de que deseas marcar este registro maestro como obsoleto?"}
         </div>
       </GlobalModal>
 

@@ -52,7 +52,7 @@ export default function KpiRulesYear() {
   return (
     <>
       <CustomToaster />
-      <FormContainer title="Crear lote de KPIs para reglas anuales (Registro MANAPOL)" onSubmit={handleSubmit}>
+      <FormContainer title="Crear lote de KPIs para reglas anuales (Registro Maestro)" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <SelectAutocomplete
             label="Área"
@@ -110,7 +110,7 @@ export default function KpiRulesYear() {
               onClick={openModal}
               className="px-6 py-3 bg-[#2AAC67] text-white rounded-md hover:bg-[#238B5B] font-medium transition-colors"
             >
-              + Seleccionar Manapol
+              + Seleccionar Maestro
             </button>
           </div>
           
@@ -149,7 +149,7 @@ export default function KpiRulesYear() {
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-700">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          doc.tipo === 'REGISTRO MANAPOL' ? 'bg-purple-100 text-purple-800' :
+                          doc.tipo === 'REGISTRO MAESTRO' ? 'bg-purple-100 text-purple-800' :
                           doc.tipo === 'POE' ? 'bg-blue-100 text-blue-800' :
                           doc.tipo === 'POLITICA' ? 'bg-green-100 text-green-800' :
                           'bg-gray-100 text-gray-800'
@@ -189,7 +189,7 @@ export default function KpiRulesYear() {
           ) : (
             <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
               <div className="text-sm">
-                No hay Manapol seleccionados. Haga clic en "Seleccionar Manapol" para agregar.
+                No hay Registros Maestros seleccionados. Haga clic en "Seleccionar Maestro" para agregar.
               </div>
             </div>
           )}
@@ -210,7 +210,7 @@ export default function KpiRulesYear() {
       <GlobalModal
         open={isModalOpen}
         onClose={handleModalCancel}
-        title="Seleccionar Manapol"
+        title="Seleccionar Registro Maestro"
         maxWidth="lg"
         fullWidth={true}
         actions={
