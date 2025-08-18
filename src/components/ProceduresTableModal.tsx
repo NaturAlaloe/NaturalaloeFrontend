@@ -134,7 +134,7 @@ export default function ProceduresTableModal({
       name: (() => {
         switch (tipo) {
           case 'manapol':
-            return "Código Manapol";
+            return "Código RM";
           case 'politica':
             return "Código";
           default:

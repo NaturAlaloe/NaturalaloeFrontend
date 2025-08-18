@@ -201,7 +201,7 @@ function RolesProceduresContent() {
                 }
               }}
             >
-              Registro Maestro
+              RM
             </Button>
           </Tooltip>
         </Box>
