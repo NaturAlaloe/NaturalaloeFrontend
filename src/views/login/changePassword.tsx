@@ -46,7 +46,7 @@ export default function ChangePassword() {
 
       if (res.data.success) {
         showCustomToast("Éxito", "Contraseña restablecida correctamente", "success");
-        setTimeout(() => navigate("/login"), 2000);
+        setTimeout(() => navigate("/"), 2000);
       } else {
         showCustomToast("Error", res.data.message, "error");
       }
