@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import InputField from "../../components/formComponents/InputField";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import api from "../../apiConfig/api";
@@ -9,7 +9,6 @@ export default function ChangePassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   const params = new URLSearchParams(location.search);
   const token = params.get("token");
