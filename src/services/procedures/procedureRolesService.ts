@@ -27,7 +27,6 @@ export const getAllRoles = async () => {
 };
 
 export const assignProceduresToRole = async (id_rol: number, id_documento: number[]) => {
-  console.log("POST /procedures/assign", { id_rol, id_documento });
   return api.post("/procedures/assign", {
     id_rol,
     id_documento,
@@ -35,7 +34,6 @@ export const assignProceduresToRole = async (id_rol: number, id_documento: numbe
 };
 
 export const unassignProceduresFromRole = async (id_rol: number, id_documento: number[]) => {
-  console.log("DELETE /procedures/unassign", { id_rol, id_documento });
   return api.delete("/procedures/unassign", {
     data: {
       id_rol,
@@ -45,7 +43,6 @@ export const unassignProceduresFromRole = async (id_rol: number, id_documento: n
 };
 
 export const assignPoliticsToRole = async (id_rol: number, id_documento: number[]) => {
-  console.log("POST /police/assign", { id_rol, id_documento });
   return api.post("/police/assign", {
     id_rol,
     id_documento,
@@ -53,7 +50,6 @@ export const assignPoliticsToRole = async (id_rol: number, id_documento: number[
 };
 
 export const unassignPoliticsFromRole = async (id_rol: number, id_documento: number[]) => {
-  console.log("DELETE /police/unassign", { id_rol, id_documento });
   return api.delete("/police/unassign", {
     data: {
       id_rol,
@@ -63,7 +59,6 @@ export const unassignPoliticsFromRole = async (id_rol: number, id_documento: num
 };
 
 export const assignManapolToRole = async (id_rol: number, id_documento: number[]) => {
-  console.log("POST /registerMan/assign", { id_rol, id_documento });
   return api.post("/registerMan/assign", {
     id_rol,
     id_documento,
@@ -71,7 +66,6 @@ export const assignManapolToRole = async (id_rol: number, id_documento: number[]
 };
 
 export const unassignManapolFromRole = async (id_rol: number, id_documento: number[]) => {
-  console.log("DELETE /registerMan/unassign", { id_rol, id_documento });
   return api.delete("/registerMan/unassign", {
     data: {
       id_rol,

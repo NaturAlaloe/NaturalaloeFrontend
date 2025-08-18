@@ -68,7 +68,7 @@ export const kpiBatchYearService = {
     try {
       const procedures = await getActiveProcedures();
       // Transformar los procedimientos al formato POE que necesitamos
-      console.log("Procedures fetched:", procedures);
+  
       return procedures.map((proc: Procedure) => ({
         id_documento: proc.id_documento,
         codigo: proc.codigo,
