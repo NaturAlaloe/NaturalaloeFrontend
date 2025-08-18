@@ -9,7 +9,6 @@ export default function ChangePassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   const params = new URLSearchParams(location.search);
   const token = params.get("token");
