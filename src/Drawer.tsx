@@ -61,6 +61,8 @@ import KpiRulesYear from "./views/manapol/KpiRulesYear";
 import KpiPoliticsYear from "./views/politics/KpiPoliticsYear";
 import PolicyTrainingScreen from "./views/home/policyTrainingScreen";
 import RmDepartmentScreen from "./views/home/rmDepartmentScreen";
+import ChangePassword from "./views/login/changePassword";
+import RecoverPassword from "./views/login/recoverPassword";
 
 const drawerWidth = 270;
 
@@ -712,8 +714,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
-          <Route path="/procedures/listProcedures"element={<ListaProcedimientos />}/>
-          <Route path="/procedures/assignmentProcedures"element={<AsignacionProcedimientos />}/>
+          <Route path="/procedures/listProcedures" element={<ListaProcedimientos />} />
+          <Route path="/procedures/assignmentProcedures" element={<AsignacionProcedimientos />} />
           <Route path="/procedures/kpi-batch-year" element={<KpiBatchYear />} />
           <Route path="/manapol/kpiRulesYear" element={<KpiRulesYear />} />
           <Route path="/training/" element={<Capacitaciones />} />
@@ -744,11 +746,11 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/politics/politicsForm" element={<Politicies />} />
           <Route path="/politics/politicsList" element={<PoliticiesLista />} />
           <Route path="/politics/kpiPoliticsYear" element={<KpiPoliticsYear />} />
-          <Route path="/collaborators/assingRol" element={<AssignRol/>} />
-          <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores/>} />
-          <Route path="/training/listTrainingsGeneral" element={<CapacitacionesGenerales/>} />
-          <Route path="/training/evaluatedTraining/:id_capacitacion" element={<Evaluacion/>} />
-          <Route path="/estadisticas" element={<Estadistica/>} />
+          <Route path="/collaborators/assingRol" element={<AssignRol />} />
+          <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores />} />
+          <Route path="/training/listTrainingsGeneral" element={<CapacitacionesGenerales />} />
+          <Route path="/training/evaluatedTraining/:id_capacitacion" element={<Evaluacion />} />
+          <Route path="/estadisticas" element={<Estadistica />} />
           <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
           <Route path="/home/pendingTrainingsScreen" element={<CapacitacionesPendientes />} />
           <Route path="/home/trainingScreen" element={<CapacitacionesDepartamentos />} />
@@ -759,6 +761,8 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/manapol/rmList" element={<RmList />} />
           <Route path="/home/policyTrainingScreen" element={<PolicyTrainingScreen />} />
           <Route path="/home/rmDepartmentScreen" element={<RmDepartmentScreen />} />
+          <Route path="/login/changePassword" element={<ChangePassword />} />
+          <Route path="/login/recoverPassword" element={<RecoverPassword />} />
         </Routes>
       </Main>
     </Box>
