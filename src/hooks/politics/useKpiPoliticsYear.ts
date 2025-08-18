@@ -59,13 +59,11 @@ export const useKpiPoliticsYear = () => {
         
         // Cargar todos los responsables (sin filtrar por área)
         const responsablesResponse = await api.get('/responsible');
-        console.log('Responsables response:', responsablesResponse.data);
         if (responsablesResponse.data.data) {
           const mappedResponsables = responsablesResponse.data.data.map((resp: any) => ({
             id: resp.id_responsable,
             nombre: resp.nombre_responsable || resp.nombre
           }));
-          console.log('Mapped responsables:', mappedResponsables);
           setResponsables(mappedResponsables);
         }
 
@@ -192,9 +190,6 @@ export const useKpiPoliticsYear = () => {
         docs_json: JSON.stringify(docsJson),
         usuario: fullName || "Usuario no identificado"
       };
-
-      console.log('Payload to send:', payload);
-      console.log('User from token:', fullName);
 
       const response = await createKpiPoliticsYear(payload);
 

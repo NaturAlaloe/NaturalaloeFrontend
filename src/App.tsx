@@ -31,7 +31,6 @@ function App() {
           setShowForceChangePasswordModal(false);
         }
       } catch (err) {
-        console.log("Sesión inválida o error:", err);
         setIsAuthenticated(false);
         setUserData(null);
         setShowForceChangePasswordModal(false);
@@ -83,7 +82,7 @@ function App() {
     setIsAuthenticated(false);
     setUserData(null);
     setShowForceChangePasswordModal(false);
-    console.log("Sesión cerrada.");
+
   };
 
   const handleCloseTokenExpiredModal = () => {

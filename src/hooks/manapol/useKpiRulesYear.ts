@@ -100,7 +100,6 @@ export const useKpiRulesYear = () => {
 
         // Cargar documentos MANAPOL disponibles
         const docsResponse = await api.get('/registerMan/available');
-        console.log('MANAPOL API Response:', docsResponse.data);
         
         // Handle different possible response structures
         let docsData = [];
@@ -114,25 +113,10 @@ export const useKpiRulesYear = () => {
           }
         }
         
-        console.log('Extracted docs data:', docsData);
-        console.log('First document raw data:', docsData[0]);
-        console.log('First document keys:', docsData[0] ? Object.keys(docsData[0]) : 'No documents');
+        
         
         if (docsData.length > 0) {
           const manapols = docsData.map((doc: any, index: number) => {
-            console.log(`Mapping MANAPOL doc ${index}:`, doc);
-            console.log(`Available fields in doc ${index}:`, Object.keys(doc));
-            console.log(`Doc codigo field value:`, doc.codigo);
-            console.log(`Doc codigo_rm field value:`, doc.codigo_rm);
-            console.log(`Doc all field values:`, {
-              id_documento: doc.id_documento,
-              codigo: doc.codigo,
-              codigo_rm: doc.codigo_rm,
-              titulo: doc.titulo,
-              departamento: doc.departamento,
-              responsable: doc.responsable,
-              estado: doc.estado
-            });
             
             // Ensure we have a valid id_documento, or create a fallback
             let documentId = doc.id_documento;
@@ -150,7 +134,7 @@ export const useKpiRulesYear = () => {
               responsable: doc.responsable || doc.responsible || '',
               estado: doc.estado || doc.status || ''
             };
-            console.log(`Mapped result ${index}:`, mapped);
+          
             return mapped;
           });
           
@@ -170,7 +154,6 @@ export const useKpiRulesYear = () => {
             });
           }
           
-          console.log('All formatted MANAPOL docs:', manapols);
           setAvailableDocs(manapols);
         } else {
           console.warn('No MANAPOL documents found in response');
@@ -276,7 +259,7 @@ export const useKpiRulesYear = () => {
       setLoading(true);
 
       // Debug: Check docs before mapping
-      console.log('Documents before mapping:', docs);
+     
 
       // Validar que todos los documentos tengan codigo
       const docsWithoutCodigo = docs.filter(doc => !doc.codigo || doc.codigo.trim() === '');
@@ -288,17 +271,13 @@ export const useKpiRulesYear = () => {
 
       // Preparar datos para enviar
       const docsJson = docs.map(doc => {
-        console.log('Mapping document:', doc);
         const mapped = {
           codigo: doc.codigo,
           tipo: doc.tipo,
           razon: doc.razon
         };
-        console.log('Mapped to:', mapped);
         return mapped;
       });
-
-      console.log('Final docsJson:', docsJson);
 
       const requestData = {
         id_area: formData.idArea,
@@ -309,14 +288,10 @@ export const useKpiRulesYear = () => {
         usuario: "sistema"
       };
 
-      console.log('Sending data to API:', requestData);
-
+      
       const response = await api.post('/registerMan/kpi/rules/year', requestData);
 
-      console.log('API Response:', response);
-      console.log('API Response data:', response.data);
-      console.log('API Response status:', response.status);
-
+    
       if (response.data.success) {
         showSuccess('Lote de KPIs para Manapol creado exitosamente');
         

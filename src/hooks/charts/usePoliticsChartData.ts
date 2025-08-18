@@ -49,7 +49,6 @@ export const usePoliticsChartData = (): UsePoliticsChartDataReturn => {
           jefatura: item.jefatura || item.nombre_jefatura || 'Jefatura no especificada'
         }));
         
-        console.log('Politics chart data:', cleanedData);
         setData(cleanedData);
       } else {
         throw new Error('La API no devolvió datos válidos para Políticas');
