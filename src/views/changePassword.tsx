@@ -45,7 +45,7 @@ export default function ChangePassword() {
 
       if (res.data.success) {
         showCustomToast("Éxito", "Contraseña restablecida correctamente", "success");
-        setTimeout(() => { window.location.replace("http://192.168.1.205:8081/"); }, 2000);
+        setTimeout(() => { window.location.href = "/"; }, 2000);
       } else {
         showCustomToast("Error", res.data.message, "error");
       }
