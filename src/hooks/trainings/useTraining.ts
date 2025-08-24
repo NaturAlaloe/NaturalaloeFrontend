@@ -31,7 +31,6 @@ interface FormData {
 }
 
 export function useCapacitation() {
-  const [isEvaluado, setIsEvaluado] = useState(false);
   const [showAsignacionesModal, setShowAsignacionesModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [facilitadores, setFacilitadores] = useState<Facilitador[]>([]);
@@ -103,13 +102,6 @@ export function useCapacitation() {
     };
     loadInitialData();
   }, []);
-
-  // Limpiar método de evaluación cuando isEvaluado cambie a false
-  useEffect(() => {
-    if (!isEvaluado) {
-      setFormData((prev) => ({ ...prev, metodoEvaluacion: "" }));
-    }
-  }, [isEvaluado]);
 
   const loadFacilitadores = async () => {
     try {
@@ -267,6 +259,7 @@ export function useCapacitation() {
       "fecha",
       "fechaFin",
       "duracion",
+      "metodoEvaluacion",
     ];
     const missingFields = requiredFields.filter(
       (field) => !formData[field as keyof FormData]
@@ -277,13 +270,16 @@ export function useCapacitation() {
       return false;
     }
 
-    if(isEvaluado && !formData.metodoEvaluacion) {
-      showCustomToast("Error", "El método de evaluación es obligatorio", "error");
-      return false;
-    }
-
-    if (isEvaluado && (!formData.metodoEvaluacion || formData.metodoEvaluacion === "" || formData.metodoEvaluacion === "Seleccione...")) {
-      showCustomToast("Error", "El método de evaluación es obligatorio cuando la capacitación es evaluada", "error");
+    if (
+      !formData.metodoEvaluacion ||
+      formData.metodoEvaluacion === "" ||
+      formData.metodoEvaluacion === "Seleccione..."
+    ) {
+      showCustomToast(
+        "Error",
+        "El método de evaluación es obligatorio",
+        "error"
+      );
       return false;
     }
 
@@ -321,9 +317,8 @@ export function useCapacitation() {
         fecha_inicio: formData.fecha,
         fecha_fin: formData.fechaFin,
         comentario: formData.comentario || undefined,
-        is_evaluado: isEvaluado,
+        is_evaluado: true, // Siempre evaluada
         metodo_empleado:
-          isEvaluado &&
           formData.metodoEvaluacion &&
           formData.metodoEvaluacion !== "" &&
           formData.metodoEvaluacion !== "Seleccione..."
@@ -372,29 +367,22 @@ export function useCapacitation() {
     });
     setColaboradoresAsignados([]);
     setPoesAsignados([]);
-    setIsEvaluado(false);
   };
 
   return {
-    // Estados principales
-    isEvaluado,
-    setIsEvaluado,
     showAsignacionesModal,
     setShowAsignacionesModal,
     isLoading,
     loadingInitialData,
-    // Datos del formulario
     formData,
     handleChange,
     handleSubmit,
     resetForm,
-    // Facilitadores
     facilitadores,
     loadingFacilitadores,
     getNombreCompletoFacilitador,
     getFacilitadoresOptions,
     getFacilitadorIdByNombre,
-    // Colaboradores
     colaboradoresDisponibles,
     loadingColaboradores,
     colaboradoresAsignados,
@@ -404,7 +392,6 @@ export function useCapacitation() {
     columnsColaboradores,
     agregarColaboradores,
     eliminarColaborador,
-    // Procedimientos (POEs)
     procedimientosDisponibles,
     loadingProcedimientos,
     poesAsignados,
@@ -414,7 +401,6 @@ export function useCapacitation() {
     columnsPoes,
     agregarPoes,
     eliminarPoe,
-    // Métodos de evaluación
     metodosEvaluacion,
   };
 }

@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from "react";
+import SearchBar from "./SearchBarTable";
 // Función auxiliar para mostrar los números de página con elipsis
 function getPageNumbers(current: number, total: number, max: number) {
   if (total <= max) {
@@ -49,12 +50,24 @@ function PaginatedTableModal<T extends { id?: string | number }>({
 }: PaginatedTableModalProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Array<string | number>>([]);
-  const totalPages = Math.ceil(data.length / rowsPerPage);
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return data;
+    return data.filter(row => {
+      // Busca en todas las columnas visibles
+      return columns.some(col => {
+        const value = col.selector(row);
+        return (
+          typeof value === "string" && value.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
+    });
+  }, [searchTerm, data, columns]);
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
-    return data.slice(start, start + rowsPerPage);
-  }, [currentPage, data, rowsPerPage]);
+    return filteredData.slice(start, start + rowsPerPage);
+  }, [currentPage, filteredData, rowsPerPage]);
 
   const toggleSelect = (id: string | number) => {
     setSelectedIds((prev) =>
@@ -89,6 +102,13 @@ function PaginatedTableModal<T extends { id?: string | number }>({
           <h3 className="font-semibold text-[#2AAC67] text-lg">{title}</h3>
         </div>
         <div className="p-4 overflow-y-auto flex-1">
+          {/* Buscador */}
+          <SearchBar
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Buscar..."
+            className="mb-4"
+          />
           <div className="overflow-x-auto border border-gray-200 rounded-lg">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-[#F0FFF4]">
