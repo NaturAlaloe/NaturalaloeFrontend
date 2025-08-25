@@ -12,6 +12,7 @@ import InputField from "../../components/formComponents/InputField";
 export default function ViewCollaborators() {
     const { collaborators, loading, error, fetchCollaborators } = useGetCollaborators();
     const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCollaborator, setSelectedCollaborator] = useState<Collaborator | null>(null);
 
@@ -28,6 +29,11 @@ export default function ViewCollaborators() {
     });
 
     const { handleEditCollaborator, loading: editLoading } = useEditCollaborator();
+
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
 
     useEffect(() => {
         if (selectedCollaborator) {
@@ -88,6 +94,7 @@ export default function ViewCollaborators() {
             col.puesto?.toLowerCase().includes(s) ||
             col.correo.toLowerCase().includes(s) ||
             col.numero.toLowerCase().includes(s) ||
+            col.cedula.toLowerCase().includes(s) ||
             new Date(col.fecha_nacimiento).toLocaleDateString().toLowerCase().includes(s)
         );
     });
@@ -169,6 +176,8 @@ export default function ViewCollaborators() {
                         pagination
                         highlightOnHover
                         pointerOnHover
+                        currentPage={currentPage}
+                        onChangePage={setCurrentPage}
                         paginationComponentOptions={{
                             rowsPerPageText: "Filas por página",
                             rangeSeparatorText: "de",
@@ -298,3 +307,4 @@ export default function ViewCollaborators() {
         </div>
     );
 }
+

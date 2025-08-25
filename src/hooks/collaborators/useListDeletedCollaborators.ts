@@ -12,11 +12,17 @@ const useListDeletedCollaborators = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   // Estados para el modal
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedCollaborator, setSelectedCollaborator] =
     useState<DeletedCollaborator | null>(null);
+
+  // Resetear página cuando cambie el término de búsqueda
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const fetchDeletedCollaborators = async () => {
     setLoading(true);
@@ -200,10 +206,12 @@ const useListDeletedCollaborators = () => {
     loading,
     error,
 
-    // Lógica de búsqueda
+    // Lógica de búsqueda y paginación
     searchTerm,
     setSearchTerm,
     filteredCollaborators,
+    currentPage,
+    setCurrentPage,
 
     // Configuración de tabla
     columns,

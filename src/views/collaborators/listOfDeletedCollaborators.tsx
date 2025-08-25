@@ -3,7 +3,7 @@ import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
 import TableContainer from "../../components/TableContainer";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
-import { Visibility } from "@mui/icons-material";
+import { Visibility, Search } from "@mui/icons-material";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
 export default function ListOfDeletedCollaborators() {
@@ -15,7 +15,11 @@ export default function ListOfDeletedCollaborators() {
         selectedCollaborator,
         handleOpenModal,
         handleCloseModal,
-        parseArrayData
+        parseArrayData,
+        searchTerm,
+        setSearchTerm,
+        currentPage,
+        setCurrentPage
     } = useListDeletedCollaborators();
 
     // Mostrar spinner mientras carga
@@ -53,12 +57,28 @@ export default function ListOfDeletedCollaborators() {
     return (
         <>
             <TableContainer title="Colaboradores Eliminados">
+                {/* Barra de búsqueda */}
+                <div className="relative mb-4">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                        <Search className="text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Buscar colaboradores eliminados..."
+                        className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-[#2AAC67] focus:border-[#2AAC67] sm:text-sm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
                 <GlobalDataTable
                     columns={columnsWithActions}
                     data={filteredCollaborators}
                     pagination
                     highlightOnHover
                     pointerOnHover
+                    currentPage={currentPage}
+                    onChangePage={setCurrentPage}
                     paginationComponentOptions={{
                         rowsPerPageText: "Filas por página",
                         rangeSeparatorText: "de",
