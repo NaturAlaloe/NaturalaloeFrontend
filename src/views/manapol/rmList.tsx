@@ -249,6 +249,8 @@ const RmList = () => {
         data={ui.registros}
         rowsPerPage={10}
         progressPending={ui.loading}
+        currentPage={ui.currentPage}
+        onChangePage={ui.setCurrentPage}
         noDataComponent={
           <div className="p-4 text-center text-gray-500">
             {ui.registrosFilter === "active"

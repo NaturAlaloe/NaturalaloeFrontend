@@ -15,7 +15,6 @@ export default function KpiPoliticsYear() {
   const {
     formData,
     docs,
-    availableDocs,
     isModalOpen,
     loading,
     loadingData,
@@ -29,6 +28,11 @@ export default function KpiPoliticsYear() {
     openModal,
     closeModal,
     handleSubmit,
+    filteredAvailableDocs,
+    searchTerm,
+    setSearchTerm,
+    modalPage,
+    setModalPage,
   } = useKpiPoliticsYear();
 
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
@@ -190,7 +194,7 @@ export default function KpiPoliticsYear() {
         open={isModalOpen}
         onClose={handleModalCancel}
         title="Seleccionar Políticas"
-        maxWidth="lg"
+        maxWidth="md"
         fullWidth={true}
         actions={
           <div className="flex justify-center space-x-3 w-full">
@@ -216,11 +220,23 @@ export default function KpiPoliticsYear() {
           </div>
         }
       >
+        {/* Buscador */}
+        <div className="mb-4">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder="Buscar por código, título o área..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2AAC67] focus:border-[#2AAC67] transition-all duration-200 placeholder:text-gray-400"
+          />
+        </div>
         <ProceduresTableModal
-          procedimientos={availableDocs}
+          procedimientos={filteredAvailableDocs}
           procedimientosSeleccionados={selectedDocIds}
           onSeleccionChange={setSelectedDocIds}
           tipo="politica"
+          page={modalPage}
+          setPage={setModalPage}
         />
       </GlobalModal>
     </>

@@ -37,7 +37,10 @@ const Collaborators: React.FC = () => {
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1); // <-- Esto asegura que siempre vuelve a la página 1 al filtrar
+            }}
             className="w-full h-12 px-3 border border-[#2AAC67] rounded-lg text-[#2AAC67] focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent"
             placeholder="Buscar por nombre o código..."
           />

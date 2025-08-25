@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DataTable, { type TableColumn } from "react-data-table-component";
 import { Checkbox } from "@mui/material";
 
@@ -20,6 +20,8 @@ interface ProceduresTableModalProps {
   onSeleccionChange: (seleccion: string[]) => void;
   tipo?: 'poe' | 'politica' | 'manapol';
   isSaving?: boolean;
+  page?: number;
+  setPage?: (page: number) => void;
 }
 
 function getPageNumbers(current: number, total: number, max: number = 10) {
@@ -54,10 +56,22 @@ export default function ProceduresTableModal({
   procedimientosSeleccionados,
   onSeleccionChange,
   tipo = 'poe',
+  page,
+  setPage,
 }: ProceduresTableModalProps) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [internalPage, setInternalPage] = useState(1);
+  const currentPage = page ?? internalPage;
+  const setCurrentPage = setPage ? (page: number) => setPage(page) : setInternalPage;
   const rowsPerPage = 4;
-  const totalPages = Math.ceil(procedimientos.length / rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(procedimientos.length / rowsPerPage));
+
+  // Corrige la página si cambia el filtro y la página actual ya no existe
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [procedimientos.length, totalPages]);
 
   const paginatedProcedimientos = procedimientos.slice(
     (currentPage - 1) * rowsPerPage,
@@ -302,7 +316,7 @@ export default function ProceduresTableModal({
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow-md'
                 }
               `}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
               disabled={currentPage === 1}
             >
               <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -345,7 +359,7 @@ export default function ProceduresTableModal({
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow-md'
                 }
               `}
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
               disabled={currentPage === totalPages}
             >
               Siguiente
