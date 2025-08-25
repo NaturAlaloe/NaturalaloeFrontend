@@ -15,7 +15,6 @@ export default function KpiBatchYear() {
   const {
     formData,
     docs,
-    availablePOEs,
     isModalOpen,
     loading,
     loadingData,

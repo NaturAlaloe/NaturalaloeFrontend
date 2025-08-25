@@ -45,6 +45,8 @@ export const useKpiPoliticsYear = () => {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [responsables, setResponsables] = useState<Responsable[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [modalPage, setModalPage] = useState(1);
 
   const estadoOptions = [
     { id: "actualizar", nombre: "Actualizar" },
@@ -91,6 +93,22 @@ export const useKpiPoliticsYear = () => {
 
     fetchInitialData();
   }, []);
+
+  // Filtrar docs según búsqueda
+  const filteredAvailableDocs = availableDocs.filter(doc => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return true;
+    return (
+      doc.codigo.toLowerCase().includes(term) ||
+      doc.titulo.toLowerCase().includes(term) ||
+      (doc.area?.toLowerCase().includes(term) ?? false)
+    );
+  });
+
+  // Cuando cambia el término de búsqueda, volver a la primera página
+  useEffect(() => {
+    setModalPage(1);
+  }, [searchTerm]);
 
   const handleResponsableChange = (selected: { id: number; nombre: string } | null) => {
     setFormData(prev => ({
@@ -235,6 +253,7 @@ export const useKpiPoliticsYear = () => {
     formData,
     docs,
     availableDocs,
+    filteredAvailableDocs,
     isModalOpen,
     loading,
     loadingData,
@@ -248,5 +267,9 @@ export const useKpiPoliticsYear = () => {
     openModal,
     closeModal,
     handleSubmit,
+    searchTerm,
+    setSearchTerm,
+    modalPage,
+    setModalPage,
   };
 };
