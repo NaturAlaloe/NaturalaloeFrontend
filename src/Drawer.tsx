@@ -63,6 +63,7 @@ import PolicyTrainingScreen from "./views/home/policyTrainingScreen";
 import RmDepartmentScreen from "./views/home/rmDepartmentScreen";
 import ChangePassword from "./views/changePassword";
 import RecoverPassword from "./views/login/recoverPassword";
+import ListOfDeletedCollaborators from "./views/collaborators/listOfDeletedCollaborators";
 
 const drawerWidth = 270;
 
@@ -651,6 +652,20 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Asignar Roles" />
               </ListItemButton>
+                            <ListItemButton
+                component={Link}
+                to="/collaborators/listOfDeletedCollaborators"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Lista de Eliminados" />
+              </ListItemButton>
             </List>
           </Collapse>
         </List>
@@ -761,10 +776,9 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           <Route path="/manapol/rmList" element={<RmList />} />
           <Route path="/home/policyTrainingScreen" element={<PolicyTrainingScreen />} />
           <Route path="/home/rmDepartmentScreen" element={<RmDepartmentScreen />} />
-
           <Route path="/changePassword" element={<ChangePassword />} />
           <Route path="/login/recoverPassword" element={<RecoverPassword />} />
-
+          <Route path="/collaborators/listOfDeletedCollaborators" element={<ListOfDeletedCollaborators />} />
         </Routes>
       </Main>
     </Box>

@@ -45,26 +45,24 @@ export default function ListProcedures() {
     <>
       <CustomToaster />
       <TableContainer title="Procedimientos de la Empresa">
-      <div className="flex items-center justify-between mb-4 gap-4">
-        
-
+        <div className="flex items-center justify-between mb-4 gap-4">
           <SearchBar
             value={controller.searchTerm}
             onChange={controller.setSearchTerm}
             placeholder={`Buscar ${controller.procedureFilter === 'active' ? 'procedimientos activos' : 'procedimientos obsoletos'} por título o código...`}
             className="flex-1"
           />
-            <div className="flex items-center gap-2">
-           
-           <select
-             className="border border-gray-300 rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent min-w-[180px]"
-             value={controller.procedureFilter}
-             onChange={(e) => controller.handleFilterChange(e.target.value as 'active' | 'obsolete')}
-           >
-             <option value="active">Procedimientos Activos</option>
-             <option value="obsolete">Procedimientos Obsoletos</option>
-           </select>
-         </div>
+          <div className="flex items-center gap-2">
+
+            <select
+              className="border border-gray-300 rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent min-w-[180px]"
+              value={controller.procedureFilter}
+              onChange={(e) => controller.handleFilterChange(e.target.value as 'active' | 'obsolete')}
+            >
+              <option value="active">Procedimientos Activos</option>
+              <option value="obsolete">Procedimientos Obsoletos</option>
+            </select>
+          </div>
         </div>
 
         <div className="mb-4">
@@ -96,7 +94,7 @@ export default function ListProcedures() {
           onChangePage={controller.setCurrentPage}
           noDataComponent={
             <div className="p-4 text-center text-gray-500">
-              {controller.procedureFilter === 'active' 
+              {controller.procedureFilter === 'active'
                 ? "No se encontraron procedimientos activos"
                 : "No se encontraron procedimientos obsoletos"
               }
@@ -379,8 +377,8 @@ export default function ListProcedures() {
                 Cancelar
               </SubmitButton>
               <SubmitButton
-                className={controller.procedureFilter === 'active' 
-                  ? "bg-red-500 hover:bg-red-600" 
+                className={controller.procedureFilter === 'active'
+                  ? "bg-red-500 hover:bg-red-600"
                   : "bg-[#2BAC67] hover:bg-green-700"
                 }
                 type="button"
@@ -392,7 +390,7 @@ export default function ListProcedures() {
           }
         >
           <div className="text-center ">
-            {controller.procedureFilter === 'active' 
+            {controller.procedureFilter === 'active'
               ? "¿Estás seguro de que deseas marcar este procedimiento como obsoleto?"
               : "¿Estás seguro de que deseas reactivar este procedimiento?"
             }
@@ -416,8 +414,8 @@ export default function ListProcedures() {
                 Cancelar
               </SubmitButton>
               <SubmitButton
-                className={controller.procedureFilter === 'active' 
-                  ? "bg-red-500 hover:bg-red-600" 
+                className={controller.procedureFilter === 'active'
+                  ? "bg-red-500 hover:bg-red-600"
                   : "bg-[#2BAC67] hover:bg-green-700"
                 }
                 type="button"
@@ -434,7 +432,7 @@ export default function ListProcedures() {
         >
           <div>
             <label className="block mb-2 font-medium text-gray-700">
-              {controller.procedureFilter === 'active' 
+              {controller.procedureFilter === 'active'
                 ? "Escribe la razón por la que este procedimiento será marcado como obsoleto:"
                 : "Escribe la razón por la que este procedimiento será reactivado:"
               }
@@ -444,14 +442,14 @@ export default function ListProcedures() {
               rows={3}
               value={controller.deleteReason}
               onChange={(e) => controller.setDeleteReason(e.target.value)}
-              placeholder={controller.procedureFilter === 'active' 
+              placeholder={controller.procedureFilter === 'active'
                 ? "Ej: Procedimiento actualizado por cambios normativos..."
                 : "Ej: Se requiere reactivar este procedimiento por cambios operacionales..."
               }
               autoFocus
               disabled={controller.obsoleteLoading}
             />
-          
+
           </div>
         </GlobalModal>
       </TableContainer>

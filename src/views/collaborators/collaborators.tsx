@@ -45,7 +45,7 @@ const Collaborators: React.FC = () => {
       </div>
 
       {error && (
-        <div className="max-w-6xl mx-auto mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mx-4">
+        <div className="max-w-6xl mx-auto mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
           {error}
         </div>
       )}
