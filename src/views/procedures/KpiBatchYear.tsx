@@ -31,6 +31,11 @@ export default function KpiBatchYear() {
     openModal,
     closeModal,
     handleSubmit,
+    poeSearch,
+    setPoeSearch,
+    poePage,
+    setPoePage,
+    filteredPOEs,
   } = useKpiBatchYear();
 
   const [selectedPOEIds, setSelectedPOEIds] = useState<string[]>([]);
@@ -226,11 +231,23 @@ export default function KpiBatchYear() {
           </div>
         }
       >
+        {/* Buscador */}
+        <div className="mb-4 flex">
+          <input
+            type="text"
+            value={poeSearch}
+            onChange={e => setPoeSearch(e.target.value)}
+            placeholder="Buscar por código o título..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#2AAC67] focus:border-[#2AAC67] transition-all duration-200"
+          />
+        </div>
         <ProceduresTableModal
-          procedimientos={availablePOEs}
+          procedimientos={filteredPOEs}
           procedimientosSeleccionados={selectedPOEIds}
           onSeleccionChange={setSelectedPOEIds}
           tipo="poe"
+          page={poePage}
+          setPage={setPoePage}
         />
       </GlobalModal>
     </>

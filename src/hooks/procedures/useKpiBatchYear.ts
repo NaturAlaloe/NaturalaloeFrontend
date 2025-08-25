@@ -27,6 +27,25 @@ export const useKpiBatchYear = () => {
   const [areas, setAreas] = useState<Area[]>([]);
   const [responsables, setResponsables] = useState<Responsable[]>([]);
 
+  // Buscador de POEs
+  const [poeSearch, setPoeSearch] = useState("");
+  const [poePage, setPoePage] = useState(1);
+
+  // Filtrar POEs según búsqueda
+  const filteredPOEs = availablePOEs.filter((poe) => {
+    const search = poeSearch.trim().toLowerCase();
+    if (!search) return true;
+    return (
+      poe.codigo?.toLowerCase().includes(search) ||
+      poe.titulo?.toLowerCase().includes(search)
+    );
+  });
+
+  // Cuando cambia la búsqueda, regresar a la primera página
+  useEffect(() => {
+    setPoePage(1);
+  }, [poeSearch, isModalOpen]);
+
   // Cargar datos iniciales
   useEffect(() => {
     const loadInitialData = async () => {
@@ -162,6 +181,11 @@ export const useKpiBatchYear = () => {
     estadoOptions,
     areas,
     responsables,
+    poeSearch,
+    setPoeSearch,
+    poePage,
+    setPoePage,
+    filteredPOEs,
     
     // Actions
     handleDocReasonChange,
