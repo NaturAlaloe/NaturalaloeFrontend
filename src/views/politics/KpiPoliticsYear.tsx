@@ -15,7 +15,6 @@ export default function KpiPoliticsYear() {
   const {
     formData,
     docs,
-    availableDocs,
     isModalOpen,
     loading,
     loadingData,
