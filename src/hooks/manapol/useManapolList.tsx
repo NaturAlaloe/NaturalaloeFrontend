@@ -170,7 +170,7 @@ export default function useManapolList() {
 
     const handleFilterChange = (filter: ManapolFilter) => {
         setRegistrosFilter(filter);
-        setCurrentPage(1);
+        setCurrentPage(1); // Esto ya lo tienes
         setSearch("");
     };
 
