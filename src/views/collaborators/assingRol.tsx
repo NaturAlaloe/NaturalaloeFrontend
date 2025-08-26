@@ -1,5 +1,4 @@
 import React from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import useCollaborators from '../../hooks/collaborator/useCollaboratorsAssign';
 import useRoles from '../../hooks/collaborator/useRols';
@@ -54,8 +53,7 @@ export default function AssignRol() {
     } catch (error: any) {
       const mensaje = error.message || 'Error al actualizar los roles';
       const tipo = mensaje.includes('selecciona') || mensaje.includes('cambios') ? 'info' : 'error';
-      showCustomToast(mensaje, undefined, tipo);
-      console.error('Error al procesar roles:', error);
+      showCustomToast('Información', mensaje, tipo);
     }
   };
 
@@ -93,7 +91,29 @@ export default function AssignRol() {
             }`}>
               {loading ? (
                 <div className="flex justify-center items-center h-full">
-                  <CircularProgress />
+                  <div className="flex flex-col items-center">
+                    <svg
+                      className="animate-spin h-8 w-8 text-[#2BAC67] mb-2"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="#2BAC67"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="#13bd62"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
+                    </svg>
+                    <span className="text-[#2BAC67] text-sm">Buscando...</span>
+                  </div>
                 </div>
               ) : !collaborators || collaborators.length === 0 ? (
                 <div className="flex justify-center items-center h-full">
@@ -176,7 +196,31 @@ export default function AssignRol() {
                   disabled={loadingRoles}
                   onClick={manejarAsignarRoles}
                 >
-                  {loadingRoles ? <CircularProgress size={24} color="inherit" /> : 'Guardar Cambios'}
+                  {loadingRoles ? (
+                    <div className="flex items-center space-x-2">
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                      <span>Guardando...</span>
+                    </div>
+                  ) : 'Guardar Cambios'}
                 </SubmitButton>
               </div>
             </>

@@ -6,7 +6,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
-import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -115,7 +114,28 @@ const paginatedRoles = useMemo(
             {loadingRoles ? (
               <TableRow>
                 <TableCell colSpan={2} sx={{ textAlign: 'center', py: 2 }}>
-                  <CircularProgress />
+                  <div className="flex justify-center items-center">
+                    <svg
+                      className="animate-spin h-8 w-8 text-[#2BAC67]"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="#2BAC67"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="#13bd62"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
+                    </svg>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : errorRoles ? (

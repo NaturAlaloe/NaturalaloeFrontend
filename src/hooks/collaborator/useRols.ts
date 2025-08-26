@@ -30,7 +30,6 @@ const useRoles = () => {
       setRoles(data);
     } catch (err) {
       setErrorRoles('Error al cargar los roles');
-      console.error('Error al cargar roles:', err);
     } finally {
       setLoadingRoles(false);
     }
@@ -50,7 +49,6 @@ const useRoles = () => {
       const data = await getRolesByCollaborator(id_colaborador);
       setCollaboratorRoles(data);
     } catch (err) {
-      console.error('Error al obtener roles del colaborador:', err);
       setCollaboratorRoles([]);
       setErrorRoles('Error al cargar roles del colaborador');
     } finally {
@@ -76,16 +74,26 @@ const useRoles = () => {
       puesto: puesto || 'Sin puesto'
     };
     
-    setColaboradorSeleccionado(nuevoColaborador);
+    // Primero limpiar estados
     setRolesSeleccionados([]);
+    setCollaboratorRoles([]);
+    setErrorRoles(null);
+    
+    // Luego establecer el nuevo colaborador
+    setColaboradorSeleccionado(nuevoColaborador);
   }, []);
 
   // Manejar selección de roles
   const handleRolSeleccion = useCallback((rol: string) => {
     if (rol !== colaboradorSeleccionado?.puesto) {
-      setRolesSeleccionados(prev =>
-        prev.includes(rol) ? prev.filter(r => r !== rol) : [...prev, rol]
-      );
+      setRolesSeleccionados(prev => {
+        const isSelected = prev.includes(rol);
+        if (isSelected) {
+          return prev.filter(r => r !== rol);
+        } else {
+          return [...prev, rol];
+        }
+      });
     }
   }, [colaboradorSeleccionado?.puesto]);
 
@@ -114,7 +122,6 @@ const useRoles = () => {
       await fetchCollaboratorRoles(colaboradorSeleccionado.id);
     } catch (err) {
       setErrorRoles('Error al asignar roles');
-      console.error('Error al asignar roles:', err);
       throw err;
     } finally {
       setLoadingRoles(false);
@@ -139,7 +146,7 @@ const useRoles = () => {
       await fetchCollaboratorRoles(colaboradorSeleccionado.id);
     } catch (err) {
       setErrorRoles('Error al desasignar roles');
-      console.error('Error al desasignar roles:', err);
+
       throw err;
     } finally {
       setLoadingRoles(false);
@@ -161,13 +168,18 @@ const useRoles = () => {
       throw new Error('No hay cambios para guardar.');
     }
 
-    if (rolesAAsignar.length > 0) {
-      await assignRoles(rolesAAsignar);
-    }
+    // Procesar secuencialmente para evitar conflictos
     if (rolesADesasignar.length > 0) {
       await unassignRoles(rolesADesasignar);
     }
-  }, [colaboradorSeleccionado, collaboratorRoles, rolesSeleccionados, assignRoles, unassignRoles]);
+    
+    if (rolesAAsignar.length > 0) {
+      await assignRoles(rolesAAsignar);
+    }
+    
+    // Refrescar roles del colaborador una vez más para asegurar consistencia
+    await fetchCollaboratorRoles(colaboradorSeleccionado.id);
+  }, [colaboradorSeleccionado, collaboratorRoles, rolesSeleccionados, assignRoles, unassignRoles, fetchCollaboratorRoles]);
 
   // Efectos
   useEffect(() => {
@@ -176,24 +188,38 @@ const useRoles = () => {
 
   useEffect(() => {
     if (colaboradorSeleccionado?.id) {
-      fetchCollaboratorRoles(colaboradorSeleccionado.id);
+      // Agregar un pequeño delay para asegurar que el estado esté limpio
+      const timer = setTimeout(() => {
+        fetchCollaboratorRoles(colaboradorSeleccionado.id);
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [colaboradorSeleccionado?.id, fetchCollaboratorRoles]);
 
   // Sincronizar rolesSeleccionados con los roles actuales del colaborador
   useEffect(() => {
-    if (colaboradorSeleccionado) {
+    if (colaboradorSeleccionado && collaboratorRoles.length >= 0) {
       const puesto = colaboradorSeleccionado.puesto;
+      const rolesDelColaborador = collaboratorRoles.map(role => role.nombre_rol);
+      
+      // Solo incluir el puesto si no es 'Sin puesto' y no está ya en los roles del colaborador
       const nuevosSeleccionados = [
         ...(puesto && puesto !== 'Sin puesto' ? [puesto] : []),
-        ...collaboratorRoles.map(role => role.nombre_rol).filter(role => role !== puesto),
+        ...rolesDelColaborador.filter(role => role !== puesto),
       ].filter(Boolean);
       
-      setRolesSeleccionados(nuevosSeleccionados);
-    } else {
+      // Solo actualizar si hay cambios reales
+      const currentSelected = rolesSeleccionados.sort();
+      const newSelected = nuevosSeleccionados.sort();
+      
+      if (JSON.stringify(currentSelected) !== JSON.stringify(newSelected)) {
+        setRolesSeleccionados(nuevosSeleccionados);
+      }
+    } else if (!colaboradorSeleccionado) {
       setRolesSeleccionados([]);
     }
-  }, [colaboradorSeleccionado, collaboratorRoles]);
+  }, [colaboradorSeleccionado?.id, collaboratorRoles]);
 
   return { 
     // Estados
