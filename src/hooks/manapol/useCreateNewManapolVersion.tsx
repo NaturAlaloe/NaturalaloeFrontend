@@ -45,7 +45,7 @@ export function useCreateNewManapolVersion({
     setCreating(true);
     try {
       // Validación de campos obligatorios
-      if (!data.codigo || !data.nueva_version || data.vigente === undefined) {
+      if (!data.codigo || data.nueva_version === undefined || data.nueva_version === null || data.vigente === undefined) {
         showCustomToast(
           "Error de validación",
           "Código, nueva versión y vigencia son obligatorios",
@@ -54,8 +54,8 @@ export function useCreateNewManapolVersion({
         return false;
       }
 
-      // Validar que la nueva versión sea un número válido
-      if (data.nueva_version <= 0) {
+      // Validar que la nueva versión sea un número válido (>= 0)
+      if (data.nueva_version < 0) {
         showCustomToast(
           "Error de validación",
           "La nueva versión debe ser un número mayor o igual a 0",

@@ -9,6 +9,7 @@ import SelectAutocomplete from "../../components/formComponents/SelectAutocomple
 import StyledCheckbox from "../../components/formComponents/StyledCheckbox";
 import PdfInput from "../../components/formComponents/PdfInput";
 import SubmitButton from "../../components/formComponents/SubmitButton";
+import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { Visibility, Edit, Delete, Restore } from "@mui/icons-material";
 import useManapolList from "../../hooks/manapol/useManapolList";
 import type { CreateNewManapolVersionData } from "../../hooks/manapol/useCreateNewManapolVersion";
@@ -278,11 +279,34 @@ const RmList = () => {
               
               // Si está marcado como nueva versión, usar el hook de crear nueva versión
               if (ui.editHook.editData?.es_nueva_version) {
+                const versionNumber = parseInt(ui.editHook.editData.version || "1", 10);
+                const originalVersionNumber = parseInt(ui.editHook.originalVersion || "0", 10);
+                
+                // Validar que el número de versión sea válido
+                if (isNaN(versionNumber)) {
+                  showCustomToast(
+                    "Error de validación",
+                    "El número de versión debe ser un número válido",
+                    "error"
+                  );
+                  return;
+                }
+
+                // Validar que la nueva versión sea diferente de la original
+                if (versionNumber === originalVersionNumber) {
+                  showCustomToast(
+                    "Error de validación",
+                    "La nueva versión debe ser diferente de la versión original",
+                    "error"
+                  );
+                  return;
+                }
+
                 const newVersionData: CreateNewManapolVersionData = {
                   codigo: ui.editHook.editData.codigo || "",
                   descripcion: ui.editHook.editData.descripcion || "",
                   id_responsable: ui.editHook.editData.id_responsable || "",
-                  nueva_version: parseFloat(ui.editHook.editData.version || "1"),
+                  nueva_version: versionNumber,
                   fecha_creacion: ui.editHook.editData.fecha_creacion || "",
                   fecha_vigencia: ui.editHook.editData.fecha_vigencia || "",
                   vigente: Boolean(ui.editHook.editData.es_vigente),

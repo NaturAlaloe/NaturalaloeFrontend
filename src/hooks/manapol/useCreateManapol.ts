@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useEffect } from "react";
 import { createManapol } from "../../services/manapol/manapolService";
-import { getManapoolLastConsecutive } from "../../services/manapol/manapolService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { useAreas } from "../procedureFormHooks/useAreas";
 import { useDepartments } from "../procedureFormHooks/useDepartments";
 import { useResponsibles } from "../procedureFormHooks/useResponsibles";
 import { usePdfInput } from "../procedureFormHooks/usePdfInput";
+import { useLastConsecutive } from "./useLastConsecutive";
 
 interface CreateManapolFormData {
   codigo: string;
@@ -34,6 +33,9 @@ export function useCreateManapol() {
   const [formData, setFormData] = useState<CreateManapolFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
 
+  // Hook para código consecutivo
+  const { consecutivo, loading: loadingConsecutive, refreshConsecutive } = useLastConsecutive();
+
   // Hooks para datos auxiliares
   const { areas, loading: loadingAreas } = useAreas();
   const { departments, loading: loadingDepartments } = useDepartments();
@@ -45,26 +47,6 @@ export function useCreateManapol() {
     resetPdfInput, 
     fileInputRef 
   } = usePdfInput();
-
-  // Obtener código consecutivo al cargar el componente
-  useEffect(() => {
-    getManapoolLastConsecutive().then((codigo) => {
-      setFormData((prev) => ({
-        ...prev,
-        codigo,
-      }));
-    }).catch((error) => {
-      console.error("Error al obtener código consecutivo:", error);
-      // No setear ningún código, dejar el campo vacío
-      // El usuario verá que hay un problema y puede reintentar
-      showCustomToast(
-        "Advertencia", 
-        error.message || "No se pudo cargar el código consecutivo. El código se asignará automáticamente al guardar.", 
-        "error"
-      );
-    });
-  }, []);
-
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -180,15 +162,14 @@ export function useCreateManapol() {
       setFormData(initialFormData);
       resetPdfInput();
 
-      // Cuando se implemente getManapolConsecutive, obtener nuevo código consecutivo
+      // Obtener nuevo código consecutivo
       try {
-        const nuevoCodigo = await getManapoolLastConsecutive();
-        setFormData(prev => ({ ...prev, codigo: nuevoCodigo }));
+        await refreshConsecutive();
       } catch (error: any) {
         console.error("Error al obtener nuevo código consecutivo:", error);
         showCustomToast(
           "Advertencia",
-          error.message || "No se pudo obtener el nuevo código consecutivo",
+          "No se pudo obtener el nuevo código consecutivo",
           "error"
         );
       }
@@ -212,6 +193,10 @@ export function useCreateManapol() {
     handleAutocompleteChange,
     handleSubmit,
     saving,
+    // Código consecutivo
+    consecutivo,
+    loadingConsecutive,
+    refreshConsecutive,
     // Datos auxiliares
     areas,
     departments,
