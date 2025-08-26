@@ -40,7 +40,7 @@ export interface KpiBatchYearPayload {
 export interface KpiBatchYearFormData {
   idArea: number | null;
   idResponsable: number | null;
-  estado: "actualizar" | "obsoletar";
+  estado: "actualizar" | "obsoleto"; // Cambiado de "obsoletar" a "obsoleto"
 }
 
 export const kpiBatchYearService = {
@@ -68,7 +68,7 @@ export const kpiBatchYearService = {
     try {
       const procedures = await getActiveProcedures();
       // Transformar los procedimientos al formato POE que necesitamos
-      console.log("Procedures fetched:", procedures);
+  
       return procedures.map((proc: Procedure) => ({
         id_documento: proc.id_documento,
         codigo: proc.codigo,
@@ -112,7 +112,7 @@ export const kpiBatchYearService = {
   getEstadoOptions() {
     return [
       { id: "actualizar", nombre: "Actualizar" },
-      { id: "obsoletar", nombre: "Obsoletar" }
+      { id: "obsoleto", nombre: "Obsoletar" } // Cambiado el id de "obsoletar" a "obsoleto"
     ];
   },
 

@@ -58,7 +58,6 @@ export const obsoletePolitics = async (
   id_documento: number,
   razon_cambio: string
 ) => {
-  console.log("Obsoleting politics with ID:", id_documento, "Reason:", razon_cambio);
   const response = await api.put(`/police/obsolete`, {
     id_documento,
     razon_cambio,
@@ -70,7 +69,6 @@ export const unobsoletePolitics = async (
   id_documento: number,
   razon_cambio: string
 ) => {
-  console.log("Reactivating politics with ID:", id_documento, "Reason:", razon_cambio);
   const response = await api.put(`/police/unobsolete`, {
     id_documento,
     razon_cambio,

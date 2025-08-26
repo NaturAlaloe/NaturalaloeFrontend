@@ -2,16 +2,16 @@ import { useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 import FullScreenSpinner from '../../components/globalComponents/FullScreenSpinner';
 import { useHomeData } from '../../hooks/useHomeData';
-import { usePoliciesCompliance } from '../../hooks/usePoliciesCompliance';
 import { useGlobalTrainingKpi } from '../../hooks/useGlobalTrainingKpi';
 import { useGlobalPoeKpi } from '../../hooks/useGlobalPoeKpi';
 import ChartSelector from '../../components/home/ChartSelector';
 import { Typography } from '@mui/material';
+import { usePolicyTraining } from '../../hooks/usePolicyTraining';
+import { useRmByDepartment } from '../../hooks/useRmByDepartment';
 
 export default function HomeScreen() {
   const navigate = useNavigate();
   const { loading: homeLoading, topCollaborators, totalPending } = useHomeData();
-  const { percentage: policiesPercentage, formattedDate: policiesDate, loading: loadingPolicies } = usePoliciesCompliance();
   const { 
     overallPercentage, 
     lastUpdate, 
@@ -24,6 +24,20 @@ export default function HomeScreen() {
     loading: loadingPoeKpi 
   } = useGlobalPoeKpi();
 
+  // Agregar el hook de capacitación por política
+  const {
+    overallPercentage: policyTrainingPercentage,
+    policies,
+    loading: loadingPolicyTraining
+  } = usePolicyTraining();
+
+  // Agregar el hook de RM por departamento
+  const {
+    overallPercentage: rmPercentage,
+    departments: rmDepartments,
+    loading: loadingRmDepartment
+  } = useRmByDepartment();
+
   // Formatear la fecha de actualización
   const formatLastUpdate = (dateString: string) => {
     if (!dateString) return "Sin datos";
@@ -31,14 +45,37 @@ export default function HomeScreen() {
       const date = new Date(dateString);
       return date.toLocaleDateString('es-ES', { 
         year: 'numeric', 
-        month: 'long'
+        month: 'long',
+        day: 'numeric'
       });
     } catch {
       return "Fecha inválida";
     }
   };
 
-  // Crear la lista de KPIs con datos dinámicos
+  // Obtener la última fecha de actualización de las políticas
+  const getLastPolicyUpdate = () => {
+    if (policies.length === 0) return "Sin datos";
+    const dates = policies
+      .map(p => p.fecha_refresco)
+      .filter(date => date)
+      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    
+    return dates.length > 0 ? formatLastUpdate(dates[0]) : "Sin datos";
+  };
+
+  // Obtener la última fecha de actualización de RM
+  const getLastRmUpdate = () => {
+    if (rmDepartments.length === 0) return "Sin datos";
+    const dates = rmDepartments
+      .map(d => d.fecha_refresco)
+      .filter(date => date)
+      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    
+    return dates.length > 0 ? formatLastUpdate(dates[0]) : "Sin datos";
+  };
+
+  // Crear la lista de KPIs con datos dinámicos (sin Cumplimiento de POEs)
   const kpiList = [
     { 
       label: 'Pendientes de Capacitación por Departamento', 
@@ -58,18 +95,47 @@ export default function HomeScreen() {
       lastUpdate: loadingPoeKpi ? "Cargando..." : formatLastUpdate(poeLastUpdate),
       isRealTime: true
     },
-    { 
-      label: 'Cumplimiento de POEs', 
-      value: loadingPolicies ? "..." : policiesPercentage, 
-      trend: '+2.5%', 
-      color: 'bg-yellow-50 text-yellow-700', 
-      hasScreen: false,
-      lastUpdate: policiesDate,
+    {
+      label: 'Capacitación por Política',
+      value: loadingPolicyTraining ? "..." : `${policyTrainingPercentage}%`,
+      trend: '+2.0%',
+      color: 'bg-purple-50 text-purple-700',
+      hasScreen: true,
+      lastUpdate: loadingPolicyTraining ? "Cargando..." : getLastPolicyUpdate(),
       isRealTime: true
     },
+    {
+      label: 'Registros Maestros por Departamento',
+      value: loadingRmDepartment ? "..." : `${rmPercentage}%`,
+      trend: '+1.8%',
+      color: 'bg-orange-50 text-orange-700',
+      hasScreen: true,
+      lastUpdate: loadingRmDepartment ? "Cargando..." : getLastRmUpdate(),
+      isRealTime: true
+    }
   ];
 
-  if (homeLoading || loadingTrainingKpi || loadingPoeKpi) {
+  // Función para manejar la navegación
+  const handleKpiNavigation = (kpiLabel: string) => {
+    switch (kpiLabel) {
+      case 'Pendientes de Capacitación por Departamento':
+        navigate('/home/trainingScreen');
+        break;
+      case 'Procedimientos Pendientes por Departamento':
+        navigate('/home/proceduresScreen');
+        break;
+      case 'Capacitación por Política':
+        navigate('/home/policyTrainingScreen');
+        break;
+      case 'Registros Maestros por Departamento':
+        navigate('/home/rmDepartmentScreen');
+        break;
+      default:
+        break;
+    }
+  };
+
+  if (homeLoading || loadingTrainingKpi || loadingPoeKpi || loadingPolicyTraining || loadingRmDepartment) {
     return <FullScreenSpinner />;
   }
 
@@ -92,11 +158,8 @@ export default function HomeScreen() {
                 kpi.hasScreen ? 'cursor-pointer' : 'cursor-default'
               }`}
               onClick={() => {
-                if (!kpi.hasScreen) return;
-                if (kpi.label === 'Pendientes de Capacitación por Departamento') {
-                  navigate('/home/trainingScreen');
-                } else if (kpi.label === 'Procedimientos Pendientes por Departamento') {
-                  navigate('/home/proceduresScreen');
+                if (kpi.hasScreen) {
+                  handleKpiNavigation(kpi.label);
                 }
               }}
             >
@@ -111,11 +174,7 @@ export default function HomeScreen() {
                     className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-semibold hover:bg-green-200 transition"
                     onClick={e => {
                       e.stopPropagation();
-                      if (kpi.label === 'Pendientes de Capacitación por Departamento') {
-                        navigate('/home/trainingScreen');
-                      } else if (kpi.label === 'Procedimientos Pendientes por Departamento') {
-                        navigate('/home/proceduresScreen');
-                      }
+                      handleKpiNavigation(kpi.label);
                     }}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">

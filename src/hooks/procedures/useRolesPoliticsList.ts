@@ -94,11 +94,6 @@ export function useRolesPoliticsList() {
       const nuevosElementos = politicasSeleccionadas.filter(id => !seleccionOriginal.includes(id));
       const elementosEliminados = seleccionOriginal.filter((id: number) => !politicasSeleccionadas.includes(id));
 
-      console.log(' Enviando cambios Políticas:', {
-        rol: rolActualPolitics.nombre_rol,
-        nuevos: nuevosElementos,
-        eliminados: elementosEliminados
-      });
 
       if (elementosEliminados.length > 0) {
         await removePolitics(rolActualPolitics.id_rol, elementosEliminados);
@@ -112,7 +107,7 @@ export function useRolesPoliticsList() {
         showCustomToast("Información", "No hay cambios para guardar", "info");
       } else {
         showCustomToast("Éxito", "Políticas actualizadas correctamente", "success");
-        console.log('Políticas guardadas, datos actualizados automáticamente');
+       
       }
     } catch (error: any) {
       console.error(' Error en handleSavePolitics:', error);

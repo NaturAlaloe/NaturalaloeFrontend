@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Drawer from './Drawer';
 import CustomToaster from './components/globalComponents/CustomToaster';
 import Login from './views/login/login';
-import ChangePassword from './views/login/changePassword';
+import ChangePassword from './views/changePassword';
 import RecoverPassword from './views/login/recoverPassword';
 import TokenExpiredModal from './components/modals/TokenExpiredModal';
 import ForceChangePasswordModal from './components/modals/ForceChangePasswordModal';
@@ -31,7 +31,6 @@ function App() {
           setShowForceChangePasswordModal(false);
         }
       } catch (err) {
-        console.log("Sesión inválida o error:", err);
         setIsAuthenticated(false);
         setUserData(null);
         setShowForceChangePasswordModal(false);
@@ -83,7 +82,7 @@ function App() {
     setIsAuthenticated(false);
     setUserData(null);
     setShowForceChangePasswordModal(false);
-    console.log("Sesión cerrada.");
+
   };
 
   const handleCloseTokenExpiredModal = () => {

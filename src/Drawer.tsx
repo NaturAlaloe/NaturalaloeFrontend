@@ -57,6 +57,13 @@ import KpiBatchYear from "./views/procedures/KpiBatchYear";
 import PoeScreen from "./views/home/proceduresSreen";
 import CapacitacionesDepartamentos from ".//views/home/trainingScreen";
 import ViewUsers from "./views/users/viewUsers";
+import KpiRulesYear from "./views/manapol/KpiRulesYear";
+import KpiPoliticsYear from "./views/politics/KpiPoliticsYear";
+import PolicyTrainingScreen from "./views/home/policyTrainingScreen";
+import RmDepartmentScreen from "./views/home/rmDepartmentScreen";
+import ChangePassword from "./views/changePassword";
+import RecoverPassword from "./views/login/recoverPassword";
+import ListOfDeletedCollaborators from "./views/collaborators/listOfDeletedCollaborators";
 
 const drawerWidth = 270;
 
@@ -371,7 +378,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   "&:hover": { background: "#2AAC67", color: "#fff" },
                 }}
               >
-                <ListItemText primary="Crear lote de KPIs anuales" />
+                <ListItemText primary="Crear lote de KPIs anuales (POE)" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -428,6 +435,22 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                 <ListItemText primary="Lista de Políticas" />
               </ListItemButton>
             </List>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/politics/kpiPoliticsYear"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Crear lote de KPIs anuales (Políticas)" />
+              </ListItemButton>
+            </List>
           </Collapse>
 
           {/* Registros Manapol */}
@@ -445,7 +468,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               }}
             >
               <ArticleIcon sx={{ color: "#b4ebce", mr: 2 }} />
-              <ListItemText primary="Registros Manapol" />
+              <ListItemText primary="Registros Maestros" />
               {openManapol ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
@@ -463,7 +486,7 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Agregar Registros Manapol" />
+                <ListItemText primary="Agregar Registros Maestros" />
               </ListItemButton>
             </List>
             <List component="div" disablePadding>
@@ -479,7 +502,23 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
                   },
                 }}
               >
-                <ListItemText primary="Lista de Registros Manapol" />
+                <ListItemText primary="Lista de Registros Maestros" />
+              </ListItemButton>
+            </List>
+            <List component="div" disablePadding>
+              <ListItemButton
+                component={Link}
+                to="/manapol/KpiRulesYear"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Crear lote de KPIs reglas anuales" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -613,6 +652,20 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
               >
                 <ListItemText primary="Asignar Roles" />
               </ListItemButton>
+                            <ListItemButton
+                component={Link}
+                to="/collaborators/listOfDeletedCollaborators"
+                sx={{
+                  pl: 6,
+                  color: "#f4fcec",
+                  "&:hover": {
+                    background: "#2AAC67",
+                    color: "#fff",
+                  },
+                }}
+              >
+                <ListItemText primary="Lista de Eliminados" />
+              </ListItemButton>
             </List>
           </Collapse>
         </List>
@@ -676,14 +729,10 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           />
           <Route path="/" element={<HomeScreen />} />
           <Route path="/procedures" element={<Procedimientos />} />
-          <Route
-            path="/procedures/listProcedures"
-            element={<ListaProcedimientos />}
-          />
-          <Route
-            path="/procedures/assignmentProcedures"
-            element={<AsignacionProcedimientos />}
-          />
+          <Route path="/procedures/listProcedures"element={<ListaProcedimientos />}/>
+          <Route path="/procedures/assignmentProcedures"element={<AsignacionProcedimientos />}/>
+          <Route path="/procedures/kpi-batch-year" element={<KpiBatchYear />} />
+          <Route path="/manapol/kpiRulesYear" element={<KpiRulesYear />} />
           <Route path="/training/" element={<Capacitaciones />} />
           <Route
             path="/training/listTraining"
@@ -711,38 +760,25 @@ export default function PersistentDrawerLeft({ onLogout }: DrawerProps) {
           />
           <Route path="/politics/politicsForm" element={<Politicies />} />
           <Route path="/politics/politicsList" element={<PoliticiesLista />} />
-          <Route path="/collaborators/assingRol" element={<AssignRol />} />
-          <Route
-            path="/collaborators/viewCollaborators"
-            element={<ListaColaboradores />}
-          />
-          <Route
-            path="/training/listTrainingsGeneral"
-            element={<CapacitacionesGenerales />}
-          />
-          <Route
-            path="/training/evaluatedTraining/:id_capacitacion"
-            element={<Evaluacion />}
-          />
-          <Route path="/estadisticas" element={<Estadistica />} />
-          <Route
-            path="/training/generalTraining"
-            element={<AddTrainingGeneral />}
-          />
-          <Route
-            path="/home/pendingTrainingsScreen"
-            element={<CapacitacionesPendientes />}
-          />
-          <Route path="/procedures/kpi-batch-year" element={<KpiBatchYear />} />
-          <Route
-            path="/home/trainingScreen"
-            element={<CapacitacionesDepartamentos />}
-          />
+          <Route path="/politics/kpiPoliticsYear" element={<KpiPoliticsYear />} />
+          <Route path="/collaborators/assingRol" element={<AssignRol/>} />
+          <Route path="/collaborators/viewCollaborators" element={<ListaColaboradores/>} />
+          <Route path="/training/listTrainingsGeneral" element={<CapacitacionesGenerales/>} />
+          <Route path="/training/evaluatedTraining/:id_capacitacion" element={<Evaluacion/>} />
+          <Route path="/estadisticas" element={<Estadistica/>} />
+          <Route path="/training/generalTraining" element={<AddTrainingGeneral />} />
+          <Route path="/home/pendingTrainingsScreen" element={<CapacitacionesPendientes />} />
+          <Route path="/home/trainingScreen" element={<CapacitacionesDepartamentos />} />
           <Route path="/home/proceduresScreen" element={<PoeScreen />} />
           <Route path="/training/registers" element={<TrainingRegisters />} />
           <Route path="/training/lists" element={<TrainingLists />} />
           <Route path="/manapol/rmForm" element={<RmForm />} />
           <Route path="/manapol/rmList" element={<RmList />} />
+          <Route path="/home/policyTrainingScreen" element={<PolicyTrainingScreen />} />
+          <Route path="/home/rmDepartmentScreen" element={<RmDepartmentScreen />} />
+          <Route path="/changePassword" element={<ChangePassword />} />
+          <Route path="/login/recoverPassword" element={<RecoverPassword />} />
+          <Route path="/collaborators/listOfDeletedCollaborators" element={<ListOfDeletedCollaborators />} />
         </Routes>
       </Main>
     </Box>

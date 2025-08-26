@@ -126,11 +126,7 @@ export function useRolesProceduresList() {
       const nuevosElementos = procedimientosSeleccionados.filter(id => !seleccionOriginal.includes(id));
       const elementosEliminados = seleccionOriginal.filter((id: number) => !procedimientosSeleccionados.includes(id));
 
-      console.log(' Enviando cambios POE:', {
-        rol: rolActualPOE.nombre_rol,
-        nuevos: nuevosElementos,
-        eliminados: elementosEliminados
-      });
+     
 
       if (elementosEliminados.length > 0) {
         await removeProcedures(rolActualPOE.id_rol, elementosEliminados);

@@ -19,7 +19,7 @@ export function useCreateProcedureSubmit() {
   }) => {
     setLoading(true);
     const formData = new FormData();
-    console.log("Submitting procedure with fields:", fields);
+    
     formData.append("descripcion", fields.descripcion);
     formData.append("id_area", String(Number(fields.id_area)));
     formData.append("id_departamento", String(Number(fields.id_departamento)));

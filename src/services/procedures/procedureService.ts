@@ -70,7 +70,6 @@ export const obsoleteProcedure = async (id_documento: number, razon_cambio: stri
       id_documento,
       razon_cambio,
     });
-    console.log("Response from obsoleteProcedure:", response.data);
     return response.data;
   } catch (error: any) {
     throw error.response?.data || { success: false, message: "Error al marcar como obsoleto" };
@@ -80,7 +79,6 @@ export const obsoleteProcedure = async (id_documento: number, razon_cambio: stri
 // Nueva función para reactivar procedimientos
 export const unobsoleteProcedure = async (id_documento: number, razon_cambio: string) => {
   try {
-    console.log("Reactivating procedure with ID:", id_documento, "Reason:", razon_cambio);
     const response = await api.put("/procedure/unobsolete", {
       id_documento,
       razon_cambio,

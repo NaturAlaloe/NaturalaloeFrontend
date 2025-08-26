@@ -2,16 +2,19 @@ import { useState, useEffect } from "react";
 import useGetCollaborators from "../../hooks/collaborator/useGetCollaborators";
 import type { Collaborator } from "../../services/collaborators/getCollaboratorsService";
 import GlobalDataTable from "../../components/globalComponents/GlobalDataTable";
-import { Edit, Delete, Search } from "@mui/icons-material";
+import { Edit, Delete, Search, PersonOutline, SwapHoriz } from "@mui/icons-material";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import { useEditCollaborator } from "../../hooks/collaborators/useEditCollaborator";
+import { useEditRolsPrincipal } from "../../hooks/collaborator/useEditRolsPrincipal";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { deleteCollaborator } from "../../services/collaborators/deleteCollaboratorService";
 import InputField from "../../components/formComponents/InputField";
+import SelectField from "../../components/formComponents/SelectField";
 
 export default function ViewCollaborators() {
     const { collaborators, loading, error, fetchCollaborators } = useGetCollaborators();
     const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCollaborator, setSelectedCollaborator] = useState<Collaborator | null>(null);
 
@@ -28,6 +31,24 @@ export default function ViewCollaborators() {
     });
 
     const { handleEditCollaborator, loading: editLoading } = useEditCollaborator();
+    const {
+        loading: roleLoading,
+        rolesLoading,
+        modalOpen: roleModalOpen,
+        selectedCollaborator: selectedCollaboratorForRole,
+        availableRoles,
+        formData: roleFormData,
+        openChangeRoleModal,
+        closeModal: closeRoleModal,
+        handleFormChange: handleRoleFormChange,
+        handleUpdateRole,
+        isFormValid
+    } = useEditRolsPrincipal();
+
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
 
     useEffect(() => {
         if (selectedCollaborator) {
@@ -88,6 +109,7 @@ export default function ViewCollaborators() {
             col.puesto?.toLowerCase().includes(s) ||
             col.correo.toLowerCase().includes(s) ||
             col.numero.toLowerCase().includes(s) ||
+            col.cedula.toLowerCase().includes(s) ||
             new Date(col.fecha_nacimiento).toLocaleDateString().toLowerCase().includes(s)
         );
     });
@@ -115,8 +137,21 @@ export default function ViewCollaborators() {
                             setModalOpen(true);
                         }}
                         className="text-green-600 hover:text-green-800"
+                        title="Editar colaborador"
                     >
                         <Edit fontSize="small" />
+                    </button>
+                    <button
+                        onClick={() => {
+                            openChangeRoleModal(row);
+                        }}
+                        className="text-green-600 hover:text-green-800"
+                        title="Cambiar rol principal"
+                    >
+                        <div className="flex items-center">
+                            <PersonOutline fontSize="small" />
+                            <SwapHoriz fontSize="small" style={{ marginLeft: '-2px' }} />
+                        </div>
                     </button>
                     <button
                         onClick={() => {
@@ -124,6 +159,7 @@ export default function ViewCollaborators() {
                             setDeleteModalOpen(true);
                         }}
                         className="text-red-600 hover:text-red-800"
+                        title="Eliminar colaborador"
                     >
                         <Delete fontSize="small" />
                     </button>
@@ -169,6 +205,8 @@ export default function ViewCollaborators() {
                         pagination
                         highlightOnHover
                         pointerOnHover
+                        currentPage={currentPage}
+                        onChangePage={setCurrentPage}
                         paginationComponentOptions={{
                             rowsPerPageText: "Filas por página",
                             rangeSeparatorText: "de",
@@ -293,8 +331,89 @@ export default function ViewCollaborators() {
                             </div>
                         </GlobalModal>
                     )}
+
+                    {/* Modal para cambiar rol principal */}
+                    {selectedCollaboratorForRole && (
+                        <GlobalModal
+                            open={roleModalOpen}
+                            onClose={() => {
+                                if (!roleLoading) {
+                                    closeRoleModal();
+                                }
+                            }}
+                            title={`Cambiar Rol Principal - ${selectedCollaboratorForRole?.nombre} ${selectedCollaboratorForRole?.apellido1}`}
+                            actions={
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        onClick={closeRoleModal}
+                                        disabled={roleLoading}
+                                        className="px-4 py-2 text-gray-600 rounded hover:bg-gray-100 disabled:opacity-50"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            const success = await handleUpdateRole();
+                                            if (success) {
+                                                fetchCollaborators();
+                                            }
+                                        }}
+                                        disabled={!isFormValid || roleLoading}
+                                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                                    >
+                                        {roleLoading ? "Actualizando..." : "Actualizar Rol"}
+                                    </button>
+                                </div>
+                            }
+                        >
+                            <div className="space-y-4">
+                                <div className="space-y-4">
+                                    <>
+                                        <SelectField
+                                            label="Nuevo Rol Principal"
+                                            name="id_rol_nuevo"
+                                            value={roleFormData.id_rol_nuevo}
+                                            onChange={(e) => {
+                                                handleRoleFormChange('id_rol_nuevo', parseInt(e.target.value));
+                                            }}
+                                            options={[
+                                                { value: 0, label: "Seleccione un rol..." },
+                                                ...availableRoles.map(role => {
+                                                
+                                                    return {
+                                                        value: role.id_rol,
+                                                        label: role.nombre_rol
+                                                    };
+                                                })
+                                            ]}
+                                            optionValue="value"
+                                            optionLabel="label"
+                                            disabled={rolesLoading || roleLoading}
+                                            required
+                                        />
+                                        <div className="space-y-2">
+                                            <label className="block text-sm text-green-600 font-medium ">
+                                                Motivo del Cambio
+                                            </label>
+                                            <textarea
+                                                value={roleFormData.motivo}
+                                                onChange={(e) => handleRoleFormChange('motivo', e.target.value)}
+                                                placeholder="Explique el motivo del cambio de rol"
+                                                disabled={roleLoading}
+                                                required
+                                                rows={3}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2AAC67] focus:border-transparent disabled:bg-gray-100"
+                                            />
+                                        </div>
+                                    </>
+
+                                </div>
+                            </div>
+                        </GlobalModal>
+                    )}
                 </>
             )}
         </div>
     );
 }
+

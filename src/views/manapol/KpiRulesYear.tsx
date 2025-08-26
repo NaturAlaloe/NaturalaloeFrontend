@@ -7,11 +7,11 @@ import CustomToaster from "../../components/globalComponents/CustomToaster";
 import ProceduresTableModal from "../../components/ProceduresTableModal";
 import GlobalModal from "../../components/globalComponents/GlobalModal";
 import FullScreenSpinner from "../../components/globalComponents/FullScreenSpinner";
-import { useKpiBatchYear } from "../../hooks/procedures/useKpiBatchYear";
+import { useKpiRulesYear } from "../../hooks/manapol/useKpiRulesYear";
 
 type StatusType = "actualizar" | "obsoleto"; // Cambiado de "obsoletar" a "obsoleto"
 
-export default function KpiBatchYear() {
+export default function KpiRulesYear() {
   const {
     formData,
     docs,
@@ -25,27 +25,28 @@ export default function KpiBatchYear() {
     handleStateChange,
     handleAreaChange,
     handleResponsableChange,
-    addSelectedPOEs,
+    addSelectedDocs,
     removeDoc,
     openModal,
     closeModal,
     handleSubmit,
-    poeSearch,
-    setPoeSearch,
-    poePage,
-    setPoePage,
-    filteredPOEs,
-  } = useKpiBatchYear();
+    // Agregar nuevos valores del hook
+    searchTerm,
+    setSearchTerm,
+    modalPage,
+    setModalPage,
+    filteredAvailableDocs,
+  } = useKpiRulesYear();
 
-  const [selectedPOEIds, setSelectedPOEIds] = useState<string[]>([]);
+  const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
 
   const handleModalSave = () => {
-    addSelectedPOEs(selectedPOEIds);
-    setSelectedPOEIds([]);
+    addSelectedDocs(selectedDocIds);
+    setSelectedDocIds([]);
   };
 
   const handleModalCancel = () => {
-    setSelectedPOEIds([]);
+    setSelectedDocIds([]);
     closeModal();
   };
 
@@ -56,7 +57,7 @@ export default function KpiBatchYear() {
   return (
     <>
       <CustomToaster />
-      <FormContainer title="Crear lote de KPIs anuales (POE)" onSubmit={handleSubmit}>
+      <FormContainer title="Crear lote de KPIs para reglas anuales (Registro Maestro)" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <SelectAutocomplete
             label="Área"
@@ -103,18 +104,18 @@ export default function KpiBatchYear() {
           />
         </div>
 
-        {/* Sección de POEs seleccionados */}
+        {/* Sección de documentos seleccionados */}
         <div className="col-span-1 md:col-span-3 mt-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-[#2AAC67]">
-              POEs Seleccionados (Cantidad: {docs.length})
+              Documentos Seleccionados (Cantidad: {docs.length})
             </h3>
             <button
               type="button"
               onClick={openModal}
               className="px-6 py-3 bg-[#2AAC67] text-white rounded-md hover:bg-[#238B5B] font-medium transition-colors"
             >
-              + Seleccionar POEs
+              + Seleccionar Maestro
             </button>
           </div>
           
@@ -125,6 +126,9 @@ export default function KpiBatchYear() {
                   <tr className="bg-[#F0FFF4] border-b border-gray-200">
                     <th className="px-6 py-4 text-left text-xs font-bold text-[#2AAC67] uppercase tracking-wider">
                       Código
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-[#2AAC67] uppercase tracking-wider">
+                      Tipo
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-[#2AAC67] uppercase tracking-wider">
                       Título
@@ -147,6 +151,16 @@ export default function KpiBatchYear() {
                     >
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
                         {doc.codigo}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          doc.tipo === 'REGISTRO MAESTRO' ? 'bg-purple-100 text-purple-800' :
+                          doc.tipo === 'POE' ? 'bg-blue-100 text-blue-800' :
+                          doc.tipo === 'POLITICA' ? 'bg-green-100 text-green-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {doc.tipo}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-700 max-w-xs">
                         <div className="truncate" title={doc.titulo}>
@@ -180,7 +194,7 @@ export default function KpiBatchYear() {
           ) : (
             <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
               <div className="text-sm">
-                No hay POEs seleccionados. Haga clic en "Seleccionar POEs" para agregar.
+                No hay Registros Maestros seleccionados. Haga clic en "Seleccionar Maestro" para agregar.
               </div>
             </div>
           )}
@@ -196,15 +210,13 @@ export default function KpiBatchYear() {
         </div>
       </FormContainer>
 
-    
       {loading && <FullScreenSpinner />}
 
- 
       <GlobalModal
         open={isModalOpen}
         onClose={handleModalCancel}
-        title="Seleccionar POEs"
-        maxWidth="md"
+        title="Seleccionar Registro Maestro"
+        maxWidth="lg"
         fullWidth={true}
         actions={
           <div className="flex justify-center space-x-3 w-full">
@@ -218,35 +230,35 @@ export default function KpiBatchYear() {
             <button
               type="button"
               onClick={handleModalSave}
-              disabled={selectedPOEIds.length === 0}
+              disabled={selectedDocIds.length === 0}
               className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                selectedPOEIds.length === 0
+                selectedDocIds.length === 0
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-[#2AAC67] text-white hover:bg-[#238B5B]'
               }`}
             >
-              Guardar Selección ({selectedPOEIds.length})
+              Guardar Selección ({selectedDocIds.length})
             </button>
           </div>
         }
       >
-        {/* Buscador */}
-        <div className="mb-4 flex">
+        {/* Barra de búsqueda */}
+        <div className="mb-4">
           <input
             type="text"
-            value={poeSearch}
-            onChange={e => setPoeSearch(e.target.value)}
-            placeholder="Buscar por código o título..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#2AAC67] focus:border-[#2AAC67] transition-all duration-200"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder="Buscar por RM o por descripción..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2AAC67] focus:border-[#2AAC67] transition-all duration-200 placeholder:text-gray-400"
           />
         </div>
         <ProceduresTableModal
-          procedimientos={filteredPOEs}
-          procedimientosSeleccionados={selectedPOEIds}
-          onSeleccionChange={setSelectedPOEIds}
-          tipo="poe"
-          page={poePage}
-          setPage={setPoePage}
+          procedimientos={filteredAvailableDocs}
+          procedimientosSeleccionados={selectedDocIds}
+          onSeleccionChange={setSelectedDocIds}
+          tipo="manapol"
+          page={modalPage}
+          setPage={setModalPage}
         />
       </GlobalModal>
     </>

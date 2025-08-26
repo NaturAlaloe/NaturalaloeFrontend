@@ -11,8 +11,6 @@ import { Delete } from '@mui/icons-material';
 
 const Capacitacion = () => {
     const {
-        isEvaluado,
-        setIsEvaluado,
         showAsignacionesModal,
         setShowAsignacionesModal,
         handleSubmit,
@@ -149,28 +147,19 @@ const Capacitacion = () => {
                 value={formData.duracion}
                 onChange={handleChange}
             />
-            {isEvaluado && (
-                <SelectField
-                    name="metodoEvaluacion"
-                    label="Método de evaluación:"
-                    className="w-full"
-                    value={formData.metodoEvaluacion}
-                    onChange={handleChange}
-                    options={metodosEvaluacion}
-                    optionLabel="label"
-                    optionValue="value"
-                />
-            )}
-            <div className="flex items-center mt-7">
-                <input
-                    type="checkbox"
-                    id="evaluado"
-                    className="accent-[#2ecc71] mr-2 w-5 h-5"
-                    checked={isEvaluado}
-                    onChange={() => setIsEvaluado(!isEvaluado)}
-                />
-                <label htmlFor="evaluado" className="font-semibold text-[#2AAC67]">Es Evaluado:</label>
-            </div>            <div className="md:col-span-3">
+
+            <SelectField
+                name="metodoEvaluacion"
+                label="Método de evaluación:"
+                className="w-full"
+                value={formData.metodoEvaluacion}
+                onChange={handleChange}
+                options={metodosEvaluacion}
+                optionLabel="label"
+                optionValue="value"
+            />
+
+            <div className="md:col-span-3">
                 <label htmlFor="comentario" className="block font-semibold text-[#2AAC67] mb-1">
                     Comentario:
                 </label>

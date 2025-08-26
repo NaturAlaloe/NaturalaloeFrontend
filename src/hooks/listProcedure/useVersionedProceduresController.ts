@@ -45,7 +45,7 @@ export function useVersionedProceduresController() {
     setLoadingObsolete(true);
     try {
       const data = await getObsoleteProcedures();
-      console.log("Procedimientos obsoletos cargados:", data);
+     
       setObsoleteProcedures(data);
     } catch (error) {
       console.error("Error loading obsolete procedures:", error);

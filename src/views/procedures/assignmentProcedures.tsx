@@ -181,7 +181,7 @@ function RolesProceduresContent() {
             </Button>
           </Tooltip>
 
-          <Tooltip title="Asignar manapol" arrow>
+          <Tooltip title="Asignar registro maestro" arrow>
             <Button
               onClick={() => handleOpenModalManapol(rol)}
               variant="contained"
@@ -201,7 +201,7 @@ function RolesProceduresContent() {
                 }
               }}
             >
-              Manapol
+              RM
             </Button>
           </Tooltip>
         </Box>
@@ -258,7 +258,7 @@ function RolesProceduresContent() {
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2AAC67] pb-2">
-        Asignar Procedimientos, Políticas y Manapol a Roles
+        Asignar Procedimientos, Políticas y Registro Maestro a Roles
       </h1>
 
       {/* Buscador */}
@@ -350,7 +350,7 @@ function RolesProceduresContent() {
                 textTransform: "none",
               }}
             >
-              Manapol
+              Registro Maestro
             </Button>
           </Box>
 
@@ -366,7 +366,7 @@ function RolesProceduresContent() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {procedimientosFiltrados.length > 0 ? procedimientosFiltrados.map((poe: any, idx: number) => (
+                    {procedimientosFiltrados.length > 0 ? procedimientosFiltrados.map((poe: any) => (
                       <TableRow key={poe.id_documento}>
                         <TableCell>{poe.codigo}</TableCell>
                         <TableCell>{poe.titulo || poe.descripcion || 'Sin título'}</TableCell>
@@ -393,7 +393,7 @@ function RolesProceduresContent() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {politicasFiltradas.length > 0 ? politicasFiltradas.map((p: any, idx: number) => (
+                    {politicasFiltradas.length > 0 ? politicasFiltradas.map((p: any) => (
                       <TableRow key={p.id_documento}>
                         <TableCell>{p.codigo}</TableCell>
                         <TableCell>{p.titulo || p.descripcion || 'Sin título'}</TableCell>
@@ -415,19 +415,19 @@ function RolesProceduresContent() {
                 <Table stickyHeader size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ backgroundColor: "#2AAC67", color: "#fff", fontWeight: 700 }}>Código Manapol</TableCell>
+                      <TableCell sx={{ backgroundColor: "#2AAC67", color: "#fff", fontWeight: 700 }}>Código RM</TableCell>
                       <TableCell sx={{ backgroundColor: "#2AAC67", color: "#fff", fontWeight: 700 }}>Título</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {manapolFiltrados.length > 0 ? manapolFiltrados.map((m: any, idx: number) => (
+                    {manapolFiltrados.length > 0 ? manapolFiltrados.map((m: any) => (
                       <TableRow key={m.id_documento}>
                         <TableCell>{m.codigo_rm || m.codigo}</TableCell>
                         <TableCell>{m.descripcion || m.titulo || 'Sin descripción'}</TableCell>
                       </TableRow>
                     )) : (
                       <TableRow>
-                        <TableCell colSpan={2} align="center">No hay manapol</TableCell>
+                        <TableCell colSpan={2} align="center">No hay Registros Maestros</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -545,7 +545,7 @@ function RolesProceduresContent() {
       <GlobalModal
         open={modalManapolOpen}
         onClose={handleCloseModalManapol}
-        title={`Asignar manapol a ${rolActualManapol?.nombre_rol || ""}`}
+        title={`Asignar Registro Maestro a ${rolActualManapol?.nombre_rol || ""}`}
         maxWidth="md"
         actions={
           <div className="flex justify-center items-center gap-1">
@@ -554,7 +554,7 @@ function RolesProceduresContent() {
               loading={savingManapol}
               style={{ backgroundColor: "#2AAC67" }}
             >
-              Guardar Manapol
+              Guardar Registro Maestro
             </SubmitButton>
           </div>
         }
@@ -563,7 +563,7 @@ function RolesProceduresContent() {
           <SearchBar
             value={modalSearchManapol}
             onChange={setModalSearchManapol}
-            placeholder="Buscar manapol por ID, código o descripción..."
+            placeholder="Buscar registro maestro por ID, código o descripción..."
           />
         </div>
 

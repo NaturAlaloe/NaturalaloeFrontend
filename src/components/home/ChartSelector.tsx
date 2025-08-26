@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Bar, Pie, Doughnut, Line } from 'react-chartjs-2';
+import { useState } from 'react';
+import { Bar, Pie, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
   ArcElement,
-  PointElement,
-  LineElement,
   Title,
   Tooltip,
   Legend,
@@ -21,126 +19,121 @@ import {
   CircularProgress,
   Typography,
   Button,
-  Alert
+  Alert,
+  Tabs,
+  Tab
 } from '@mui/material';
-import api from "../../apiConfig/api";
+
+// Hooks
+import { usePoeChartData } from '../../hooks/charts/usePoeChartData';
+import { useMannapolChartData } from '../../hooks/charts/useMannapolChartData';
+import { usePoliticsChartData } from '../../hooks/charts/usePoliticsChartData';
+import { useChartData } from '../../hooks/charts/useChartData';
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
   ArcElement,
-  PointElement,
-  LineElement,
   Title,
   Tooltip,
   Legend
 );
 
-interface POEData {
-  id_lote: number;
-  area: string;
-  jefatura: string;
-  estado: string;
-  cantidad: number;
-  actualizados: string;
-  pendientes: string;
-  lista_documentos: {
-    tipo: string;
-    razon: string;
-    codigo: string;
-    estado: string;
-  }[];
-}
+type DataSource = 'poe' | 'manapol' | 'politics';
+type ChartType = 'bar' | 'pie' | 'doughnut';
+type GroupBy = 'area' | 'jefatura';
 
 const ChartSelector = () => {
-  // Chart state
-  const [chartType, setChartType] = useState<'bar' | 'pie' | 'doughnut' | 'line'>('bar');
-  const [groupBy, setGroupBy] = useState<'area' | 'jefatura'>('area');
-  const [poeData, setPoeData] = useState<POEData[]>([]);
-  const [chartLoading, setChartLoading] = useState(true);
-  const [apiError, setApiError] = useState<string | null>(null);
+  // Chart configuration state
+  const [chartType, setChartType] = useState<ChartType>('bar');
+  const [groupBy, setGroupBy] = useState<GroupBy>('area');
+  const [dataSource, setDataSource] = useState<DataSource>('poe');
 
-  const fetchChartData = async () => {
-    try {
-      setChartLoading(true);
-      setApiError(null);
-      const response = await api.get('/dataForGraphicWithKPI');
+  // Data hooks
+  const { data: poeData, loading: poeLoading, error: poeError, refetch: refetchPoe } = usePoeChartData();
+  const { data: mannapolData, loading: mannapolLoading, error: mannapolError, refetch: refetchMannapol } = useMannapolChartData();
+  const { data: politicsData, loading: politicsLoading, error: politicsError, refetch: refetchPolitics } = usePoliticsChartData();
 
-      if (response.data.success) {
-        setPoeData(response.data.data);
-      } else {
-        setApiError('La API no devolvió datos válidos');
-      }
-    } catch (error: any) {
-      console.error('Error fetching POE data:', error);
-      setApiError('Error al cargar los datos. Intente nuevamente.');
-    } finally {
-      setChartLoading(false);
+  // Chart data processing hook
+  const { 
+    processKpiData, 
+    processKpiDataForCircular,
+    processPoliticsData, 
+    processPoliticsDataForCircular,
+    getEmptyChartData 
+  } = useChartData();
+
+  // Computed values
+  const isLoading = poeLoading || mannapolLoading || politicsLoading;
+  const hasError = poeError || mannapolError || politicsError;
+
+  const getCurrentData = () => {
+    switch (dataSource) {
+      case 'poe': return { data: poeData, error: poeError };
+      case 'manapol': return { data: mannapolData, error: mannapolError };
+      case 'politics': return { data: politicsData, error: politicsError };
+      default: return { data: [], error: null };
     }
   };
 
-  useEffect(() => {
-    fetchChartData();
-  }, []);
-
   const getChartData = () => {
-    if (chartLoading) {
-      return {
-        labels: ['Cargando datos...'],
-        datasets: [{
-          label: 'Datos',
-          data: [1],
-          backgroundColor: ['#e5e7eb'],
-          borderWidth: 1,
-        }]
-      };
+    if (isLoading) {
+      return getEmptyChartData('Cargando datos...');
     }
 
-    if (apiError || !poeData.length) {
-      return {
-        labels: ['Sin datos'],
-        datasets: [{
-          label: 'Datos',
-          data: [1],
-          backgroundColor: ['#e5e7eb'],
-          borderWidth: 1,
-        }]
-      };
+    if (hasError) {
+      return getEmptyChartData('Sin datos');
     }
 
-    const groupKey = groupBy === 'area' ? 'area' : 'jefatura';
-    const groups = poeData.reduce((acc: Record<string, { actualizados: number, pendientes: number }>, item) => {
-      const key = item[groupKey] || 'Sin especificar';
-      if (!acc[key]) {
-        acc[key] = { actualizados: 0, pendientes: 0 };
-      }
-      acc[key].actualizados += parseInt(item.actualizados) || 0;
-      acc[key].pendientes += parseInt(item.pendientes) || 0;
-      return acc;
-    }, {});
+    const { data, error } = getCurrentData();
+    
+    if (error || !data.length) {
+      return getEmptyChartData(`Sin datos para ${getChartTitle()}`);
+    }
 
-    const labels = Object.keys(groups);
-    const actualizadosData = Object.values(groups).map(group => group.actualizados);
-    const pendientesData = Object.values(groups).map(group => group.pendientes);
+    // Determinar si es gráfico circular
+    const isCircularChart = chartType === 'pie' || chartType === 'doughnut';
 
-    return {
-      labels,
-      datasets: [
-        {
-          label: 'Actualizados',
-          data: actualizadosData,
-          backgroundColor: '#4ade80',
-          borderWidth: 1,
-        },
-        {
-          label: 'Pendientes',
-          data: pendientesData,
-          backgroundColor: '#f87171',
-          borderWidth: 1,
+    switch (dataSource) {
+      case 'poe':
+      case 'manapol':
+        if (isCircularChart) {
+          return processKpiDataForCircular(data as any) || getEmptyChartData('Sin datos disponibles');
+        } else {
+          return processKpiData(data as any, groupBy) || getEmptyChartData('Sin datos disponibles');
         }
-      ]
-    };
+      case 'politics':
+        if (isCircularChart) {
+          return processPoliticsDataForCircular(data as any) || getEmptyChartData('Sin datos de políticas');
+        } else {
+          return processPoliticsData(data as any) || getEmptyChartData('Sin datos de políticas');
+        }
+      default:
+        return getEmptyChartData('Sin datos');
+    }
+  };
+
+  const getChartTitle = () => {
+    switch (dataSource) {
+      case 'poe': return 'KPI Anual - Procedimientos Operativos Estándar (POE)';
+      case 'manapol': return 'KPI Anual - Registros Maestros';
+      case 'politics': return 'KPI Anual - Políticas Empresariales';
+      default: return 'KPI Anual - Datos del Sistema';
+    }
+  };
+
+  const getDataCount = () => {
+    const { data } = getCurrentData();
+    return data.length;
+  };
+
+  const handleRefresh = () => {
+    switch (dataSource) {
+      case 'poe': refetchPoe(); break;
+      case 'manapol': refetchMannapol(); break;
+      case 'politics': refetchPolitics(); break;
+    }
   };
 
   const commonOptions = {
@@ -148,12 +141,18 @@ const ChartSelector = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
+        display: true,
         position: 'bottom' as const,
         align: 'center' as const,
         labels: {
           boxWidth: 20,
           padding: 20,
           usePointStyle: true,
+          font: {
+            size: 12,
+            weight: 'normal' as const,
+          },
+          color: '#374151',
         },
       },
       tooltip: {
@@ -161,15 +160,22 @@ const ChartSelector = () => {
           label: function (context: any) {
             const label = context.dataset.label || '';
             const value = context.raw;
-            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-            const percentage = Math.round((value / total) * 100);
-            return `${label}: ${value} (${!isNaN(percentage) ? percentage : 0}%)`;
+            
+            // Para gráficos circulares
+            if (chartType === 'pie' || chartType === 'doughnut') {
+              const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${context.label}: ${value} (${!isNaN(percentage) ? percentage : 0}%)`;
+            }
+            
+            // Para gráficos de barras
+            return `${label}: ${value}`;
           }
         }
       },
       title: {
         display: true,
-        text: 'Actualización de Procedimientos',
+        text: getChartTitle(),
         font: { size: 16 },
         padding: {
           top: 10,
@@ -187,8 +193,81 @@ const ChartSelector = () => {
     }
   };
 
+  // Opciones específicas para gráficos circulares
+  const getCircularChartOptions = () => ({
+    ...commonOptions,
+    plugins: {
+      ...commonOptions.plugins,
+      legend: {
+        display: true,
+        position: 'bottom' as const,
+        align: 'center' as const,
+        labels: {
+          boxWidth: 20,
+          padding: 20,
+          usePointStyle: true,
+          font: {
+            size: 12,
+            weight: 'normal' as const,
+          },
+          color: '#374151',
+          generateLabels: function(chart: any) {
+            const data = chart.data;
+            if (data.datasets.length > 0) {
+              // Para POE y MANAPOL (estados: actualizar/obsoleto)
+              if (dataSource === 'poe' || dataSource === 'manapol') {
+                if (data.labels.includes('Actualizar') && data.labels.includes('Obsoleto')) {
+                  return [
+                    {
+                      text: 'Actualizar',
+                      fillStyle: '#f87171',
+                      strokeStyle: '#fff',
+                      lineWidth: 2,
+                      hidden: false,
+                      index: 0
+                    },
+                    {
+                      text: 'Obsoleto',
+                      fillStyle: '#94a3b8',
+                      strokeStyle: '#fff',
+                      lineWidth: 2,
+                      hidden: false,
+                      index: 1
+                    }
+                  ];
+                }
+              }
+              
+              // Para políticas (manejo dinámico de estados)
+              if (dataSource === 'politics') {
+                return data.labels.map((label: string, index: number) => ({
+                  text: label,
+                  fillStyle: data.datasets[0].backgroundColor[index],
+                  strokeStyle: '#fff',
+                  lineWidth: 2,
+                  hidden: false,
+                  index: index
+                }));
+              }
+            }
+            
+            // Fallback para casos sin datos
+            return [{
+              text: 'Sin datos',
+              fillStyle: '#e5e7eb',
+              strokeStyle: '#fff',
+              lineWidth: 2,
+              hidden: false,
+              index: 0
+            }];
+          }
+        },
+      },
+    }
+  });
+
   const renderChart = () => {
-    if (chartLoading) {
+    if (isLoading) {
       return (
         <div className="flex items-center justify-center h-full">
           <CircularProgress />
@@ -196,26 +275,27 @@ const ChartSelector = () => {
       );
     }
 
-    if (apiError) {
+    if (hasError) {
       return (
         <div className="flex flex-col items-center justify-center h-full gap-4">
           <Alert severity="error" className="w-full max-w-md">
-            {apiError}
+            {hasError}
           </Alert>
-          <Button variant="contained" onClick={fetchChartData}>
+          <Button variant="contained" onClick={handleRefresh}>
             Reintentar
           </Button>
         </div>
       );
     }
 
-    if (!poeData.length) {
+    const { data } = getCurrentData();
+    if (!data.length) {
       return (
         <div className="flex flex-col items-center justify-center h-full gap-4">
           <Typography variant="h6" className="text-gray-500">
-            No hay datos disponibles
+            No hay datos disponibles para {getChartTitle()}
           </Typography>
-          <Button variant="outlined" onClick={fetchChartData}>
+          <Button variant="outlined" onClick={handleRefresh}>
             Recargar datos
           </Button>
         </div>
@@ -224,7 +304,6 @@ const ChartSelector = () => {
 
     const selectedData = getChartData();
 
-    // Wrapper div with proper centering
     const ChartWrapper = ({ children }: { children: React.ReactNode }) => (
       <div className="w-full h-full flex items-center justify-center">
         <div className="w-full h-full max-w-full max-h-full">
@@ -233,76 +312,87 @@ const ChartSelector = () => {
       </div>
     );
 
+    // Usar opciones específicas según el tipo de gráfico
+    const barChartProps = { data: selectedData, options: commonOptions };
+    const circularChartProps = { data: selectedData, options: getCircularChartOptions() };
+
     switch (chartType) {
-      case 'bar':
-        return (
-          <ChartWrapper>
-            <Bar data={selectedData} options={commonOptions} />
-          </ChartWrapper>
-        );
-      case 'pie':
-        return (
-          <ChartWrapper>
-            <Pie data={selectedData} options={commonOptions} />
-          </ChartWrapper>
-        );
-      case 'doughnut':
-        return (
-          <ChartWrapper>
-            <Doughnut data={selectedData} options={commonOptions} />
-          </ChartWrapper>
-        );
-      case 'line':
-        return (
-          <ChartWrapper>
-            <Line data={selectedData} options={commonOptions} />
-          </ChartWrapper>
-        );
-      default:
-        return (
-          <ChartWrapper>
-            <Bar data={selectedData} options={commonOptions} />
-          </ChartWrapper>
-        );
+      case 'bar': 
+        return <ChartWrapper><Bar {...barChartProps} /></ChartWrapper>;
+      case 'pie': 
+        return <ChartWrapper><Pie {...circularChartProps} /></ChartWrapper>;
+      case 'doughnut': 
+        return <ChartWrapper><Doughnut {...circularChartProps} /></ChartWrapper>;
+      default: 
+        return <ChartWrapper><Bar {...barChartProps} /></ChartWrapper>;
     }
   };
 
   return (
     <div className="bg-white rounded-xl shadow-gray-300 shadow p-6 flex flex-col transition hover:shadow-lg h-full">
+      {/* Data Source Tabs */}
+      <div className="mb-4">
+        <Tabs 
+          value={dataSource} 
+          onChange={(_e, newValue) => setDataSource(newValue)}
+          sx={{
+            '& .MuiTab-root': {
+              color: '#6b7280',
+              fontSize: '0.875rem',
+              minWidth: 'auto',
+              padding: '6px 12px',
+              '&.Mui-selected': {
+                color: '#2AAC67',
+              },
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: '#2AAC67',
+            },
+          }}
+        >
+          <Tab label="POE" value="poe" />
+          <Tab label="Maestro" value="manapol" />
+          <Tab label="Políticas" value="politics" />
+        </Tabs>
+      </div>
+
       {/* Chart Controls */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-        <Typography variant="h6" className="text-green-800">
-          Actualización de Procedimientos Operativos Estándar (POE)
+        <Typography variant="h6" className="text-green-800 text-sm md:text-base">
+          {getChartTitle()}
         </Typography>
 
         <div className="flex gap-4 flex-wrap">
-          <FormControl
-            size="small"
-            sx={{
-              minWidth: 140,
-              '& .MuiOutlinedInput-root': {
-                '&.Mui-focused fieldset': {
-                  borderColor: '#2AAC67',
+          {/* Selector de agrupación solo para POE y MANAPOL (que sí tienen área) */}
+          {(dataSource === 'poe' || dataSource === 'manapol') && (
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 140,
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#2AAC67',
+                  },
                 },
-              },
-              '& .MuiInputLabel-root': {
-                '&.Mui-focused': {
-                  color: '#2AAC67',
+                '& .MuiInputLabel-root': {
+                  '&.Mui-focused': {
+                    color: '#2AAC67',
+                  },
                 },
-              },
-            }}
-          >
-            <InputLabel id="groupby-select-label">Agrupar por</InputLabel>
-            <Select
-              labelId="groupby-select-label"
-              value={groupBy}
-              label="Agrupar por"
-              onChange={(e) => setGroupBy(e.target.value as 'area' | 'jefatura')}
+              }}
             >
-              <MenuItem value="area">Área</MenuItem>
-              <MenuItem value="jefatura">Jefatura</MenuItem>
-            </Select>
-          </FormControl>
+              <InputLabel id="groupby-select-label">Agrupar por</InputLabel>
+              <Select
+                labelId="groupby-select-label"
+                value={groupBy}
+                label="Agrupar por"
+                onChange={(e) => setGroupBy(e.target.value as GroupBy)}
+              >
+                <MenuItem value="area">Área</MenuItem>
+                <MenuItem value="jefatura">Jefatura</MenuItem>
+              </Select>
+            </FormControl>
+          )}
 
           <FormControl
             size="small"
@@ -325,18 +415,17 @@ const ChartSelector = () => {
               labelId="chart-select-label"
               value={chartType}
               label="Gráfico"
-              onChange={(e) => setChartType(e.target.value as any)}
+              onChange={(e) => setChartType(e.target.value as ChartType)}
             >
               <MenuItem value="bar">Barras</MenuItem>
               <MenuItem value="pie">Circular</MenuItem>
               <MenuItem value="doughnut">Dona</MenuItem>
-              <MenuItem value="line">Líneas</MenuItem>
             </Select>
           </FormControl>
         </div>
       </div>
 
-      {/* Chart Container - Properly centered */}
+      {/* Chart Container */}
       <div className="flex-1 bg-gray-50 rounded-lg p-4" style={{ minHeight: '450px' }}>
         <Box
           sx={{
@@ -353,7 +442,7 @@ const ChartSelector = () => {
 
       {/* Chart Footer */}
       <div className="flex justify-between items-center text-sm text-gray-500 mt-4 pt-4 border-t">
-        <span>Total registros: {poeData.length}</span>
+        <span>Total lotes de KPIs: {getDataCount()}</span>
         <span>Última actualización: {new Date().toLocaleDateString('es-ES')}</span>
       </div>
     </div>

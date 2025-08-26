@@ -47,7 +47,6 @@ interface GeneralInfoSectionProps {
   facilitadoresOptions: FacilitadorOption[];
   setForm: React.Dispatch<React.SetStateAction<TrainingFormData>>;
   filteredSeguimientoOptions: Option[];
-  isEvaluado: boolean;
   esMetodoTeorico: boolean;
   esMetodoPractico: boolean;
   today: string;
@@ -59,9 +58,6 @@ export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
   facilitadoresOptions,
   setForm,
   filteredSeguimientoOptions,
-  isEvaluado,
-  esMetodoTeorico,
-  esMetodoPractico,
   today,
 }) => (
   <FormSection title="Información General">
@@ -136,77 +132,14 @@ export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
           }
           placeholder="Seleccione seguimiento"
         />
-        {isEvaluado && esMetodoTeorico && form.nota && (
-          <div
-            className={`text-sm p-2 rounded ${
-              Number(form.nota) >= 80
-                ? "text-green-600 bg-green-50"
-                : "text-orange-600 bg-orange-50"
-            }`}
-          >
-            {Number(form.nota) >= 80 ? (
-              <>
-                ✅ <strong>Nota aprobatoria</strong>: Solo
-                seguimiento "Satisfactorio" disponible
-              </>
-            ) : (
-              <>
-                ⚠️ <strong>Nota no aprobatoria</strong>: Solo
-                seguimiento "Reevaluación" y "Reprogramar"
-                disponibles
-              </>
-            )}
-          </div>
-        )}
-        {isEvaluado &&
-          esMetodoPractico &&
-          form.estadoAprobacion && (
-            <div
-              className={`text-sm p-2 rounded ${
-                form.estadoAprobacion.toLowerCase() === "aprobado"
-                  ? "text-green-600 bg-green-50"
-                  : "text-orange-600 bg-orange-50"
-              }`}
-            >
-              {form.estadoAprobacion.toLowerCase() ===
-              "aprobado" ? (
-                <>
-                  ✅ <strong>Estado aprobado</strong>: Solo
-                  seguimiento "Satisfactorio" disponible
-                </>
-              ) : (
-                <>
-                  ⚠️ <strong>Estado reprobado</strong>: Solo
-                  seguimiento "Reevaluación" y "Reprogramar"
-                  disponibles
-                </>
-              )}
-            </div>
-          )}
       </div>
 
-      <div className="flex items-center">
-        <input
-          type="checkbox"
-          id="esEvaluado"
-          name="esEvaluado"
-          checked={isEvaluado}
-          onChange={handleChange}
-          className="accent-[#2ecc71] mr-2 w-5 h-5"
-        />
-        <label
-          htmlFor="esEvaluado"
-          className="font-semibold text-[#2ecc71]"
-        >
-          Es Evaluado
-        </label>
-      </div>
+
     </div>
   </FormSection>
 );
 
 interface EvaluationSectionProps {
-  isEvaluado: boolean;
   form: TrainingFormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
   esMetodoTeorico: boolean;
@@ -216,7 +149,6 @@ interface EvaluationSectionProps {
 }
 
 export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
-  isEvaluado,
   form,
   handleChange,
   esMetodoTeorico,
@@ -224,12 +156,9 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
   metodoEvaluacionOptions,
   estadoAprobacionOptions,
 }) => {
-  if (!isEvaluado) return null;
-
   // Helper para manejar cambios en método de evaluación
   const handleMetodoChange = (value: Option | Option[] | null) => {
     const metodoValue = value && !Array.isArray(value) ? value.valor : "";
-    // Usar el handleChange del hook para mantener toda la lógica de validación
     const event = {
       target: {
         name: "metodoEvaluacion",
@@ -237,14 +166,12 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
         type: "select"
       }
     } as any;
-    
     handleChange(event);
   };
 
   // Helper para manejar cambios en estado de aprobación
   const handleEstadoChange = (value: Option | Option[] | null) => {
     const estadoValue = value && !Array.isArray(value) ? value.valor : "";
-    // Usar el handleChange del hook para mantener la lógica de filtrado
     const event = {
       target: {
         name: "estadoAprobacion",
@@ -252,7 +179,6 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
         type: "select"
       }
     } as any;
-    
     handleChange(event);
   };
 

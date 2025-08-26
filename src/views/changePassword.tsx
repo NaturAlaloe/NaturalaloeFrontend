@@ -1,27 +1,21 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import InputField from "../../components/formComponents/InputField";
-import { showCustomToast } from "../../components/globalComponents/CustomToaster";
-import api from "../../apiConfig/api";
+import { useLocation } from "react-router-dom";
+import InputField from "../components/formComponents/InputField";
+import { showCustomToast } from "../components/globalComponents/CustomToaster";
+import api from "../apiConfig/api";
 
 export default function ChangePassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   const params = new URLSearchParams(location.search);
   const token = params.get("token");
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    console.group("Validación de formulario");
-    console.log("Token obtenido de URL:", token);
-    console.log("Nueva contraseña:", newPassword);
-    console.log("Confirmación contraseña:", confirmPassword);
-    console.groupEnd();
+   
 
     if (!newPassword || !confirmPassword) {
       showCustomToast("Error", "Por favor completa todos los campos", "error");
@@ -44,24 +38,14 @@ export default function ChangePassword() {
         newPassword: newPassword
       };
 
-      console.group("Preparando solicitud a /resetPassword");
-      console.log("Endpoint completo:", api.defaults.baseURL + "/resetPassword");
-      console.log("Método: POST");
-      console.log("Payload a enviar:", payload);
-      console.log("Headers configurados:", api.defaults.headers);
-      console.groupEnd();
+      
 
       const res = await api.post("/resetPassword", payload);
 
-      console.group("Respuesta del servidor");
-      console.log("Status:", res.status);
-      console.log("Datos recibidos:", res.data);
-      console.log("Headers recibidos:", res.headers);
-      console.groupEnd();
 
       if (res.data.success) {
         showCustomToast("Éxito", "Contraseña restablecida correctamente", "success");
-        setTimeout(() => navigate("/login"), 2000);
+        setTimeout(() => { window.location.replace("/"); }, 2000);
       } else {
         showCustomToast("Error", res.data.message, "error");
       }
@@ -69,14 +53,10 @@ export default function ChangePassword() {
     } catch (err: any) {
       console.group("Error en la solicitud");
       console.error("Error completo:", err);
-      console.log("¿Tiene response?:", !!err.response);
+   
       if (err.response) {
-        console.log("Status code:", err.response.status);
-        console.log("Datos del error:", err.response.data);
-        console.log("Headers del error:", err.response.headers);
+  
       }
-      console.log("Mensaje:", err.message);
-      console.log("Configuración de la solicitud:", err.config);
       console.groupEnd();
 
       if (err.response?.data?.message) {

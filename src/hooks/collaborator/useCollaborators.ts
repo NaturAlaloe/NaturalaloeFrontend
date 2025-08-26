@@ -33,15 +33,17 @@ const useCollaborators = () => {
 
   // Filtrado en frontend si searchTerm existe
   const filteredCollaborators = searchTerm
-    ? collaborators.filter(colab =>
-        (
+    ? collaborators.filter(colab => {
+        const search = searchTerm.toLowerCase();
+        return (
           `${colab.nombre || ''} ${colab.apellido1 || ''} ${colab.apellido2 || ''}`
             .toLowerCase()
-            .includes(searchTerm.toLowerCase())
-        ) ||
-        String(colab.id_colaborador || '').includes(searchTerm) ||
-        (colab.puesto || '').toLowerCase().includes(searchTerm.toLowerCase())
-      )
+            .includes(search) ||
+          String(colab.id_colaborador || '').includes(search) ||
+          (colab.puesto || '').toLowerCase().includes(search) ||
+          colab.cedula.toLowerCase().includes(search) 
+        );
+      })
     : collaborators;
 
   return { 
