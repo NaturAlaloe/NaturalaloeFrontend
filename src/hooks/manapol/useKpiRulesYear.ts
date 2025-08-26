@@ -55,6 +55,10 @@ export const useKpiRulesYear = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Agregar estado para búsqueda
+  const [searchTerm, setSearchTerm] = useState("");
+  const [modalPage, setModalPage] = useState(1);
+
   const estadoOptions = [
     { id: "actualizar", nombre: "Actualizar" },
     { id: "obsoleto", nombre: "Obsoletar" }, // Cambiado de "obsoletar" a "obsoleto"
@@ -227,6 +231,8 @@ export const useKpiRulesYear = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setSearchTerm(""); // Reset search when closing
+    setModalPage(1);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -326,6 +332,22 @@ export const useKpiRulesYear = () => {
     }
   };
 
+  // Filtrar docs según búsqueda
+  const filteredAvailableDocs = availableDocs.filter(doc => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return true;
+    return (
+      doc.codigo.toLowerCase().includes(term) ||
+      doc.titulo.toLowerCase().includes(term) ||
+      (doc.departamento?.toLowerCase().includes(term) ?? false)
+    );
+  });
+
+  // Cuando cambia el término de búsqueda, volver a la primera página
+  useEffect(() => {
+    setModalPage(1);
+  }, [searchTerm]);
+
   return {
     formData,
     docs,
@@ -347,5 +369,10 @@ export const useKpiRulesYear = () => {
     openModal,
     closeModal,
     handleSubmit,
+    searchTerm,
+    setSearchTerm,
+    modalPage,
+    setModalPage,
+    filteredAvailableDocs,
   };
 };

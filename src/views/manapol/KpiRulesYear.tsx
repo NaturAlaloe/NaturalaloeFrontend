@@ -15,7 +15,6 @@ export default function KpiRulesYear() {
   const {
     formData,
     docs,
-    availableDocs,
     isModalOpen,
     loading,
     loadingData,
@@ -31,6 +30,12 @@ export default function KpiRulesYear() {
     openModal,
     closeModal,
     handleSubmit,
+    // Agregar nuevos valores del hook
+    searchTerm,
+    setSearchTerm,
+    modalPage,
+    setModalPage,
+    filteredAvailableDocs,
   } = useKpiRulesYear();
 
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
@@ -237,11 +242,23 @@ export default function KpiRulesYear() {
           </div>
         }
       >
+        {/* Barra de búsqueda */}
+        <div className="mb-4">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder="Buscar por RM o por descripción..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2AAC67] focus:border-[#2AAC67] transition-all duration-200 placeholder:text-gray-400"
+          />
+        </div>
         <ProceduresTableModal
-          procedimientos={availableDocs}
+          procedimientos={filteredAvailableDocs}
           procedimientosSeleccionados={selectedDocIds}
           onSeleccionChange={setSelectedDocIds}
           tipo="manapol"
+          page={modalPage}
+          setPage={setModalPage}
         />
       </GlobalModal>
     </>
