@@ -23,9 +23,7 @@ export const useEditRolsPrincipal = () => {
     setRolesLoading(true);
     try {
       const roles = await getRolsCollaborators();
-      console.log("Roles recibidos:", roles); // Debug log
-      console.log("Tipo de roles:", typeof roles); // Debug log
-      console.log("Es array:", Array.isArray(roles)); // Debug log
+     
       
       // Verificar si roles es válido y es un array
       if (roles && Array.isArray(roles)) {
@@ -50,19 +48,15 @@ export const useEditRolsPrincipal = () => {
 
   // Abrir modal para cambiar rol
   const openChangeRoleModal = (collaborator: any) => {
-    console.log("=== ABRIENDO MODAL DE CAMBIO DE ROL ===");
-    console.log("Colaborador seleccionado:", collaborator);
-    
+   
     setSelectedCollaborator(collaborator);
     setFormData({
       id_rol_nuevo: 0,
       motivo: "",
     });
     
-    console.log("Estableciendo modalOpen a true");
     setModalOpen(true);
     
-    console.log("Iniciando fetchAvailableRoles...");
     fetchAvailableRoles();
   };
 
