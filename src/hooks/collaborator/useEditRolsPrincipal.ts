@@ -23,15 +23,18 @@ export const useEditRolsPrincipal = () => {
     setRolesLoading(true);
     try {
       const roles = await getRolsCollaborators();
-     
-      
+
       // Verificar si roles es válido y es un array
       if (roles && Array.isArray(roles)) {
         setAvailableRoles(roles);
       } else {
         console.warn("Roles no válidos recibidos:", roles);
         setAvailableRoles([]);
-        showCustomToast("Advertencia", "No se encontraron roles disponibles", "info");
+        showCustomToast(
+          "Advertencia",
+          "No se encontraron roles disponibles",
+          "info"
+        );
       }
     } catch (error: any) {
       const errorMessage =
@@ -48,15 +51,14 @@ export const useEditRolsPrincipal = () => {
 
   // Abrir modal para cambiar rol
   const openChangeRoleModal = (collaborator: any) => {
-   
     setSelectedCollaborator(collaborator);
     setFormData({
       id_rol_nuevo: 0,
       motivo: "",
     });
-    
+
     setModalOpen(true);
-    
+
     fetchAvailableRoles();
   };
 
@@ -96,6 +98,15 @@ export const useEditRolsPrincipal = () => {
         "Error",
         "Debe proporcionar un motivo para el cambio",
         "error"
+      );
+      return false;
+    }
+
+    if (selectedCollaborator.id_rol === formData.id_rol_nuevo) {
+      showCustomToast(
+        "Advertencia",
+        "El rol seleccionado es igual al actual",
+        "info"
       );
       return false;
     }
