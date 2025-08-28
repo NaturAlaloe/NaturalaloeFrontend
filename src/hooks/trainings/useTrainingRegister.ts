@@ -12,15 +12,7 @@ export function useTrainingRegister({
   const { register, loading } = useRegisterIndividualTraining();
 
   const handleRegister = async (isEvaluado: boolean, form: any) => {
-    if (!isEvaluado) {
-      showCustomToast(
-        "Error",
-        "La capacitación individual debe ser evaluada.",
-        "error"
-      );
-      return;
-    }
-
+    
     if (!form.fechaInicio) {
       showCustomToast("Error", "La fecha de inicio es obligatoria.", "error");
       return;
