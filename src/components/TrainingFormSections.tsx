@@ -50,6 +50,7 @@ interface GeneralInfoSectionProps {
   esMetodoTeorico: boolean;
   esMetodoPractico: boolean;
   today: string;
+  isEvaluado?: boolean;
 }
 
 export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
@@ -140,6 +141,7 @@ export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
 );
 
 interface EvaluationSectionProps {
+  isEvaluado?: boolean;
   form: TrainingFormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
   esMetodoTeorico: boolean;
