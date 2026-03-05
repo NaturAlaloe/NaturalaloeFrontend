@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, type ChangeEvent } from "react";
-import { createPolitics, getPoliticsConsecutive } from "../../services/politics/politicsService";
+import { useState, useEffect, useRef, useCallback, type ChangeEvent } from "react";
+import { createPolitics, getPoliticsConsecutive, getPoliticsList } from "../../services/politics/politicsService";
 import { getResponsibles } from "../../services/responsibles/getResponsibles";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 
@@ -17,6 +17,19 @@ export function usePolitics() {
   const [responsables, setResponsables] = useState<{ id_responsable: number; nombre_responsable: string }[]>([]);
   const [loadingResponsables, setLoadingResponsables] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Código editable manualmente
+  const [codigoOverride, setCodigoOverride] = useState("");
+  const [isManualEdit, setIsManualEdit] = useState(false);
+  // Formato: 2 dígitos - 2 dígitos (ej: 01-01)
+  const CODE_REGEX_POL = /^\d{2}-\d{2}$/;
+  // Valor mostrado: si el usuario no ha editado, usa el auto-generado
+  const codigoDisplay = isManualEdit ? codigoOverride : formData.codigo;
+
+  const handleCodigoChange = useCallback((value: string) => {
+    setIsManualEdit(true);
+    setCodigoOverride(value);
+  }, []);
 
   useEffect(() => {
     getPoliticsConsecutive().then((codigo) => {
@@ -63,7 +76,33 @@ export function usePolitics() {
       return;
     }
 
+    if (!codigoDisplay.trim()) {
+      showCustomToast("Código requerido", "Espera a que se genere el código o ingrésalo manualmente", "error");
+      return;
+    }
+
+    if (!CODE_REGEX_POL.test(codigoDisplay)) {
+      showCustomToast("Código inválido", "El código debe seguir la estructura: 00-00", "error");
+      return;
+    }
+
+    // Verificar que el código no exista
+    try {
+      const lista = await getPoliticsList();
+      const existe = lista.some((p: any) =>
+        p.codigo_politica?.toLowerCase() === codigoDisplay.toLowerCase()
+      );
+      if (existe) {
+        showCustomToast("Código duplicado", "Este código ya existe en las políticas activas.", "error");
+        return;
+      }
+    } catch {
+      showCustomToast("Error de verificación", "No se pudo verificar si el código ya existe.", "error");
+      return;
+    }
+
     const data = new FormData();
+    data.append("codigo", codigoDisplay);
     data.append("descripcion", formData.descripcion.trim());
     data.append("id_responsable", String(Number(formData.id_responsable)).trim());
     data.append("version", String(Number(formData.version)).trim());
@@ -75,6 +114,8 @@ export function usePolitics() {
       await createPolitics(data);
       showCustomToast("Éxito", "Política registrada exitosamente", "success");
       const nuevoCodigo = await getPoliticsConsecutive();
+      setIsManualEdit(false);
+      setCodigoOverride("");
       setFormData({
         codigo: nuevoCodigo,
         descripcion: "",
@@ -82,11 +123,8 @@ export function usePolitics() {
         version: "",
         fecha_creacion: "",
         fecha_vigencia: "",
-
-
       });
       setPdfFile(null);
-      // Resetear el input del archivo HTML
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -96,7 +134,6 @@ export function usePolitics() {
         error?.response?.data?.message || "Ocurrió un error al registrar la política",
         "error"
       );
-      throw error;
     }
   };
 
@@ -110,5 +147,7 @@ export function usePolitics() {
     responsables,
     loadingResponsables,
     fileInputRef,
+    codigoDisplay,
+    handleCodigoChange,
   };
 }

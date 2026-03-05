@@ -29,9 +29,10 @@ export default function Procedures() {
     responsableSeleccionado,
     areaSeleccionada,
     handleSubmit,
-    procedureCode,
     loadingConsecutivo,
     fileInputRef,
+    codigoDisplay,
+    handleCodigoChange,
   } = useNewProcedureForm();
 
   return (
@@ -88,9 +89,9 @@ export default function Procedures() {
             <InputField
               label="Código del Procedimiento"
               name="codigo"
-              value={procedureCode}
-              readOnly
-              placeholder="Se generará automáticamente"
+              value={codigoDisplay}
+              onChange={(e) => handleCodigoChange(e.target.value)}
+              placeholder="Ej: 001-01-001"
               required
               endAdornment={
                 loadingConsecutivo ? (
@@ -103,12 +104,6 @@ export default function Procedures() {
                 ) : null
               }
             />
-            {/* Aviso cuando está generando código */}
-            {departamentoSeleccionado && categoriaSeleccionada && !procedureCode && !loadingConsecutivo && (
-              <div className="mt-1 text-sm text-orange-600">
-                ⚠️ Generando código...
-              </div>
-            )}
           </div>
           <SelectAutocomplete
             label="Responsable"

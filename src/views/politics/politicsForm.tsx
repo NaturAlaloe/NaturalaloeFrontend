@@ -3,6 +3,7 @@ import InputField from "../../components/formComponents/InputField";
 import SubmitButton from "../../components/formComponents/SubmitButton";
 import SelectAutocomplete from "../../components/formComponents/SelectAutocomplete";
 import PdfInput from "../../components/formComponents/PdfInput";
+import CustomToaster from "../../components/globalComponents/CustomToaster";
 import { usePolitics } from "../../hooks/politics/usePolitics";
 
 export default function PoliticsForm() {
@@ -16,18 +17,22 @@ export default function PoliticsForm() {
     responsables,
     loadingResponsables,
     fileInputRef,
+    codigoDisplay,
+    handleCodigoChange,
   } = usePolitics();
 
   return (
+    <>
+    <CustomToaster />
     <FormContainer title="Registro de Política" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <InputField
           label="Código"
           name="codigo"
-          value={formData.codigo}
-          onChange={() => { }}
-          disabled
-  
+          value={codigoDisplay}
+          onChange={(e) => handleCodigoChange(e.target.value)}
+          placeholder="Ej: 01-01"
+          required
         />
         <InputField
           label="Descripción"
@@ -104,5 +109,6 @@ export default function PoliticsForm() {
         </SubmitButton>
       </div>
     </FormContainer>
+    </>
   );
 }

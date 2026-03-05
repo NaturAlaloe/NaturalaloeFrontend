@@ -14,7 +14,6 @@ const RmForm = () => {
     handleSubmit,
     saving,
     // Código consecutivo
-    consecutivo,
     loadingConsecutive,
     // Datos auxiliares
     areas,
@@ -28,6 +27,8 @@ const RmForm = () => {
     handlePdfChange,
     removePdf,
     fileInputRef,
+    codigoDisplay,
+    handleCodigoChange,
   } = useCreateManapol();
 
   return (
@@ -39,14 +40,15 @@ const RmForm = () => {
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          {/* Código (solo lectura, muestra el consecutivo del hook) */}
+          {/* Código editable, auto-generado o ingresado manualmente */}
           <InputField
             label="Código"
             name="codigo"
-            value={loadingConsecutive ? "Generando..." : (consecutivo || "Error al generar")}
-            readOnly
-            disabled
-            placeholder="Se generará automáticamente"
+            value={loadingConsecutive ? "Generando..." : codigoDisplay}
+            onChange={(e) => handleCodigoChange(e.target.value)}
+            placeholder="Ej: RM-001"
+            required
+            disabled={loadingConsecutive}
           />
 
           {/* Descripción */}

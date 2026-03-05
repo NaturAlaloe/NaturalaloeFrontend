@@ -11,7 +11,8 @@ import { useProcedureCode } from "./useProcedureCode";
 import { useProcedureFormState } from "./useProcedureFormState";
 import { useProcedureFormHandlers } from "./useProcedureFormHandlers";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { getActiveProcedures } from "../../services/procedures/procedureService";
 
 interface FormData {
   titulo: string;
@@ -82,22 +83,38 @@ export function useNewProcedureForm() {
   }, [departamentoSeleccionado, categoriaSeleccionada, fetchLastConsecutive]);
 
   // Código POE modularizado
-  const { codeApi, codeVisual } = useProcedureCode(
+  const { codeVisual } = useProcedureCode(
     departamentoSeleccionado,
     categoriaSeleccionada,
     lastConsecutive
   );
+
+  // Estado para código editable manualmente
+  const [codigoOverride, setCodigoOverride] = useState("");
+  const [isManualEdit, setIsManualEdit] = useState(false);
+
+  // Regex formato: 3 dígitos - 2 dígitos - 3 dígitos (ej: 001-01-001)
+  const CODE_REGEX = /^\d{3}-\d{2}-\d{3}$/;
+
+  // Valor mostrado: si el usuario no ha editado, se usa el auto-generado directamente
+  const codigoDisplay = isManualEdit ? codigoOverride : codeVisual;
+
+  const handleCodigoChange = useCallback((value: string) => {
+    setIsManualEdit(true);
+    setCodigoOverride(value);
+  }, []);
 
   // PDF
   const { pdfFile, setPdfFile, handlePdfChange, resetPdfInput, fileInputRef } =
     usePdfInput();
 
   // Reset
-  const limpiarFormulario = useFormReset(
-    initialState,
-    setFormData,
-    resetPdfInput
-  );
+  const _limpiarBase = useFormReset(initialState, setFormData, resetPdfInput);
+  const limpiarFormulario = useCallback(() => {
+    _limpiarBase();
+    setIsManualEdit(false);
+    setCodigoOverride("");
+  }, [_limpiarBase]);
 
   // Submit
   const { submitProcedure, loading: loadingSubmit } =
@@ -171,10 +188,41 @@ export function useNewProcedureForm() {
       );
       return;
     }
-    if (!codeApi) {
+    if (!codigoDisplay.trim()) {
       showCustomToast(
-        "Código no generado",
-        "Espera a que se genere el código del procedimiento automáticamente",
+        "Código requerido",
+        "Por favor, ingresa o espera a que se genere el código del procedimiento",
+        "error"
+      );
+      return;
+    }
+    if (!CODE_REGEX.test(codigoDisplay)) {
+      showCustomToast(
+        "Código inválido",
+        "El código debe seguir la estructura: 000-00-000",
+        "error"
+      );
+      return;
+    }
+
+    // Verificar que el código no exista en los procedimientos activos
+    try {
+      const procedures = await getActiveProcedures();
+      const exists = procedures.some(
+        (p) => p.codigo?.toLowerCase() === codigoDisplay.toLowerCase()
+      );
+      if (exists) {
+        showCustomToast(
+          "Código duplicado",
+          "Este código ya existe en los procedimientos activos.",
+          "error"
+        );
+        return;
+      }
+    } catch {
+      showCustomToast(
+        "Error de verificación",
+        "No se pudo verificar si el código ya existe. Intenta nuevamente.",
         "error"
       );
       return;
@@ -191,7 +239,7 @@ export function useNewProcedureForm() {
         fecha_creacion: formData.fechaCreacion,
         fecha_vigencia: formData.fechaVigencia,
         documento: pdfFile,
-        codigo: codeApi, // Solo depto-categoria
+        codigo: codigoDisplay,
       });
       limpiarFormulario();
     } catch {
@@ -223,5 +271,7 @@ export function useNewProcedureForm() {
     procedureCode: codeVisual,
     loadingConsecutivo,
     fileInputRef,
+    codigoDisplay,
+    handleCodigoChange,
   };
 }

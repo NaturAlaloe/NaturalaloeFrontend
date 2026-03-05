@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { createManapol } from "../../services/manapol/manapolService";
+import { useState, useCallback } from "react";
+import { createManapol, getManapolList } from "../../services/manapol/manapolService";
 import { showCustomToast } from "../../components/globalComponents/CustomToaster";
 import { useAreas } from "../procedureFormHooks/useAreas";
 import { useDepartments } from "../procedureFormHooks/useDepartments";
@@ -33,8 +33,21 @@ export function useCreateManapol() {
   const [formData, setFormData] = useState<CreateManapolFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
 
+  // Código editable manualmente
+  const [codigoOverride, setCodigoOverride] = useState("");
+  const [isManualEdit, setIsManualEdit] = useState(false);
+  const CODE_REGEX_RM = /^RM-\d{3}$/;
+
   // Hook para código consecutivo
   const { consecutivo, loading: loadingConsecutive, refreshConsecutive } = useLastConsecutive();
+
+  // Valor mostrado: si el usuario no ha editado, usa el auto-generado
+  const codigoDisplay = isManualEdit ? codigoOverride : (consecutivo || "");
+
+  const handleCodigoChange = useCallback((value: string) => {
+    setIsManualEdit(true);
+    setCodigoOverride(value);
+  }, []);
 
   // Hooks para datos auxiliares
   const { areas, loading: loadingAreas } = useAreas();
@@ -135,9 +148,34 @@ export function useCreateManapol() {
       return;
     }
 
+    if (!codigoDisplay.trim()) {
+      showCustomToast("Código requerido", "Espera a que se genere el código o ingrésalo manualmente", "error");
+      return;
+    }
+
+    if (!CODE_REGEX_RM.test(codigoDisplay)) {
+      showCustomToast("Código inválido", "El código debe seguir la estructura: RM-000", "error");
+      return;
+    }
+
+    // Verificar que el código no exista
+    try {
+      const rawData = await getManapolList();
+      const lista = Array.isArray(rawData) ? rawData : [];
+      const existe = lista.some((r: any) => r.codigo_rm?.toLowerCase() === codigoDisplay.toLowerCase());
+      if (existe) {
+        showCustomToast("Código duplicado", "Este código ya existe en los registros maestros.", "error");
+        return;
+      }
+    } catch {
+      showCustomToast("Error de verificación", "No se pudo verificar si el código ya existe.", "error");
+      return;
+    }
+
     setSaving(true);
     try {
       const formDataToSend = new FormData();
+      formDataToSend.append("codigo", codigoDisplay);
       formDataToSend.append("descripcion", formData.descripcion.trim());
       formDataToSend.append("id_area", formData.id_area);
       formDataToSend.append("departamento", formData.departamento);
@@ -145,13 +183,13 @@ export function useCreateManapol() {
       formDataToSend.append("version", formData.version);
       formDataToSend.append("fecha_creacion", formData.fecha_creacion);
       formDataToSend.append("fecha_vigencia", formData.fecha_vigencia);
-      
+
       if (pdfFile) {
         formDataToSend.append("documento", pdfFile);
       }
 
       await createManapol(formDataToSend);
-      
+
       showCustomToast(
         "Éxito",
         "Registro Manapol creado exitosamente",
@@ -161,6 +199,8 @@ export function useCreateManapol() {
       // Resetear formulario
       setFormData(initialFormData);
       resetPdfInput();
+      setIsManualEdit(false);
+      setCodigoOverride("");
 
       // Obtener nuevo código consecutivo
       try {
@@ -209,5 +249,8 @@ export function useCreateManapol() {
     handlePdfChange,
     removePdf,
     fileInputRef,
+    // Código editable
+    codigoDisplay,
+    handleCodigoChange,
   };
 }
